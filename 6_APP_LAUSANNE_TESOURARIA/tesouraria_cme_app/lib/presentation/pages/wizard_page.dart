@@ -161,18 +161,9 @@ class _WizardPageState extends State<WizardPage> {
       try {
         final serverDraft = await FechamentoApiService().getDraftFromServer();
         if (serverDraft != null && mounted && _phase == ClosingPhase.counting) {
-          // Only restore if the list or physical total changed on the server to prevent UI stutter
-          if (serverDraft.identifiedEntries.length != _bloc.state.identifiedEntries.length ||
-              serverDraft.anonymousEntries.length != _bloc.state.anonymousEntries.length ||
-              serverDraft.physicalTotal != _bloc.state.physicalTotal ||
-              serverDraft.coTreasurer != _bloc.state.coTreasurer ||
-              serverDraft.mainTreasurer != _bloc.state.mainTreasurer) {
-            _bloc.add(RestoreDraftEvent(serverDraft));
-            setState(() {
-              _selectedDate = serverDraft.date ?? DateTime.now();
-              _coTreasurerController.text = serverDraft.coTreasurer ?? "";
-            });
-          }
+          // A sincronização ativa de rascunho do servidor foi removida.
+          // O timer serve agora apenas para verificar se a sessão continua válida (sem disparar UNAUTHORIZED).
+          // O estado local é a fonte da verdade enquanto o usuário está digitando.
         }
       } catch (e) {
         if (e.toString().contains('UNAUTHORIZED') && mounted) {
