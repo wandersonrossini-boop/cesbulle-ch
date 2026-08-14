@@ -24,6 +24,8 @@ class _LoginPageState extends State<LoginPage> {
   String? _errorMessage;
   Timer? _coldStartTimer;
 
+  bool _obscurePassword = true;
+
   @override
   void dispose() {
     _coldStartTimer?.cancel();
@@ -216,263 +218,345 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        // Dark blue elegant background
         decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/login_bg.png'),
-            fit: BoxFit.cover,
+          gradient: LinearGradient(
+            colors: [Color(0xFF031224), Color(0xFF06203D)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
         ),
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 420),
-              child: Container(
-                padding: const EdgeInsets.all(40.0),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.6),
-                  borderRadius: BorderRadius.circular(32),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      blurRadius: 30,
-                      offset: const Offset(0, 15),
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Logo / Icon
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryGreen,
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Logo / Icon
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryGreen.withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.account_balance_wallet_rounded,
-                        size: 56,
-                        color: AppTheme.primaryGreen,
-                      ),
+                    child: const Icon(
+                      Icons.account_balance_wallet_rounded,
+                      size: 36,
+                      color: Colors.white,
                     ),
-                    const SizedBox(height: 24),
-                    // Titles
-                    Text(
-                      "CME Lausanne",
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        letterSpacing: -0.5,
-                      ),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Titles
+                  const Text(
+                    "CME Lausanne",
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      letterSpacing: -0.5,
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      "Acesso da Tesouraria",
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    "T E S O U R A R I A",
+                    style: TextStyle(
+                      color: AppTheme.primaryGreen,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 4.0,
                     ),
-                    const SizedBox(height: 40),
-                    // Inputs
-                    TextField(
-                      controller: _usernameController,
-                      style: const TextStyle(fontSize: 16, color: Colors.white),
-                      decoration: InputDecoration(
-                        labelText: 'Usuário',
-                        labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
-                        prefixIcon: Icon(Icons.person_outline, color: Colors.white.withValues(alpha: 0.6)),
-                        filled: true,
-                        fillColor: Colors.white.withValues(alpha: 0.1),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+                  ),
+                  
+                  const SizedBox(height: 16),
+                  const Divider(color: Color(0xFF1E3A5F), thickness: 1, indent: 40, endIndent: 40),
+                  const SizedBox(height: 32),
+
+                  // White Card
+                  Container(
+                    padding: const EdgeInsets.all(32.0),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8FAFC), // slightly off-white for a cleaner look
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.3),
+                          blurRadius: 40,
+                          offset: const Offset(0, 20),
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppTheme.primaryGreen, width: 2),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 20),
-                      ),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-                    TextField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      style: const TextStyle(fontSize: 16, color: Colors.white),
-                      decoration: InputDecoration(
-                        labelText: 'Senha',
-                        labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
-                        prefixIcon: Icon(Icons.lock_outline, color: Colors.white.withValues(alpha: 0.6)),
-                        filled: true,
-                        fillColor: Colors.white.withValues(alpha: 0.1),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppTheme.primaryGreen, width: 2),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 20),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    // Lembrar-me e Esqueci minha senha
-                    Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      crossAxisAlignment: WrapCrossAlignment.center,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Checkbox(
-                              value: _rememberMe,
-                              onChanged: (value) {
+                        // USUÁRIO
+                        const Text(
+                          "USUÁRIO",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF475569),
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _usernameController,
+                          textInputAction: TextInputAction.next,
+                          style: const TextStyle(fontSize: 15, color: Color(0xFF0F172A)),
+                          decoration: InputDecoration(
+                            hintText: 'Informe seu usuário',
+                            hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 15),
+                            prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFF475569), size: 22),
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(6),
+                              borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(6),
+                              borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(6),
+                              borderSide: const BorderSide(color: AppTheme.primaryGreen, width: 2),
+                            ),
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 24),
+                        
+                        // SENHA
+                        const Text(
+                          "SENHA",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF475569),
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _passwordController,
+                          obscureText: _obscurePassword,
+                          textInputAction: TextInputAction.done,
+                          onSubmitted: (_) => _login(),
+                          style: const TextStyle(fontSize: 15, color: Color(0xFF0F172A)),
+                          decoration: InputDecoration(
+                            hintText: 'Informe sua senha',
+                            hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 15),
+                            prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF475569), size: 22),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                color: const Color(0xFF475569),
+                                size: 20,
+                              ),
+                              onPressed: () {
                                 setState(() {
-                                  _rememberMe = value ?? false;
+                                  _obscurePassword = !_obscurePassword;
                                 });
                               },
-                              activeColor: AppTheme.primaryGreen,
-                              checkColor: Colors.white,
-                              side: BorderSide(color: Colors.white.withValues(alpha: 0.6)),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4),
-                              ),
                             ),
-                            Text(
-                              "Lembrar-me",
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.9),
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(6),
+                              borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(6),
+                              borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(6),
+                              borderSide: const BorderSide(color: AppTheme.primaryGreen, width: 2),
+                            ),
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 20),
+                        
+                        // Lembrar-me e Esqueci minha senha
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: Checkbox(
+                                    value: _rememberMe,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _rememberMe = value ?? false;
+                                      });
+                                    },
+                                    activeColor: AppTheme.primaryGreen,
+                                    side: const BorderSide(color: Color(0xFF94A3B8), width: 1.5),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  "Lembrar-me",
+                                  style: TextStyle(
+                                    color: Color(0xFF334155),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    title: const Text("Esqueci minha senha", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                                    content: const Text(
+                                      "Por razões de segurança, a redefinição de senha deve ser solicitada diretamente ao Administrador do Sistema ou à Secretaria CME.",
+                                      style: TextStyle(color: Color(0xFF475569)),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: const Text("ENTENDIDO"),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                              child: const Text(
+                                "Esqueci a senha",
+                                style: TextStyle(
+                                  color: AppTheme.primaryGreen,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ],
                         ),
-                        TextButton(
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                title: const Text("Esqueci minha senha"),
-                                content: const Text(
-                                  "Por razões de segurança, a redefinição de senha deve ser solicitada diretamente ao Administrador do Sistema ou à Secretaria CME.",
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: const Text("ENTENDIDO"),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            "Esqueci a senha",
-                            style: TextStyle(
-                              color: AppTheme.primaryGreen,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                        
+                        const SizedBox(height: 32),
+                        
+                        // Error Message
+                        if (_errorMessage != null)
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            margin: const EdgeInsets.only(bottom: 24),
+                            decoration: BoxDecoration(
+                              color: AppTheme.excludeRed.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(6),
                             ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.error_outline, color: AppTheme.excludeRed, size: 20),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    _errorMessage!,
+                                    style: const TextStyle(color: AppTheme.excludeRed, fontWeight: FontWeight.w600, fontSize: 13),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          
+                        // Login Button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: ElevatedButton(
+                            onPressed: _isLoading ? null : _login,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF1F6030), // Dark green matching the mockup
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                                  )
+                                : const Text(
+                                    'ENTRAR',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 1.0,
+                                    ),
+                                  ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
-                    // Error Message
-                    if (_errorMessage != null)
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        margin: const EdgeInsets.only(bottom: 24),
-                        decoration: BoxDecoration(
-                          color: AppTheme.excludeRed.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.error_outline, color: AppTheme.excludeRed, size: 20),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                _errorMessage!,
-                                style: const TextStyle(color: AppTheme.excludeRed, fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    // Login Button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 56,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? null : _login,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primaryGreen,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: _isLoading
-                            ? const SizedBox(
-                                height: 24,
-                                width: 24,
-                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
-                              )
-                            : const Text(
-                                'ENTRAR',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1.2,
-                                ),
-                              ),
+                  ),
+                  
+                  const SizedBox(height: 48),
+                  
+                  // Request Access Button (Keeping functionality)
+                  TextButton(
+                    onPressed: () => _showRegisterDialog(),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white.withValues(alpha: 0.7),
+                    ),
+                    child: const Text(
+                      "Novo Tesoureiro? Solicitar Acesso",
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        decoration: TextDecoration.underline,
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    // Request Access Button
-                    TextButton(
-                      onPressed: () => _showRegisterDialog(),
-                      child: const Text(
-                        "Novo Tesoureiro? Solicitar Acesso",
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          decoration: TextDecoration.underline,
-                        ),
+                  ),
+                  
+                  if (_showColdStartNotice) ...[
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Conectando ao servidor. A primeira conexão pode levar alguns segundos...',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                        fontStyle: FontStyle.italic,
                       ),
+                      textAlign: TextAlign.center,
                     ),
-                    if (_showColdStartNotice) ...[
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Conectando ao servidor. A primeira conexão pode levar alguns segundos...',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                          fontStyle: FontStyle.italic,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
                   ],
-                ),
+
+                  const SizedBox(height: 12),
+                  // Footer
+                  Text(
+                    "CME Lausanne  •  Tesouraria\nv1.0.0",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.4),
+                      fontSize: 12,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
