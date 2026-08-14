@@ -29,7 +29,7 @@ public class DataInitializer implements CommandLineRunner {
             admin.setRole("ADMIN");
             admin.setAuthorized(true);
             userRepository.save(admin);
-            logger.info(">>> Usuário ADMIN (pastor) verificado/criado com sucesso!");
+            logger.info(">>> Configured default admin user.");
         } else {
             // Atualizar a senha do pastor caso já exista, para garantir o acesso neste momento
             AppUser pastor = userRepository.findByUsername("pastor").get();
@@ -37,13 +37,7 @@ public class DataInitializer implements CommandLineRunner {
             pastor.setAuthorized(true);
             pastor.setRole("ADMIN");
             userRepository.save(pastor);
-            logger.info(">>> Usuário ADMIN (pastor) atualizado com sucesso!");
+            logger.info(">>> Verified default admin user credentials.");
         }
-
-        // Print existing users for debugging
-        userRepository.findAll().forEach(user -> {
-            logger.info(">>> USER IN DB: username={}, role={}, isAuthorized={}", 
-                user.getUsername(), user.getRole(), user.isAuthorized());
-        });
     }
 }

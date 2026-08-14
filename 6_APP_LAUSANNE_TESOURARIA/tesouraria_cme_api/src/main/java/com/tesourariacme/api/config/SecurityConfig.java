@@ -21,7 +21,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     
-    @org.springframework.beans.factory.annotation.Value("${cors.allowed.origins:*}")
+    @org.springframework.beans.factory.annotation.Value("${cors.allowed.origins:https://cme-lausanne-mvp-12345.web.app,http://localhost:8080,http://localhost:3000,http://localhost:5000}")
     private String corsAllowedOrigins;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter) {
@@ -37,23 +37,30 @@ public class SecurityConfig {
                 config.setAllowedOrigins(java.util.Arrays.asList(corsAllowedOrigins.split(",")));
                 config.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                 config.setAllowedHeaders(java.util.Arrays.asList("*"));
+                config.setAllowCredentials(true);
                 return config;
             }))
+            .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.getWriter().write("{\"error\": \"Não autenticado. Por favor, forneça um token válido.\"}");
+                })
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN);
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.getWriter().write("{\"error\": \"Acesso negado. Você não tem permissão para acessar este recurso.\"}");
+                })
+            )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/debug-users").permitAll()
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/membros/**").permitAll()
+                .requestMatchers("/api/auth/health").permitAll()
+                .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
             
         return http.build();
-    }
-
-    @Bean
-    public org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/api/auth/debug-users");
     }
 
     @Bean
