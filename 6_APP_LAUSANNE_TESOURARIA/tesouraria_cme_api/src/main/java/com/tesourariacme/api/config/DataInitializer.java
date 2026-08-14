@@ -19,23 +19,23 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (userRepository.count() == 0) {
-            AppUser admin = new AppUser();
+        if (userRepository.findByUsername("pastor").isEmpty()) {
+            AppUser admin = userRepository.findByUsername("admin").orElse(new AppUser());
             admin.setUsername("pastor");
             admin.setName("Administrador do Sistema");
-            admin.setPasswordHash(passwordEncoder.encode("Pr.124578.")); // Senha padrão inicial
+            admin.setPasswordHash(passwordEncoder.encode("Pr.124578."));
             admin.setRole("ADMIN");
             admin.setAuthorized(true);
             userRepository.save(admin);
-            System.out.println("Usuário ADMIN criado com sucesso: pastor / Pr.124578.");
+            System.out.println("Usuário ADMIN (pastor) verificado/criado com sucesso!");
         } else {
-            // Se o banco já existe e o admin antigo ainda está lá, vamos atualizá-lo
-            userRepository.findByUsername("admin").ifPresent(admin -> {
-                admin.setUsername("pastor");
-                admin.setPasswordHash(passwordEncoder.encode("Pr.124578."));
-                userRepository.save(admin);
-                System.out.println("Usuário ADMIN atualizado para: pastor / Pr.124578.");
-            });
+            // Atualizar a senha do pastor caso já exista, para garantir o acesso neste momento
+            AppUser pastor = userRepository.findByUsername("pastor").get();
+            pastor.setPasswordHash(passwordEncoder.encode("Pr.124578."));
+            pastor.setAuthorized(true);
+            pastor.setRole("ADMIN");
+            userRepository.save(pastor);
+            System.out.println("Usuário ADMIN (pastor) atualizado com sucesso!");
         }
     }
 }
