@@ -28,6 +28,14 @@ public class DataInitializer implements CommandLineRunner {
             admin.setAuthorized(true);
             userRepository.save(admin);
             System.out.println("Usuário ADMIN criado com sucesso: pastor / Pr.124578.");
+        } else {
+            // Se o banco já existe e o admin antigo ainda está lá, vamos atualizá-lo
+            userRepository.findByUsername("admin").ifPresent(admin -> {
+                admin.setUsername("pastor");
+                admin.setPasswordHash(passwordEncoder.encode("Pr.124578."));
+                userRepository.save(admin);
+                System.out.println("Usuário ADMIN atualizado para: pastor / Pr.124578.");
+            });
         }
     }
 }
