@@ -11,6 +11,7 @@ import '../../core/theme.dart';
 import '../../services/draft_service.dart';
 import '../../services/fechamento_api_service.dart';
 import '../../services/auth_api_service.dart';
+import '../../services/user_api_service.dart';
 import '../widgets/app_sidebar_drawer.dart';
 import 'dashboard_page.dart';
 import 'login_page.dart';
@@ -43,12 +44,27 @@ class _WizardPageState extends State<WizardPage> {
   late final ServiceClosingBloc _bloc;
   final DraftService _draftService = DraftService();
   Timer? _syncTimer;
+  List<AppUser> _availableTreasurers = [];
+  String? _selectedCoTreasurer;
 
   @override
   void initState() {
     super.initState();
     _bloc = ServiceClosingBloc()..add(LoadMembersEvent());
     _checkForDraft();
+    _loadTreasurers();
+  }
+
+  Future<void> _loadTreasurers() async {
+    try {
+      final users = await UserApiService().getAllUsers();
+      final currentUserName = await _getCurrentUserName();
+      if (mounted) {
+        setState(() {
+          _availableTreasurers = users.where((u) => u.isAuthorized && u.name != currentUserName).toList();
+        });
+      }
+    } catch (_) {}
   }
 
   Future<String> _getCurrentUserName() async {
@@ -161,9 +177,12 @@ class _WizardPageState extends State<WizardPage> {
       try {
         final serverDraft = await FechamentoApiService().getDraftFromServer();
         if (serverDraft != null && mounted && _phase == ClosingPhase.counting) {
-          // A sincronização ativa de rascunho do servidor foi removida.
-          // O timer serve agora apenas para verificar se a sessão continua válida (sem disparar UNAUTHORIZED).
-          // O estado local é a fonte da verdade enquanto o usuário está digitando.
+          // Sync check ok
+        }
+        // Save local draft
+        final state = _bloc.state;
+        if (state.date != null && _phase == ClosingPhase.counting) {
+          await _draftService.saveDraft(state);
         }
       } catch (e) {
         if (e.toString().contains('UNAUTHORIZED') && mounted) {
@@ -370,8 +389,38 @@ class _WizardPageState extends State<WizardPage> {
                 ),
                 
                 // Space between date and button
-                SizedBox(height: isDesktop ? 100 : 80),
+                SizedBox(height: isDesktop ? 60 : 40),
                 
+                // Co-treasurer selector
+                const Text("Tesoureiro Auxiliar (Opcional)", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
+                const SizedBox(height: 8),
+                Container(
+                  width: isDesktop ? 360 : double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      value: _selectedCoTreasurer,
+                      hint: const Text("Selecione um auxiliar..."),
+                      items: _availableTreasurers.map((u) {
+                        return DropdownMenuItem<String>(
+                          value: u.name,
+                          child: Text(u.name),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        setState(() => _selectedCoTreasurer = val);
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32),
+
                 // INICIAR button
                 Container(
                   width: isDesktop ? 360 : double.infinity,
@@ -395,7 +444,7 @@ class _WizardPageState extends State<WizardPage> {
                         final currentUserName = await _getCurrentUserName();
                         if (context.mounted) {
                           context.read<ServiceClosingBloc>().add(
-                            InitializeClosingContextEvent(_selectedDate, currentUserName, '')
+                            InitializeClosingContextEvent(_selectedDate, currentUserName, _selectedCoTreasurer ?? '')
                           );
                           setState(() => _phase = ClosingPhase.counting);
                           _startSyncTimer();
@@ -423,7 +472,7 @@ class _WizardPageState extends State<WizardPage> {
                 Container(
                   constraints: const BoxConstraints(maxWidth: 380),
                   child: const Text(
-                    "Ao iniciar, você poderá registrar os valores de dízimos, ofertas e votos e finalizar o fechamento.",
+                    "Ao iniciar, seus lançamentos serão salvos como rascunho no servidor e localmente, permitindo retomar de onde parou.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,

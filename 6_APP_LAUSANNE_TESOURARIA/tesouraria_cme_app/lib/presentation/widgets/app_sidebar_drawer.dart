@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
 import '../../services/auth_api_service.dart';
+import '../../services/user_api_service.dart';
 import '../pages/login_page.dart';
 import '../pages/dashboard_page.dart';
 import '../pages/wizard_page.dart';
@@ -10,8 +12,10 @@ import '../pages/reports_page.dart';
 import '../pages/movements_page.dart';
 import '../pages/expenses_page.dart';
 import '../pages/settings_page.dart';
+import '../pages/profile_page.dart';
+import '../pages/admin_users_page.dart';
 
-class AppSidebarDrawer extends StatelessWidget {
+class AppSidebarDrawer extends StatefulWidget {
   final String activeRoute;
   final bool permanent;
 
@@ -20,6 +24,28 @@ class AppSidebarDrawer extends StatelessWidget {
     this.activeRoute = 'dashboard',
     this.permanent = false,
   });
+
+  @override
+  State<AppSidebarDrawer> createState() => _AppSidebarDrawerState();
+}
+
+class _AppSidebarDrawerState extends State<AppSidebarDrawer> {
+  AppUser? _user;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    try {
+      final user = await UserApiService().getMyProfile();
+      if (mounted) setState(() => _user = user);
+    } catch (_) {
+      // Ignorar, mantém _user nulo
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,9 +102,9 @@ class AppSidebarDrawer extends StatelessWidget {
                   context: context,
                   icon: Icons.grid_view_rounded,
                   title: 'Visão geral',
-                  isActive: activeRoute == 'dashboard',
+                  isActive: widget.activeRoute == 'dashboard',
                   onTap: () {
-                    if (!permanent) Navigator.pop(context);
+                    if (!widget.permanent) Navigator.pop(context);
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(builder: (_) => const DashboardScreen()),
                     );
@@ -88,9 +114,9 @@ class AppSidebarDrawer extends StatelessWidget {
                   context: context,
                   icon: Icons.add_circle_outline_rounded,
                   title: 'Novo fechamento',
-                  isActive: activeRoute == 'fechamento',
+                  isActive: widget.activeRoute == 'fechamento',
                   onTap: () {
-                    if (!permanent) Navigator.pop(context);
+                    if (!widget.permanent) Navigator.pop(context);
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(builder: (_) => const WizardPage()),
                     );
@@ -100,9 +126,9 @@ class AppSidebarDrawer extends StatelessWidget {
                   context: context,
                   icon: Icons.receipt_long_rounded,
                   title: 'Movimentos',
-                  isActive: activeRoute == 'movimentos',
+                  isActive: widget.activeRoute == 'movimentos',
                   onTap: () {
-                    if (!permanent) Navigator.pop(context);
+                    if (!widget.permanent) Navigator.pop(context);
                     Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (_) => const MovementsPage(),
                     ));
@@ -112,9 +138,9 @@ class AppSidebarDrawer extends StatelessWidget {
                   context: context,
                   icon: Icons.people_outline_rounded,
                   title: 'Contribuintes',
-                  isActive: activeRoute == 'contribuintes',
+                  isActive: widget.activeRoute == 'contribuintes',
                   onTap: () {
-                    if (!permanent) Navigator.pop(context);
+                    if (!widget.permanent) Navigator.pop(context);
                     Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (_) => const MembersPage(),
                     ));
@@ -124,9 +150,9 @@ class AppSidebarDrawer extends StatelessWidget {
                   context: context,
                   icon: Icons.account_balance_wallet_outlined,
                   title: 'Despesas',
-                  isActive: activeRoute == 'despesas',
+                  isActive: widget.activeRoute == 'despesas',
                   onTap: () {
-                    if (!permanent) Navigator.pop(context);
+                    if (!widget.permanent) Navigator.pop(context);
                     Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (_) => const ExpensesPage(),
                     ));
@@ -136,9 +162,9 @@ class AppSidebarDrawer extends StatelessWidget {
                   context: context,
                   icon: Icons.point_of_sale_rounded,
                   title: 'Fechamentos',
-                  isActive: activeRoute == 'fechamentos',
+                  isActive: widget.activeRoute == 'fechamentos',
                   onTap: () {
-                    if (!permanent) Navigator.pop(context);
+                    if (!widget.permanent) Navigator.pop(context);
                     Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (_) => const HistoryPage(),
                     ));
@@ -148,21 +174,46 @@ class AppSidebarDrawer extends StatelessWidget {
                   context: context,
                   icon: Icons.bar_chart_rounded,
                   title: 'Relatórios',
-                  isActive: activeRoute == 'relatorios',
+                  isActive: widget.activeRoute == 'relatorios',
                   onTap: () {
-                    if (!permanent) Navigator.pop(context);
+                    if (!widget.permanent) Navigator.pop(context);
                     Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (_) => const ReportsPage(),
+                    ));
+                  },
+                ),
+                if (_user?.role == 'ADMIN')
+                  _buildMenuItem(
+                    context: context,
+                    icon: Icons.admin_panel_settings_outlined,
+                    title: 'Admin de Usuários',
+                    isActive: widget.activeRoute == 'admin_users',
+                    onTap: () {
+                      if (!widget.permanent) Navigator.pop(context);
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
+                        builder: (_) => const AdminUsersPage(),
+                      ));
+                    },
+                  ),
+                _buildMenuItem(
+                  context: context,
+                  icon: Icons.person_outline,
+                  title: 'Meu Perfil',
+                  isActive: widget.activeRoute == 'perfil',
+                  onTap: () {
+                    if (!widget.permanent) Navigator.pop(context);
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (_) => const ProfilePage(),
                     ));
                   },
                 ),
                 _buildMenuItem(
                   context: context,
                   icon: Icons.settings_outlined,
-                  title: 'Configurações',
-                  isActive: activeRoute == 'configuracoes',
+                  title: 'Configurações App',
+                  isActive: widget.activeRoute == 'configuracoes',
                   onTap: () {
-                    if (!permanent) Navigator.pop(context);
+                    if (!widget.permanent) Navigator.pop(context);
                     Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (_) => const SettingsPage(),
                     ));
@@ -185,21 +236,24 @@ class AppSidebarDrawer extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     backgroundColor: Colors.white.withValues(alpha: 0.2),
-                    child: const Text('A', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    backgroundImage: _user?.avatarBase64 != null ? MemoryImage(base64Decode(_user!.avatarBase64!)) : null,
+                    child: _user?.avatarBase64 == null
+                        ? Text(_user != null && _user!.name.isNotEmpty ? _user!.name[0].toUpperCase() : '?', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))
+                        : null,
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Admilson Silva',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                          _user?.name ?? 'Carregando...',
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
-                          'Tesoureiro',
-                          style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 11),
+                          _user?.role == 'ADMIN' ? 'Administrador' : 'Tesoureiro',
+                          style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 11),
                         ),
                       ],
                     ),
@@ -223,7 +277,7 @@ class AppSidebarDrawer extends StatelessWidget {
       ),
     );
 
-    if (permanent) {
+    if (widget.permanent) {
       return SizedBox(
         width: 260,
         child: content,

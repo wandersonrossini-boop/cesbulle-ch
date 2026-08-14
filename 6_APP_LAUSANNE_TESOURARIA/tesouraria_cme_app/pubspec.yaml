@@ -15,6 +15,8 @@ dependencies:
   intl: ^0.18.1
   shared_preferences: ^2.2.2
   share_plus: ^13.3.0
+  image_picker: ^1.0.7
+  image: ^4.1.4
 
 dev_dependencies:
   flutter_test:

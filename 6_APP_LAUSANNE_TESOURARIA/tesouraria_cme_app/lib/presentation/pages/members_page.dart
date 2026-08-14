@@ -70,6 +70,73 @@ class _MembersPageState extends State<MembersPage> {
     }
   }
 
+  void _showCreateDialog() {
+    final ctrl = TextEditingController();
+    bool isSaving = false;
+    String? error;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: const Text('Novo Contribuinte', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: ctrl,
+                  decoration: const InputDecoration(labelText: 'Nome', border: OutlineInputBorder()),
+                  autofocus: true,
+                ),
+                if (error != null) ...[
+                  const SizedBox(height: 8),
+                  Text(error!, style: const TextStyle(color: AppTheme.excludeRed, fontSize: 13)),
+                ]
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: isSaving ? null : () => Navigator.pop(ctx),
+                child: const Text('CANCELAR'),
+              ),
+              ElevatedButton(
+                onPressed: isSaving
+                    ? null
+                    : () async {
+                        final name = ctrl.text.trim();
+                        if (name.isEmpty) return;
+                        setModalState(() {
+                          isSaving = true;
+                          error = null;
+                        });
+                        try {
+                          await _apiService.createMember(name);
+                          if (ctx.mounted) {
+                            Navigator.pop(ctx);
+                            _loadMembers();
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Contribuinte adicionado!')));
+                          }
+                        } catch (e) {
+                          setModalState(() {
+                            isSaving = false;
+                            error = e.toString().replaceFirst('Exception: ', '');
+                          });
+                        }
+                      },
+                style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryGreen),
+                child: isSaving
+                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    : const Text('SALVAR', style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
   Future<void> _showRenameDialog(MemberDetail member) async {
     final controller = TextEditingController(text: member.name);
     final formKey = GlobalKey<FormState>();
@@ -244,6 +311,12 @@ class _MembersPageState extends State<MembersPage> {
               ),
             ),
       body: body,
+      floatingActionButton: isDesktop ? null : FloatingActionButton.extended(
+        onPressed: _showCreateDialog,
+        backgroundColor: AppTheme.primaryGreen,
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text('NOVO CONTRIBUINTE', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
     );
   }
 
@@ -310,36 +383,52 @@ class _MembersPageState extends State<MembersPage> {
   }
 
   Widget _buildHeader(bool isDesktop) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
-          'MEMBROS',
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF64748B),
-            letterSpacing: 1.5,
-          ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'MEMBROS',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF64748B),
+                letterSpacing: 1.5,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Contribuintes',
+              style: TextStyle(
+                fontSize: isDesktop ? 24 : 20,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF0F172A),
+                letterSpacing: -0.5,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Gerencie os membros cadastrados na base de dados da tesouraria.',
+              style: TextStyle(
+                fontSize: isDesktop ? 13 : 12,
+                color: const Color(0xFF64748B),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 4),
-        Text(
-          'Contribuintes',
-          style: TextStyle(
-            fontSize: isDesktop ? 24 : 20,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF0F172A),
-            letterSpacing: -0.5,
+        if (isDesktop)
+          ElevatedButton.icon(
+            onPressed: _showCreateDialog,
+            icon: const Icon(Icons.add, color: Colors.white, size: 20),
+            label: const Text('NOVO CONTRIBUINTE', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primaryGreen,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'Gerencie os membros cadastrados na base de dados da tesouraria.',
-          style: TextStyle(
-            fontSize: isDesktop ? 13 : 12,
-            color: const Color(0xFF64748B),
-          ),
-        ),
       ],
     );
   }

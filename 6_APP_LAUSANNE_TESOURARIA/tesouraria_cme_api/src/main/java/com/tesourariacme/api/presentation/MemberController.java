@@ -42,6 +42,22 @@ public class MemberController {
         return ResponseEntity.ok(result);
     }
 
+    // POST /api/membros — create a new member explicitly
+    @PostMapping
+    public ResponseEntity<?> createMember(@RequestBody Map<String, String> body) {
+        String name = body.getOrDefault("name", "").trim();
+        if (name.isEmpty()) {
+            return ResponseEntity.badRequest().body("O nome não pode ser vazio.");
+        }
+        if (memberRepository.findByNameIgnoreCase(name).isPresent()) {
+            return ResponseEntity.badRequest().body("Já existe um contribuinte com este nome.");
+        }
+        Member newMember = new Member();
+        newMember.setName(name);
+        memberRepository.save(newMember);
+        return ResponseEntity.ok(Map.of("id", newMember.getId(), "name", newMember.getName()));
+    }
+
     // PUT /api/membros/{id} — rename a member
     @PutMapping("/{id}")
     public ResponseEntity<?> renameMember(@PathVariable Long id, @RequestBody Map<String, String> body) {

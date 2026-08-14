@@ -1,5 +1,8 @@
-import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:image/image.dart' as img;
 import '../../services/auth_api_service.dart';
 import '../../core/theme.dart';
 import 'dashboard_page.dart';
@@ -48,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
-      final success = await _authService.login(
+      final errorMsg = await _authService.login(
         _usernameController.text,
         _passwordController.text,
       );
@@ -62,7 +65,11 @@ class _LoginPageState extends State<LoginPage> {
         });
       }
 
-      if (success) {
+      if (errorMsg == null) {
+        // Success
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('remember_me', _rememberMe);
+        
         if (!mounted) return;
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const DashboardScreen()),
@@ -70,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         if (mounted) {
           setState(() {
-            _errorMessage = 'Credenciais inválidas ou tempo esgotado. Tente novamente.';
+            _errorMessage = errorMsg;
           });
         }
       }
@@ -84,6 +91,125 @@ class _LoginPageState extends State<LoginPage> {
         });
       }
     }
+  }
+
+  void _showRegisterDialog() {
+    final nameCtrl = TextEditingController();
+    final userCtrl = TextEditingController();
+    final passCtrl = TextEditingController();
+    bool isRegistering = false;
+    String? modalError;
+    String? base64Avatar;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: const Text('Solicitar Acesso'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Preencha seus dados. O acesso só será liberado após a aprovação do Administrador.',
+                    style: TextStyle(fontSize: 13, color: Colors.black87),
+                  ),
+                  const SizedBox(height: 16),
+                  GestureDetector(
+                    onTap: () async {
+                      final picker = ImagePicker();
+                      final xfile = await picker.pickImage(source: ImageSource.gallery, maxWidth: 300, maxHeight: 300);
+                      if (xfile != null) {
+                        final bytes = await xfile.readAsBytes();
+                        // Compress aggressively
+                        final image = img.decodeImage(bytes);
+                        if (image != null) {
+                          final resized = img.copyResize(image, width: 150, height: 150);
+                          final jpegBytes = img.encodeJpg(resized, quality: 60);
+                          setModalState(() {
+                            base64Avatar = base64Encode(jpegBytes);
+                          });
+                        }
+                      }
+                    },
+                    child: CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Colors.grey.shade200,
+                      backgroundImage: base64Avatar != null ? MemoryImage(base64Decode(base64Avatar!)) : null,
+                      child: base64Avatar == null
+                          ? const Icon(Icons.camera_alt, color: Colors.grey, size: 30)
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: nameCtrl,
+                    decoration: const InputDecoration(labelText: 'Nome Completo', border: OutlineInputBorder()),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: userCtrl,
+                    decoration: const InputDecoration(labelText: 'Nome de Usuário', border: OutlineInputBorder()),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: passCtrl,
+                    obscureText: true,
+                    decoration: const InputDecoration(labelText: 'Senha', border: OutlineInputBorder()),
+                  ),
+                  if (modalError != null) ...[
+                    const SizedBox(height: 12),
+                    Text(modalError!, style: const TextStyle(color: AppTheme.excludeRed, fontSize: 13)),
+                  ]
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: isRegistering ? null : () => Navigator.pop(ctx),
+                child: const Text('CANCELAR'),
+              ),
+              ElevatedButton(
+                onPressed: isRegistering
+                    ? null
+                    : () async {
+                        if (nameCtrl.text.isEmpty || userCtrl.text.isEmpty || passCtrl.text.isEmpty) {
+                          setModalState(() => modalError = 'Preencha todos os campos.');
+                          return;
+                        }
+                        setModalState(() {
+                          isRegistering = true;
+                          modalError = null;
+                        });
+
+                        final err = await _authService.register(
+                            nameCtrl.text.trim(), userCtrl.text.trim(), passCtrl.text.trim(), base64Avatar);
+
+                        if (err != null) {
+                          setModalState(() {
+                            isRegistering = false;
+                            modalError = err;
+                          });
+                        } else {
+                          if (ctx.mounted) {
+                            Navigator.pop(ctx);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Solicitação enviada! Aguarde a aprovação.')),
+                            );
+                          }
+                        }
+                      },
+                child: isRegistering
+                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                    : const Text('ENVIAR'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -317,6 +443,20 @@ class _LoginPageState extends State<LoginPage> {
                                   letterSpacing: 1.2,
                                 ),
                               ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Request Access Button
+                    TextButton(
+                      onPressed: () => _showRegisterDialog(),
+                      child: const Text(
+                        "Novo Tesoureiro? Solicitar Acesso",
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
                     ),
                     if (_showColdStartNotice) ...[

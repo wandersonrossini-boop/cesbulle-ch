@@ -47,6 +47,22 @@ class MemberApiService {
     }
   }
 
+  Future<MemberDetail> createMember(String name) async {
+    final headers = await _authHeaders();
+    final response = await http.post(
+      Uri.parse('$_baseUrl/membros'),
+      headers: headers,
+      body: jsonEncode({'name': name}),
+    );
+    if (response.statusCode == 200) {
+      return MemberDetail.fromJson(jsonDecode(response.body));
+    } else if (response.statusCode == 401) {
+      throw Exception('UNAUTHORIZED');
+    } else {
+      throw Exception(response.body.isNotEmpty ? response.body : 'Erro ao criar contribuinte.');
+    }
+  }
+
   Future<void> renameMember(int id, String newName) async {
     final headers = await _authHeaders();
     final response = await http.put(
