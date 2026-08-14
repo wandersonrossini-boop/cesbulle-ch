@@ -65,6 +65,17 @@ public class AuthController {
         userRepository.save(newUser);
         return ResponseEntity.ok("Usuário cadastrado com sucesso. Aguardando aprovação.");
     }
+
+    @GetMapping("/debug-users")
+    public ResponseEntity<?> debugUsers() {
+        return ResponseEntity.ok(userRepository.findAll().stream().map(u -> 
+            java.util.Map.of(
+                "username", u.getUsername(),
+                "role", u.getRole(),
+                "isAuthorized", u.isAuthorized()
+            )
+        ).toList());
+    }
 }
 
 @Data
