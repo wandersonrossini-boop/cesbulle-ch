@@ -727,13 +727,30 @@ class _WizardPageState extends State<WizardPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Text(
-                        "Últimos lançamentos",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Últimos lançamentos",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF0F172A),
+                            ),
+                          ),
+                          if (allEntries.isNotEmpty)
+                            TextButton.icon(
+                              onPressed: () => _undoLastGlobalEntry(context, state),
+                              icon: const Icon(Icons.undo, size: 14),
+                              label: const Text("Desfazer último", style: TextStyle(fontSize: 12)),
+                              style: TextButton.styleFrom(
+                                foregroundColor: AppTheme.excludeRed,
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                            ),
+                        ],
                       ),
                       const SizedBox(height: 16),
                       if (allEntries.isEmpty)
@@ -949,8 +966,12 @@ class _WizardPageState extends State<WizardPage> {
     String filterText = "";
     
     Widget selectorContent(StateSetter setDialogState) {
-      final filteredMembers = state.knownMembers.where((m) => m.toLowerCase().contains(filterText.toLowerCase())).toList();
-      return Container(
+      return BlocBuilder<ServiceClosingBloc, ServiceClosingState>(
+        builder: (context, currentState) {
+          final filteredMembers = currentState.knownMembers
+              .where((m) => m.toLowerCase().contains(filterText.toLowerCase()))
+              .toList();
+          return Container(
         constraints: const BoxConstraints(maxHeight: 350),
         width: 320,
         child: Column(
@@ -977,10 +998,34 @@ class _WizardPageState extends State<WizardPage> {
             const Divider(),
             Expanded(
               child: filteredMembers.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Text("Nenhum contribuinte encontrado", style: TextStyle(color: Colors.grey, fontSize: 13)),
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text("Nenhum contribuinte encontrado", style: TextStyle(color: Colors.grey, fontSize: 13)),
+                            if (filterText.trim().isNotEmpty) ...[
+                              const SizedBox(height: 16),
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  context.read<ServiceClosingBloc>().add(AddLocalMemberEvent(filterText));
+                                  setState(() {
+                                    _memberNameController.text = filterText.trim();
+                                  });
+                                  Navigator.pop(context);
+                                },
+                                icon: const Icon(Icons.add, size: 18),
+                                label: Text('Adicionar "${filterText.trim()}"'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF1E3A8A),
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                     )
                   : ListView.builder(
@@ -1013,6 +1058,8 @@ class _WizardPageState extends State<WizardPage> {
               ),
           ],
         ),
+      );
+        },
       );
     }
 
@@ -1080,14 +1127,6 @@ class _WizardPageState extends State<WizardPage> {
       final entryId = DateTime.now().microsecondsSinceEpoch.toString();
       final envelope = Envelope(id: entryId, memberName: memberName, type: _selectedType, amount: rappen);
       context.read<ServiceClosingBloc>().add(AddEnvelopeEvent(envelope));
-      
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: const Text("Lançamento identificado salvo!"),
-        duration: const Duration(milliseconds: 1200),
-        behavior: SnackBarBehavior.floating,
-        action: SnackBarAction(label: "DESFAZER", textColor: Colors.yellow, onPressed: () => _bloc.add(UndoAddedEntryEvent(entryId))),
-      ));
     } else {
       // Anonymous
       final entry = AnonymousEntry(
@@ -1096,20 +1135,36 @@ class _WizardPageState extends State<WizardPage> {
         amount: rappen,
       );
       context.read<ServiceClosingBloc>().add(AddAnonymousOfferingEvent(entry));
-      
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("${_selectedType == EnvelopeType.dizimo ? 'Dízimo' : _selectedType == EnvelopeType.voto ? 'Voto' : 'Oferta'} anônima somada!"),
-        duration: const Duration(milliseconds: 1200),
-        behavior: SnackBarBehavior.floating,
-        action: SnackBarAction(label: "DESFAZER", textColor: Colors.yellow, onPressed: () => _bloc.add(UndoAnonymousOfferingEvent(entry.id))),
-      ));
     }
 
     _memberNameController.clear();
     setState(() {
       _keyboardBuffer = '0';
     });
+  }
+
+  void _undoLastGlobalEntry(BuildContext context, ServiceClosingState state) {
+    String? latestIdentifiedId;
+    int latestIdentifiedTime = 0;
+    if (state.identifiedEntries.isNotEmpty) {
+      latestIdentifiedId = state.identifiedEntries.last.id;
+      latestIdentifiedTime = int.tryParse(latestIdentifiedId) ?? 0;
+    }
+
+    String? latestAnonymousId;
+    int latestAnonymousTime = 0;
+    if (state.anonymousEntries.isNotEmpty) {
+      latestAnonymousId = state.anonymousEntries.last.id;
+      latestAnonymousTime = int.tryParse(latestAnonymousId) ?? 0;
+    }
+
+    if (latestIdentifiedTime == 0 && latestAnonymousTime == 0) return;
+
+    if (latestIdentifiedTime > latestAnonymousTime) {
+      _bloc.add(UndoAddedEntryEvent(latestIdentifiedId!));
+    } else {
+      _bloc.add(UndoAnonymousOfferingEvent(latestAnonymousId!));
+    }
   }
 
   Widget _buildReviewPhase(BuildContext context, ServiceClosingState state) {
