@@ -17,6 +17,8 @@ public class DataInitializer implements CommandLineRunner {
         this.passwordEncoder = passwordEncoder;
     }
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(DataInitializer.class);
+
     @Override
     public void run(String... args) {
         if (userRepository.findByUsername("pastor").isEmpty()) {
@@ -27,7 +29,7 @@ public class DataInitializer implements CommandLineRunner {
             admin.setRole("ADMIN");
             admin.setAuthorized(true);
             userRepository.save(admin);
-            System.out.println("Usuário ADMIN (pastor) verificado/criado com sucesso!");
+            logger.info(">>> Usuário ADMIN (pastor) verificado/criado com sucesso!");
         } else {
             // Atualizar a senha do pastor caso já exista, para garantir o acesso neste momento
             AppUser pastor = userRepository.findByUsername("pastor").get();
@@ -35,7 +37,13 @@ public class DataInitializer implements CommandLineRunner {
             pastor.setAuthorized(true);
             pastor.setRole("ADMIN");
             userRepository.save(pastor);
-            System.out.println("Usuário ADMIN (pastor) atualizado com sucesso!");
+            logger.info(">>> Usuário ADMIN (pastor) atualizado com sucesso!");
         }
+
+        // Print existing users for debugging
+        userRepository.findAll().forEach(user -> {
+            logger.info(">>> USER IN DB: username={}, role={}, isAuthorized={}", 
+                user.getUsername(), user.getRole(), user.isAuthorized());
+        });
     }
 }

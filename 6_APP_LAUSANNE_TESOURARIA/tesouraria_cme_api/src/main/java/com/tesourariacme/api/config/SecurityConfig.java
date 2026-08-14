@@ -40,6 +40,7 @@ public class SecurityConfig {
                 return config;
             }))
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/debug-users").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/membros/**").permitAll()
                 .anyRequest().authenticated()
