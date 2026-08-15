@@ -36,8 +36,24 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(request -> {
                 var config = new org.springframework.web.cors.CorsConfiguration();
-                config.setAllowedOrigins(java.util.Arrays.asList(corsAllowedOrigins.split(",")));
-                config.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+                java.util.List<String> origins = new java.util.ArrayList<>(java.util.Arrays.asList(
+                        "https://cme-lausanne-mvp-12345.web.app",
+                        "http://localhost:8080",
+                        "http://localhost:3000",
+                        "http://localhost:5000"
+                ));
+
+                if (corsAllowedOrigins != null && !corsAllowedOrigins.contains("${")) {
+                    for (String origin : corsAllowedOrigins.split(",")) {
+                        if (!origins.contains(origin.trim())) {
+                            origins.add(origin.trim());
+                        }
+                    }
+                }
+
+                config.setAllowedOrigins(origins);
+                config.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
                 config.setAllowedHeaders(java.util.Arrays.asList("*"));
                 config.setAllowCredentials(true);
                 return config;
@@ -55,6 +71,7 @@ public class SecurityConfig {
                 })
             )
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/auth/**")).permitAll()
                 .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/error")).permitAll()
                 .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/membros/**")).hasRole("ADMIN")
