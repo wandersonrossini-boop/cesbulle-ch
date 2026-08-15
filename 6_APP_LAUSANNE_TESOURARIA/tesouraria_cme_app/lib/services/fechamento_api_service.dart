@@ -11,7 +11,7 @@ class FechamentoApiService {
 
   Future<void> submitClosing(ServiceClosingState state) async {
     final Map<String, dynamic> payload = {
-      "serviceDate": state.date != null ? "\${state.date!.year.toString().padLeft(4, '0')}-\${state.date!.month.toString().padLeft(2, '0')}-\${state.date!.day.toString().padLeft(2, '0')}" : null,
+      "serviceDate": state.date != null ? "${state.date!.year.toString().padLeft(4, '0')}-${state.date!.month.toString().padLeft(2, '0')}-${state.date!.day.toString().padLeft(2, '0')}" : null,
       "mainTreasurer": state.mainTreasurer,
       "coTreasurer": state.coTreasurer,
       "physicalTotal": BigDecimalConverter.fromRappen(state.physicalTotal),
@@ -38,7 +38,7 @@ class FechamentoApiService {
     );
 
     if (response.statusCode != 200 && response.statusCode != 201) {
-      throw Exception('Falha ao sincronizar o fechamento: \${response.body}');
+      throw Exception('Falha ao sincronizar o fechamento: ${response.body}');
     }
   }
 
