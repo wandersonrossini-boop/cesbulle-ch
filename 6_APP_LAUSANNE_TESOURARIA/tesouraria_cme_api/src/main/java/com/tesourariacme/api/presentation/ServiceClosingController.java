@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/fechamento-culto")
-@CrossOrigin(origins = "*") // Para MVP local e Flutter Web
+
 public class ServiceClosingController {
 
     private final SubmitServiceClosingUseCase useCase;
