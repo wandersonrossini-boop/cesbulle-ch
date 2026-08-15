@@ -38,7 +38,7 @@ public class SubmitServiceClosingUseCase {
     }
 
     public java.util.List<com.tesourariacme.api.presentation.ServiceClosingSummaryResponse> getHistory() {
-        return repository.findAllByOrderByServiceDateDesc().stream().map(c -> 
+        return repository.findHistoryOrdered().stream().map(c ->
             new com.tesourariacme.api.presentation.ServiceClosingSummaryResponse(
                 c.getId(), c.getServiceDate(), c.getMainTreasurer(), c.getCoTreasurer(), c.getPhysicalTotal()
             )
