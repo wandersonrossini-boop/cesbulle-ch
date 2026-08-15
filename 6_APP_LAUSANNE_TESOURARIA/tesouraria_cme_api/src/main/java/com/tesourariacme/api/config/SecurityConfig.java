@@ -75,7 +75,7 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/auth/**")).permitAll()
                 .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/error")).permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/membros").authenticated()
-                .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/membros/**")).hasRole("ADMIN")
+                .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/membros/**")).hasAnyRole("ADMIN", "TREASURER")
                 .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/dashboard/**")).authenticated()
                 .anyRequest().authenticated()
             )
