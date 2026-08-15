@@ -11,7 +11,6 @@ import '../../core/theme.dart';
 import '../../services/draft_service.dart';
 import '../../services/fechamento_api_service.dart';
 import '../../services/auth_api_service.dart';
-import '../../services/user_api_service.dart';
 import '../widgets/app_sidebar_drawer.dart';
 import 'dashboard_page.dart';
 import 'login_page.dart';
@@ -29,7 +28,11 @@ class WizardPage extends StatefulWidget {
 class _WizardPageState extends State<WizardPage> {
   final TextEditingController _coTreasurerController = TextEditingController();
   final TextEditingController _memberNameController = TextEditingController();
+  final TextEditingController _verifierNameController = TextEditingController();
   final FocusNode _keyboardFocusNode = FocusNode();
+
+  bool _isManualVerifier = false;
+  String? _selectedVerifier;
 
   bool _isTextFieldFocused() {
     final primaryFocus = FocusManager.instance.primaryFocus;
@@ -44,27 +47,12 @@ class _WizardPageState extends State<WizardPage> {
   late final ServiceClosingBloc _bloc;
   final DraftService _draftService = DraftService();
   Timer? _syncTimer;
-  List<AppUser> _availableTreasurers = [];
-  String? _selectedCoTreasurer;
 
   @override
   void initState() {
     super.initState();
     _bloc = ServiceClosingBloc()..add(LoadMembersEvent());
     _checkForDraft();
-    _loadTreasurers();
-  }
-
-  Future<void> _loadTreasurers() async {
-    try {
-      final users = await UserApiService().getAllUsers();
-      final currentUserName = await _getCurrentUserName();
-      if (mounted) {
-        setState(() {
-          _availableTreasurers = users.where((u) => u.isAuthorized && u.name != currentUserName).toList();
-        });
-      }
-    } catch (_) {}
   }
 
   Future<String> _getCurrentUserName() async {
@@ -117,6 +105,9 @@ class _WizardPageState extends State<WizardPage> {
                 setState(() {
                   _selectedDate = joinedDraft.date ?? DateTime.now();
                   _coTreasurerController.text = joinedDraft.coTreasurer ?? "";
+                  _verifierNameController.text = joinedDraft.verifierName ?? "";
+                  _isManualVerifier = joinedDraft.verifierType == 'MANUAL';
+                  _selectedVerifier = joinedDraft.verifierType == 'SELECTED' ? joinedDraft.verifierName : null;
                   _phase = ClosingPhase.counting;
                 });
                 Navigator.pop(dlgContext);
@@ -157,6 +148,9 @@ class _WizardPageState extends State<WizardPage> {
                 setState(() {
                   _selectedDate = draft.date ?? DateTime.now();
                   _coTreasurerController.text = draft.coTreasurer ?? "";
+                  _verifierNameController.text = draft.verifierName ?? "";
+                  _isManualVerifier = draft.verifierType == 'MANUAL';
+                  _selectedVerifier = draft.verifierType == 'SELECTED' ? draft.verifierName : null;
                   _phase = ClosingPhase.counting;
                 });
                 Navigator.pop(dlgContext);
@@ -205,6 +199,7 @@ class _WizardPageState extends State<WizardPage> {
     _syncTimer?.cancel();
     _coTreasurerController.dispose();
     _memberNameController.dispose();
+    _verifierNameController.dispose();
     _keyboardFocusNode.dispose();
     _bloc.close();
     super.dispose();
@@ -390,36 +385,6 @@ class _WizardPageState extends State<WizardPage> {
                 
                 // Space between date and button
                 SizedBox(height: isDesktop ? 60 : 40),
-                
-                // Co-treasurer selector
-                const Text("Tesoureiro Auxiliar (Opcional)", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
-                const SizedBox(height: 8),
-                Container(
-                  width: isDesktop ? 360 : double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      isExpanded: true,
-                      value: _selectedCoTreasurer,
-                      hint: const Text("Selecione um auxiliar..."),
-                      items: _availableTreasurers.map((u) {
-                        return DropdownMenuItem<String>(
-                          value: u.name,
-                          child: Text(u.name),
-                        );
-                      }).toList(),
-                      onChanged: (val) {
-                        setState(() => _selectedCoTreasurer = val);
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 32),
 
                 // INICIAR button
                 Container(
@@ -444,7 +409,7 @@ class _WizardPageState extends State<WizardPage> {
                         final currentUserName = await _getCurrentUserName();
                         if (context.mounted) {
                           context.read<ServiceClosingBloc>().add(
-                            InitializeClosingContextEvent(_selectedDate, currentUserName, _selectedCoTreasurer ?? '')
+                            InitializeClosingContextEvent(_selectedDate, currentUserName, '')
                           );
                           setState(() => _phase = ClosingPhase.counting);
                           _startSyncTimer();
@@ -1420,35 +1385,83 @@ class _WizardPageState extends State<WizardPage> {
           ),
         ),
         const SizedBox(height: 24),
-        DropdownButtonFormField<String>(
-          initialValue: _coTreasurerController.text.isEmpty || !state.knownMembers.contains(_coTreasurerController.text) 
-                 ? null : _coTreasurerController.text,
-          decoration: InputDecoration(
-            labelText: "Co-tesoureiro",
-            hintText: "Selecione o co-tesoureiro",
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        if (_isManualVerifier) ...[
+          TextField(
+            controller: _verifierNameController,
+            decoration: InputDecoration(
+              labelText: "Conferente da contagem",
+              hintText: "Digite o nome de quem conferiu",
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            ),
+            onChanged: (val) {
+              setState(() {});
+            },
           ),
-          items: state.knownMembers.map((String member) {
-            return DropdownMenuItem<String>(value: member, child: Text(member, style: const TextStyle(fontSize: 14)));
-          }).toList(),
-          onChanged: (val) {
-            if (val != null) {
-              setState(() => _coTreasurerController.text = val);
-            }
-          },
-        ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () {
+                setState(() {
+                  _isManualVerifier = false;
+                  _verifierNameController.clear();
+                  _selectedVerifier = null;
+                });
+              },
+              child: const Text("Selecionar da lista"),
+            ),
+          ),
+        ] else ...[
+          DropdownButtonFormField<String>(
+            initialValue: _selectedVerifier,
+            decoration: InputDecoration(
+              labelText: "Conferente da contagem",
+              hintText: "Selecione quem conferiu",
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            ),
+            items: [
+              ...state.knownMembers.map((String member) {
+                return DropdownMenuItem<String>(value: member, child: Text(member, style: const TextStyle(fontSize: 14)));
+              }),
+              const DropdownMenuItem<String>(
+                value: "_ADD_MANUAL_",
+                child: Text("+ Adicionar outro nome...", style: TextStyle(color: Color(0xFF1E3A8A), fontWeight: FontWeight.bold)),
+              ),
+            ],
+            onChanged: (val) {
+              if (val == "_ADD_MANUAL_") {
+                setState(() {
+                  _isManualVerifier = true;
+                  _selectedVerifier = null;
+                  _verifierNameController.clear();
+                });
+              } else if (val != null) {
+                setState(() {
+                  _selectedVerifier = val;
+                  _verifierNameController.text = val;
+                });
+              }
+            },
+          ),
+        ],
         const SizedBox(height: 24),
         ElevatedButton(
-          onPressed: (state.error == null && !state.isSubmitting && state.difference == 0 && state.physicalTotal > 0 && _coTreasurerController.text.isNotEmpty) ? () {
+          onPressed: (state.error == null && !state.isSubmitting && state.difference == 0 && state.physicalTotal > 0 && _verifierNameController.text.isNotEmpty) ? () {
             _syncTimer?.cancel();
             context.read<ServiceClosingBloc>().add(
-              InitializeClosingContextEvent(state.date ?? DateTime.now(), state.mainTreasurer, _coTreasurerController.text)
+              SubmitClosingEvent(
+                verifierName: _verifierNameController.text.trim(),
+                verifierType: _isManualVerifier ? "MANUAL" : "SELECTED",
+              ),
             );
-            context.read<ServiceClosingBloc>().add(SubmitClosingEvent());
           } : null,
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF1E3A8A), 

@@ -14,6 +14,8 @@ class FechamentoApiService {
       "serviceDate": state.date != null ? "${state.date!.year.toString().padLeft(4, '0')}-${state.date!.month.toString().padLeft(2, '0')}-${state.date!.day.toString().padLeft(2, '0')}" : null,
       "mainTreasurer": state.mainTreasurer,
       "coTreasurer": state.coTreasurer,
+      "verifierName": state.verifierName,
+      "verifierType": state.verifierType,
       "physicalTotal": BigDecimalConverter.fromRappen(state.physicalTotal),
       "identifiedEntries": state.identifiedEntries.map((e) => {
         "memberName": e.memberName,

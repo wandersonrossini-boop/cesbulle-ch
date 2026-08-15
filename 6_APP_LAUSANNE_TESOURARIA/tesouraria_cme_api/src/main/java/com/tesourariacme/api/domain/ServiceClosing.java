@@ -20,6 +20,10 @@ public class ServiceClosing {
     private LocalDate serviceDate;
     private String mainTreasurer; // "Admilson"
     private String coTreasurer;
+    private String verifierName;
+
+    @Enumerated(EnumType.STRING)
+    private VerifierType verifierType;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Envelope> identifiedEntries = new ArrayList<>();

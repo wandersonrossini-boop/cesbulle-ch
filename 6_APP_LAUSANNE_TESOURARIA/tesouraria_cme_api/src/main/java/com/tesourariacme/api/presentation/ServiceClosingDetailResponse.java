@@ -17,6 +17,8 @@ public class ServiceClosingDetailResponse {
     private LocalDate serviceDate;
     private String mainTreasurer;
     private String coTreasurer;
+    private String verifierName;
+    private String verifierType;
     
     private List<EnvelopeRequest> identifiedEntries;
     
@@ -35,6 +37,15 @@ public class ServiceClosingDetailResponse {
         dto.setServiceDate(entity.getServiceDate());
         dto.setMainTreasurer(entity.getMainTreasurer());
         dto.setCoTreasurer(entity.getCoTreasurer());
+
+        String vName = entity.getVerifierName();
+        String vType = entity.getVerifierType() != null ? entity.getVerifierType().name() : null;
+        if (vName == null && entity.getCoTreasurer() != null && !entity.getCoTreasurer().trim().isEmpty()) {
+            vName = entity.getCoTreasurer();
+            vType = "LEGACY";
+        }
+        dto.setVerifierName(vName);
+        dto.setVerifierType(vType);
         dto.setPhysicalTotal(entity.getPhysicalTotal());
         dto.setIdentifiedTotal(entity.getIdentifiedTotal());
         dto.setUnidentifiedTotal(entity.getUnidentifiedTotal());

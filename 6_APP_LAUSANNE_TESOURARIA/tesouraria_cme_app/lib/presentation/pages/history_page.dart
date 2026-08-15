@@ -405,9 +405,9 @@ class _HistoryView extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFF0F172A)),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (item.coTreasurer.isNotEmpty && item.coTreasurer != '-')
+                  if (item.verifierName != null && item.verifierName!.isNotEmpty && item.verifierName != '-')
                     Text(
-                      'Co-Tes.: ${item.coTreasurer}',
+                      'Conf.: ${item.verifierName}',
                       style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
                       overflow: TextOverflow.ellipsis,
                     ),

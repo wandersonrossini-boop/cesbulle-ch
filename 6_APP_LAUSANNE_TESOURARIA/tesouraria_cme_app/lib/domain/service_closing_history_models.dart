@@ -5,6 +5,8 @@ class ServiceClosingSummary {
   final String serviceDate;
   final String mainTreasurer;
   final String coTreasurer;
+  final String? verifierName;
+  final String? verifierType;
   final double physicalTotal;
 
   ServiceClosingSummary({
@@ -12,6 +14,8 @@ class ServiceClosingSummary {
     required this.serviceDate,
     required this.mainTreasurer,
     required this.coTreasurer,
+    this.verifierName,
+    this.verifierType,
     required this.physicalTotal,
   });
 
@@ -38,6 +42,8 @@ class ServiceClosingSummary {
       serviceDate: parseDate(json['serviceDate']),
       mainTreasurer: json['mainTreasurer'] ?? '-',
       coTreasurer: json['coTreasurer'] ?? '-',
+      verifierName: json['verifierName'],
+      verifierType: json['verifierType'],
       physicalTotal: (json['physicalTotal'] ?? 0).toDouble(),
     );
   }
@@ -49,6 +55,8 @@ class ServiceClosingDetail {
   final String serviceDate;
   final String mainTreasurer;
   final String coTreasurer;
+  final String? verifierName;
+  final String? verifierType;
   
   final List<Envelope> identifiedEntries;
   
@@ -66,6 +74,8 @@ class ServiceClosingDetail {
     required this.serviceDate,
     required this.mainTreasurer,
     required this.coTreasurer,
+    this.verifierName,
+    this.verifierType,
     required this.identifiedEntries,
     required this.unidentifiedDizimoTotal,
     required this.unidentifiedOfertaTotal,
@@ -114,6 +124,8 @@ class ServiceClosingDetail {
       serviceDate: parseDate(json['serviceDate']),
       mainTreasurer: json['mainTreasurer'] ?? '-',
       coTreasurer: json['coTreasurer'] ?? '-',
+      verifierName: json['verifierName'],
+      verifierType: json['verifierType'],
       identifiedEntries: entries,
       unidentifiedDizimoTotal: (json['unidentifiedDizimoTotal'] ?? 0).toDouble(),
       unidentifiedOfertaTotal: (json['unidentifiedOfertaTotal'] ?? 0).toDouble(),

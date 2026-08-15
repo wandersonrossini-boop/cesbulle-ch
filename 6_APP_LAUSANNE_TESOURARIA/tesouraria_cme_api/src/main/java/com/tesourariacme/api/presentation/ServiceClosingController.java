@@ -47,6 +47,8 @@ public class ServiceClosingController {
             closing.setServiceDate(request.getServiceDate());
             closing.setMainTreasurer(request.getMainTreasurer());
             closing.setCoTreasurer(request.getCoTreasurer());
+            closing.setVerifierName(request.getVerifierName());
+            closing.setVerifierType(request.getVerifierType());
             closing.setPhysicalTotal(request.getPhysicalTotal());
             closing.setUnidentifiedDizimoTotal(request.getUnidentifiedDizimoTotal());
             closing.setUnidentifiedOfertaTotal(request.getUnidentifiedOfertaTotal());

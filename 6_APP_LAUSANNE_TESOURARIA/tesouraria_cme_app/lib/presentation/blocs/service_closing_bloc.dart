@@ -63,6 +63,8 @@ class ServiceClosingBloc extends Bloc<ServiceClosingEvent, ServiceClosingState> 
         error: null,
         isSuccess: false,
         coTreasurer: event.coTreasurer ?? state.coTreasurer,
+        verifierName: event.verifierName ?? state.verifierName,
+        verifierType: event.verifierType ?? state.verifierType,
       );
       emit(updatedState);
 

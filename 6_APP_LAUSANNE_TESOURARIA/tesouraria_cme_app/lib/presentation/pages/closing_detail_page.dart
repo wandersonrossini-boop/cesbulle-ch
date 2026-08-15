@@ -99,7 +99,7 @@ class ClosingDetailView extends StatelessWidget {
             const SizedBox(height: 8),
             Text('Tesoureiro Principal: ${detail.mainTreasurer}', style: const TextStyle(fontSize: 16)),
             const SizedBox(height: 4),
-            Text('Co-Tesoureiro: ${detail.coTreasurer}', style: const TextStyle(fontSize: 16)),
+            Text('Conferente: ${detail.verifierName ?? detail.coTreasurer}', style: const TextStyle(fontSize: 16)),
           ],
         ),
       ),
@@ -202,7 +202,8 @@ class ClosingDetailView extends StatelessWidget {
     final buffer = StringBuffer();
     buffer.writeln('📊 *Fechamento de Culto - CME Lausanne*');
     buffer.writeln('📅 Data: ${detail.serviceDate}');
-    buffer.writeln('👤 Tesoureiros: ${detail.mainTreasurer}, ${detail.coTreasurer}');
+    buffer.writeln('👤 Responsável: ${detail.mainTreasurer}');
+    buffer.writeln('👥 Conferente: ${detail.verifierName ?? detail.coTreasurer}');
     buffer.writeln();
     buffer.writeln('*RESUMO FINANCEIRO*');
     buffer.writeln('✅ Total Identificado: CHF ${detail.identifiedTotal.toStringAsFixed(2)}');

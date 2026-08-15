@@ -22,6 +22,20 @@ public class SubmitServiceClosingUseCase {
     public ServiceClosing execute(ServiceClosing serviceClosing) {
         serviceClosing.calculateTotalsAndValidate();
         
+        // Verifier Validation
+        if (serviceClosing.getVerifierType() != null) {
+            if (serviceClosing.getVerifierType() == com.tesourariacme.api.domain.VerifierType.AUTHENTICATED) {
+                throw new IllegalArgumentException("Tipo de conferente AUTHENTICATED não é suportado nesta fase.");
+            }
+            if (serviceClosing.getVerifierName() == null || serviceClosing.getVerifierName().trim().isEmpty()) {
+                throw new IllegalArgumentException("Nome do conferente não pode ser vazio para o tipo " + serviceClosing.getVerifierType());
+            }
+        } else {
+            if (serviceClosing.getVerifierName() != null && !serviceClosing.getVerifierName().trim().isEmpty()) {
+                throw new IllegalArgumentException("Tipo de conferente deve ser informado se o nome for preenchido.");
+            }
+        }
+
         // Passive Member Registration
         if (serviceClosing.getIdentifiedEntries() != null) {
             serviceClosing.getIdentifiedEntries().forEach(env -> {
@@ -38,11 +52,17 @@ public class SubmitServiceClosingUseCase {
     }
 
     public java.util.List<com.tesourariacme.api.presentation.ServiceClosingSummaryResponse> getHistory() {
-        return repository.findHistoryOrdered().stream().map(c ->
-            new com.tesourariacme.api.presentation.ServiceClosingSummaryResponse(
-                c.getId(), c.getServiceDate(), c.getMainTreasurer(), c.getCoTreasurer(), c.getPhysicalTotal()
-            )
-        ).collect(java.util.stream.Collectors.toList());
+        return repository.findHistoryOrdered().stream().map(c -> {
+            String vName = c.getVerifierName();
+            String vType = c.getVerifierType() != null ? c.getVerifierType().name() : null;
+            if (vName == null && c.getCoTreasurer() != null && !c.getCoTreasurer().trim().isEmpty()) {
+                vName = c.getCoTreasurer();
+                vType = "LEGACY";
+            }
+            return new com.tesourariacme.api.presentation.ServiceClosingSummaryResponse(
+                c.getId(), c.getServiceDate(), c.getMainTreasurer(), c.getCoTreasurer(), vName, vType, c.getPhysicalTotal()
+            );
+        }).collect(java.util.stream.Collectors.toList());
     }
 
     public ServiceClosing getById(Long id) {

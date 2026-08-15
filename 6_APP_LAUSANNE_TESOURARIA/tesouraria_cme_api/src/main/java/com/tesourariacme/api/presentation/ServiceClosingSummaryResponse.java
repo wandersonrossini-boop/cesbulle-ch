@@ -14,6 +14,8 @@ public class ServiceClosingSummaryResponse {
     private LocalDate serviceDate;
     private String mainTreasurer;
     private String coTreasurer;
+    private String verifierName;
+    private String verifierType;
     private BigDecimal physicalTotal;
     
     // Status can be determined by the client (if difference is 0, it is "Conferido"), 

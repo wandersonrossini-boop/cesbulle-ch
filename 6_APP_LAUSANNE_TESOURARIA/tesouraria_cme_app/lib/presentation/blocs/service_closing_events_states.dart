@@ -74,10 +74,12 @@ class SetPhysicalTotalEvent extends ServiceClosingEvent {
 
 class SubmitClosingEvent extends ServiceClosingEvent {
   final String? coTreasurer;
-  SubmitClosingEvent({this.coTreasurer});
+  final String? verifierName;
+  final String? verifierType;
+  SubmitClosingEvent({this.coTreasurer, this.verifierName, this.verifierType});
 
   @override
-  List<Object?> get props => [coTreasurer];
+  List<Object?> get props => [coTreasurer, verifierName, verifierType];
 }
 
 class AddLocalMemberEvent extends ServiceClosingEvent {
@@ -100,6 +102,8 @@ class ServiceClosingState extends Equatable {
   final DateTime? date;
   final String mainTreasurer;
   final String? coTreasurer;
+  final String? verifierName;
+  final String? verifierType;
   final List<Envelope> identifiedEntries;
   final List<AnonymousEntry> anonymousEntries;
   final int physicalTotal;
@@ -120,6 +124,8 @@ class ServiceClosingState extends Equatable {
     this.date,
     this.mainTreasurer = "Admilson",
     this.coTreasurer,
+    this.verifierName,
+    this.verifierType,
     this.identifiedEntries = const [],
     this.anonymousEntries = const [],
     this.physicalTotal = 0,
@@ -133,6 +139,8 @@ class ServiceClosingState extends Equatable {
     DateTime? date,
     String? mainTreasurer,
     String? coTreasurer,
+    String? verifierName,
+    String? verifierType,
     List<Envelope>? identifiedEntries,
     List<AnonymousEntry>? anonymousEntries,
     int? physicalTotal,
@@ -145,6 +153,8 @@ class ServiceClosingState extends Equatable {
       date: date ?? this.date,
       mainTreasurer: mainTreasurer ?? this.mainTreasurer,
       coTreasurer: coTreasurer ?? this.coTreasurer,
+      verifierName: verifierName ?? this.verifierName,
+      verifierType: verifierType ?? this.verifierType,
       identifiedEntries: identifiedEntries ?? this.identifiedEntries,
       anonymousEntries: anonymousEntries ?? this.anonymousEntries,
       physicalTotal: physicalTotal ?? this.physicalTotal,
@@ -157,7 +167,7 @@ class ServiceClosingState extends Equatable {
 
   @override
   List<Object?> get props => [
-    date, mainTreasurer, coTreasurer, 
+    date, mainTreasurer, coTreasurer, verifierName, verifierType,
     identifiedEntries, anonymousEntries, physicalTotal, error, knownMembers,
     isSubmitting, isSuccess
   ];
@@ -167,6 +177,8 @@ class ServiceClosingState extends Equatable {
       'date': date?.toIso8601String(),
       'mainTreasurer': mainTreasurer,
       'coTreasurer': coTreasurer,
+      'verifierName': verifierName,
+      'verifierType': verifierType,
       'identifiedEntries': identifiedEntries.map((e) => e.toJson()).toList(),
       'anonymousEntries': anonymousEntries.map((e) => e.toJson()).toList(),
       'physicalTotal': physicalTotal,
@@ -182,6 +194,8 @@ class ServiceClosingState extends Equatable {
       date: json['date'] != null ? DateTime.parse(json['date']) : null,
       mainTreasurer: json['mainTreasurer'] ?? "Admilson",
       coTreasurer: json['coTreasurer'],
+      verifierName: json['verifierName'],
+      verifierType: json['verifierType'],
       identifiedEntries: (json['identifiedEntries'] as List<dynamic>?)
               ?.map((e) => Envelope.fromJson(e))
               .toList() ??
