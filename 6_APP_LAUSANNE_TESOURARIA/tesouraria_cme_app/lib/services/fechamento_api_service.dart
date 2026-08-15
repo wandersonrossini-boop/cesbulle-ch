@@ -7,7 +7,7 @@ import '../presentation/blocs/service_closing_events_states.dart';
 import '../domain/envelope.dart';
 
 class FechamentoApiService {
-  static const String _baseUrl = String.fromEnvironment('API_BASE_URL', defaultValue: 'https://tesouraria-cme-db.onrender.com/api');
+  static const String _baseUrl = String.fromEnvironment('API_BASE_URL', defaultValue: 'https://tesouraria-cme-api.onrender.com/api');
 
   Future<void> submitClosing(ServiceClosingState state) async {
     final Map<String, dynamic> payload = {

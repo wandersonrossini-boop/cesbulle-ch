@@ -114,7 +114,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         title: 'Servidor & Sistema',
                         icon: Icons.info_outline,
                         children: [
-                          _buildInfoRow('API Backend', 'https://tesouraria-cme-db.onrender.com/api'),
+                          _buildInfoRow('API Backend', 'https://tesouraria-cme-api.onrender.com/api'),
                           _buildInfoRow('Versão do App', '1.2.0 (Release Lausanne)'),
                           _buildInfoRow('Ambiente', 'Produção (Firebase Hosting)'),
                         ],

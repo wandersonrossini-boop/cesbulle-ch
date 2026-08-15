@@ -56,9 +56,9 @@ npx firebase-tools deploy --only hosting --project cme-lausanne-mvp-12345 --acco
 O Render faz **auto-deploy automático** a cada `git push origin main`.
 
 Repositório conectado ao Render:
-- **GitHub:** https://github.com/secretariacessuica-bit/FIREBASE_SERVICE_ACCOUNT
-- **Pasta:** `/6_APP_LAUSANNE_TESOURARIA/tesouraria_cme_api`
-- **URL da API:** https://tesouraria-cme-db.onrender.com/api
+- **GitHub:** https://github.com/wandersonrossini-boop/cesbulle-ch
+- **Root Directory:** `6_APP_LAUSANNE_TESOURARIA/tesouraria_cme_api`
+- **URL da API:** https://tesouraria-cme-api.onrender.com/api
 
 > ✅ Basta fazer `git push` — o Render detecta e faz o deploy automaticamente via Docker.
 

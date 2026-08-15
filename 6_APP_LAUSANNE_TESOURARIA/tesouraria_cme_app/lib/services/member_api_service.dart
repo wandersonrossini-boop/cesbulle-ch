@@ -19,7 +19,7 @@ class MemberDetail {
 class MemberApiService {
   static const String _baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://tesouraria-cme-db.onrender.com/api',
+    defaultValue: 'https://tesouraria-cme-api.onrender.com/api',
   );
 
   Future<Map<String, String>> _authHeaders() async {
