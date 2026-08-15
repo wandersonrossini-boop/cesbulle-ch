@@ -33,6 +33,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        logger.info(">>> API RECEBEU TENTATIVA DE LOGIN. Username exato recebido: '{}'", request.getUsername());
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
@@ -40,12 +41,13 @@ public class AuthController {
 
             // Se chegou aqui, as credenciais estão corretas e isAuthorized = true (ver CustomUserDetailsService)
             String token = jwtUtil.generateToken(request.getUsername());
+            logger.info(">>> LOGIN BEM-SUCEDIDO para '{}'", request.getUsername());
             return ResponseEntity.ok(new LoginResponse(token));
         } catch (org.springframework.security.authentication.DisabledException e) {
-            logger.error("Login failed for username '{}': {}", request.getUsername(), e.getMessage());
+            logger.error(">>> LOGIN FALHOU (DisabledException) para '{}': {}", request.getUsername(), e.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Usuário aguardando aprovação do Admin.");
         } catch (Exception e) {
-            logger.error("Login failed for username '{}': {}", request.getUsername(), e.getMessage());
+            logger.error(">>> LOGIN FALHOU (Exception) para '{}': {}", request.getUsername(), e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
         }
     }
