@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 public class AuthController {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(AuthController.class);
+
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final AppUserRepository userRepository;
@@ -40,8 +42,10 @@ public class AuthController {
             String token = jwtUtil.generateToken(request.getUsername());
             return ResponseEntity.ok(new LoginResponse(token));
         } catch (org.springframework.security.authentication.DisabledException e) {
+            logger.error("Login failed for username '{}': {}", request.getUsername(), e.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Usuário aguardando aprovação do Admin.");
         } catch (Exception e) {
+            logger.error("Login failed for username '{}': {}", request.getUsername(), e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
         }
     }
