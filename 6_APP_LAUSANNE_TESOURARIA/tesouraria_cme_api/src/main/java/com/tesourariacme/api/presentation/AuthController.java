@@ -48,7 +48,8 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Usuário aguardando aprovação do Admin.");
         } catch (Exception e) {
             logger.error(">>> LOGIN FALHOU (Exception) para '{}': {}", request.getUsername(), e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Credenciais inválidas para o usuário: [" + request.getUsername() + "]");
         }
     }
 
@@ -79,6 +80,8 @@ public class AuthController {
 }
 
 @Data
+@lombok.NoArgsConstructor
+@lombok.AllArgsConstructor
 class LoginRequest {
     private String username;
     private String password;
@@ -90,6 +93,8 @@ class LoginResponse {
 }
 
 @Data
+@lombok.NoArgsConstructor
+@lombok.AllArgsConstructor
 class RegisterRequest {
     private String username;
     private String password;
