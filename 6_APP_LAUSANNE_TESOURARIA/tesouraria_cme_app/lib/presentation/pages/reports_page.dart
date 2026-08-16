@@ -100,7 +100,7 @@ class _ReportsPageState extends State<ReportsPage> {
     return _closingDetails.where((detail) {
       final date = _parseDate(detail.serviceDate);
       if (date == null) {
-        return _selectedPeriod == ReportPeriod.all;
+        return false;
       }
 
       switch (_selectedPeriod) {
@@ -366,7 +366,7 @@ class _ReportsPageState extends State<ReportsPage> {
         ),
         const SizedBox(height: 4),
         Text(
-          'CHF ${totalGeneral.toStringAsFixed(2)}',
+          'CHF ${_formatCHF(totalGeneral)}',
           style: const TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.bold,
@@ -376,7 +376,7 @@ class _ReportsPageState extends State<ReportsPage> {
         ),
         const SizedBox(height: 6),
         Text(
-          '$countCultos ${countCultos == 1 ? 'culto consolidado' : 'cultos consolidados'} · Média de CHF ${averageCulto.toStringAsFixed(2)} por culto',
+          '$countCultos ${countCultos == 1 ? 'culto consolidado' : 'cultos consolidados'} · Média de CHF ${_formatCHF(averageCulto)} por culto',
           style: const TextStyle(
             fontSize: 13,
             color: Color(0xFF475569),
@@ -413,10 +413,10 @@ class _ReportsPageState extends State<ReportsPage> {
           ),
           children: [
             _buildTableHeader(['Categoria', 'Valor', '% do total']),
-            _buildTableRow('Dízimos', 'CHF ${dizimo.toStringAsFixed(2)}', pctFormat(dizimoPct)),
-            _buildTableRow('Ofertas', 'CHF ${oferta.toStringAsFixed(2)}', pctFormat(ofertaPct)),
-            _buildTableRow('Votos', 'CHF ${voto.toStringAsFixed(2)}', pctFormat(votoPct)),
-            _buildTableRow('Total', 'CHF ${totalGeneral.toStringAsFixed(2)}', totalGeneral > 0 ? '100.0%' : '—', isTotal: true),
+            _buildTableRow('Dízimos', 'CHF ${_formatCHF(dizimo)}', pctFormat(dizimoPct)),
+            _buildTableRow('Ofertas', 'CHF ${_formatCHF(oferta)}', pctFormat(ofertaPct)),
+            _buildTableRow('Votos', 'CHF ${_formatCHF(voto)}', pctFormat(votoPct)),
+            _buildTableRow('Total', 'CHF ${_formatCHF(totalGeneral)}', totalGeneral > 0 ? '100.0%' : '—', isTotal: true),
           ],
         ),
       ],
@@ -449,9 +449,9 @@ class _ReportsPageState extends State<ReportsPage> {
           ),
           children: [
             _buildTableHeader(['Origem', 'Valor', '% do total']),
-            _buildTableRow('Identificado (Envelopes)', 'CHF ${identified.toStringAsFixed(2)}', pctFormat(identifiedPct)),
-            _buildTableRow('Anônimo (Bandeja / Coleta)', 'CHF ${anonymous.toStringAsFixed(2)}', pctFormat(anonymousPct)),
-            _buildTableRow('Total', 'CHF ${totalGeneral.toStringAsFixed(2)}', totalGeneral > 0 ? '100.0%' : '—', isTotal: true),
+            _buildTableRow('Identificado (Envelopes)', 'CHF ${_formatCHF(identified)}', pctFormat(identifiedPct)),
+            _buildTableRow('Anônimo (Bandeja / Coleta)', 'CHF ${_formatCHF(anonymous)}', pctFormat(anonymousPct)),
+            _buildTableRow('Total', 'CHF ${_formatCHF(totalGeneral)}', totalGeneral > 0 ? '100.0%' : '—', isTotal: true),
           ],
         ),
       ],
@@ -550,5 +550,24 @@ class _ReportsPageState extends State<ReportsPage> {
         ),
       ],
     );
+  }
+
+  String _formatCHF(double value) {
+    final isNegative = value < 0;
+    final absValue = value.abs();
+    final String parts = absValue.toStringAsFixed(2);
+    final List<String> split = parts.split('.');
+    final String whole = split[0];
+    final String decimal = split[1];
+
+    final buffer = StringBuffer();
+    final int len = whole.length;
+    for (int i = 0; i < len; i++) {
+      buffer.write(whole[i]);
+      if ((len - 1 - i) % 3 == 0 && i != len - 1) {
+        buffer.write("'");
+      }
+    }
+    return "${isNegative ? '-' : ''}${buffer.toString()}.$decimal";
   }
 }
