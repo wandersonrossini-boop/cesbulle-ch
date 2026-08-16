@@ -12,7 +12,11 @@ class ServiceClosingBloc extends Bloc<ServiceClosingEvent, ServiceClosingState> 
     });
 
     on<RestoreDraftEvent>((event, emit) {
-      emit(event.draftState);
+      emit(event.draftState.copyWith(
+        isSubmitting: false,
+        isSuccess: false,
+        error: null,
+      ));
     });
 
     on<LoadMembersEvent>((event, emit) async {
@@ -92,10 +96,22 @@ class ServiceClosingBloc extends Bloc<ServiceClosingEvent, ServiceClosingState> 
   @override
   void onChange(Change<ServiceClosingState> change) {
     super.onChange(change);
-    // Ignore se for um erro ocorrendo, não queremos sobrescrever o draft sem necessidade com apenas erro
-    if (change.nextState.error == null) {
-      _draftService.saveDraft(change.nextState);
-      FechamentoApiService().saveDraftToServer(change.nextState);
+    final nextState = change.nextState;
+    // Só grava o rascunho se a data estiver preenchida (contexto iniciado) e não for sucesso ou erro
+    if (nextState.error == null && nextState.date != null && !nextState.isSuccess) {
+      _draftService.saveDraft(nextState);
+      _syncDraftToServer(nextState);
     }
+  }
+
+  Future<void> _syncDraftToServer(ServiceClosingState state) async {
+    try {
+      final apiService = FechamentoApiService();
+      final serverDraft = await apiService.getDraftFromServer();
+      // Só publica no servidor se não houver sessão ativa lá ou se formos o dono dela
+      if (serverDraft == null || serverDraft.mainTreasurer == state.mainTreasurer) {
+        await apiService.saveDraftToServer(state);
+      }
+    } catch (_) {}
   }
 }

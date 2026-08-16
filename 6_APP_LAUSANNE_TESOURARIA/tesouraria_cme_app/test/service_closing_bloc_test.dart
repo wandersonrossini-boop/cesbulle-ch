@@ -61,5 +61,23 @@ void main() {
       expect(bloc.state.physicalTotal, 25000);
       expect(bloc.state.difference, 1000);
     });
+
+    test('RestoreDraftEvent clears isSuccess, isSubmitting and error', () async {
+      final dirtyState = ServiceClosingState(
+        date: DateTime.now(),
+        mainTreasurer: 'Admilson',
+        isSuccess: true,
+        isSubmitting: true,
+        error: 'Some error',
+      );
+
+      bloc.add(RestoreDraftEvent(dirtyState));
+      await Future.delayed(Duration.zero);
+
+      expect(bloc.state.isSuccess, false);
+      expect(bloc.state.isSubmitting, false);
+      expect(bloc.state.error, null);
+      expect(bloc.state.mainTreasurer, 'Admilson');
+    });
   });
 }
