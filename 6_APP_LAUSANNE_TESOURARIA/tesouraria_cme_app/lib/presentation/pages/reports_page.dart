@@ -257,32 +257,27 @@ class _ReportsPageState extends State<ReportsPage> {
       padding: EdgeInsets.all(isDesktop ? 32.0 : 16.0),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1100),
+          constraints: const BoxConstraints(maxWidth: 800),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _buildHeader(isDesktop),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+              const Divider(color: Color(0xFFE2E8F0), height: 1),
+              const SizedBox(height: 16),
               _buildPeriodSelector(),
+              const SizedBox(height: 16),
+              const Divider(color: Color(0xFFE2E8F0), height: 1),
               const SizedBox(height: 24),
-              _buildMetricsGrid(totalGeneral, totalDizimo, totalOferta, totalVoto, averageCulto, countCultos),
+              _buildMainSummary(totalGeneral, countCultos, averageCulto),
               const SizedBox(height: 32),
-              if (isDesktop)
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(child: _buildCategoryBreakdownCard(totalGeneral, totalDizimo, totalOferta, totalVoto)),
-                    const SizedBox(width: 24),
-                    Expanded(child: _buildOriginBreakdownCard(totalGeneral, totalIdentified, totalAnonymous)),
-                  ],
-                )
-              else ...[
-                _buildCategoryBreakdownCard(totalGeneral, totalDizimo, totalOferta, totalVoto),
-                const SizedBox(height: 24),
-                _buildOriginBreakdownCard(totalGeneral, totalIdentified, totalAnonymous),
-              ],
+              _buildCompositionTable(totalGeneral, totalDizimo, totalOferta, totalVoto),
               const SizedBox(height: 32),
-              _buildExportCard(context, filtered, totalGeneral, totalDizimo, totalOferta, totalVoto),
+              _buildOriginTable(totalGeneral, totalIdentified, totalAnonymous),
+              const SizedBox(height: 32),
+              const Divider(color: Color(0xFFE2E8F0), height: 1),
+              const SizedBox(height: 24),
+              _buildArchiveSection(context),
             ],
           ),
         ),
@@ -294,16 +289,6 @@ class _ReportsPageState extends State<ReportsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'RELATÓRIOS',
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF64748B),
-            letterSpacing: 1.5,
-          ),
-        ),
-        const SizedBox(height: 4),
         Text(
           'Consolidado Financeiro',
           style: TextStyle(
@@ -323,246 +308,247 @@ class _ReportsPageState extends State<ReportsPage> {
   }
 
   Widget _buildPeriodSelector() {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF1F5F9),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Wrap(
-        spacing: 4,
-        runSpacing: 4,
-        children: ReportPeriod.values.map((period) {
-          final isSelected = _selectedPeriod == period;
-          return ChoiceChip(
-            label: Text(
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: ReportPeriod.values.asMap().entries.map((entry) {
+        final index = entry.key;
+        final period = entry.value;
+        final isSelected = _selectedPeriod == period;
+
+        final textWidget = InkWell(
+          onTap: () {
+            setState(() => _selectedPeriod = period);
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+            child: Text(
               period.label,
               style: TextStyle(
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? Colors.white : const Color(0xFF475569),
                 fontSize: 13,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+                decoration: isSelected ? TextDecoration.underline : TextDecoration.none,
               ),
             ),
-            selected: isSelected,
-            selectedColor: const Color(0xFF1E3A8A),
-            backgroundColor: Colors.transparent,
-            side: BorderSide.none,
-            elevation: 0,
-            onSelected: (selected) {
-              if (selected) {
-                setState(() => _selectedPeriod = period);
-              }
-            },
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildMetricsGrid(double totalGeneral, double totalDizimo, double totalOferta, double totalVoto, double averageCulto, int countCultos) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final crossAxisCount = constraints.maxWidth > 700 ? 3 : (constraints.maxWidth > 450 ? 2 : 1);
-        return GridView.count(
-          crossAxisCount: crossAxisCount,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          childAspectRatio: 2.2,
-          children: [
-            _metricCard('Total Geral', 'CHF ${totalGeneral.toStringAsFixed(2)}', Icons.payments_outlined, const Color(0xFF1E3A8A)),
-            _metricCard('Total Dízimos', 'CHF ${totalDizimo.toStringAsFixed(2)}', Icons.volunteer_activism_outlined, const Color(0xFF059669)),
-            _metricCard('Total Ofertas', 'CHF ${totalOferta.toStringAsFixed(2)}', Icons.savings_outlined, const Color(0xFFD97706)),
-            _metricCard('Total Votos', 'CHF ${totalVoto.toStringAsFixed(2)}', Icons.card_giftcard_outlined, const Color(0xFF7C3AED)),
-            _metricCard('Média por Culto', 'CHF ${averageCulto.toStringAsFixed(2)}', Icons.bar_chart_rounded, const Color(0xFF2563EB)),
-            _metricCard('Cultos Consolidados', '$countCultos', Icons.event_available_outlined, const Color(0xFF475569)),
-          ],
+          ),
         );
-      },
+
+        if (index < ReportPeriod.values.length - 1) {
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              textWidget,
+              const SizedBox(width: 8),
+              const Text('|', style: TextStyle(color: Color(0xFFCBD5E1), fontSize: 13)),
+            ],
+          );
+        } else {
+          return textWidget;
+        }
+      }).toList(),
     );
   }
 
-  Widget _metricCard(String label, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icon, color: color, size: 24),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
-                    fontFamily: 'monospace',
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  label,
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCategoryBreakdownCard(double totalGeneral, double dizimo, double oferta, double voto) {
-    final dizimoPct = totalGeneral > 0 ? (dizimo / totalGeneral) * 100 : 0.0;
-    final ofertaPct = totalGeneral > 0 ? (oferta / totalGeneral) * 100 : 0.0;
-    final votoPct = totalGeneral > 0 ? (voto / totalGeneral) * 100 : 0.0;
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Distribuição por Categoria',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
-          ),
-          const SizedBox(height: 16),
-          _progressBarItem('Dízimo', dizimo, dizimoPct, const Color(0xFF059669)),
-          const SizedBox(height: 12),
-          _progressBarItem('Oferta', oferta, ofertaPct, const Color(0xFFD97706)),
-          const SizedBox(height: 12),
-          _progressBarItem('Voto', voto, votoPct, const Color(0xFF7C3AED)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOriginBreakdownCard(double totalGeneral, double identified, double anonymous) {
-    final identifiedPct = totalGeneral > 0 ? (identified / totalGeneral) * 100 : 0.0;
-    final anonymousPct = totalGeneral > 0 ? (anonymous / totalGeneral) * 100 : 0.0;
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Identificado vs. Anônimo',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
-          ),
-          const SizedBox(height: 16),
-          _progressBarItem('Identificado (Envelopes)', identified, identifiedPct, const Color(0xFF1E3A8A)),
-          const SizedBox(height: 12),
-          _progressBarItem('Anônimo (Bandeja / Coleta)', anonymous, anonymousPct, const Color(0xFF64748B)),
-        ],
-      ),
-    );
-  }
-
-  Widget _progressBarItem(String title, double amount, double percentage, Color color) {
+  Widget _buildMainSummary(double totalGeneral, int countCultos, double averageCulto) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF334155))),
-            Text(
-              'CHF ${amount.toStringAsFixed(2)} (${percentage.toStringAsFixed(1)}%)',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF0F172A), fontFamily: 'monospace'),
-            ),
-          ],
+        const Text(
+          'TOTAL CONSOLIDADO',
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF64748B),
+            letterSpacing: 1.0,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'CHF ${totalGeneral.toStringAsFixed(2)}',
+          style: const TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF0F172A),
+            fontFamily: 'monospace',
+          ),
         ),
         const SizedBox(height: 6),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(
-            value: (percentage / 100.0).clamp(0.0, 1.0),
-            backgroundColor: const Color(0xFFF1F5F9),
-            valueColor: AlwaysStoppedAnimation<Color>(color),
-            minHeight: 8,
+        Text(
+          '$countCultos ${countCultos == 1 ? 'culto consolidado' : 'cultos consolidados'} · Média de CHF ${averageCulto.toStringAsFixed(2)} por culto',
+          style: const TextStyle(
+            fontSize: 13,
+            color: Color(0xFF475569),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildExportCard(BuildContext context, List<ServiceClosingDetail> details, double totalGeral, double dizimo, double oferta, double voto) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xFFEFF6FF),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFBFDBFE)),
+  Widget _buildCompositionTable(double totalGeneral, double dizimo, double oferta, double voto) {
+    final dizimoPct = totalGeneral > 0 ? (dizimo / totalGeneral) * 100 : null;
+    final ofertaPct = totalGeneral > 0 ? (oferta / totalGeneral) * 100 : null;
+    final votoPct = totalGeneral > 0 ? (voto / totalGeneral) * 100 : null;
+
+    String pctFormat(double? pct) => pct != null ? '${pct.toStringAsFixed(1)}%' : '—';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Composição financeira',
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+        ),
+        const SizedBox(height: 12),
+        Table(
+          columnWidths: const {
+            0: FlexColumnWidth(2),
+            1: FlexColumnWidth(1),
+            2: FlexColumnWidth(1),
+          },
+          border: const TableBorder(
+            bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1),
+            horizontalInside: BorderSide(color: Color(0xFFF1F5F9), width: 1),
+          ),
+          children: [
+            _buildTableHeader(['Categoria', 'Valor', '% do total']),
+            _buildTableRow('Dízimos', 'CHF ${dizimo.toStringAsFixed(2)}', pctFormat(dizimoPct)),
+            _buildTableRow('Ofertas', 'CHF ${oferta.toStringAsFixed(2)}', pctFormat(ofertaPct)),
+            _buildTableRow('Votos', 'CHF ${voto.toStringAsFixed(2)}', pctFormat(votoPct)),
+            _buildTableRow('Total', 'CHF ${totalGeneral.toStringAsFixed(2)}', totalGeneral > 0 ? '100.0%' : '—', isTotal: true),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOriginTable(double totalGeneral, double identified, double anonymous) {
+    final identifiedPct = totalGeneral > 0 ? (identified / totalGeneral) * 100 : null;
+    final anonymousPct = totalGeneral > 0 ? (anonymous / totalGeneral) * 100 : null;
+
+    String pctFormat(double? pct) => pct != null ? '${pct.toStringAsFixed(1)}%' : '—';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Origem dos valores',
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+        ),
+        const SizedBox(height: 12),
+        Table(
+          columnWidths: const {
+            0: FlexColumnWidth(2),
+            1: FlexColumnWidth(1),
+            2: FlexColumnWidth(1),
+          },
+          border: const TableBorder(
+            bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1),
+            horizontalInside: BorderSide(color: Color(0xFFF1F5F9), width: 1),
+          ),
+          children: [
+            _buildTableHeader(['Origem', 'Valor', '% do total']),
+            _buildTableRow('Identificado (Envelopes)', 'CHF ${identified.toStringAsFixed(2)}', pctFormat(identifiedPct)),
+            _buildTableRow('Anônimo (Bandeja / Coleta)', 'CHF ${anonymous.toStringAsFixed(2)}', pctFormat(anonymousPct)),
+            _buildTableRow('Total', 'CHF ${totalGeneral.toStringAsFixed(2)}', totalGeneral > 0 ? '100.0%' : '—', isTotal: true),
+          ],
+        ),
+      ],
+    );
+  }
+
+  TableRow _buildTableHeader(List<String> headers) {
+    return TableRow(
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1.5)),
       ),
-      child: Row(
-        children: [
-          const Icon(Icons.summarize_outlined, size: 32, color: Color(0xFF1E3A8A)),
-          const SizedBox(width: 16),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Exportar Relatório Consolidado',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF1E3A8A)),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Gere um documento de resumo do período selecionado para arquivamento contábil.',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF475569)),
-                ),
-              ],
+      children: headers.asMap().entries.map((entry) {
+        final index = entry.key;
+        final text = entry.value;
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          child: Text(
+            text,
+            textAlign: index == 0 ? TextAlign.left : TextAlign.right,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF64748B),
             ),
           ),
-          const SizedBox(width: 16),
-          ElevatedButton.icon(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Relatório pronto para impressão/exportação.')),
-              );
-            },
-            icon: const Icon(Icons.print_outlined, size: 18),
-            label: const Text('Exportar / Imprimir'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1E3A8A),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-              elevation: 0,
-            ),
+        );
+      }).toList(),
+    );
+  }
+
+  TableRow _buildTableRow(String label, String value, String percentage, {bool isTotal = false}) {
+    final style = TextStyle(
+      fontSize: 13,
+      fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+      color: const Color(0xFF0F172A),
+    );
+    final valueStyle = TextStyle(
+      fontSize: 13,
+      fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+      color: const Color(0xFF0F172A),
+      fontFamily: 'monospace',
+    );
+
+    return TableRow(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          child: Text(label, style: style),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          child: Text(value, textAlign: TextAlign.right, style: valueStyle),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          child: Text(percentage, textAlign: TextAlign.right, style: valueStyle),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildArchiveSection(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Relatório para arquivo',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+              ),
+              SizedBox(height: 2),
+              Text(
+                'Gere um documento de resumo do período selecionado para arquivamento contábil.',
+                style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+        const SizedBox(width: 16),
+        OutlinedButton(
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Relatório pronto para impressão/exportação.')),
+            );
+          },
+          style: OutlinedButton.styleFrom(
+            foregroundColor: const Color(0xFF0F172A),
+            side: const BorderSide(color: Color(0xFFE2E8F0)),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          ),
+          child: const Text('Exportar / Imprimir', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+        ),
+      ],
     );
   }
 }
