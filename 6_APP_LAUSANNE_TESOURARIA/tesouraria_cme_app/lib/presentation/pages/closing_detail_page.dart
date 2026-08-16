@@ -200,29 +200,23 @@ class ClosingDetailView extends StatelessWidget {
 
   void _shareClosingDetails(ServiceClosingDetail detail) {
     final buffer = StringBuffer();
-    buffer.writeln('📊 *Fechamento de Culto - CME Lausanne*');
-    buffer.writeln('📅 Data: ${detail.serviceDate}');
-    buffer.writeln('👤 Responsável: ${detail.mainTreasurer}');
-    buffer.writeln('👥 Conferente: ${detail.verifierName ?? detail.coTreasurer}');
-    buffer.writeln();
-    buffer.writeln('*RESUMO FINANCEIRO*');
-    buffer.writeln('✅ Total Identificado: CHF ${detail.identifiedTotal.toStringAsFixed(2)}');
-    buffer.writeln('✅ Total Não Identificado (Avulsos): CHF ${detail.unidentifiedTotal.toStringAsFixed(2)}');
-    buffer.writeln('-----------------------------------');
-    buffer.writeln('💰 *Total Físico Conferido: CHF ${detail.physicalTotal.toStringAsFixed(2)}*');
-    
     final diff = detail.physicalTotal - detail.registeredTotal;
-    buffer.writeln('⚖️ Diferença: CHF ${diff.toStringAsFixed(2)}');
+
+    buffer.writeln('FECHAMENTO DE CULTO — CME LAUSANNE');
     buffer.writeln();
-    
-    if (detail.identifiedEntries.isNotEmpty) {
-      buffer.writeln('*DETALHES DOS IDENTIFICADOS*');
-      for (var e in detail.identifiedEntries) {
-        final typeStr = e.type.name.toUpperCase();
-        buffer.writeln('- ${e.memberName} ($typeStr): CHF ${(e.amount / 100).toStringAsFixed(2)}');
-      }
-    }
-    
+    buffer.writeln('Data: ${detail.serviceDate}');
+    buffer.writeln('Tesoureiro responsável: ${detail.mainTreasurer}');
+    buffer.writeln('Conferente da contagem: ${detail.verifierName ?? detail.coTreasurer}');
+    buffer.writeln();
+    buffer.writeln('RESUMO FINANCEIRO');
+    buffer.writeln();
+    buffer.writeln('Total identificado: CHF ${detail.identifiedTotal.toStringAsFixed(2)}');
+    buffer.writeln('Total não identificado: CHF ${detail.unidentifiedTotal.toStringAsFixed(2)}');
+    buffer.writeln('Total físico conferido: CHF ${detail.physicalTotal.toStringAsFixed(2)}');
+    buffer.writeln('Diferença: CHF ${diff.toStringAsFixed(2)}');
+    buffer.writeln();
+    buffer.writeln('Fechamento conferido e finalizado no sistema de Tesouraria CME Lausanne.');
+
     // ignore: deprecated_member_use
     Share.share(buffer.toString(), subject: 'Fechamento de Culto - ${detail.serviceDate}');
   }
