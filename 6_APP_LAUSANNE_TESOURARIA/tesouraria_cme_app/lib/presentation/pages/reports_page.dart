@@ -99,7 +99,9 @@ class _ReportsPageState extends State<ReportsPage> {
     final now = DateTime.now();
     return _closingDetails.where((detail) {
       final date = _parseDate(detail.serviceDate);
-      if (date == null) return true;
+      if (date == null) {
+        return _selectedPeriod == ReportPeriod.all;
+      }
 
       switch (_selectedPeriod) {
         case ReportPeriod.thisMonth:
