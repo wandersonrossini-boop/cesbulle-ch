@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -27,4 +30,9 @@ public class Expense {
     private String reversalJustification;
     private String approvedBy;
     private LocalDate approvalDate;
+    @Column(length = 500)
+    private String observations;
+
+    @OneToMany(mappedBy = "expense", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<ExpenseAttachment> attachments = new ArrayList<>();
 }

@@ -37,6 +37,7 @@ public class ExpenseController {
         expense.setAmount(request.getAmount());
         expense.setPaymentMethod(request.getPaymentMethod());
         expense.setReceiptReference(request.getReceiptReference());
+        expense.setObservations(request.getObservations());
         expense.setCreatedBy(authentication.getName());
         expense.setStatus("PENDING");
 
@@ -101,9 +102,15 @@ class ExpenseRequest {
     private BigDecimal amount;
     private String paymentMethod;
     private String receiptReference;
+    private String observations;
 }
 
 @Data
 class ReversalRequest {
+    private String justification;
+}
+
+@Data
+class DeactivationRequest {
     private String justification;
 }
