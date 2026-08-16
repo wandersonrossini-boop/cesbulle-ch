@@ -1,25 +1,40 @@
 package com.tesourariacme.api.presentation;
 
+import com.tesourariacme.api.domain.DocumentType;
 import com.tesourariacme.api.domain.Expense;
+import com.tesourariacme.api.domain.ExpenseAttachment;
+import com.tesourariacme.api.infrastructure.ExpenseAttachmentRepository;
 import com.tesourariacme.api.infrastructure.ExpenseRepository;
+import com.tesourariacme.api.infrastructure.StorageService;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/despesas")
 public class ExpenseController {
 
     private final ExpenseRepository expenseRepository;
+    private final ExpenseAttachmentRepository expenseAttachmentRepository;
+    private final StorageService storageService;
 
-    public ExpenseController(ExpenseRepository expenseRepository) {
+    public ExpenseController(
+            ExpenseRepository expenseRepository,
+            ExpenseAttachmentRepository expenseAttachmentRepository,
+            StorageService storageService) {
         this.expenseRepository = expenseRepository;
+        this.expenseAttachmentRepository = expenseAttachmentRepository;
+        this.storageService = storageService;
     }
 
     @GetMapping
@@ -85,6 +100,143 @@ public class ExpenseController {
             Expense saved = expenseRepository.save(expense);
             return ResponseEntity.ok(saved);
         }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{expenseId}/attachments")
+    public ResponseEntity<?> uploadAttachment(
+            @PathVariable Long expenseId,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("documentType") DocumentType documentType,
+            Authentication authentication) {
+
+        return expenseRepository.findById(expenseId).map(expense -> {
+            if ("REJECTED".equals(expense.getStatus()) || "REVERSED".equals(expense.getStatus())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Não é permitido adicionar anexos a despesas rejeitadas ou estornadas.");
+            }
+
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body("Arquivo vazio.");
+            }
+            if (file.getSize() > 5 * 1024 * 1024) {
+                return ResponseEntity.badRequest().body("Tamanho máximo de arquivo permitido é 5MB.");
+            }
+
+            String contentType = file.getContentType();
+            String originalFilename = file.getOriginalFilename();
+            String ext = getFileExtension(originalFilename);
+
+            if (!isValidFormat(contentType, ext)) {
+                return ResponseEntity.badRequest().body("Formato de arquivo não suportado. Apenas PDF, JPG, JPEG e PNG.");
+            }
+
+            String uuid = UUID.randomUUID().toString();
+            String storagePath = "expenses/" + expenseId + "/" + uuid + "." + ext;
+
+            try {
+                storageService.save(storagePath, file);
+
+                ExpenseAttachment attachment = new ExpenseAttachment();
+                attachment.setExpense(expense);
+                attachment.setDocumentType(documentType);
+                attachment.setFileName(originalFilename);
+                attachment.setContentType(contentType);
+                attachment.setStoragePath(storagePath);
+                attachment.setFileSize(file.getSize());
+                attachment.setUploadedBy(authentication.getName());
+                attachment.setUploadedAt(LocalDateTime.now());
+                attachment.setActive(true);
+
+                ExpenseAttachment saved = expenseAttachmentRepository.save(attachment);
+                
+                expense.getAttachments().add(saved);
+                expenseRepository.save(expense);
+
+                return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Erro ao salvar arquivo: " + e.getMessage());
+            }
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{expenseId}/attachments/{attachmentId}/deactivate")
+    public ResponseEntity<?> deactivateAttachment(
+            @PathVariable Long expenseId,
+            @PathVariable Long attachmentId,
+            @RequestBody DeactivationRequest request,
+            Authentication authentication) {
+
+        if (request.getJustification() == null || request.getJustification().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Justificativa de desativação é obrigatória.");
+        }
+
+        Optional<Expense> expenseOpt = expenseRepository.findById(expenseId);
+        if (expenseOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Expense expense = expenseOpt.get();
+
+        if (!"PENDING".equals(expense.getStatus())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Apenas despesas PENDENTES podem ter anexos desativados.");
+        }
+
+        Optional<ExpenseAttachment> attachmentOpt = expenseAttachmentRepository.findByIdAndExpenseId(attachmentId, expenseId);
+        if (attachmentOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Anexo não encontrado ou não pertence a esta despesa.");
+        }
+
+        ExpenseAttachment attachment = attachmentOpt.get();
+        attachment.setActive(false);
+        attachment.setDeactivatedBy(authentication.getName());
+        attachment.setDeactivatedAt(LocalDateTime.now());
+        attachment.setDeactivationJustification(request.getJustification());
+
+        ExpenseAttachment saved = expenseAttachmentRepository.save(attachment);
+        return ResponseEntity.ok(saved);
+    }
+
+    @GetMapping("/{expenseId}/attachments/{attachmentId}")
+    public ResponseEntity<?> downloadAttachment(
+            @PathVariable Long expenseId,
+            @PathVariable Long attachmentId) {
+
+        Optional<ExpenseAttachment> attachmentOpt = expenseAttachmentRepository.findByIdAndExpenseId(attachmentId, expenseId);
+        if (attachmentOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Anexo não encontrado ou não pertence a esta despesa.");
+        }
+
+        ExpenseAttachment attachment = attachmentOpt.get();
+        if (!attachment.isActive()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Este anexo foi desativado.");
+        }
+
+        try {
+            byte[] data = storageService.load(attachment.getStoragePath());
+            return ResponseEntity.ok()
+                    .header("Content-Type", attachment.getContentType())
+                    .header("Content-Disposition", "inline; filename=\"" + attachment.getFileName() + "\"")
+                    .body(data);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro ao ler arquivo: " + e.getMessage());
+        }
+    }
+
+    private String getFileExtension(String filename) {
+        if (filename == null || !filename.contains(".")) return "";
+        return filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
+    }
+
+    private boolean isValidFormat(String contentType, String ext) {
+        boolean validMime = "application/pdf".equals(contentType)
+                || "image/jpeg".equals(contentType)
+                || "image/png".equals(contentType);
+        boolean validExt = "pdf".equals(ext) || "jpg".equals(ext) || "jpeg".equals(ext) || "png".equals(ext);
+        return validMime && validExt;
     }
 
     private boolean isAdmin(Authentication authentication) {
