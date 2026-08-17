@@ -31,15 +31,6 @@ class _WizardPageState extends State<WizardPage> {
   final TextEditingController _verifierNameController = TextEditingController();
   final FocusNode _keyboardFocusNode = FocusNode();
 
-  bool _isManualVerifier = false;
-  String? _selectedVerifier;
-
-  bool _isTextFieldFocused() {
-    final primaryFocus = FocusManager.instance.primaryFocus;
-    if (primaryFocus == null) return false;
-    return primaryFocus.context?.widget is EditableText;
-  }
-  
   ClosingPhase _phase = ClosingPhase.setup;
   EnvelopeType _selectedType = EnvelopeType.dizimo;
   DateTime _selectedDate = DateTime.now();
@@ -106,8 +97,6 @@ class _WizardPageState extends State<WizardPage> {
                   _selectedDate = joinedDraft.date ?? DateTime.now();
                   _coTreasurerController.text = joinedDraft.coTreasurer ?? "";
                   _verifierNameController.text = joinedDraft.verifierName ?? "";
-                  _isManualVerifier = joinedDraft.verifierType == 'MANUAL';
-                  _selectedVerifier = joinedDraft.verifierType == 'SELECTED' ? joinedDraft.verifierName : null;
                   _phase = ClosingPhase.counting;
                 });
                 Navigator.pop(dlgContext);
@@ -149,8 +138,6 @@ class _WizardPageState extends State<WizardPage> {
                   _selectedDate = draft.date ?? DateTime.now();
                   _coTreasurerController.text = draft.coTreasurer ?? "";
                   _verifierNameController.text = draft.verifierName ?? "";
-                  _isManualVerifier = draft.verifierType == 'MANUAL';
-                  _selectedVerifier = draft.verifierType == 'SELECTED' ? draft.verifierName : null;
                   _phase = ClosingPhase.counting;
                 });
                 Navigator.pop(dlgContext);
@@ -1385,73 +1372,21 @@ class _WizardPageState extends State<WizardPage> {
           ),
         ),
         const SizedBox(height: 24),
-        if (_isManualVerifier) ...[
-          TextField(
-            controller: _verifierNameController,
-            decoration: InputDecoration(
-              labelText: "Conferente da contagem",
-              hintText: "Digite o nome de quem conferiu",
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            ),
-            onChanged: (val) {
-              setState(() {});
-            },
+        TextField(
+          controller: _verifierNameController,
+          decoration: InputDecoration(
+            labelText: "Conferente da contagem",
+            hintText: "Digite o nome de quem conferiu",
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           ),
-          const SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () {
-                setState(() {
-                  _isManualVerifier = false;
-                  _verifierNameController.clear();
-                  _selectedVerifier = null;
-                });
-              },
-              child: const Text("Selecionar da lista"),
-            ),
-          ),
-        ] else ...[
-          DropdownButtonFormField<String>(
-            initialValue: _selectedVerifier,
-            decoration: InputDecoration(
-              labelText: "Conferente da contagem",
-              hintText: "Selecione quem conferiu",
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            ),
-            items: [
-              ...state.knownMembers.map((String member) {
-                return DropdownMenuItem<String>(value: member, child: Text(member, style: const TextStyle(fontSize: 14)));
-              }),
-              const DropdownMenuItem<String>(
-                value: "_ADD_MANUAL_",
-                child: Text("+ Adicionar outro nome...", style: TextStyle(color: Color(0xFF1E3A8A), fontWeight: FontWeight.bold)),
-              ),
-            ],
-            onChanged: (val) {
-              if (val == "_ADD_MANUAL_") {
-                setState(() {
-                  _isManualVerifier = true;
-                  _selectedVerifier = null;
-                  _verifierNameController.clear();
-                });
-              } else if (val != null) {
-                setState(() {
-                  _selectedVerifier = val;
-                  _verifierNameController.text = val;
-                });
-              }
-            },
-          ),
-        ],
+          onChanged: (val) {
+            setState(() {});
+          },
+        ),
         const SizedBox(height: 24),
         ElevatedButton(
           onPressed: (state.error == null && !state.isSubmitting && state.difference == 0 && state.physicalTotal > 0 && _verifierNameController.text.isNotEmpty) ? () {
@@ -1459,7 +1394,7 @@ class _WizardPageState extends State<WizardPage> {
             context.read<ServiceClosingBloc>().add(
               SubmitClosingEvent(
                 verifierName: _verifierNameController.text.trim(),
-                verifierType: _isManualVerifier ? "MANUAL" : "SELECTED",
+                verifierType: "MANUAL",
               ),
             );
           } : null,
