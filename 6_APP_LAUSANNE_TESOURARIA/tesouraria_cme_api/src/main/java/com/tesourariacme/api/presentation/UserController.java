@@ -10,6 +10,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import com.tesourariacme.api.infrastructure.ExpenseRepository;
+import com.tesourariacme.api.infrastructure.ExpenseAttachmentRepository;
+import com.tesourariacme.api.infrastructure.ServiceClosingRepository;
+import com.tesourariacme.api.infrastructure.MemberRepository;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @RestController
@@ -19,15 +25,52 @@ public class UserController {
 
     private final AppUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ExpenseRepository expenseRepository;
+    private final ExpenseAttachmentRepository expenseAttachmentRepository;
+    private final ServiceClosingRepository serviceClosingRepository;
+    private final MemberRepository memberRepository;
 
-    public UserController(AppUserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserController(
+            AppUserRepository userRepository, 
+            PasswordEncoder passwordEncoder,
+            ExpenseRepository expenseRepository,
+            ExpenseAttachmentRepository expenseAttachmentRepository,
+            ServiceClosingRepository serviceClosingRepository,
+            MemberRepository memberRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.expenseRepository = expenseRepository;
+        this.expenseAttachmentRepository = expenseAttachmentRepository;
+        this.serviceClosingRepository = serviceClosingRepository;
+        this.memberRepository = memberRepository;
     }
 
     // ----------------------------------------------------
     // ADMIN ENDPOINTS
     // ----------------------------------------------------
+
+    @PostMapping("/reset-database")
+    @Transactional
+    public ResponseEntity<?> resetDatabase(Authentication authentication) {
+        if (!isAdmin(authentication)) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+
+        // 1. Delete all attachments
+        expenseAttachmentRepository.deleteAllInBatch();
+        // 2. Delete all expenses
+        expenseRepository.deleteAllInBatch();
+        // 3. Delete all service closings (this also cascades to envelopes as they are mapped/owned)
+        serviceClosingRepository.deleteAllInBatch();
+        // 4. Delete all members
+        memberRepository.deleteAllInBatch();
+        // 5. Delete all non-admin users (role != ADMIN and username != pastor)
+        userRepository.findAll().forEach(user -> {
+            if (!"ADMIN".equalsIgnoreCase(user.getRole()) && !"pastor".equalsIgnoreCase(user.getUsername())) {
+                userRepository.delete(user);
+            }
+        });
+
+        return ResponseEntity.ok("Banco de dados limpo com sucesso (preservando administradores).");
+    }
 
     @GetMapping
     public ResponseEntity<List<AppUser>> getAllUsers(Authentication authentication) {
