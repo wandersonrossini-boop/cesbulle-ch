@@ -31,6 +31,12 @@ class _WizardPageState extends State<WizardPage> {
   final TextEditingController _verifierNameController = TextEditingController();
   final FocusNode _keyboardFocusNode = FocusNode();
 
+  bool _isTextFieldFocused() {
+    final primaryFocus = FocusManager.instance.primaryFocus;
+    if (primaryFocus == null) return false;
+    return primaryFocus.context?.widget is EditableText;
+  }
+
   ClosingPhase _phase = ClosingPhase.setup;
   EnvelopeType _selectedType = EnvelopeType.dizimo;
   DateTime _selectedDate = DateTime.now();
