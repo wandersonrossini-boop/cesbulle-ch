@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'service_closing_events_states.dart';
 import '../../services/fechamento_api_service.dart';
@@ -5,6 +6,7 @@ import '../../services/draft_service.dart';
 
 class ServiceClosingBloc extends Bloc<ServiceClosingEvent, ServiceClosingState> {
   final DraftService _draftService = DraftService();
+  Timer? _debounceTimer;
 
   ServiceClosingBloc() : super(const ServiceClosingState()) {
     on<InitializeClosingContextEvent>((event, emit) {
@@ -97,11 +99,27 @@ class ServiceClosingBloc extends Bloc<ServiceClosingEvent, ServiceClosingState> 
   void onChange(Change<ServiceClosingState> change) {
     super.onChange(change);
     final nextState = change.nextState;
-    // Só grava o rascunho se a data estiver preenchida (contexto iniciado) e não for sucesso ou erro
-    if (nextState.error == null && nextState.date != null && !nextState.isSuccess) {
+    // Só grava o rascunho se a data estiver preenchida (contexto iniciado), não for sucesso, erro ou submissão
+    if (nextState.error == null && nextState.date != null && !nextState.isSuccess && !nextState.isSubmitting) {
       _draftService.saveDraft(nextState);
-      _syncDraftToServer(nextState);
+      
+      // Cancela o timer anterior para aplicar o debounce de 1 segundo
+      _debounceTimer?.cancel();
+      _debounceTimer = Timer(const Duration(seconds: 1), () {
+        if (!isClosed) {
+          _syncDraftToServer(nextState);
+        }
+      });
+    } else {
+      // Cancela qualquer sync pendente se o estado mudar para erro, sucesso ou submissão
+      _debounceTimer?.cancel();
     }
+  }
+
+  @override
+  Future<void> close() {
+    _debounceTimer?.cancel();
+    return super.close();
   }
 
   Future<void> _syncDraftToServer(ServiceClosingState state) async {
