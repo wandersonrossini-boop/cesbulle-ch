@@ -124,13 +124,14 @@ public class ServiceClosingTest {
         IllegalArgumentException ex5 = assertThrows(IllegalArgumentException.class, () -> useCase.execute(c5));
         assertTrue(ex5.getMessage().contains("Tipo de conferente deve ser informado se o nome for preenchido"));
 
-        // Case 6: payload legado somente com coTreasurer -> aceito
+        // Case 6: payload legado somente com coTreasurer -> rejeitado na nova submissão
         ServiceClosing c6 = new ServiceClosing();
         c6.setPhysicalTotal(BigDecimal.ZERO);
         c6.setVerifierType(null);
         c6.setVerifierName(null);
         c6.setCoTreasurer("Wan");
-        assertDoesNotThrow(() -> useCase.execute(c6));
+        IllegalArgumentException ex6 = assertThrows(IllegalArgumentException.class, () -> useCase.execute(c6));
+        assertTrue(ex6.getMessage().contains("Nome do conferente não pode ser vazio"));
 
         // Case 7: AUTHENTICATED -> rejeitado nesta fase
         ServiceClosing c7 = new ServiceClosing();
@@ -139,5 +140,109 @@ public class ServiceClosingTest {
         c7.setVerifierName("Admilson");
         IllegalArgumentException ex7 = assertThrows(IllegalArgumentException.class, () -> useCase.execute(c7));
         assertTrue(ex7.getMessage().contains("Tipo de conferente AUTHENTICATED não é suportado nesta fase"));
+    }
+
+    @Test
+    public void testDoubleVerificationScenarios() {
+        ServiceClosingRepository repo = org.mockito.Mockito.mock(ServiceClosingRepository.class);
+        MemberRepository memberRepo = org.mockito.Mockito.mock(MemberRepository.class);
+        com.tesourariacme.api.application.SubmitServiceClosingUseCase useCase = 
+            new com.tesourariacme.api.application.SubmitServiceClosingUseCase(repo, memberRepo);
+
+        // Cenário A: mainTreasurer = "Anderson", verifierName = "Anderson" -> REJEITADO
+        ServiceClosing cA = new ServiceClosing();
+        cA.setPhysicalTotal(BigDecimal.ZERO);
+        cA.setVerifierType(VerifierType.MANUAL);
+        cA.setMainTreasurer("Anderson");
+        cA.setVerifierName("Anderson");
+        IllegalArgumentException exA = assertThrows(IllegalArgumentException.class, () -> useCase.execute(cA));
+        assertTrue(exA.getMessage().contains("O conferente deve ser uma pessoa diferente"));
+
+        // Cenário B: mainTreasurer = "Anderson", verifierName = " anderson " -> REJEITADO
+        ServiceClosing cB = new ServiceClosing();
+        cB.setPhysicalTotal(BigDecimal.ZERO);
+        cB.setVerifierType(VerifierType.MANUAL);
+        cB.setMainTreasurer("Anderson");
+        cB.setVerifierName(" anderson ");
+        IllegalArgumentException exB = assertThrows(IllegalArgumentException.class, () -> useCase.execute(cB));
+        assertTrue(exB.getMessage().contains("O conferente deve ser uma pessoa diferente"));
+
+        // Cenário C: mainTreasurer = "Anderson", coTreasurer = "Maria", verifierName = "Maria" -> ACEITO
+        ServiceClosing cC = new ServiceClosing();
+        cC.setPhysicalTotal(BigDecimal.ZERO);
+        cC.setVerifierType(VerifierType.MANUAL);
+        cC.setMainTreasurer("Anderson");
+        cC.setCoTreasurer("Maria");
+        cC.setVerifierName("Maria");
+        assertDoesNotThrow(() -> useCase.execute(cC));
+
+        // Cenário D: mainTreasurer = "Anderson", verifierName = "João" -> ACEITO
+        ServiceClosing cD = new ServiceClosing();
+        cD.setPhysicalTotal(BigDecimal.ZERO);
+        cD.setVerifierType(VerifierType.MANUAL);
+        cD.setMainTreasurer("Anderson");
+        cD.setVerifierName("João");
+        assertDoesNotThrow(() -> useCase.execute(cD));
+    }
+
+    @Test
+    public void testGateT4ScenariosAF() {
+        ServiceClosingRepository repo = org.mockito.Mockito.mock(ServiceClosingRepository.class);
+        MemberRepository memberRepo = org.mockito.Mockito.mock(MemberRepository.class);
+        com.tesourariacme.api.application.SubmitServiceClosingUseCase useCase = 
+            new com.tesourariacme.api.application.SubmitServiceClosingUseCase(repo, memberRepo);
+
+        // Cenário A: main="A", verifier=null, co="B" -> REJEITADO
+        ServiceClosing cA = new ServiceClosing();
+        cA.setPhysicalTotal(BigDecimal.ZERO);
+        cA.setMainTreasurer("A");
+        cA.setVerifierName(null);
+        cA.setCoTreasurer("B");
+        IllegalArgumentException exA = assertThrows(IllegalArgumentException.class, () -> useCase.execute(cA));
+        assertTrue(exA.getMessage().contains("Nome do conferente não pode ser vazio"));
+
+        // Cenário B: main="A", verifier="", co="B" -> REJEITADO
+        ServiceClosing cB = new ServiceClosing();
+        cB.setPhysicalTotal(BigDecimal.ZERO);
+        cB.setMainTreasurer("A");
+        cB.setVerifierName("");
+        cB.setCoTreasurer("B");
+        IllegalArgumentException exB = assertThrows(IllegalArgumentException.class, () -> useCase.execute(cB));
+        assertTrue(exB.getMessage().contains("Nome do conferente não pode ser vazio"));
+
+        // Cenário C: main="A", verifier="A" -> REJEITADO
+        ServiceClosing cC = new ServiceClosing();
+        cC.setPhysicalTotal(BigDecimal.ZERO);
+        cC.setMainTreasurer("A");
+        cC.setVerifierName("A");
+        cC.setVerifierType(VerifierType.MANUAL);
+        IllegalArgumentException exC = assertThrows(IllegalArgumentException.class, () -> useCase.execute(cC));
+        assertTrue(exC.getMessage().contains("O conferente deve ser uma pessoa diferente"));
+
+        // Cenário D: main="A", verifier=" a " -> REJEITADO
+        ServiceClosing cD = new ServiceClosing();
+        cD.setPhysicalTotal(BigDecimal.ZERO);
+        cD.setMainTreasurer("A");
+        cD.setVerifierName(" a ");
+        cD.setVerifierType(VerifierType.MANUAL);
+        IllegalArgumentException exD = assertThrows(IllegalArgumentException.class, () -> useCase.execute(cD));
+        assertTrue(exD.getMessage().contains("O conferente deve ser uma pessoa diferente"));
+
+        // Cenário E: main="A", co="B", verifier="B" -> ACEITO
+        ServiceClosing cE = new ServiceClosing();
+        cE.setPhysicalTotal(BigDecimal.ZERO);
+        cE.setMainTreasurer("A");
+        cE.setCoTreasurer("B");
+        cE.setVerifierName("B");
+        cE.setVerifierType(VerifierType.MANUAL);
+        assertDoesNotThrow(() -> useCase.execute(cE));
+
+        // Cenário F: main="A", verifier="C" -> ACEITO
+        ServiceClosing cF = new ServiceClosing();
+        cF.setPhysicalTotal(BigDecimal.ZERO);
+        cF.setMainTreasurer("A");
+        cF.setVerifierName("C");
+        cF.setVerifierType(VerifierType.MANUAL);
+        assertDoesNotThrow(() -> useCase.execute(cF));
     }
 }

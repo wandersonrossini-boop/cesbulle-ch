@@ -10,7 +10,20 @@ class InitializeClosingContextEvent extends ServiceClosingEvent {
   final DateTime date;
   final String mainTreasurer;
   final String coTreasurer;
-  InitializeClosingContextEvent(this.date, this.mainTreasurer, this.coTreasurer);
+  final int? sessionId;
+  final String? serviceTime;
+  final String? serviceEndTime;
+  final String? serviceType;
+
+  InitializeClosingContextEvent(
+    this.date,
+    this.mainTreasurer,
+    this.coTreasurer, {
+    this.sessionId,
+    this.serviceTime,
+    this.serviceEndTime,
+    this.serviceType,
+  });
 }
 
 class LoadMembersEvent extends ServiceClosingEvent {}
@@ -99,7 +112,11 @@ class UndoAddedEntryEvent extends ServiceClosingEvent {
 }
 
 class ServiceClosingState extends Equatable {
+  final int? sessionId;
   final DateTime? date;
+  final String? serviceTime;
+  final String? serviceEndTime;
+  final String? serviceType;
   final String mainTreasurer;
   final String? coTreasurer;
   final String? verifierName;
@@ -121,8 +138,12 @@ class ServiceClosingState extends Equatable {
   int anonymousTotalBy(EnvelopeType type) => anonymousEntries.where((e) => e.type == type).fold(0, (sum, item) => sum + item.amount);
 
   const ServiceClosingState({
+    this.sessionId,
     this.date,
-    this.mainTreasurer = "Admilson",
+    this.serviceTime,
+    this.serviceEndTime,
+    this.serviceType,
+    this.mainTreasurer = "",
     this.coTreasurer,
     this.verifierName,
     this.verifierType,
@@ -136,7 +157,11 @@ class ServiceClosingState extends Equatable {
   });
 
   ServiceClosingState copyWith({
+    int? sessionId,
     DateTime? date,
+    String? serviceTime,
+    String? serviceEndTime,
+    String? serviceType,
     String? mainTreasurer,
     String? coTreasurer,
     String? verifierName,
@@ -150,7 +175,11 @@ class ServiceClosingState extends Equatable {
     bool? isSuccess,
   }) {
     return ServiceClosingState(
+      sessionId: sessionId ?? this.sessionId,
       date: date ?? this.date,
+      serviceTime: serviceTime ?? this.serviceTime,
+      serviceEndTime: serviceEndTime ?? this.serviceEndTime,
+      serviceType: serviceType ?? this.serviceType,
       mainTreasurer: mainTreasurer ?? this.mainTreasurer,
       coTreasurer: coTreasurer ?? this.coTreasurer,
       verifierName: verifierName ?? this.verifierName,
@@ -167,14 +196,19 @@ class ServiceClosingState extends Equatable {
 
   @override
   List<Object?> get props => [
-    date, mainTreasurer, coTreasurer, verifierName, verifierType,
+    sessionId, date, serviceTime, serviceEndTime, serviceType,
+    mainTreasurer, coTreasurer, verifierName, verifierType,
     identifiedEntries, anonymousEntries, physicalTotal, error, knownMembers,
     isSubmitting, isSuccess
   ];
 
   Map<String, dynamic> toJson() {
     return {
+      'sessionId': sessionId,
       'date': date?.toIso8601String(),
+      'serviceTime': serviceTime,
+      'serviceEndTime': serviceEndTime,
+      'serviceType': serviceType,
       'mainTreasurer': mainTreasurer,
       'coTreasurer': coTreasurer,
       'verifierName': verifierName,
@@ -191,8 +225,12 @@ class ServiceClosingState extends Equatable {
 
   factory ServiceClosingState.fromJson(Map<String, dynamic> json) {
     return ServiceClosingState(
+      sessionId: json['sessionId'] as int?,
       date: json['date'] != null ? DateTime.parse(json['date']) : null,
-      mainTreasurer: json['mainTreasurer'] ?? "Admilson",
+      serviceTime: json['serviceTime'] as String?,
+      serviceEndTime: json['serviceEndTime'] as String?,
+      serviceType: json['serviceType'] as String?,
+      mainTreasurer: json['mainTreasurer'] ?? "",
       coTreasurer: json['coTreasurer'],
       verifierName: json['verifierName'],
       verifierType: json['verifierType'],

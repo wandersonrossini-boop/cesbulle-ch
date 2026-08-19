@@ -1,11 +1,19 @@
 package com.tesourariacme.api.presentation;
 
 import com.tesourariacme.api.application.SubmitServiceClosingUseCase;
+import com.tesourariacme.api.application.ServiceClosingSessionService;
 import com.tesourariacme.api.domain.Envelope;
 import com.tesourariacme.api.domain.ServiceClosing;
+import com.tesourariacme.api.domain.ServiceClosingSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 @RestController
@@ -14,10 +22,14 @@ import java.util.stream.Collectors;
 public class ServiceClosingController {
 
     private final SubmitServiceClosingUseCase useCase;
+    private final ServiceClosingSessionService sessionService;
+    private final ObjectMapper objectMapper;
     private static Object activeDraft = null; // static to persist across controller requests
 
-    public ServiceClosingController(SubmitServiceClosingUseCase useCase) {
+    public ServiceClosingController(SubmitServiceClosingUseCase useCase, ServiceClosingSessionService sessionService, ObjectMapper objectMapper) {
         this.useCase = useCase;
+        this.sessionService = sessionService;
+        this.objectMapper = objectMapper;
     }
 
     @PostMapping("/draft")
@@ -93,6 +105,107 @@ public class ServiceClosingController {
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/session")
+    public ResponseEntity<?> createSession(@RequestBody ServiceClosingSessionRequest request, Authentication authentication) {
+        try {
+            String user = authentication != null ? authentication.getName() : "anonymous";
+            ServiceClosingSession session = sessionService.getOrCreate(
+                    request.getServiceDate(),
+                    request.getServiceTime(),
+                    request.getServiceEndTime(),
+                    request.getServiceType(),
+                    user
+            );
+            return ResponseEntity.ok(ServiceClosingSessionResponse.fromEntity(session));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/session/{id}")
+    public ResponseEntity<?> getSessionById(@PathVariable Long id) {
+        return sessionService.findById(id)
+                .map(session -> ResponseEntity.ok(ServiceClosingSessionResponse.fromEntity(session)))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/session/{id}/draft")
+    public ResponseEntity<?> saveSessionDraft(@PathVariable Long id, @RequestBody Object draft) {
+        try {
+            String jsonStr = objectMapper.writeValueAsString(draft);
+            sessionService.saveDraft(id, jsonStr);
+            return ResponseEntity.ok().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erro ao processar o rascunho: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/session/{id}/draft")
+    public ResponseEntity<?> getSessionDraft(@PathVariable Long id) {
+        return sessionService.getDraft(id)
+                .filter(draft -> draft != null && !draft.trim().isEmpty())
+                .map(draft -> {
+                    try {
+                        Object obj = objectMapper.readValue(draft, Object.class);
+                        return ResponseEntity.ok(obj);
+                    } catch (Exception e) {
+                        return ResponseEntity.internalServerError().build();
+                    }
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/session/{id}/draft")
+    public ResponseEntity<?> clearSessionDraft(@PathVariable Long id) {
+        try {
+            sessionService.clearDraft(id);
+            return ResponseEntity.ok().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Data
+    public static class ServiceClosingSessionRequest {
+        private LocalDate serviceDate;
+        private LocalTime serviceTime;
+        private LocalTime serviceEndTime;
+        private String serviceType;
+    }
+
+    @Data
+    public static class ServiceClosingSessionResponse {
+        private Long id;
+        private LocalDate serviceDate;
+        private LocalTime serviceTime;
+        private LocalTime serviceEndTime;
+        private String serviceType;
+        private String status;
+        private String startedBy;
+        private LocalDateTime startedAt;
+        private LocalDateTime expiresAt;
+
+        public static ServiceClosingSessionResponse fromEntity(ServiceClosingSession session) {
+            ServiceClosingSessionResponse resp = new ServiceClosingSessionResponse();
+            resp.setId(session.getId());
+            resp.setServiceDate(session.getServiceDate());
+            resp.setServiceTime(session.getServiceTime());
+            resp.setServiceEndTime(session.getServiceEndTime());
+            resp.setServiceType(session.getServiceType());
+            resp.setStatus(session.getStatus().name());
+            resp.setStartedBy(session.getStartedBy());
+            resp.setStartedAt(session.getStartedAt());
+            resp.setExpiresAt(session.getExpiresAt());
+            return resp;
         }
     }
 }

@@ -192,4 +192,94 @@ class FechamentoApiService {
       );
     } catch (_) {}
   }
+
+  Future<Map<String, dynamic>> getOrCreateSession({
+    required DateTime date,
+    required String startTime,
+    required String endTime,
+    required String? type,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/fechamento-culto/session'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'serviceDate': "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}",
+        'serviceTime': startTime,
+        'serviceEndTime': endTime,
+        'serviceType': type,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else if (response.statusCode == 401) {
+      throw Exception('UNAUTHORIZED');
+    } else {
+      throw Exception('Falha ao criar/obter sessão (${response.statusCode}): ${response.body}');
+    }
+  }
+
+  Future<void> saveSessionDraftToServer(int sessionId, ServiceClosingState state) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('jwt_token');
+
+      await http.post(
+        Uri.parse('$_baseUrl/fechamento-culto/session/$sessionId/draft'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(state.toJson()),
+      );
+    } catch (_) {}
+  }
+
+  Future<ServiceClosingState?> getSessionDraftFromServer(int sessionId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('jwt_token');
+
+      final response = await http.get(
+        Uri.parse('$_baseUrl/fechamento-culto/session/$sessionId/draft'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return ServiceClosingState.fromJson(data);
+      } else if (response.statusCode == 401) {
+        throw Exception('UNAUTHORIZED');
+      }
+      return null;
+    } on Exception {
+      rethrow;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> clearSessionDraftOnServer(int sessionId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('jwt_token');
+
+      await http.delete(
+        Uri.parse('$_baseUrl/fechamento-culto/session/$sessionId/draft'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+      );
+    } catch (_) {}
+  }
 }

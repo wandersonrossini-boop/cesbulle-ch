@@ -53,6 +53,27 @@ class FakeFechamentoApiService implements FechamentoApiService {
 
   @override
   Future<void> clearDraftOnServer() async {}
+
+  @override
+  Future<Map<String, dynamic>> getOrCreateSession({
+    required DateTime date,
+    required String startTime,
+    required String endTime,
+    required String? type,
+  }) async {
+    return {};
+  }
+
+  @override
+  Future<void> saveSessionDraftToServer(int sessionId, ServiceClosingState state) async {}
+
+  @override
+  Future<ServiceClosingState?> getSessionDraftFromServer(int sessionId) async {
+    return null;
+  }
+
+  @override
+  Future<void> clearSessionDraftOnServer(int sessionId) async {}
 }
 
 void main() {

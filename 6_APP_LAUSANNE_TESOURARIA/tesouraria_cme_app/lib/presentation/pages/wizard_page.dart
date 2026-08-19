@@ -45,11 +45,29 @@ class _WizardPageState extends State<WizardPage> {
   final DraftService _draftService = DraftService();
   Timer? _syncTimer;
 
+  TimeOfDay? _startTime;
+  TimeOfDay? _endTime;
+  final TextEditingController _typeController = TextEditingController();
+  bool _isConnecting = false;
+  bool _isMemberSelectorOpen = false;
+
+  bool _isTimeValid() {
+    if (_startTime == null || _endTime == null) return false;
+    final startMin = _startTime!.hour * 60 + _startTime!.minute;
+    final endMin = _endTime!.hour * 60 + _endTime!.minute;
+    return endMin > startMin;
+  }
+
+  String _formatTimeOfDay(TimeOfDay time) {
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+    return "$hour:$minute";
+  }
+
   @override
   void initState() {
     super.initState();
     _bloc = ServiceClosingBloc()..add(LoadMembersEvent());
-    _checkForDraft();
   }
 
   Future<String> _getCurrentUserName() async {
@@ -58,68 +76,33 @@ class _WizardPageState extends State<WizardPage> {
     return savedUser.substring(0, 1).toUpperCase() + savedUser.substring(1);
   }
 
-  Future<void> _checkForDraft() async {
-    // Check server draft first to sync multi-device
-    final serverDraft = await FechamentoApiService().getDraftFromServer();
-    
-    if (serverDraft != null && mounted) {
-      final currentUserName = await _getCurrentUserName();
-      
-      // Auto-assign as co-treasurer if this user is not the main treasurer
-      ServiceClosingState joinedDraft = serverDraft;
-      if (serverDraft.mainTreasurer != currentUserName) {
-        String newCoTreasurer = serverDraft.coTreasurer ?? "";
-        if (!newCoTreasurer.contains(currentUserName)) {
-          newCoTreasurer = newCoTreasurer.isEmpty 
-              ? currentUserName 
-              : "$newCoTreasurer, $currentUserName";
-        }
-        joinedDraft = serverDraft.copyWith(coTreasurer: newCoTreasurer);
-        _bloc.add(InitializeClosingContextEvent(
-          joinedDraft.date ?? DateTime.now(),
-          joinedDraft.mainTreasurer,
-          joinedDraft.coTreasurer ?? '',
-        ));
-      }
-      if (!mounted) return;
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (dlgContext) => AlertDialog(
-          title: const Text("Contagem Coletiva"),
-          content: Text("Existe uma contagem ativa iniciada por ${joinedDraft.mainTreasurer} para o culto de ${joinedDraft.date != null ? DateFormat('dd/MM').format(joinedDraft.date!) : ''}. Deseja participar dela?"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dlgContext);
-                _checkLocalDraftFallback();
-              },
-              child: const Text("IGNORAR"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                _bloc.add(RestoreDraftEvent(joinedDraft));
-                setState(() {
-                  _selectedDate = joinedDraft.date ?? DateTime.now();
-                  _coTreasurerController.text = joinedDraft.coTreasurer ?? "";
-                  _verifierNameController.text = joinedDraft.verifierName ?? "";
-                  _phase = ClosingPhase.counting;
-                });
-                Navigator.pop(dlgContext);
-                _startSyncTimer();
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1E3A8A), foregroundColor: Colors.white),
-              child: const Text("PARTICIPAR"),
-            ),
-          ],
-        ),
-      );
-      return;
-    }
-
-    _checkLocalDraftFallback();
+  void _initializeCleanSession(
+    int? sessionId,
+    DateTime date,
+    String userName,
+    String startTime,
+    String endTime,
+    String? type,
+  ) {
+    _bloc.add(
+      InitializeClosingContextEvent(
+        date,
+        userName,
+        '',
+        sessionId: sessionId,
+        serviceTime: startTime,
+        serviceEndTime: endTime,
+        serviceType: type,
+      )
+    );
+    setState(() {
+      _phase = ClosingPhase.counting;
+      _isConnecting = false;
+    });
+    _startSyncTimer();
   }
 
+  // ignore: unused_element
   Future<void> _checkLocalDraftFallback() async {
     final draft = await _draftService.loadDraft();
     if (draft != null && mounted) {
@@ -194,6 +177,7 @@ class _WizardPageState extends State<WizardPage> {
     _memberNameController.dispose();
     _verifierNameController.dispose();
     _keyboardFocusNode.dispose();
+    _typeController.dispose();
     _bloc.close();
     super.dispose();
   }
@@ -365,19 +349,98 @@ class _WizardPageState extends State<WizardPage> {
                 const SizedBox(height: 16),
                 
                 // Date text
-                Text(
-                  formattedDate,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: isDesktop ? 36 : 26,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF0F172A),
-                    letterSpacing: -0.5,
+                InkWell(
+                  onTap: _isConnecting ? null : () async {
+                    final pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: _selectedDate,
+                      firstDate: DateTime(2020),
+                      lastDate: DateTime(2100),
+                    );
+                    if (pickedDate != null) {
+                      setState(() {
+                        _selectedDate = pickedDate;
+                      });
+                    }
+                  },
+                  child: Text(
+                    formattedDate,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: isDesktop ? 36 : 26,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF0F172A),
+                      letterSpacing: -0.5,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 ),
                 
-                // Space between date and button
-                SizedBox(height: isDesktop ? 60 : 40),
+                const SizedBox(height: 24),
+                
+                // Name/Type of Worship TextField
+                TextField(
+                  controller: _typeController,
+                  enabled: !_isConnecting,
+                  decoration: const InputDecoration(
+                    labelText: "Nome/Tipo do Culto (Opcional)",
+                    border: OutlineInputBorder(),
+                    fillColor: Colors.white,
+                    filled: true,
+                  ),
+                ),
+                
+                const SizedBox(height: 16),
+                
+                // Time Pickers Row
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: _isConnecting ? null : () async {
+                          final pickedTime = await showTimePicker(
+                            context: context,
+                            initialTime: _startTime ?? const TimeOfDay(hour: 19, minute: 0),
+                          );
+                          if (pickedTime != null) {
+                            setState(() {
+                              _startTime = pickedTime;
+                            });
+                          }
+                        },
+                        child: Text(
+                          _startTime == null
+                              ? "Início: --:--"
+                              : "Início: ${_formatTimeOfDay(_startTime!)}",
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: _isConnecting ? null : () async {
+                          final pickedTime = await showTimePicker(
+                            context: context,
+                            initialTime: _endTime ?? const TimeOfDay(hour: 21, minute: 0),
+                          );
+                          if (pickedTime != null) {
+                            setState(() {
+                              _endTime = pickedTime;
+                            });
+                          }
+                        },
+                        child: Text(
+                          _endTime == null
+                              ? "Fim: --:--"
+                              : "Fim: ${_formatTimeOfDay(_endTime!)}",
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                
+                // Space between fields and button
+                const SizedBox(height: 32),
 
                 // INICIAR button
                 Container(
@@ -385,39 +448,190 @@ class _WizardPageState extends State<WizardPage> {
                   height: 60,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color(0xFF0A2E6B), // dark navy
-                        Color(0xFF0C53D4), // royal blue
-                      ],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
+                    gradient: (_startTime == null || _endTime == null || _isConnecting)
+                        ? null
+                        : const LinearGradient(
+                            colors: [
+                              Color(0xFF0A2E6B), // dark navy
+                              Color(0xFF0C53D4), // royal blue
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                    color: (_startTime == null || _endTime == null || _isConnecting)
+                        ? Colors.grey[400]
+                        : null,
                   ),
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
                       borderRadius: BorderRadius.circular(8),
-                      onTap: () async {
-                        final currentUserName = await _getCurrentUserName();
-                        if (context.mounted) {
-                          context.read<ServiceClosingBloc>().add(
-                            InitializeClosingContextEvent(_selectedDate, currentUserName, '')
-                          );
-                          setState(() => _phase = ClosingPhase.counting);
-                          _startSyncTimer();
-                        }
-                      },
-                      child: const Center(
-                        child: Text(
-                          "INICIAR",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.0,
-                          ),
-                        ),
+                      onTap: (_startTime == null || _endTime == null || _isConnecting)
+                          ? null
+                          : () async {
+                              if (!_isTimeValid()) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('O horário final deve ser posterior ao horário inicial.'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                                return;
+                              }
+                              
+                              setState(() {
+                                _isConnecting = true;
+                              });
+
+                              final currentUserName = await _getCurrentUserName();
+                              final date = _selectedDate;
+                              final startTimeStr = _formatTimeOfDay(_startTime!);
+                              final endTimeStr = _formatTimeOfDay(_endTime!);
+                              final typeStr = _typeController.text.trim().isNotEmpty
+                                  ? _typeController.text.trim()
+                                  : null;
+
+                              int? sessionId;
+                              DateTime sessionDate = _selectedDate;
+                              String sessionStartTime = startTimeStr;
+                              String sessionEndTime = endTimeStr;
+                              String? sessionType = typeStr;
+
+                              try {
+                                final apiService = FechamentoApiService();
+                                final session = await apiService.getOrCreateSession(
+                                  date: date,
+                                  startTime: startTimeStr,
+                                  endTime: endTimeStr,
+                                  type: typeStr,
+                                );
+                                sessionId = session['id'] as int?;
+                                if (session['serviceDate'] != null) {
+                                  sessionDate = DateTime.parse(session['serviceDate'] as String);
+                                }
+                                if (session['serviceTime'] != null) {
+                                  sessionStartTime = session['serviceTime'] as String;
+                                }
+                                if (session['serviceEndTime'] != null) {
+                                  sessionEndTime = session['serviceEndTime'] as String;
+                                }
+                                if (session.containsKey('serviceType')) {
+                                  sessionType = session['serviceType'] as String?;
+                                }
+                              } catch (e) {
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Erro ao iniciar sessão: ${e.toString()}'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                                setState(() {
+                                  _isConnecting = false;
+                                });
+                                return;
+                              }
+
+                              if (context.mounted) {
+                                ServiceClosingState? sessionDraft;
+                                if (sessionId != null) {
+                                  try {
+                                    final apiService = FechamentoApiService();
+                                    sessionDraft = await apiService.getSessionDraftFromServer(sessionId);
+                                  } catch (_) {}
+                                }
+
+                                if (sessionDraft != null && mounted) {
+                                  // Auto-assign co-treasurer if this user is not main treasurer
+                                  ServiceClosingState joinedDraft = sessionDraft;
+                                  if (sessionDraft.mainTreasurer != currentUserName) {
+                                    String newCoTreasurer = sessionDraft.coTreasurer ?? "";
+                                    if (!newCoTreasurer.contains(currentUserName)) {
+                                      newCoTreasurer = newCoTreasurer.isEmpty
+                                          ? currentUserName
+                                          : "$newCoTreasurer, $currentUserName";
+                                    }
+                                    joinedDraft = sessionDraft.copyWith(coTreasurer: newCoTreasurer);
+                                  }
+
+                                  showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (dlgContext) => AlertDialog(
+                                      title: const Text("Contagem Coletiva da Sessão"),
+                                      content: Text("Existe uma contagem ativa iniciada por ${joinedDraft.mainTreasurer} para esta sessão. Deseja participar dela?"),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(dlgContext);
+                                            setState(() {
+                                              _isConnecting = false;
+                                            });
+                                          },
+                                          child: const Text("VOLTAR"),
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            // Restaura o rascunho preservando metadados de autoridade
+                                            final finalDraft = joinedDraft.copyWith(
+                                              sessionId: sessionId,
+                                              date: sessionDate,
+                                              serviceTime: sessionStartTime,
+                                              serviceEndTime: sessionEndTime,
+                                              serviceType: sessionType,
+                                            );
+                                            _bloc.add(RestoreDraftEvent(finalDraft));
+                                            setState(() {
+                                              _selectedDate = sessionDate;
+                                              _coTreasurerController.text = finalDraft.coTreasurer ?? "";
+                                              _verifierNameController.text = finalDraft.verifierName ?? "";
+                                              _phase = ClosingPhase.counting;
+                                              _isConnecting = false;
+                                            });
+                                            Navigator.pop(dlgContext);
+                                            _startSyncTimer();
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: const Color(0xFF1E3A8A),
+                                            foregroundColor: Colors.white,
+                                          ),
+                                          child: const Text("PARTICIPAR"),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                } else {
+                                  _initializeCleanSession(
+                                    sessionId,
+                                    sessionDate,
+                                    currentUserName,
+                                    sessionStartTime,
+                                    sessionEndTime,
+                                    sessionType,
+                                  );
+                                }
+                              }
+                            },
+                      child: Center(
+                        child: _isConnecting
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2.0,
+                                ),
+                              )
+                            : const Text(
+                                "INICIAR",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 1.0,
+                                ),
+                              ),
                       ),
                     ),
                   ),
@@ -451,7 +665,7 @@ class _WizardPageState extends State<WizardPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 800;
 
-    if (!_keyboardFocusNode.hasFocus && !_isTextFieldFocused()) {
+    if (!_keyboardFocusNode.hasFocus && !_isTextFieldFocused() && !_isMemberSelectorOpen) {
       _keyboardFocusNode.requestFocus();
     }
     
@@ -969,9 +1183,13 @@ class _WizardPageState extends State<WizardPage> {
     );
   }
 
-  void _showContributorSelector(BuildContext context, ServiceClosingState state, bool isDesktop) {
+  Future<void> _showContributorSelector(BuildContext context, ServiceClosingState state, bool isDesktop) async {
     String filterText = "";
     
+    setState(() {
+      _isMemberSelectorOpen = true;
+    });
+
     Widget selectorContent(StateSetter setDialogState) {
       return BlocBuilder<ServiceClosingBloc, ServiceClosingState>(
         builder: (context, currentState) {
@@ -1070,52 +1288,59 @@ class _WizardPageState extends State<WizardPage> {
       );
     }
 
-    if (isDesktop) {
-      showDialog(
-        context: context,
-        builder: (dialogContext) {
-          return BlocProvider.value(
-            value: _bloc,
-            child: Dialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              child: StatefulBuilder(
-                builder: (context, setDialogState) {
-                  return Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: selectorContent(setDialogState),
-                  );
-                },
-              ),
-            ),
-          );
-        },
-      );
-    } else {
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-        builder: (sheetContext) {
-          return BlocProvider.value(
-            value: _bloc,
-            child: Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
-              ),
-              child: StatefulBuilder(
-                builder: (context, setDialogState) {
-                  return SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
+    try {
+      if (isDesktop) {
+        await showDialog(
+          context: context,
+          builder: (dialogContext) {
+            return BlocProvider.value(
+              value: _bloc,
+              child: Dialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                child: StatefulBuilder(
+                  builder: (context, setDialogState) {
+                    return Padding(
+                      padding: const EdgeInsets.all(12.0),
                       child: selectorContent(setDialogState),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
-          );
-        },
-      );
+            );
+          },
+        );
+      } else {
+        await showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+          builder: (sheetContext) {
+            return BlocProvider.value(
+              value: _bloc,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
+                ),
+                child: StatefulBuilder(
+                  builder: (context, setDialogState) {
+                    return SafeArea(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: selectorContent(setDialogState),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            );
+          },
+        );
+      }
+    } finally {
+      setState(() {
+        _isMemberSelectorOpen = false;
+      });
+      _keyboardFocusNode.requestFocus();
     }
   }
 
@@ -1294,6 +1519,16 @@ class _WizardPageState extends State<WizardPage> {
                   ],
                 );
               }),
+              if (state.anonymousEntries.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Center(
+                    child: InkWell(
+                      onTap: () => _showAllAnonymousEntriesDialog(context, state),
+                      child: const Text("Ver todos os lançamentos anônimos  >", style: TextStyle(color: Color(0xFF1E3A8A), fontSize: 13, fontWeight: FontWeight.w600)),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -1394,8 +1629,21 @@ class _WizardPageState extends State<WizardPage> {
           },
         ),
         const SizedBox(height: 24),
+        if (_verifierNameController.text.trim().toLowerCase() == state.mainTreasurer.trim().toLowerCase() && _verifierNameController.text.trim().isNotEmpty)
+          const Padding(
+            padding: EdgeInsets.only(bottom: 16.0),
+            child: Text(
+              "O conferente deve ser uma pessoa diferente do responsável pela contagem.",
+              style: TextStyle(color: AppTheme.excludeRed, fontSize: 13),
+            ),
+          ),
         ElevatedButton(
-          onPressed: (state.error == null && !state.isSubmitting && state.difference == 0 && state.physicalTotal > 0 && _verifierNameController.text.isNotEmpty) ? () {
+          onPressed: (state.error == null &&
+                  !state.isSubmitting &&
+                  state.difference == 0 &&
+                  state.physicalTotal > 0 &&
+                  _verifierNameController.text.trim().isNotEmpty &&
+                  _verifierNameController.text.trim().toLowerCase() != state.mainTreasurer.trim().toLowerCase()) ? () {
             _syncTimer?.cancel();
             context.read<ServiceClosingBloc>().add(
               SubmitClosingEvent(
@@ -1764,6 +2012,99 @@ class _WizardPageState extends State<WizardPage> {
             ),
           ),
         ),
+        );
+      },
+    );
+  }
+
+  void _showAllAnonymousEntriesDialog(BuildContext context, ServiceClosingState state) {
+    showDialog(
+      context: context,
+      builder: (dlgContext) {
+        return BlocProvider.value(
+          value: _bloc,
+          child: Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: Container(
+              width: 600,
+              constraints: const BoxConstraints(maxHeight: 500),
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Lançamentos Anônimos (${state.anonymousEntries.length})",
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF111827)),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Color(0xFF6B7280)),
+                        onPressed: () => Navigator.pop(dlgContext),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    color: const Color(0xFFF8FAFC),
+                    child: const Row(
+                      children: [
+                        Expanded(flex: 2, child: Text("Categoria", style: TextStyle(fontSize: 12, color: Color(0xFF6B7280), fontWeight: FontWeight.w600))),
+                        Expanded(child: Text("Valor", textAlign: TextAlign.right, style: TextStyle(fontSize: 12, color: Color(0xFF6B7280), fontWeight: FontWeight.w600))),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1, color: Color(0xFFE5E7EB)),
+                  Expanded(
+                    child: ListView.separated(
+                      itemCount: state.anonymousEntries.length,
+                      separatorBuilder: (_, __) => const Divider(height: 1, color: Color(0xFFF3F4F6)),
+                      itemBuilder: (context, index) {
+                        final entry = state.anonymousEntries[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          child: Row(
+                            children: [
+                              Expanded(flex: 2, child: Text(entry.type.name.toUpperCase(), style: const TextStyle(fontSize: 13, color: Color(0xFF111827)))),
+                              Expanded(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text('CHF ${BigDecimalConverter.fromRappen(entry.amount).toStringAsFixed(2)}', style: const TextStyle(fontSize: 13, color: Color(0xFF111827))),
+                                    const SizedBox(width: 8),
+                                    InkWell(
+                                      onTap: () {
+                                        context.read<ServiceClosingBloc>().add(UndoAnonymousOfferingEvent(entry.id));
+                                        Navigator.pop(dlgContext);
+                                      },
+                                      child: const Tooltip(
+                                        message: "Remover lançamento",
+                                        child: Icon(Icons.delete_outline, size: 18, color: AppTheme.excludeRed),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(dlgContext),
+                      child: const Text("FECHAR"),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         );
       },
     );

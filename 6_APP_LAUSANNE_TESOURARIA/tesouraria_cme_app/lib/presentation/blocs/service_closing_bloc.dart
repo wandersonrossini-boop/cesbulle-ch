@@ -10,7 +10,15 @@ class ServiceClosingBloc extends Bloc<ServiceClosingEvent, ServiceClosingState> 
 
   ServiceClosingBloc() : super(const ServiceClosingState()) {
     on<InitializeClosingContextEvent>((event, emit) {
-      emit(state.copyWith(date: event.date, mainTreasurer: event.mainTreasurer, coTreasurer: event.coTreasurer));
+      emit(state.copyWith(
+        date: event.date,
+        mainTreasurer: event.mainTreasurer,
+        coTreasurer: event.coTreasurer,
+        sessionId: event.sessionId,
+        serviceTime: event.serviceTime,
+        serviceEndTime: event.serviceEndTime,
+        serviceType: event.serviceType,
+      ));
     });
 
     on<RestoreDraftEvent>((event, emit) {
@@ -78,7 +86,12 @@ class ServiceClosingBloc extends Bloc<ServiceClosingEvent, ServiceClosingState> 
         final apiService = FechamentoApiService();
         await apiService.submitClosing(updatedState);
         await _draftService.clearDraft();
-        await apiService.clearDraftOnServer();
+        final sessionId = state.sessionId;
+        if (sessionId != null) {
+          await apiService.clearSessionDraftOnServer(sessionId);
+        } else {
+          await apiService.clearDraftOnServer();
+        }
         emit(updatedState.copyWith(isSubmitting: false, isSuccess: true));
       } catch (e) {
         emit(updatedState.copyWith(isSubmitting: false, error: e.toString()));
@@ -123,12 +136,15 @@ class ServiceClosingBloc extends Bloc<ServiceClosingEvent, ServiceClosingState> 
   }
 
   Future<void> _syncDraftToServer(ServiceClosingState state) async {
+    final sessionId = state.sessionId;
+    if (sessionId == null) return;
+
     try {
       final apiService = FechamentoApiService();
-      final serverDraft = await apiService.getDraftFromServer();
+      final serverDraft = await apiService.getSessionDraftFromServer(sessionId);
       // Só publica no servidor se não houver sessão ativa lá ou se formos o dono dela
       if (serverDraft == null || serverDraft.mainTreasurer == state.mainTreasurer) {
-        await apiService.saveDraftToServer(state);
+        await apiService.saveSessionDraftToServer(sessionId, state);
       }
     } catch (_) {}
   }
