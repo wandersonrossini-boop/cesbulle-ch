@@ -67,6 +67,9 @@ public class ExpenseController {
         }
 
         return expenseRepository.findById(id).map(expense -> {
+            if (!"PENDING".equals(expense.getStatus())) {
+                return ResponseEntity.badRequest().body("Apenas despesas PENDENTES podem ser aprovadas.");
+            }
             expense.setStatus("APPROVED");
             expense.setApprovedBy(authentication.getName());
             expense.setApprovalDate(LocalDate.now());
@@ -76,27 +79,44 @@ public class ExpenseController {
     }
 
     @PutMapping("/{id}/reject")
-    public ResponseEntity<?> rejectExpense(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<?> rejectExpense(@PathVariable Long id, @RequestBody RejectionRequest request, Authentication authentication) {
         if (!isAdmin(authentication)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Apenas administradores podem rejeitar despesas.");
         }
+        if (request.getJustification() == null || request.getJustification().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Justificativa de rejeição é obrigatória.");
+        }
 
         return expenseRepository.findById(id).map(expense -> {
+            if (!"PENDING".equals(expense.getStatus())) {
+                return ResponseEntity.badRequest().body("Apenas despesas PENDENTES podem ser rejeitadas.");
+            }
             expense.setStatus("REJECTED");
+            expense.setRejectionJustification(request.getJustification());
+            expense.setRejectedBy(authentication.getName());
+            expense.setRejectionDate(java.time.LocalDate.now());
             Expense saved = expenseRepository.save(expense);
             return ResponseEntity.ok(saved);
         }).orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}/reverse")
-    public ResponseEntity<?> reverseExpense(@PathVariable Long id, @RequestBody ReversalRequest request) {
+    public ResponseEntity<?> reverseExpense(@PathVariable Long id, @RequestBody ReversalRequest request, Authentication authentication) {
+        if (!isAdmin(authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Apenas administradores podem estornar despesas.");
+        }
         if (request.getJustification() == null || request.getJustification().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("Justificativa de estorno é obrigatória.");
         }
 
         return expenseRepository.findById(id).map(expense -> {
+            if (!"APPROVED".equals(expense.getStatus())) {
+                return ResponseEntity.badRequest().body("Apenas despesas APROVADAS podem ser estornadas.");
+            }
             expense.setStatus("REVERSED");
             expense.setReversalJustification(request.getJustification());
+            expense.setReversedBy(authentication.getName());
+            expense.setReversalDate(java.time.LocalDate.now());
             Expense saved = expenseRepository.save(expense);
             return ResponseEntity.ok(saved);
         }).orElse(ResponseEntity.notFound().build());
@@ -259,6 +279,11 @@ class ExpenseRequest {
 
 @Data
 class ReversalRequest {
+    private String justification;
+}
+
+@Data
+class RejectionRequest {
     private String justification;
 }
 

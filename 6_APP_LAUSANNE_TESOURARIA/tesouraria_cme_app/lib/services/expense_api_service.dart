@@ -13,9 +13,15 @@ class ExpenseModel {
   final String receiptReference;
   final String status; // PENDING, APPROVED, REJECTED, REVERSED
   final String? reversalJustification;
+  final String? rejectedBy;
+  final DateTime? rejectionDate;
+  final String? rejectionJustification;
+  final String? reversedBy;
+  final DateTime? reversalDate;
   final String createdBy;
   final String? approvedBy;
-  final String? approvalDate;
+  final DateTime? approvalDate;
+  final String? observations;
 
   ExpenseModel({
     required this.id,
@@ -28,12 +34,25 @@ class ExpenseModel {
     required this.receiptReference,
     required this.status,
     this.reversalJustification,
+    this.rejectedBy,
+    this.rejectionDate,
+    this.rejectionJustification,
+    this.reversedBy,
+    this.reversalDate,
     required this.createdBy,
     this.approvedBy,
     this.approvalDate,
+    this.observations,
   });
 
   factory ExpenseModel.fromJson(Map<String, dynamic> json) {
+    DateTime? parseIsoDate(dynamic val) {
+      if (val == null) return null;
+      if (val is String && val.isNotEmpty) {
+        try { return DateTime.parse(val); } catch (_) { return null; }
+      }
+      return null;
+    }
     String parseDate(dynamic val) {
       if (val == null) return '-';
       if (val is String) {
@@ -57,9 +76,15 @@ class ExpenseModel {
       receiptReference: json['receiptReference'] ?? '',
       status: json['status'] ?? 'PENDING',
       reversalJustification: json['reversalJustification'],
+      rejectedBy: json['rejectedBy'],
+      rejectionDate: parseIsoDate(json['rejectionDate']),
+      rejectionJustification: json['rejectionJustification'],
+      reversedBy: json['reversedBy'],
+      reversalDate: parseIsoDate(json['reversalDate']),
       createdBy: json['createdBy'] ?? '',
       approvedBy: json['approvedBy'],
-      approvalDate: json['approvalDate'] != null ? parseDate(json['approvalDate']) : null,
+      approvalDate: parseIsoDate(json['approvalDate']),
+      observations: json['observations'],
     );
   }
 }
@@ -155,7 +180,7 @@ class ExpenseApiService {
     }
   }
 
-  Future<void> rejectExpense(int id) async {
+  Future<void> rejectExpense(int id, String justification) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('jwt_token');
 
@@ -165,6 +190,7 @@ class ExpenseApiService {
         'Content-Type': 'application/json',
         if (token != null) 'Authorization': 'Bearer $token',
       },
+      body: jsonEncode({'justification': justification}),
     );
 
     if (response.statusCode != 200) {

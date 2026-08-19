@@ -27,6 +27,11 @@ public class Expense {
     private String receiptReference;
     private String createdBy;
     private String status; // PENDING, APPROVED, REJECTED, REVERSED
+    private String rejectedBy;
+    private LocalDate rejectionDate;
+    private String rejectionJustification;
+    private String reversedBy;
+    private LocalDate reversalDate;
     private String reversalJustification;
     private String approvedBy;
     private LocalDate approvalDate;

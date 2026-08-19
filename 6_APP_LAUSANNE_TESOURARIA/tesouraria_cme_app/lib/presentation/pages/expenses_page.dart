@@ -350,19 +350,70 @@ class _ExpensesPageState extends State<ExpensesPage> {
     }
   }
 
-  Future<void> _handleReject(ExpenseModel expense) async {
-    try {
-      setState(() => _isLoading = true);
-      await _apiService.rejectExpense(int.parse(expense.id));
-      _loadInitialData();
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao rejeitar despesa: $e'), backgroundColor: Colors.red),
+  void _showRejectionDialog(ExpenseModel expense) {
+    final justificationController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (dlgContext) {
+        return AlertDialog(
+          title: const Text('Justificativa de Rejeição', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'Informe o motivo da rejeição desta despesa:',
+                style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: justificationController,
+                decoration: const InputDecoration(
+                  labelText: 'Motivo da rejeição',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+                style: const TextStyle(fontSize: 13),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dlgContext),
+              child: const Text('CANCELAR', style: TextStyle(color: Color(0xFF64748B))),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final justification = justificationController.text.trim();
+                if (justification.isNotEmpty) {
+                  try {
+                    Navigator.pop(dlgContext);
+                    setState(() => _isLoading = true);
+                    final idInt = int.parse(expense.id);
+                    await _apiService.rejectExpense(idInt, justification);
+                    _loadInitialData();
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Erro ao rejeitar despesa: $e'), backgroundColor: Colors.red),
+                      );
+                      _loadInitialData();
+                    }
+                  }
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFDC2626),
+                foregroundColor: Colors.white,
+                elevation: 0,
+              ),
+              child: const Text('CONFIRMAR REJEIÇÃO'),
+            ),
+          ],
         );
-        _loadInitialData();
-      }
-    }
+      },
+    );
   }
 
   @override
@@ -623,16 +674,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
               Text('Beneficiário: ${item.supplier}', style: const TextStyle(fontSize: 11, color: Color(0xFF64748B))),
               if (item.receiptReference.isNotEmpty)
                 Text('Ref: ${item.receiptReference}', style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8))),
-              if (item.status == 'REVERSED' && item.reversalJustification != null)
-                Container(
-                  margin: const EdgeInsets.only(top: 4),
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(color: const Color(0xFFFEF3C7), borderRadius: BorderRadius.circular(4)),
-                  child: Text(
-                    'Justificativa: ${item.reversalJustification}',
-                    style: const TextStyle(fontSize: 10, color: Color(0xFF92400E)),
-                  ),
-                ),
+
             ],
           ),
         ),
@@ -675,7 +717,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                 IconButton(
                   icon: const Icon(Icons.highlight_off, size: 18, color: Colors.red),
                   tooltip: 'Rejeitar',
-                  onPressed: () => _handleReject(item),
+                  onPressed: () => _showRejectionDialog(item),
                 ),
               ],
               if (item.status != 'REVERSED')
@@ -684,6 +726,11 @@ class _ExpensesPageState extends State<ExpensesPage> {
                   tooltip: 'Estornar',
                   onPressed: () => _showReversalDialog(item),
                 ),
+              IconButton(
+                icon: const Icon(Icons.info_outline, size: 18, color: Color(0xFF64748B)),
+                tooltip: 'Detalhes',
+                onPressed: () => _showExpenseDetailsDialog(item),
+              ),
             ],
           ),
         ),
@@ -708,5 +755,78 @@ class _ExpensesPageState extends State<ExpensesPage> {
       }
     }
     return "${isNegative ? '-' : ''}${buffer.toString()}.$decimal";
+  }
+
+  void _showExpenseDetailsDialog(ExpenseModel item) {
+    String fmtDate(DateTime? dt) {
+      if (dt == null) return '-';
+      return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}';
+    }
+
+    Widget buildRow(String label, String? value) {
+      if (value == null || value.trim().isEmpty) return const SizedBox.shrink();
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 3),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('$label: ', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF475569))),
+            Expanded(child: Text(value, style: const TextStyle(fontSize: 13, color: Color(0xFF0F172A)))),
+          ],
+        ),
+      );
+    }
+
+    Widget buildSection(String title) => Padding(
+      padding: const EdgeInsets.only(top: 12, bottom: 4),
+      child: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
+    );
+
+    showDialog(
+      context: context,
+      builder: (dlgContext) {
+        return AlertDialog(
+          title: const Text('Detalhes da despesa', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          content: SizedBox(
+            width: 420,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  buildSection('Dados Principais'),
+                  buildRow('Criado por', item.createdBy.isNotEmpty ? item.createdBy : null),
+                  buildRow('Data', item.date),
+                  buildRow('Descrição', item.description),
+                  buildRow('Beneficiário', item.supplier),
+                  buildRow('Categoria', item.category),
+                  buildRow('Meio de pagamento', item.paymentMethod),
+                  buildRow('Referência', item.receiptReference.isNotEmpty ? item.receiptReference : null),
+                  buildRow('Observações', item.observations),
+                  buildSection('Histórico'),
+                  // PENDING: sem campos de histórico adicionais
+                  // APPROVED
+                  buildRow('Aprovado por', item.approvedBy),
+                  buildRow('Data de aprovação', fmtDate(item.approvalDate)),
+                  // REJECTED
+                  buildRow('Rejeitado por', item.rejectedBy),
+                  buildRow('Data de rejeição', item.rejectionDate != null ? fmtDate(item.rejectionDate) : null),
+                  buildRow('Justificativa da rejeição', item.rejectionJustification),
+                  // REVERSED
+                  buildRow('Estornado por', item.reversedBy),
+                  buildRow('Data de estorno', item.reversalDate != null ? fmtDate(item.reversalDate) : null),
+                  buildRow('Justificativa do estorno', item.reversalJustification),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Fechar'),
+              onPressed: () => Navigator.of(dlgContext).pop(),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
