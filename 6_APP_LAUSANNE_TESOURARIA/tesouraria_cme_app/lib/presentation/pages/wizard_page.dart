@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -64,10 +66,36 @@ class _WizardPageState extends State<WizardPage> {
     return "$hour:$minute";
   }
 
+  bool _isLoadingStatus = true;
+  Map<String, dynamic>? _currentStatus;
+
+  Future<void> _checkCurrentStatus() async {
+    if (!mounted) return;
+    setState(() {
+      _isLoadingStatus = true;
+    });
+    try {
+      final status = await FechamentoApiService().getCurrentSessionStatus();
+      if (mounted) {
+        setState(() {
+          _currentStatus = status;
+          _isLoadingStatus = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingStatus = false;
+        });
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _bloc = ServiceClosingBloc()..add(LoadMembersEvent());
+    _checkCurrentStatus();
   }
 
   Future<String> _getCurrentUserName() async {
@@ -316,10 +344,165 @@ class _WizardPageState extends State<WizardPage> {
   }
 
   Widget _buildSetupPhase(BuildContext context, ServiceClosingState state, bool isDesktop) {
-    // Format date: e.g. "Domingo, 09 de agosto de 2026"
-    String formattedDate = DateFormat("EEEE, dd 'de' MMMM 'de' yyyy", 'pt_BR').format(_selectedDate);
-    if (formattedDate.isNotEmpty) {
-      formattedDate = formattedDate.substring(0, 1).toUpperCase() + formattedDate.substring(1);
+    if (_isLoadingStatus) {
+      return const Scaffold(
+        backgroundColor: Color(0xFFFAFAFA),
+        body: Center(
+          child: CircularProgressIndicator(color: Color(0xFF1E3A8A)),
+        ),
+      );
+    }
+
+    final hasSchedule = _currentStatus?['hasSchedule'] ?? false;
+    final hasSession = _currentStatus?['hasSession'] ?? false;
+    final schedule = _currentStatus?['schedule'];
+    final sessionMap = _currentStatus?['session'];
+
+    IconData stateIcon;
+    Color iconColor;
+    String titleText;
+    String descText;
+    String buttonText;
+    VoidCallback? onActionButtonPressed;
+
+    if (!hasSchedule) {
+      // Estado: Sem Culto
+      stateIcon = Icons.event_busy_outlined;
+      iconColor = const Color(0xFF64748B);
+      titleText = "Nenhum Culto Programado";
+      descText = "A detecção automática não identificou nenhum culto ativo na agenda para o momento atual.";
+      buttonText = "VERIFICAR NOVAMENTE";
+      onActionButtonPressed = _isConnecting ? null : () => _checkCurrentStatus();
+    } else if (!hasSession) {
+      // Estado: Iniciar
+      stateIcon = Icons.play_circle_outline;
+      iconColor = const Color(0xFF16A34A);
+      titleText = "Iniciar Fechamento";
+      descText = "${schedule['serviceType']} (${schedule['startTime']} - ${schedule['endTime']})";
+      buttonText = "INICIAR CONTAGEM FÍSICA";
+      onActionButtonPressed = _isConnecting ? null : () async {
+        setState(() {
+          _isConnecting = true;
+        });
+        try {
+          final currentUserName = await _getCurrentUserName();
+          final apiService = FechamentoApiService();
+          final resolvedSession = await apiService.resolveAutomaticSession();
+          
+          final int? sessId = resolvedSession['id'] as int?;
+          final DateTime sDate = DateTime.parse(resolvedSession['serviceDate'] as String);
+          final String sStartTime = resolvedSession['serviceTime'] as String;
+          final String sEndTime = resolvedSession['serviceEndTime'] as String;
+          final String? sType = resolvedSession['serviceType'] as String?;
+
+          _initializeCleanSession(
+            sessId,
+            sDate,
+            currentUserName,
+            sStartTime,
+            sEndTime,
+            sType,
+          );
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Erro ao iniciar contagem: ${e.toString()}'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        } finally {
+          if (mounted) {
+            setState(() {
+              _isConnecting = false;
+            });
+          }
+        }
+      };
+    } else {
+      // Estado: Participar
+      stateIcon = Icons.group_outlined;
+      iconColor = const Color(0xFFEA580C);
+      titleText = "Participar da Contagem";
+      descText = "${schedule['serviceType']} (${schedule['startTime']} - ${schedule['endTime']})";
+      buttonText = "RETOMAR/PARTICIPAR DA CONTAGEM";
+      onActionButtonPressed = _isConnecting ? null : () async {
+        setState(() {
+          _isConnecting = true;
+        });
+        try {
+          final currentUserName = await _getCurrentUserName();
+          final apiService = FechamentoApiService();
+          final resolvedSession = await apiService.resolveAutomaticSession();
+          
+          final int? sessId = resolvedSession['id'] as int?;
+          final DateTime sDate = DateTime.parse(resolvedSession['serviceDate'] as String);
+          final String sStartTime = resolvedSession['serviceTime'] as String;
+          final String sEndTime = resolvedSession['serviceEndTime'] as String;
+          final String? sType = resolvedSession['serviceType'] as String?;
+
+          ServiceClosingState? sessionDraft;
+          if (sessId != null) {
+            try {
+              sessionDraft = await apiService.getSessionDraftFromServer(sessId);
+            } catch (_) {}
+          }
+
+          if (sessionDraft != null && mounted) {
+            ServiceClosingState joinedDraft = sessionDraft;
+            if (sessionDraft.mainTreasurer != currentUserName) {
+              String newCoTreasurer = sessionDraft.coTreasurer ?? "";
+              if (!newCoTreasurer.contains(currentUserName)) {
+                newCoTreasurer = newCoTreasurer.isEmpty
+                    ? currentUserName
+                    : "$newCoTreasurer, $currentUserName";
+              }
+              joinedDraft = sessionDraft.copyWith(coTreasurer: newCoTreasurer);
+            }
+
+            final finalDraft = joinedDraft.copyWith(
+              sessionId: sessId,
+              date: sDate,
+              serviceTime: sStartTime,
+              serviceEndTime: sEndTime,
+              serviceType: sType,
+            );
+            _bloc.add(RestoreDraftEvent(finalDraft));
+            setState(() {
+              _selectedDate = sDate;
+              _coTreasurerController.text = finalDraft.coTreasurer ?? "";
+              _verifierNameController.text = finalDraft.verifierName ?? "";
+              _phase = ClosingPhase.counting;
+            });
+            _startSyncTimer();
+          } else {
+            _initializeCleanSession(
+              sessId,
+              sDate,
+              currentUserName,
+              sStartTime,
+              sEndTime,
+              sType,
+            );
+          }
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Erro ao participar: ${e.toString()}'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        } finally {
+          if (mounted) {
+            setState(() {
+              _isConnecting = false;
+            });
+          }
+        }
+      };
     }
 
     return Container(
@@ -329,331 +512,85 @@ class _WizardPageState extends State<WizardPage> {
       child: Center(
         child: SingleChildScrollView(
           child: Container(
-            constraints: const BoxConstraints(maxWidth: 600),
+            constraints: const BoxConstraints(maxWidth: 480),
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // CONTAGEM DE CULTO
-                Text(
-                  "CONTAGEM DE CULTO",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: isDesktop ? 13 : 11,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF64748B),
-                    letterSpacing: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                
-                // Date text
-                InkWell(
-                  onTap: _isConnecting ? null : () async {
-                    final pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: _selectedDate,
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime(2100),
-                    );
-                    if (pickedDate != null) {
-                      setState(() {
-                        _selectedDate = pickedDate;
-                      });
-                    }
-                  },
-                  child: Text(
-                    formattedDate,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: isDesktop ? 36 : 26,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF0F172A),
-                      letterSpacing: -0.5,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
-                
-                const SizedBox(height: 24),
-                
-                // Name/Type of Worship TextField
-                TextField(
-                  controller: _typeController,
-                  enabled: !_isConnecting,
-                  decoration: const InputDecoration(
-                    labelText: "Nome/Tipo do Culto (Opcional)",
-                    border: OutlineInputBorder(),
-                    fillColor: Colors.white,
-                    filled: true,
-                  ),
-                ),
-                
-                const SizedBox(height: 16),
-                
-                // Time Pickers Row
-                Row(
+            child: Card(
+              color: Colors.white,
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: const BorderSide(color: Color(0xFFE2E8F0)),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: _isConnecting ? null : () async {
-                          final pickedTime = await showTimePicker(
-                            context: context,
-                            initialTime: _startTime ?? const TimeOfDay(hour: 19, minute: 0),
-                          );
-                          if (pickedTime != null) {
-                            setState(() {
-                              _startTime = pickedTime;
-                            });
-                          }
-                        },
-                        child: Text(
-                          _startTime == null
-                              ? "Início: --:--"
-                              : "Início: ${_formatTimeOfDay(_startTime!)}",
-                        ),
+                    Icon(stateIcon, size: 72, color: iconColor),
+                    const SizedBox(height: 24),
+                    Text(
+                      titleText,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF0F172A),
+                        letterSpacing: -0.5,
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: _isConnecting ? null : () async {
-                          final pickedTime = await showTimePicker(
-                            context: context,
-                            initialTime: _endTime ?? const TimeOfDay(hour: 21, minute: 0),
-                          );
-                          if (pickedTime != null) {
-                            setState(() {
-                              _endTime = pickedTime;
-                            });
-                          }
-                        },
-                        child: Text(
-                          _endTime == null
-                              ? "Fim: --:--"
-                              : "Fim: ${_formatTimeOfDay(_endTime!)}",
+                    const SizedBox(height: 12),
+                    Text(
+                      descText,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF64748B),
+                        height: 1.5,
+                      ),
+                    ),
+                    if (hasSession && sessionMap != null && sessionMap['startedBy'] != null) ...[
+                      const SizedBox(height: 16),
+                      Text(
+                        "Iniciado por: ${sessionMap['startedBy']}",
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF1E3A8A),
                         ),
                       ),
+                    ],
+                    const SizedBox(height: 32),
+                    ElevatedButton(
+                      onPressed: onActionButtonPressed,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1E3A8A),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: _isConnecting
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            )
+                          : Text(
+                              buttonText,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
                     ),
                   ],
                 ),
-                
-                // Space between fields and button
-                const SizedBox(height: 32),
-
-                // INICIAR button
-                Container(
-                  width: isDesktop ? 360 : double.infinity,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    gradient: (_startTime == null || _endTime == null || _isConnecting)
-                        ? null
-                        : const LinearGradient(
-                            colors: [
-                              Color(0xFF0A2E6B), // dark navy
-                              Color(0xFF0C53D4), // royal blue
-                            ],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                          ),
-                    color: (_startTime == null || _endTime == null || _isConnecting)
-                        ? Colors.grey[400]
-                        : null,
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(8),
-                      onTap: (_startTime == null || _endTime == null || _isConnecting)
-                          ? null
-                          : () async {
-                              if (!_isTimeValid()) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('O horário final deve ser posterior ao horário inicial.'),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                                return;
-                              }
-                              
-                              setState(() {
-                                _isConnecting = true;
-                              });
-
-                              final currentUserName = await _getCurrentUserName();
-                              final date = _selectedDate;
-                              final startTimeStr = _formatTimeOfDay(_startTime!);
-                              final endTimeStr = _formatTimeOfDay(_endTime!);
-                              final typeStr = _typeController.text.trim().isNotEmpty
-                                  ? _typeController.text.trim()
-                                  : null;
-
-                              int? sessionId;
-                              DateTime sessionDate = _selectedDate;
-                              String sessionStartTime = startTimeStr;
-                              String sessionEndTime = endTimeStr;
-                              String? sessionType = typeStr;
-
-                              try {
-                                final apiService = FechamentoApiService();
-                                final session = await apiService.getOrCreateSession(
-                                  date: date,
-                                  startTime: startTimeStr,
-                                  endTime: endTimeStr,
-                                  type: typeStr,
-                                );
-                                sessionId = session['id'] as int?;
-                                if (session['serviceDate'] != null) {
-                                  sessionDate = DateTime.parse(session['serviceDate'] as String);
-                                }
-                                if (session['serviceTime'] != null) {
-                                  sessionStartTime = session['serviceTime'] as String;
-                                }
-                                if (session['serviceEndTime'] != null) {
-                                  sessionEndTime = session['serviceEndTime'] as String;
-                                }
-                                if (session.containsKey('serviceType')) {
-                                  sessionType = session['serviceType'] as String?;
-                                }
-                              } catch (e) {
-                                if (mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Erro ao iniciar sessão: ${e.toString()}'),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
-                                }
-                                setState(() {
-                                  _isConnecting = false;
-                                });
-                                return;
-                              }
-
-                              if (context.mounted) {
-                                ServiceClosingState? sessionDraft;
-                                if (sessionId != null) {
-                                  try {
-                                    final apiService = FechamentoApiService();
-                                    sessionDraft = await apiService.getSessionDraftFromServer(sessionId);
-                                  } catch (_) {}
-                                }
-
-                                if (sessionDraft != null && mounted) {
-                                  // Auto-assign co-treasurer if this user is not main treasurer
-                                  ServiceClosingState joinedDraft = sessionDraft;
-                                  if (sessionDraft.mainTreasurer != currentUserName) {
-                                    String newCoTreasurer = sessionDraft.coTreasurer ?? "";
-                                    if (!newCoTreasurer.contains(currentUserName)) {
-                                      newCoTreasurer = newCoTreasurer.isEmpty
-                                          ? currentUserName
-                                          : "$newCoTreasurer, $currentUserName";
-                                    }
-                                    joinedDraft = sessionDraft.copyWith(coTreasurer: newCoTreasurer);
-                                  }
-
-                                  showDialog(
-                                    context: context,
-                                    barrierDismissible: false,
-                                    builder: (dlgContext) => AlertDialog(
-                                      title: const Text("Contagem Coletiva da Sessão"),
-                                      content: Text("Existe uma contagem ativa iniciada por ${joinedDraft.mainTreasurer} para esta sessão. Deseja participar dela?"),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(dlgContext);
-                                            setState(() {
-                                              _isConnecting = false;
-                                            });
-                                          },
-                                          child: const Text("VOLTAR"),
-                                        ),
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            // Restaura o rascunho preservando metadados de autoridade
-                                            final finalDraft = joinedDraft.copyWith(
-                                              sessionId: sessionId,
-                                              date: sessionDate,
-                                              serviceTime: sessionStartTime,
-                                              serviceEndTime: sessionEndTime,
-                                              serviceType: sessionType,
-                                            );
-                                            _bloc.add(RestoreDraftEvent(finalDraft));
-                                            setState(() {
-                                              _selectedDate = sessionDate;
-                                              _coTreasurerController.text = finalDraft.coTreasurer ?? "";
-                                              _verifierNameController.text = finalDraft.verifierName ?? "";
-                                              _phase = ClosingPhase.counting;
-                                              _isConnecting = false;
-                                            });
-                                            Navigator.pop(dlgContext);
-                                            _startSyncTimer();
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(0xFF1E3A8A),
-                                            foregroundColor: Colors.white,
-                                          ),
-                                          child: const Text("PARTICIPAR"),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                } else {
-                                  _initializeCleanSession(
-                                    sessionId,
-                                    sessionDate,
-                                    currentUserName,
-                                    sessionStartTime,
-                                    sessionEndTime,
-                                    sessionType,
-                                  );
-                                }
-                              }
-                            },
-                      child: Center(
-                        child: _isConnecting
-                            ? const SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2.0,
-                                ),
-                              )
-                            : const Text(
-                                "INICIAR",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1.0,
-                                ),
-                              ),
-                      ),
-                    ),
-                  ),
-                ),
-                
-                // Space between button and text
-                const SizedBox(height: 48),
-                
-                // Explanatory text below
-                Container(
-                  constraints: const BoxConstraints(maxWidth: 380),
-                  child: const Text(
-                    "Ao iniciar, seus lançamentos serão salvos como rascunho no servidor e localmente, permitindo retomar de onde parou.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFF64748B),
-                      height: 1.5,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),

@@ -7,18 +7,26 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.tesourariacme.api.domain.ServiceSchedule;
+import com.tesourariacme.api.infrastructure.ServiceScheduleRepository;
+import java.time.DayOfWeek;
+import java.util.List;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 
 @Service
 public class ServiceClosingSessionService {
 
     private final ServiceClosingSessionRepository repository;
+    private final ServiceScheduleRepository scheduleRepository;
 
-    public ServiceClosingSessionService(ServiceClosingSessionRepository repository) {
+    public ServiceClosingSessionService(ServiceClosingSessionRepository repository, ServiceScheduleRepository scheduleRepository) {
         this.repository = repository;
+        this.scheduleRepository = scheduleRepository;
     }
 
     public Optional<ServiceClosingSession> findById(Long id) {
@@ -40,7 +48,7 @@ public class ServiceClosingSessionService {
         session.setStatus(ServiceClosingSessionStatus.ACTIVE);
         session.setStartedBy(user);
         
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Europe/Zurich"));
         session.setStartedAt(now);
         session.setExpiresAt(calculateExpirationPolicy(date, endTime));
 
@@ -60,7 +68,7 @@ public class ServiceClosingSessionService {
         }
 
         if (session.getStatus() == ServiceClosingSessionStatus.ACTIVE) {
-            if (LocalDateTime.now().isAfter(session.getExpiresAt())) {
+            if (LocalDateTime.now(ZoneId.of("Europe/Zurich")).isAfter(session.getExpiresAt())) {
                 session.setStatus(ServiceClosingSessionStatus.PENDING_CLOSE);
                 return repository.saveAndFlush(session);
             }
@@ -105,5 +113,91 @@ public class ServiceClosingSessionService {
         }
         session.setDraftJson(null);
         repository.saveAndFlush(session);
+    }
+
+    public Optional<ServiceSchedule> findScheduleForTime(LocalDateTime dateTime) {
+        DayOfWeek day = dateTime.getDayOfWeek();
+        LocalTime time = dateTime.toLocalTime();
+        
+        List<ServiceSchedule> schedules = scheduleRepository.findByDayOfWeekAndActiveTrue(day);
+        
+        ServiceSchedule matched = null;
+        long minDistanceMinutes = Long.MAX_VALUE;
+        
+        for (ServiceSchedule sched : schedules) {
+            // Janela operacional: do início do culto até +60 minutos pós-término
+            LocalTime windowStart = sched.getStartTime();
+            LocalTime windowEnd = sched.getEndTime().plusMinutes(60);
+            
+            boolean inWindow = false;
+            if (windowStart.isBefore(windowEnd)) {
+                inWindow = !time.isBefore(windowStart) && !time.isAfter(windowEnd);
+            } else {
+                inWindow = !time.isBefore(windowStart) || !time.isAfter(windowEnd);
+            }
+            
+            if (inWindow) {
+                long dist = java.time.temporal.ChronoUnit.MINUTES.between(sched.getStartTime(), time);
+                long absDist = Math.abs(dist);
+                if (absDist < minDistanceMinutes) {
+                    minDistanceMinutes = absDist;
+                    matched = sched;
+                }
+            }
+        }
+        return Optional.ofNullable(matched);
+    }
+
+    @Transactional
+    public ServiceClosingSession resolveOrCreateSession(LocalDateTime dateTime, String user) {
+        ServiceSchedule schedule = findScheduleForTime(dateTime)
+                .orElseThrow(() -> new IllegalArgumentException("Nenhum culto aplicável"));
+
+        LocalDate date = dateTime.toLocalDate();
+        
+        Optional<ServiceClosingSession> existingOpt = repository.findByServiceScheduleAndServiceDate(schedule, date);
+        if (existingOpt.isPresent()) {
+            return handleExistingSession(existingOpt.get());
+        }
+
+        // Tentar encontrar legado pelo mesmo dia/hora de início
+        Optional<ServiceClosingSession> legacyOpt = repository.findByServiceDateAndServiceTime(date, schedule.getStartTime());
+        if (legacyOpt.isPresent()) {
+            ServiceClosingSession legacy = legacyOpt.get();
+            if (legacy.getServiceSchedule() == null) {
+                legacy.setServiceSchedule(schedule);
+                repository.saveAndFlush(legacy);
+            }
+            return handleExistingSession(legacy);
+        }
+
+        ServiceClosingSession session = new ServiceClosingSession();
+        session.setServiceSchedule(schedule);
+        session.setServiceDate(date);
+        session.setServiceTime(schedule.getStartTime());
+        session.setServiceEndTime(schedule.getEndTime());
+        session.setServiceType(schedule.getServiceType());
+        session.setStatus(ServiceClosingSessionStatus.ACTIVE);
+        session.setStartedBy(user);
+        session.setStartedAt(LocalDateTime.now(ZoneId.of("Europe/Zurich")));
+        session.setExpiresAt(calculateExpirationPolicy(date, schedule.getEndTime()));
+
+        try {
+            return repository.saveAndFlush(session);
+        } catch (DataIntegrityViolationException e) {
+            return repository.findByServiceScheduleAndServiceDate(schedule, date)
+                    .map(this::handleExistingSession)
+                    .orElseGet(() -> repository.findByServiceDateAndServiceTime(date, schedule.getStartTime())
+                            .map(this::handleExistingSession)
+                            .orElseThrow(() -> e));
+        }
+    }
+
+    public Optional<ServiceClosingSession> findSessionByScheduleAndDate(ServiceSchedule schedule, LocalDate date) {
+        Optional<ServiceClosingSession> opt = repository.findByServiceScheduleAndServiceDate(schedule, date);
+        if (opt.isPresent()) {
+            return opt;
+        }
+        return repository.findByServiceDateAndServiceTime(date, schedule.getStartTime());
     }
 }

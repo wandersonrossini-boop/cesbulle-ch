@@ -12,6 +12,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import com.tesourariacme.api.domain.ServiceSchedule;
+import com.tesourariacme.api.infrastructure.ServiceScheduleRepository;
+import java.time.DayOfWeek;
+import java.util.List;
+import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -20,12 +26,14 @@ import static org.mockito.Mockito.*;
 public class ServiceClosingSessionServiceTest {
 
     private ServiceClosingSessionRepository repository;
+    private ServiceScheduleRepository scheduleRepository;
     private ServiceClosingSessionService service;
 
     @BeforeEach
     public void setUp() {
         repository = mock(ServiceClosingSessionRepository.class);
-        service = new ServiceClosingSessionService(repository);
+        scheduleRepository = mock(ServiceScheduleRepository.class);
+        service = new ServiceClosingSessionService(repository, scheduleRepository);
     }
 
     @Test
@@ -211,5 +219,147 @@ public class ServiceClosingSessionServiceTest {
         assertThrows(IllegalStateException.class, () -> {
             service.clearDraft(sessionId);
         });
+    }
+
+    @Test
+    public void testFindScheduleForTime_FoundInScheduledTime() {
+        LocalDateTime dt = LocalDateTime.of(2026, 8, 23, 10, 15); // Sunday 10:15
+        ServiceSchedule schedule = new ServiceSchedule(DayOfWeek.SUNDAY, LocalTime.of(10, 0), LocalTime.of(12, 0), "Regular", true);
+        
+        when(scheduleRepository.findByDayOfWeekAndActiveTrue(DayOfWeek.SUNDAY))
+                .thenReturn(Arrays.asList(schedule));
+
+        Optional<ServiceSchedule> matched = service.findScheduleForTime(dt);
+        assertTrue(matched.isPresent());
+        assertEquals("Regular", matched.get().getServiceType());
+    }
+
+    @Test
+    public void testResolveOrCreateSession_CreatesNewSession() {
+        LocalDateTime dt = LocalDateTime.of(2026, 8, 23, 10, 15); // Sunday 10:15
+        ServiceSchedule schedule = new ServiceSchedule(DayOfWeek.SUNDAY, LocalTime.of(10, 0), LocalTime.of(12, 0), "Regular", true);
+        schedule.setId(42L);
+
+        when(scheduleRepository.findByDayOfWeekAndActiveTrue(DayOfWeek.SUNDAY))
+                .thenReturn(Arrays.asList(schedule));
+        when(repository.findByServiceScheduleAndServiceDate(schedule, dt.toLocalDate()))
+                .thenReturn(Optional.empty());
+        when(repository.findByServiceDateAndServiceTime(dt.toLocalDate(), schedule.getStartTime()))
+                .thenReturn(Optional.empty());
+        when(repository.saveAndFlush(any(ServiceClosingSession.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+
+        ServiceClosingSession session = service.resolveOrCreateSession(dt, "Admilson");
+
+        assertNotNull(session);
+        assertEquals(schedule, session.getServiceSchedule());
+        assertEquals(dt.toLocalDate(), session.getServiceDate());
+        assertEquals(LocalTime.of(10, 0), session.getServiceTime());
+        assertEquals(ServiceClosingSessionStatus.ACTIVE, session.getStatus());
+        assertEquals("Admilson", session.getStartedBy());
+    }
+
+    @Test
+    public void testResolveOrCreateSession_SecondCallIdempotentReturnsSameSession() {
+        LocalDateTime dt = LocalDateTime.of(2026, 8, 23, 10, 15);
+        ServiceSchedule schedule = new ServiceSchedule(DayOfWeek.SUNDAY, LocalTime.of(10, 0), LocalTime.of(12, 0), "Regular", true);
+        schedule.setId(42L);
+
+        ServiceClosingSession existing = new ServiceClosingSession();
+        existing.setServiceSchedule(schedule);
+        existing.setServiceDate(dt.toLocalDate());
+        existing.setStatus(ServiceClosingSessionStatus.ACTIVE);
+        existing.setExpiresAt(LocalDateTime.now().plusHours(1));
+
+        when(scheduleRepository.findByDayOfWeekAndActiveTrue(DayOfWeek.SUNDAY))
+                .thenReturn(Arrays.asList(schedule));
+        when(repository.findByServiceScheduleAndServiceDate(schedule, dt.toLocalDate()))
+                .thenReturn(Optional.of(existing));
+
+        ServiceClosingSession session = service.resolveOrCreateSession(dt, "Admilson");
+
+        assertSame(existing, session);
+        verify(repository, never()).saveAndFlush(any());
+    }
+
+    @Test
+    public void testFindScheduleForTime_WithinPostTimeWindowAllowed() {
+        LocalDateTime dt = LocalDateTime.of(2026, 8, 23, 12, 30); // Sunday 12:30 (endTime is 12:00, within +60 mins)
+        ServiceSchedule schedule = new ServiceSchedule(DayOfWeek.SUNDAY, LocalTime.of(10, 0), LocalTime.of(12, 0), "Regular", true);
+
+        when(scheduleRepository.findByDayOfWeekAndActiveTrue(DayOfWeek.SUNDAY))
+                .thenReturn(Arrays.asList(schedule));
+
+        Optional<ServiceSchedule> matched = service.findScheduleForTime(dt);
+        assertTrue(matched.isPresent());
+    }
+
+    @Test
+    public void testResolveOrCreateSession_NoWorshipApplicableThrowsException() {
+        LocalDateTime dt = LocalDateTime.of(2026, 8, 23, 16, 00); // Sunday 16:00 (outside any window)
+        ServiceSchedule schedule = new ServiceSchedule(DayOfWeek.SUNDAY, LocalTime.of(10, 0), LocalTime.of(12, 0), "Regular", true);
+
+        when(scheduleRepository.findByDayOfWeekAndActiveTrue(DayOfWeek.SUNDAY))
+                .thenReturn(Arrays.asList(schedule));
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            service.resolveOrCreateSession(dt, "Admilson");
+        });
+    }
+
+    @Test
+    public void testResolveOrCreateSession_InactiveScheduleIsIgnored() {
+        LocalDateTime dt = LocalDateTime.of(2026, 8, 23, 10, 15);
+        when(scheduleRepository.findByDayOfWeekAndActiveTrue(DayOfWeek.SUNDAY))
+                .thenReturn(Collections.emptyList()); // Active schedules list is empty
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            service.resolveOrCreateSession(dt, "Admilson");
+        });
+    }
+
+    @Test
+    public void testFindScheduleForTime_TwoServicesSameDayDoNotCollide() {
+        ServiceSchedule morning = new ServiceSchedule(DayOfWeek.SUNDAY, LocalTime.of(10, 0), LocalTime.of(12, 0), "Morning", true);
+        ServiceSchedule evening = new ServiceSchedule(DayOfWeek.SUNDAY, LocalTime.of(19, 0), LocalTime.of(21, 0), "Evening", true);
+
+        when(scheduleRepository.findByDayOfWeekAndActiveTrue(DayOfWeek.SUNDAY))
+                .thenReturn(Arrays.asList(morning, evening));
+
+        // Test at 10:15
+        Optional<ServiceSchedule> matchMorning = service.findScheduleForTime(LocalDateTime.of(2026, 8, 23, 10, 15));
+        assertTrue(matchMorning.isPresent());
+        assertEquals("Morning", matchMorning.get().getServiceType());
+
+        // Test at 19:30
+        Optional<ServiceSchedule> matchEvening = service.findScheduleForTime(LocalDateTime.of(2026, 8, 23, 19, 30));
+        assertTrue(matchEvening.isPresent());
+        assertEquals("Evening", matchEvening.get().getServiceType());
+    }
+
+    @Test
+    public void testResolveOrCreateSession_LegacySessionSupport() {
+        LocalDateTime dt = LocalDateTime.of(2026, 8, 23, 10, 15);
+        ServiceSchedule schedule = new ServiceSchedule(DayOfWeek.SUNDAY, LocalTime.of(10, 0), LocalTime.of(12, 0), "Regular", true);
+        schedule.setId(100L);
+
+        ServiceClosingSession legacy = new ServiceClosingSession();
+        legacy.setServiceDate(dt.toLocalDate());
+        legacy.setServiceTime(schedule.getStartTime());
+        legacy.setStatus(ServiceClosingSessionStatus.ACTIVE);
+        legacy.setExpiresAt(LocalDateTime.now().plusHours(1));
+
+        when(scheduleRepository.findByDayOfWeekAndActiveTrue(DayOfWeek.SUNDAY))
+                .thenReturn(Arrays.asList(schedule));
+        when(repository.findByServiceScheduleAndServiceDate(schedule, dt.toLocalDate()))
+                .thenReturn(Optional.empty());
+        when(repository.findByServiceDateAndServiceTime(dt.toLocalDate(), schedule.getStartTime()))
+                .thenReturn(Optional.of(legacy));
+
+        ServiceClosingSession resolved = service.resolveOrCreateSession(dt, "Admilson");
+
+        assertSame(legacy, resolved);
+        assertEquals(schedule, resolved.getServiceSchedule());
+        verify(repository, times(1)).saveAndFlush(legacy);
     }
 }

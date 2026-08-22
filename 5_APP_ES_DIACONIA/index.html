@@ -511,8 +511,8 @@
                             <span>Mensagens</span>
                         </a>
                         
-                        <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
-                            <a class="admin-menu-item" onclick="App.navigateTo('view-setor-select')" style="color: var(--cyan-accent);">
+                        <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                            <a class="admin-menu-item" onclick="App.navigateTo('view-setor-select')" style="color: #38bdf8 !important;">
                                 <i class="fa-solid fa-right-left"></i>
                                 <span>Mudar para Membro</span>
                             </a>
@@ -658,9 +658,6 @@
                         <!-- TAB: Setores -->
                         <div id="admin-sub-setores" class="admin-tabview" style="display: none;">
                             <div class="panel-card" style="background: #F8FAFC; border: none; box-shadow: none; padding: 0;">
-                                <div class="panel-header" style="background: white; border-radius: 12px; margin-bottom: 20px; border: 1px solid #E2E8F0; padding: 15px 20px;">
-                                    <div class="panel-title"><i class="fa-solid fa-sitemap" style="margin-right: 8px; color: var(--navy-primary);"></i> Organograma Matricial do Diaconato</div>
-                                </div>
                                 <div id="admin-organogram-container">
                                     <!-- Dynamic Organogram Matrix -->
                                 </div>
@@ -677,23 +674,25 @@
                                     </button>
                                 </div>
                                 
-                                <!-- Filters -->
-                                <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
-                                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                        <select id="member-filter-sector" class="select-clean" style="padding: 10px 32px 10px 15px;" onchange="App.renderMembrosTable()">
-                                            <option value="">Todos os Setores</option>
-                                            <option value="entrada">Portaria</option>
-                                            <option value="check_in">Check-in</option>
-                                            <option value="apoio_templo_ronda_dir">Apoio Templo / Ronda Dir.</option>
-                                            <option value="apoio_templo_ronda_esq">Apoio Templo / Ronda Esq.</option>
-                                            <option value="acolhimento">Acolhimento</option>
-                                        </select>
-                                        <select id="member-filter-status" class="select-clean" style="padding: 10px 32px 10px 15px;" onchange="App.renderMembrosTable()">
-                                            <option value="">Todos os Status</option>
-                                            <option value="ativo">Ativo</option>
-                                            <option value="inativo">Inativo</option>
-                                        </select>
+                                <!-- Filters + Search -->
+                                <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;">
+                                    <div style="position: relative; flex: 1; min-width: 200px;">
+                                        <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94A3B8; font-size: 0.85rem;"></i>
+                                        <input type="text" id="member-search-input" placeholder="Pesquisar por nome ou função..." oninput="App.renderMembrosTable()" style="width: 100%; padding: 9px 12px 9px 36px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.9rem; color: var(--navy-dark); background: #F8FAFC; box-sizing: border-box;">
                                     </div>
+                                    <select id="member-filter-sector" class="select-clean" style="padding: 9px 32px 9px 12px;" onchange="App.renderMembrosTable()">
+                                        <option value="">Todos os Setores</option>
+                                        <option value="entrada">Portaria</option>
+                                        <option value="check_in">Check-in</option>
+                                        <option value="apoio_templo_ronda_dir">Apoio Templo / Ronda Dir.</option>
+                                        <option value="apoio_templo_ronda_esq">Apoio Templo / Ronda Esq.</option>
+                                        <option value="acolhimento">Acolhimento</option>
+                                    </select>
+                                    <select id="member-filter-status" class="select-clean" style="padding: 9px 32px 9px 12px;" onchange="App.renderMembrosTable()">
+                                        <option value="">Todos os Status</option>
+                                        <option value="ativo">Ativo</option>
+                                        <option value="inativo">Inativo</option>
+                                    </select>
                                 </div>
                                 
                                 <div class="table-container">
@@ -701,12 +700,10 @@
                                         <thead>
                                             <tr>
                                                 <th>Nome</th>
-                                                <th>E-mail</th>
-                                                <th>Perfil</th>
-                                                <th>Setor</th>
                                                 <th>Função Principal</th>
-                                                <th>Status</th>
-                                                <th>Ações</th>
+                                                <th>Setor</th>
+                                                <th>Disponibilidade</th>
+                                                <th style="text-align: right;">Ações</th>
                                             </tr>
                                         </thead>
                                         <tbody id="admin-membros-table-body">
@@ -714,32 +711,38 @@
                                         </tbody>
                                     </table>
                                 </div>
-                        </div>
+                            </div>
                         </div>
                         
                         <!-- TAB: Afastamentos -->
                         <div id="admin-sub-afastamentos" class="admin-tabview" style="display: none;">
                             <div class="panel-card" style="margin-bottom: 25px;">
                                 <div class="panel-header">
-                                    <div class="panel-title"><i class="fa-solid fa-person-walking-luggage" style="margin-right: 5px; color: var(--teal-primary);"></i> Gestão de Disponibilidade e Afastamentos</div>
+                                    <div class="panel-title">Gestão de Afastamentos e Disponibilidade</div>
                                 </div>
                                 <p style="font-size: 0.85rem; color: var(--slate-gray); margin-bottom: 20px; line-height: 1.5; background: rgba(18, 115, 105, 0.05); padding: 12px; border-radius: 8px;">
                                     <i class="fa-solid fa-circle-info" style="color: var(--teal-primary); margin-right: 4px;"></i>
-                                    Visualize membros atualmente em férias, licença médica, viagem ou afastamento temporário. Membros afastados são automaticamente desconsiderados do rodízio, substituições automáticas e escalas automáticas preditivas.
+                                    Membros afastados são automaticamente desconsiderados do rodízio, substituições automáticas e escalas automáticas preditivas.
                                 </p>
+
+                                <!-- Filter Tabs -->
+                                <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #E2E8F0; padding-bottom: 12px;">
+                                    <button id="btn-af-atuais" onclick="App.switchAfastamentosFilter('atuais')" style="background: var(--teal-primary); color: white; border: none; padding: 7px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">Atuais</button>
+                                    <button id="btn-af-programados" onclick="App.switchAfastamentosFilter('programados')" style="background: transparent; color: var(--navy-dark); border: 1px solid #CBD5E1; padding: 7px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">Programados</button>
+                                    <button id="btn-af-encerrados" onclick="App.switchAfastamentosFilter('encerrados')" style="background: transparent; color: var(--navy-dark); border: 1px solid #CBD5E1; padding: 7px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">Histórico</button>
+                                </div>
 
                                 <div class="table-container">
                                     <table class="admin-table">
                                         <thead>
-                                            <tr>
-                                                <th>Nome</th>
-                                                <th>Status Operacional</th>
-                                                <th>Data Inicial</th>
-                                                <th>Data Final Prevista</th>
+                                            <tr id="admin-afastamentos-thead-row">
+                                                <th>Membro</th>
+                                                <th>Status</th>
+                                                <th>Data Início</th>
+                                                <th>Data Fim Previsto</th>
                                                 <th>Dias Restantes</th>
                                                 <th>Motivo</th>
-                                                <th>Observações da Supervisão</th>
-                                                <th>Retorno</th>
+                                                <th>Obs. Supervisão</th>
                                                 <th style="text-align: right;">Ações</th>
                                             </tr>
                                         </thead>
@@ -748,23 +751,18 @@
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
-
-                            <div class="panel-card">
-                                <div class="panel-header">
-                                    <div class="panel-title"><i class="fa-solid fa-history" style="margin-right: 5px; color: var(--navy-primary);"></i> Histórico Completo de Afastamentos</div>
-                                </div>
-                                <div class="table-container">
+                                <!-- Historico table (hidden, used for encerrados filter) -->
+                                <div class="table-container" id="admin-afastamentos-historico-container" style="display:none;">
                                     <table class="admin-table">
                                         <thead>
                                             <tr>
-                                                <th>Obreiro</th>
+                                                <th>Membro</th>
                                                 <th>Tipo / Status</th>
-                                                <th>Data Inicial</th>
-                                                <th>Data Final Prevista</th>
+                                                <th>Data Início</th>
+                                                <th>Data Fim</th>
                                                 <th>Motivo</th>
-                                                <th>Observações da Supervisão</th>
-                                                <th>Data Registro</th>
+                                                <th>Obs. Supervisão</th>
+                                                <th>Registrado em</th>
                                             </tr>
                                         </thead>
                                         <tbody id="admin-afastamentos-historico-table-body">
@@ -790,11 +788,16 @@
                                 </div>
                             </div>
                             
+                            <div class="escalas-subtabs" style="display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid #E2E8F0; padding-bottom: 15px;">
+                                <button class="btn-primary" id="btn-tab-cultos" onclick="App.switchEscalasSubTab('cultos')" style="background: var(--teal-primary); width: auto; padding: 8px 16px; border-radius: 6px; box-shadow: none;">Cultos e Eventos</button>
+                                <button class="btn-secondary" id="btn-tab-operacionais" onclick="App.switchEscalasSubTab('operacionais')" style="width: auto; padding: 8px 16px; border-radius: 6px; border-color: #CBD5E1; color: var(--navy-dark); box-shadow: none;">Escalas Operacionais</button>
+                            </div>
+                            
                             <!-- 1. Escolha o Culto / Evento -->
                             <div class="scales-section-container" id="admin-calendar-view-container" style="margin-bottom: 30px;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                    <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--navy-dark); margin: 0;"><i class="fa-solid fa-calendar-plus" style="margin-right: 5px;"></i> 1. Escolha o Culto / Evento</h3>
-                                    <button class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 0.85rem;" onclick="App.openCultoFormModal()">
+                                    <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--navy-dark); margin: 0;"><i class="fa-solid fa-calendar-plus" style="margin-right: 5px;"></i> 1. Calendário de Cultos</h3>
+                                    <button class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 0.85rem; background: var(--teal-primary);" onclick="App.openCultoFormModal()">
                                         <i class="fa-solid fa-plus"></i> Novo Culto / Evento
                                     </button>
                                 </div>
@@ -1335,28 +1338,24 @@
                         
                     </div>
                 </main>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- ==========================================
-         MODAIS E DIÁLOGOS FLUTUANTES
-         ========================================== -->
-         
-    <!-- Modal 1: Adicionar/Editar Membro (Admin) -->
-    <div class="premium-modal" id="modal-membro-form">
-        <div class="modal-content light-bg">
+            </div>    <div class="premium-modal" id="modal-membro-form">
+        <div class="modal-content light-bg" style="max-width: 600px; padding: 25px;">
             <button class="modal-close-btn" onclick="App.closeMembroFormModal()"><i class="fa-solid fa-xmark"></i></button>
-            <h3 class="panel-title" id="membro-modal-title" style="margin-bottom: 20px;">Cadastrar Novo Membro</h3>
+            <h3 id="membro-modal-title" style="margin-bottom: 15px; font-size: 1.2rem; font-weight: 700; color: #1E293B;">Cadastrar Novo Membro</h3>
             
+            <!-- Tab Navigation inside modal -->
+            <div id="membro-modal-tabs" style="display: flex; border-bottom: 2px solid #E2E8F0; margin-bottom: 20px; gap: 5px; overflow-x: auto; padding-bottom: 5px;">
+                <button type="button" class="modal-tab-btn active" onclick="App.switchMembroModalTab('id')" style="background:none; border:none; padding:8px 12px; font-weight:700; font-size:0.8rem; color:var(--teal-primary); border-bottom:2px solid var(--teal-primary); cursor:pointer; white-space:nowrap;">1. Identificação</button>
+                <button type="button" class="modal-tab-btn" onclick="App.switchMembroModalTab('acesso')" style="background:none; border:none; padding:8px 12px; font-weight:600; font-size:0.8rem; color:#64748B; cursor:pointer; white-space:nowrap;">2. Acesso</button>
+                <button type="button" class="modal-tab-btn" onclick="App.switchMembroModalTab('setores')" style="background:none; border:none; padding:8px 12px; font-weight:600; font-size:0.8rem; color:#64748B; cursor:pointer; white-space:nowrap;">3. Setores & Funções</button>
+                <button type="button" class="modal-tab-btn" onclick="App.switchMembroModalTab('disp')" style="background:none; border:none; padding:8px 12px; font-weight:600; font-size:0.8rem; color:#64748B; cursor:pointer; white-space:nowrap;">4. Disponibilidade</button>
+            </div>
+
             <form id="membro-form" onsubmit="App.handleMembroSave(event)">
                 <input type="hidden" id="membro-form-id">
                 
-                <!-- SEÇÃO 1 - IDENTIFICAÇÃO -->
-                <div style="margin-bottom: 25px;">
-                    <h4 style="font-size: 0.95rem; color: var(--navy-dark); margin-bottom: 15px; border-bottom: 1px solid #E2E8F0; padding-bottom: 8px;"><i class="fa-solid fa-address-card" style="color: var(--teal-primary); margin-right: 8px;"></i>Identificação</h4>
-                    
+                <!-- TAB 1: IDENTIFICAÇÃO -->
+                <div id="membro-tab-id" class="membro-modal-tab-content">
                     <div class="form-group">
                         <label for="membro-nome">Nome Completo</label>
                         <div class="input-icon-wrapper">
@@ -1395,10 +1394,8 @@
                     </div>
                 </div>
 
-                <!-- SEÇÃO 2 - ACESSO -->
-                <div style="margin-bottom: 25px;">
-                    <h4 style="font-size: 0.95rem; color: var(--navy-dark); margin-bottom: 15px; border-bottom: 1px solid #E2E8F0; padding-bottom: 8px;"><i class="fa-solid fa-lock" style="color: var(--teal-primary); margin-right: 8px;"></i>Acesso e Segurança</h4>
-                    
+                <!-- TAB 2: ACESSO -->
+                <div id="membro-tab-acesso" class="membro-modal-tab-content" style="display: none;">
                     <div class="form-group">
                         <label for="membro-email">E-mail de Login</label>
                         <div class="input-icon-wrapper">
@@ -1407,34 +1404,31 @@
                         </div>
                     </div>
                     
-                    <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <div class="form-group">
-                            <label for="membro-senha">Senha</label>
-                            <div class="input-icon-wrapper">
-                                <i class="fa-solid fa-key"></i>
-                                <input type="text" id="membro-senha" required placeholder="Senha de acesso">
-                            </div>
+                    <div class="form-group">
+                        <label for="membro-perfil">Perfil de Acesso</label>
+                        <div class="input-icon-wrapper">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <select id="membro-perfil" required onchange="App.handleMembroPerfilChange(this.value)">
+                                <option value="membro">Membro</option>
+                                <option value="admin">Administrador</option>
+                            </select>
                         </div>
-                        <div class="form-group">
-                            <label for="membro-perfil">Perfil de Acesso</label>
-                            <div class="input-icon-wrapper">
-                                <i class="fa-solid fa-shield-halved"></i>
-                                <select id="membro-perfil" required onchange="App.handleMembroPerfilChange(this.value)">
-                                    <option value="membro">Membro</option>
-                                    <option value="admin">Administrador</option>
-                                </select>
-                            </div>
+                    </div>
+
+                    <div id="redefinir-senha-bloco" style="display:none; margin-top: 20px; background: #F1F5F9; padding: 15px; border-radius: 12px; border: 1px solid #E2E8F0;">
+                        <div style="font-weight: 700; font-size: 0.8rem; color: #475569; text-transform: uppercase; margin-bottom: 10px;">Redefinir Acesso</div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="text" id="membro-nova-senha" placeholder="Digite nova senha para redefinir" style="flex:1; padding: 8px 12px !important; border: 1px solid #CBD5E1 !important; border-radius: 8px !important; font-size:0.85rem !important;">
+                            <button type="button" onclick="App.redefinirSenhaMembro()" style="background: var(--teal-primary); color: white; border: none; padding: 9px 15px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s;">Redefinir</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- SEÇÃO 3 - ALOCAÇÃO OPERACIONAL -->
-                <div id="membro-setor-funcao-fields" style="margin-bottom: 25px;">
-                    <h4 style="font-size: 0.95rem; color: var(--navy-dark); margin-bottom: 15px; border-bottom: 1px solid #E2E8F0; padding-bottom: 8px;"><i class="fa-solid fa-network-wired" style="color: var(--teal-primary); margin-right: 8px;"></i>Alocação Operacional</h4>
-                    
+                <!-- TAB 3: SETORES & FUNÇÕES -->
+                <div id="membro-tab-setores" class="membro-modal-tab-content" style="display: none;">
                     <div class="form-group">
-                        <label style="font-weight: 600; color: var(--navy-dark); margin-bottom: 8px; display: block;">Setores de Atuação (Selecione um ou mais)</label>
-                        <div id="membro-setores-checkboxes" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; padding: 12px; background: rgba(0,0,0,0.02); border-radius: 12px; border: 1px solid rgba(0,0,0,0.08);">
+                        <label style="font-weight: 600; color: #1E293B; margin-bottom: 8px; display: block;">Setores de Atuação (Selecione um ou mais)</label>
+                        <div id="membro-setores-checkboxes" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; padding: 12px; background: #F8FAFC; border-radius: 12px; border: 1px solid #E2E8F0;">
                             <!-- Generado dinamicamente via JS -->
                         </div>
                     </div>
@@ -1471,12 +1465,17 @@
                         </div>
                         <small style="display: block; margin-top: 4px; font-size: 0.75rem; color: #64748B;">Mantido por compatibilidade com cadastros antigos.</small>
                     </div>
+
+                    <div style="margin-top: 15px;">
+                        <label style="display: flex; align-items: center; gap: 10px; font-weight: 600; cursor: pointer; color: #1E293B; background: #F8FAFC; padding: 12px; border-radius: 8px; border: 1px solid #E2E8F0;">
+                            <input type="checkbox" id="membro-e-repositor" style="width: 20px; height: 20px; accent-color: var(--teal-primary); margin: 0; cursor: pointer;">
+                            <span>É Repositor / Comprador autorizado</span>
+                        </label>
+                    </div>
                 </div>
 
-                <!-- SEÇÃO 4 - DISPONIBILIDADE E SUBSTITUIÇÃO -->
-                <div style="margin-bottom: 25px;">
-                    <h4 style="font-size: 0.95rem; color: var(--navy-dark); margin-bottom: 15px; border-bottom: 1px solid #E2E8F0; padding-bottom: 8px;"><i class="fa-solid fa-calendar-check" style="color: var(--teal-primary); margin-right: 8px;"></i>Disponibilidade e Substituição</h4>
-                    
+                <!-- TAB 4: DISPONIBILIDADE -->
+                <div id="membro-tab-disp" class="membro-modal-tab-content" style="display: none;">
                     <div class="form-group">
                         <label for="membro-disponibilidade">Disponibilidade Geral</label>
                         <div class="input-icon-wrapper">
@@ -1512,28 +1511,10 @@
                                     <option value="Coordenador">Coordenador</option>
                                 </select>
                             </div>
-                            <small style="display: block; margin-top: 4px; font-size: 0.75rem; color: #64748B;">Campo informativo no momento.</small>
                         </div>
                     </div>
-                </div>
-                
-                <!-- SEÇÃO 5 - FUNÇÕES ADICIONAIS -->
-                <div style="margin-bottom: 25px;">
-                    <h4 style="font-size: 0.95rem; color: var(--navy-dark); margin-bottom: 15px; border-bottom: 1px solid #E2E8F0; padding-bottom: 8px;"><i class="fa-solid fa-toolbox" style="color: var(--teal-primary); margin-right: 8px;"></i>Funções Adicionais</h4>
-                    
-                    <div class="form-group">
-                        <label style="display: flex; align-items: center; gap: 10px; font-weight: 600; cursor: pointer; color: var(--navy-dark); background: rgba(0,0,0,0.02); padding: 12px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.05);">
-                            <input type="checkbox" id="membro-e-repositor" style="width: 20px; height: 20px; accent-color: var(--navy-primary); margin: 0; cursor: pointer;">
-                            <span>É Repositor / Comprador autorizado</span>
-                        </label>
-                    </div>
-                </div>
 
-                <!-- SEÇÃO 6 - CICLO DE VIDA E STATUS -->
-                <div style="margin-bottom: 25px;">
-                    <h4 style="font-size: 0.95rem; color: var(--navy-dark); margin-bottom: 15px; border-bottom: 1px solid #E2E8F0; padding-bottom: 8px;"><i class="fa-solid fa-heart-pulse" style="color: var(--teal-primary); margin-right: 8px;"></i>Ciclo de Vida e Status</h4>
-                    
-                    <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
                         <div class="form-group">
                             <label for="membro-status">Status Cadastral</label>
                             <div class="input-icon-wrapper">
@@ -1557,13 +1538,12 @@
                                     <option value="Inativo Temporário">Inativo Temporário</option>
                                 </select>
                             </div>
-                            <small style="display: block; margin-top: 4px; font-size: 0.75rem; color: #64748B;">Férias e afastamentos removem o membro das escalas agendadas no período.</small>
                         </div>
                     </div>
 
                     <!-- Detalhes do Afastamento (condicional) -->
-                    <div id="afastamento-dates-fields" style="display: none; flex-direction: column; gap: 15px; margin-top: 15px; background: rgba(0,0,0,0.02); padding: 15px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.06);">
-                        <div style="font-weight: 700; font-size: 0.85rem; color: var(--navy-dark); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 6px; margin-bottom: 5px;">
+                    <div id="afastamento-dates-fields" style="display: none; flex-direction: column; gap: 15px; margin-top: 15px; background: #F8FAFC; padding: 15px; border-radius: 12px; border: 1px solid #E2E8F0;">
+                        <div style="font-weight: 700; font-size: 0.85rem; color: #1E293B; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #E2E8F0; padding-bottom: 6px; margin-bottom: 5px;">
                             <i class="fa-solid fa-plane-departure" style="margin-right: 4px;"></i> Detalhes do Afastamento
                         </div>
                         <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -1607,8 +1587,8 @@
                 </div>
                 
                 <!-- BOTOES DE AÇÃO -->
-                <div style="display: flex; gap: 15px; margin-top: 25px;">
-                    <button type="button" class="btn-secondary" onclick="App.closeMembroFormModal()" style="color: var(--navy-dark); border-color: #E2E8F0;">Cancelar</button>
+                <div style="display: flex; gap: 15px; margin-top: 25px; border-top: 1px solid #E2E8F0; padding-top: 15px;">
+                    <button type="button" class="btn-secondary" onclick="App.closeMembroFormModal()">Cancelar</button>
                     <button type="submit" class="btn-primary" style="flex: 2;">Salvar Membro</button>
                 </div>
             </form>
@@ -1618,99 +1598,107 @@
     <!-- Modal 2: Adicionar/Editar Escala (Admin) -->
     <div class="premium-modal" id="modal-escala-form">
         <div class="modal-content light-bg">
-            <button class="modal-close-btn" onclick="App.closeEscalaFormModal()"><i class="fa-solid fa-xmark"></i></button>
-            <h3 class="panel-title" id="escala-modal-title" style="margin-bottom: 20px;">Montar Nova Escala</h3>
+            <div class="modal-header-fixed">
+                <button class="modal-close-btn" type="button" onclick="App.closeEscalaFormModal()"><i class="fa-solid fa-xmark"></i></button>
+                <h3 class="panel-title" id="escala-modal-title" style="margin: 0; font-weight: 800; font-size: 1.2rem; color: #1E293B;">Montar Nova Escala</h3>
+            </div>
             
-            <form id="escala-form" onsubmit="App.handleEscalaSave(event)">
+            <form id="escala-form" onsubmit="App.handleEscalaSave(event)" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
                 <input type="hidden" id="escala-form-id">
                 <input type="hidden" id="escala-cultoid">
                 
-                <div class="form-group">
-                    <label for="escala-setor">Setor</label>
-                    <div class="input-icon-wrapper">
-                        <i class="fa-solid fa-network-wired"></i>
-                        <select id="escala-setor" required onchange="App.handleEscalaSetorChange(this.value)">
-                            <option value="" disabled selected>Escolha o setor</option>
-                            <option value="entrada">Portaria</option>
-                            <option value="check_in">Check-in</option>
-                            <option value="apoio_templo_ronda_dir">Apoio Templo / Ronda Lado Direito</option>
-                            <option value="apoio_templo_ronda_esq">Apoio Templo / Ronda Lado Esquerdo</option>
-                            <option value="acolhimento">Acolhimento</option>
-                            <option value="limpeza">Limpeza</option>
-                            <option value="manutencao">Manutenção</option>
-                            <option value="escala_livre">Escala Livre</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="escala-funcao">Função</label>
-                    <div class="input-icon-wrapper">
-                        <i class="fa-solid fa-address-card"></i>
-                        <select id="escala-funcao" required onchange="App.adjustEscalaFormFields()">
-                            <option value="" disabled selected>Selecione o setor antes</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="escala-membro">Membro(s) Escalado(s) <span style="font-size:0.75rem; color:var(--slate-gray); font-weight:normal;">(Segure Ctrl para selecionar vários)</span></label>
-                    <div class="input-icon-wrapper" style="align-items: flex-start;">
-                        <i class="fa-solid fa-users" style="top: 15px;"></i>
-                        <select id="escala-membro" required multiple style="height: 120px; padding-top: 10px;">
-                            <option value="" disabled>Selecione a função antes</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="escala-data">Data</label>
-                    <div class="input-icon-wrapper">
-                        <i class="fa-solid fa-calendar"></i>
-                        <input type="date" id="escala-data" required>
-                    </div>
-                </div>
-                
-                <div class="form-grid">
+                <div class="modal-body-scrollable">
                     <div class="form-group">
-                        <label for="escala-horainicio">Hora de Início</label>
+                        <label for="escala-setor">Setor</label>
                         <div class="input-icon-wrapper">
-                            <i class="fa-solid fa-clock"></i>
-                            <input type="time" id="escala-horainicio" required value="08:00">
+                            <i class="fa-solid fa-network-wired"></i>
+                            <select id="escala-setor" required onchange="App.handleEscalaSetorChange(this.value)">
+                                <option value="" disabled selected>Escolha o setor</option>
+                                <option value="entrada">Portaria</option>
+                                <option value="check_in">Check-in</option>
+                                <option value="apoio_templo_ronda_dir">Apoio Templo / Ronda Lado Direito</option>
+                                <option value="apoio_templo_ronda_esq">Apoio Templo / Ronda Lado Esquerdo</option>
+                                <option value="acolhimento">Acolhimento</option>
+                                <option value="limpeza">Limpeza</option>
+                                <option value="manutencao">Manutenção</option>
+                                <option value="escala_livre">Escala Livre</option>
+                            </select>
                         </div>
                     </div>
+                    
                     <div class="form-group">
-                        <label for="escala-horafim">Hora de Fim</label>
+                        <label for="escala-funcao">Função</label>
                         <div class="input-icon-wrapper">
-                            <i class="fa-solid fa-clock"></i>
-                            <input type="time" id="escala-horafim" required value="12:00">
+                            <i class="fa-solid fa-address-card"></i>
+                            <select id="escala-funcao" required onchange="App.adjustEscalaFormFields()">
+                                <option value="" disabled selected>Selecione o setor antes</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <label style="margin: 0; font-weight: 700; font-size: 0.8rem; color: #475569;">Membros disponíveis</label>
+                            <span id="escala-membros-selecionados-contador" style="font-size: 0.75rem; font-weight: 700; color: var(--teal-primary);">0 selecionados</span>
+                        </div>
+                        <div class="input-icon-wrapper" style="margin-bottom: 8px;">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="escala-membro-search" placeholder="Filtrar membros por nome..." oninput="App.filterEscalaMembrosList(this.value)" style="padding-left: 40px !important;">
+                        </div>
+                        <div id="escala-membros-checkboxes-container" style="max-height: 150px; overflow-y: auto; border: 1px solid #94A3B8; border-radius: 10px; padding: 10px; background: #FFFFFF; display: flex; flex-direction: column; gap: 8px;">
+                            <div style="font-size:0.8rem; color:#64748B; text-align:center; padding: 10px;">Selecione o setor/função para carregar os membros</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="escala-data">Data</label>
+                        <div class="input-icon-wrapper">
+                            <i class="fa-solid fa-calendar"></i>
+                            <input type="date" id="escala-data" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="escala-horainicio">Hora de Início</label>
+                            <div class="input-icon-wrapper">
+                                <i class="fa-solid fa-clock"></i>
+                                <input type="time" id="escala-horainicio" required value="08:00">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="escala-horafim">Hora de Fim</label>
+                            <div class="input-icon-wrapper">
+                                <i class="fa-solid fa-clock"></i>
+                                <input type="time" id="escala-horafim" required value="12:00">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="escala-repeticao-group" style="display: none;">
+                        <label for="escala-repeticao">Repetição da Escala (Frequência)</label>
+                        <div class="input-icon-wrapper">
+                            <i class="fa-solid fa-arrows-spin"></i>
+                            <select id="escala-repeticao">
+                                <option value="unica" selected>Única (Apenas esta data)</option>
+                                <option value="mensal">Mensal (Gera 12 meses)</option>
+                                <option value="semanal">Semanal (Gera 12 semanas)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="escala-obs">Observações / Instruções</label>
+                        <div class="input-icon-wrapper" style="align-items: flex-start;">
+                            <i class="fa-solid fa-comment" style="top: 15px;"></i>
+                            <textarea id="escala-obs" rows="3" placeholder="Ex: Fazer ronda externa de hora em hora..." style="padding-left: 45px; resize: none;"></textarea>
                         </div>
                     </div>
                 </div>
                 
-                <div class="form-group" id="escala-repeticao-group" style="display: none;">
-                    <label for="escala-repeticao">Repetição da Escala (Frequência)</label>
-                    <div class="input-icon-wrapper">
-                        <i class="fa-solid fa-arrows-spin"></i>
-                        <select id="escala-repeticao">
-                            <option value="unica" selected>Única (Apenas esta data)</option>
-                            <option value="mensal">Mensal (Gera 12 meses)</option>
-                            <option value="semanal">Semanal (Gera 12 semanas)</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="escala-obs">Observações / Instruções</label>
-                    <div class="input-icon-wrapper" style="align-items: flex-start;">
-                        <i class="fa-solid fa-comment" style="top: 15px;"></i>
-                        <textarea id="escala-obs" rows="3" placeholder="Ex: Fazer ronda externa de hora em hora..." style="padding-left: 45px; resize: none;"></textarea>
-                    </div>
-                </div>
-                
-                <div style="display: flex; gap: 15px; margin-top: 25px;">
-                    <button type="button" class="btn-secondary" onclick="App.closeEscalaFormModal()" style="color: var(--navy-dark); border-color: #E2E8F0;">Cancelar</button>
-                    <button type="submit" class="btn-primary" style="flex: 2;">Confirmar Escala</button>
+                <div class="modal-footer-fixed" style="display: flex; gap: 15px;">
+                    <button type="button" class="btn-secondary" onclick="App.closeEscalaFormModal()">Cancelar</button>
+                    <button type="submit" class="btn-primary" style="flex: 2; background-color: var(--teal-primary); border-color: var(--teal-primary); font-weight: 700;">Salvar escala</button>
                 </div>
             </form>
         </div>
@@ -1814,21 +1802,26 @@
     <!-- Modal: Fechamento de Culto (Admin) -->
     <div class="premium-modal" id="modal-culto-fechamento">
         <div class="modal-content light-bg" style="max-width: 600px; width: 95%;">
-            <button class="modal-close-btn" onclick="App.closeFechamentoCultoModal()"><i class="fa-solid fa-xmark"></i></button>
-            <h3 class="panel-title" style="margin-bottom: 15px; color: var(--teal-primary);"><i class="fa-solid fa-lock"></i> Fechamento do Culto</h3>
-            <p style="font-size: 0.9rem; color: var(--slate-gray); margin-bottom: 20px;">Homologue a presença real da equipe escalada para este culto.</p>
+            <div class="modal-header-fixed">
+                <button class="modal-close-btn" type="button" onclick="App.closeFechamentoCultoModal()"><i class="fa-solid fa-xmark"></i></button>
+                <h3 class="panel-title" style="margin: 0 0 5px 0; color: #1E293B; font-weight: 800; font-size: 1.2rem;"><i class="fa-solid fa-lock" style="color: var(--teal-primary);"></i> Fechamento do Culto</h3>
+                <div id="fechamento-culto-detalhes" style="font-size: 0.85rem; font-weight: 700; color: #475569; margin-top: 5px;"></div>
+            </div>
             
-            <form id="culto-fechamento-form" onsubmit="App.handleFechamentoCultoSubmit(event)">
+            <form id="culto-fechamento-form" onsubmit="App.handleFechamentoCultoSubmit(event)" style="display: flex; flex-direction: column; flex: 1; overflow: hidden; margin: 0;">
                 <input type="hidden" id="fechamento-culto-id">
                 
-                <div id="fechamento-membros-lista" style="max-height: 300px; overflow-y: auto; margin-bottom: 20px; display: flex; flex-direction: column; gap: 12px; border: 1px solid #E2E8F0; padding: 12px; border-radius: 8px; background: #fff;">
-                    <!-- Rendered dynamically -->
+                <div class="modal-body-scrollable" style="margin-bottom: 15px;">
+                    <p style="font-size: 0.85rem; color: #475569; margin: 0 0 15px 0; font-weight: 500;">Homologue a presença real da equipe voluntária escalada para este culto.</p>
+                    <div id="fechamento-membros-lista" style="border: 1px solid #94A3B8; padding: 12px; border-radius: 10px; background: #fff;">
+                        <!-- Rendered dynamically -->
+                    </div>
                 </div>
                 
-                <button type="submit" class="btn-primary" style="margin-top: 10px; width: 100%;">
-                    <i class="fa-solid fa-circle-check"></i>
-                    Gravar Fechamento e Presenças
-                </button>
+                <div class="modal-footer-fixed" style="display: flex; gap: 15px;">
+                    <button type="button" class="btn-secondary" onclick="App.closeFechamentoCultoModal()">Cancelar</button>
+                    <button type="submit" class="btn-primary" style="flex: 2; background-color: var(--teal-primary); border-color: var(--teal-primary); font-weight: 700;">Salvar presença</button>
+                </div>
             </form>
         </div>
     </div>
@@ -2311,7 +2304,7 @@
         <div class="premium-modal" id="modal-afastamento-rapido">
             <div class="modal-content light-bg" style="max-width: 480px;">
                 <button class="modal-close-btn" onclick="App.closeAfastamentoRapidoModal()"><i class="fa-solid fa-xmark"></i></button>
-                <h3 class="panel-title" id="afastamento-rapido-membro-nome" style="margin-bottom: 20px;">Afastar Obreiro</h3>
+                <h3 class="panel-title" id="afastamento-rapido-membro-nome" style="margin-bottom: 20px; font-weight: 700; color: #1E293B;">Afastar Membro</h3>
                 
                 <form id="afastamento-rapido-form" onsubmit="event.preventDefault(); App.handleAfastamentoRapidoSave();">
                     <input type="hidden" id="afastamento-rapido-membro-id">
@@ -2354,12 +2347,12 @@
                             <input type="text" id="afastamento-rapido-motivo" required placeholder="Ex: Férias anuais programadas">
                         </div>
                     </div>
-
+ 
                     <div class="form-group" style="margin-top: 15px;">
                         <label for="afastamento-rapido-obs">Observações da Supervisão (opcional)</label>
                         <textarea id="afastamento-rapido-obs" rows="2" placeholder="Observações adicionais para a supervisão..." style="width: 100%; border-radius: 8px; border: 1px solid #CBD5E1; padding: 8px; font-family: inherit; font-size: 0.85rem; resize: none; box-sizing: border-box;"></textarea>
                     </div>
-
+ 
                     <div class="form-group" style="margin-top: 15px;">
                         <label for="afastamento-rapido-retorno">Retorno Automático?</label>
                         <div class="input-icon-wrapper">
@@ -2371,9 +2364,9 @@
                         </div>
                     </div>
                     
-                    <div style="display: flex; gap: 15px; margin-top: 25px;">
-                        <button type="button" class="btn-secondary" onclick="App.closeAfastamentoRapidoModal()" style="color: var(--navy-dark); border-color: #E2E8F0;">Cancelar</button>
-                        <button type="submit" class="btn-primary" style="flex: 2; background: #EF4444; border-color: #EF4444;">🚫 Confirmar Afastamento</button>
+                    <div style="display: flex; gap: 15px; margin-top: 25px; border-top: 1px solid #E2E8F0; padding-top: 15px;">
+                        <button type="button" class="btn-secondary" onclick="App.closeAfastamentoRapidoModal()">Cancelar</button>
+                        <button type="submit" class="btn-primary" style="flex: 2; background: var(--teal-primary); border-color: var(--teal-primary);">Registrar Afastamento</button>
                     </div>
                 </form>
             </div>
@@ -2435,6 +2428,6 @@
         <script src="js/firebase-config.js?v=3.11.3"></script>
         <script src="js/db.js?v=3.11.3"></script>
         <script src="js/config/sectorsData.js?v=3.11.3"></script>
-        <script src="js/app.js?v=3.11.8"></script>
+        <script src="js/app.js?v=3.11.20"></script>
 </body>
 </html>

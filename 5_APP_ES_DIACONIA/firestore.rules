@@ -2,99 +2,17 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Função auxiliar para obter o perfil do usuário logado na coleção de membros
-    function getUserData() {
-      return get(/databases/$(database)/documents/membros/$(request.auth.uid)).data;
-    }
+    // Como o sistema utiliza autenticação customizada via front-end (Autenticação por Nome)
+    // e o Firebase Auth é usado apenas de forma anônima, não é possível validar
+    // a identidade real do usuário nas regras do Firestore.
+    // Portanto, o controle de acesso é delegado ao aplicativo (Front-end).
 
-    // Função para verificar se está autenticado
     function isAuthenticated() {
       return request.auth != null;
     }
 
-    // Função para verificar perfil específico
-    function hasRole(role) {
-      return isAuthenticated() && 
-        (request.auth.uid == 'admin_default' || getUserData().perfil == role);
-    }
-
-    // Regra Geral de Admin ou Supervisor Geral (Controle irrestrito)
-    function isAdminOrSupervisor() {
-      return hasRole('admin') || hasRole('supervisor_geral') || request.auth.uid == 'admin_default';
-    }
-
-    // 1. Coleção Membros
-    match /membros/{membroId} {
-      // Membro pode ler seu próprio documento, Admin/Supervisor/Coordenador pode ler todos
-      allow read: if isAuthenticated() && (
-        request.auth.uid == membroId || 
-        isAdminOrSupervisor() || 
-        hasRole('coordenador')
-      );
-      
-      // Apenas Admin e Supervisor Geral podem criar, editar ou excluir membros
-      allow write: if isAdminOrSupervisor();
-    }
-
-    // 2. Coleção Escalas (Ativas e Arquivadas)
-    match /escalas/{escalaId} {
-      allow read: if isAuthenticated();
-      // Apenas Admin, Supervisor Geral ou Coordenador de Setor podem gerenciar escalas
-      allow write: if isAdminOrSupervisor() || hasRole('coordenador');
-    }
-
-    match /escalas_arquivadas/{escalaId} {
-      // Leitura permitida para auditoria
-      allow read: if isAdminOrSupervisor();
-      // Apenas Admin e Supervisor Geral podem gerenciar arquivo histórico
-      allow write: if isAdminOrSupervisor();
-    }
-
-    // 3. Coleção Setores
-    match /setores/{setorId} {
-      allow read: if isAuthenticated();
-      allow write: if isAdminOrSupervisor();
-    }
-
-    // 4. Coleção Produtos e Histórico de Estoque
-    match /produtos/{produtoId} {
-      allow read: if isAuthenticated();
-      // Repositores, Coordenadores, Supervisores e Admins podem editar estoque
-      allow write: if isAuthenticated() && (
-        isAdminOrSupervisor() || 
-        hasRole('coordenador') || 
-        getUserData().eRepositor == true
-      );
-    }
-
-    match /historico_estoque/{movId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update, delete: if isAdminOrSupervisor();
-    }
-
-    // 5. Coleção Reposições (Pedidos de compra)
-    match /reposicoes/{repId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update, delete: if isAdminOrSupervisor() || hasRole('coordenador');
-    }
-
-    // 6. Coleção Avisos (Informativos Gerais)
-    match /avisos/{avisoId} {
-      allow read: if isAuthenticated();
-      allow write: if isAdminOrSupervisor();
-    }
-
-    // 7. Coleção de Logs de Substituições e Históricos de Controle
-    match /historico_substituicoes/{subId} {
-      allow read: if isAdminOrSupervisor() || hasRole('coordenador');
-      allow write: if isAuthenticated();
-    }
-
-    match /controle_arquivamento/{controleId} {
-      allow read: if isAdminOrSupervisor();
-      allow write: if isAdminOrSupervisor();
+    match /{document=**} {
+      allow read, write: if isAuthenticated();
     }
   }
 }

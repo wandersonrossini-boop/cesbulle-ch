@@ -282,4 +282,50 @@ class FechamentoApiService {
       );
     } catch (_) {}
   }
+
+  Future<Map<String, dynamic>> getCurrentSessionStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/fechamento-culto/session/current-status'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(utf8.decode(response.bodyBytes));
+    } else {
+      throw Exception('Erro ao verificar status da sessão (${response.statusCode})');
+    }
+  }
+
+  Future<Map<String, dynamic>> resolveAutomaticSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/fechamento-culto/session'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'serviceDate': null,
+        'serviceTime': null,
+        'serviceEndTime': null,
+        'serviceType': null,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(utf8.decode(response.bodyBytes));
+    } else if (response.statusCode == 401) {
+      throw Exception('UNAUTHORIZED');
+    } else {
+      throw Exception('Falha ao obter sessão automática (${response.statusCode}): ${response.body}');
+    }
+  }
 }

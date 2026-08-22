@@ -20,6 +20,10 @@ public class ServiceClosingSession {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "service_schedule_id", nullable = true)
+    private ServiceSchedule serviceSchedule;
+
     @Column(nullable = false)
     private LocalDate serviceDate;
 

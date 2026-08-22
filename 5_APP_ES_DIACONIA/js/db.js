@@ -142,20 +142,20 @@ const DbService = {
                     },
                     {
                         id: "acolhimento_integracao",
-                        nome: "Acolhimento e Integraï¿½ï¿½o",
-                        funcoes: ["Acolhimento", "Integraï¿½ï¿½o"],
+                        nome: "Acolhimento e Integração",
+                        funcoes: ["Acolhimento", "Integração"],
                         cor: "#4A154B" // purple
                     },
                     {
                         id: "limpeza",
                         nome: "Limpeza",
-                        funcoes: ["Limpeza geral", "Salï¿½o e banheiros", "ï¿½reas externas", "Reposiï¿½ï¿½o de produtos"],
+                        funcoes: ["Limpeza geral", "Salão e banheiros", "Áreas externas", "Reposição de produtos"],
                         cor: "#1E3A8A" // deep blue
                     },
                     {
                         id: "manutencao",
-                        nome: "Manutenï¿½ï¿½o",
-                        funcoes: ["Manutenï¿½ï¿½o predial", "Elï¿½trica", "Hidrï¿½ulica", "Ar-condicionado", "Reparos gerais"],
+                        nome: "Manutenção",
+                        funcoes: ["Manutenção predial", "Elétrica", "Hidráulica", "Ar-condicionado", "Reparos gerais"],
                         cor: "#065F46" // green
                     }
                 ];
@@ -166,29 +166,29 @@ const DbService = {
 
                 // 5. Seed Products
                 const initialProducts = [
-                    { nome: "Papel higiï¿½nico", setorId: "limpeza", quantidade: 30, status: "ativo" },
-                    { nome: "Sabonete lï¿½quido", setorId: "limpeza", quantidade: 15, status: "ativo" },
+                    { nome: "Papel higiênico", setorId: "limpeza", quantidade: 30, status: "ativo" },
+                    { nome: "Sabonete líquido", setorId: "limpeza", quantidade: 15, status: "ativo" },
                     { nome: "Desinfetante", setorId: "limpeza", quantidade: 10, status: "ativo" },
                     { nome: "Detergente", setorId: "limpeza", quantidade: 12, status: "ativo" },
                     { nome: "Saco de lixo 100L", setorId: "limpeza", quantidade: 50, status: "ativo" },
                     { nome: "Esponja de limpeza", setorId: "limpeza", quantidade: 20, status: "ativo" },
-                    { nome: "ï¿½lcool 70%", setorId: "limpeza", quantidade: 15, status: "ativo" },
+                    { nome: "Álcool 70%", setorId: "limpeza", quantidade: 15, status: "ativo" },
                     
-                    { nome: "Lï¿½mpada LED 9W", setorId: "manutencao", quantidade: 15, status: "ativo" },
+                    { nome: "Lâmpada LED 9W", setorId: "manutencao", quantidade: 15, status: "ativo" },
                     { nome: "Fita isolante", setorId: "manutencao", quantidade: 8, status: "ativo" },
                     { nome: "Pilhas AA (para microfone)", setorId: "manutencao", quantidade: 24, status: "ativo" },
                     { nome: "Filtro de ar-condicionado", setorId: "manutencao", quantidade: 6, status: "ativo" },
                     { nome: "Parafuso e bucha 8mm", setorId: "manutencao", quantidade: 100, status: "ativo" },
                     
-                    { nome: "Copo descartï¿½vel 200ml", setorId: "acolhimento_integracao", quantidade: 200, status: "ativo" },
+                    { nome: "Copo descartável 200ml", setorId: "acolhimento_integracao", quantidade: 200, status: "ativo" },
                     { nome: "Fita crepe", setorId: "acolhimento_integracao", quantidade: 5, status: "ativo" },
-                    { nome: "Crachï¿½ de visitante", setorId: "acolhimento_integracao", quantidade: 40, status: "ativo" },
-                    { nome: "Caneta esferogrï¿½fica azul", setorId: "acolhimento_integracao", quantidade: 15, status: "ativo" },
+                    { nome: "Crachá de visitante", setorId: "acolhimento_integracao", quantidade: 40, status: "ativo" },
+                    { nome: "Caneta esferográfica azul", setorId: "acolhimento_integracao", quantidade: 15, status: "ativo" },
                     
                     { nome: "Pilhas AAA", setorId: "diaconia_templo", quantidade: 20, status: "ativo" },
-                    { nome: "Rï¿½dio comunicador (reserva)", setorId: "diaconia_templo", quantidade: 2, status: "ativo" },
+                    { nome: "Rádio comunicador (reserva)", setorId: "diaconia_templo", quantidade: 2, status: "ativo" },
                     { nome: "Lanterna LED", setorId: "diaconia_templo", quantidade: 4, status: "ativo" },
-                    { nome: "Capa de chuva descartï¿½vel", setorId: "diaconia_templo", quantidade: 30, status: "ativo" }
+                    { nome: "Capa de chuva descartável", setorId: "diaconia_templo", quantidade: 30, status: "ativo" }
                 ];
 
                 for (let prod of initialProducts) {

@@ -74,6 +74,16 @@ class FakeFechamentoApiService implements FechamentoApiService {
 
   @override
   Future<void> clearSessionDraftOnServer(int sessionId) async {}
+
+  @override
+  Future<Map<String, dynamic>> getCurrentSessionStatus() async {
+    return {'hasSchedule': false};
+  }
+
+  @override
+  Future<Map<String, dynamic>> resolveAutomaticSession() async {
+    return {};
+  }
 }
 
 void main() {

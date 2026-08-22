@@ -7,7 +7,12 @@
     --bg-main: #0e1726;          /* Fundo geral limpo */
     --bg-surface: #172130;       /* Fundo dos cards */
     --bg-elevated: #1f2d40;      /* Modais e popups */
+    --bg-light: #F8FAFC;         /* Fundo claro (painel admin) */
     --border-subtle: #2d3b50;    /* Bordas finas de 1px */
+
+    /* Cores sólidas */
+    --white: #FFFFFF;
+    --navy-primary: #1E293B;     /* Texto escuro institucional */
 
     /* Identidade & Ações Operacionais */
     --color-primary: #0d9488;    /* Verde corporativo institucional (Botão Confirmar) */
@@ -19,13 +24,13 @@
     --color-gold: #d97706;       /* Restrito a badges de Supervisor/Admin/Celebração */
 
     /* Tipografia */
-    --text-primary: #f8fafc;     /* Texto principal de alto contraste */
+    --text-primary: #f8fafc;     /* Texto principal de alto contraste (tema escuro) */
     --text-secondary: #94a3b8;   /* Legendas e rótulos secundários */
 
     /* Compatibilidade Reversa */
     --teal-primary: var(--color-primary);
     --teal-light: #0f766e;
-    --navy-dark: var(--text-primary);
+    --navy-dark: var(--text-primary);  /* Mantido para compatibilidade: tema escuro = texto claro */
     --slate-gray: var(--text-secondary);
     --theme-color: var(--color-primary);
     
@@ -40,6 +45,24 @@
     --transition-smooth: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
     --transition-bounce: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
+/* ============================================================
+   ADMIN PANEL — LIGHT THEME OVERRIDE
+   A área admin usa fundo claro; variáveis são sobrescritas aqui
+   para garantir legibilidade do texto em fundos brancos/cinza.
+   ============================================================ */
+.admin-main {
+    --navy-dark: #1E293B;
+    --navy-primary: #1E293B;
+    --slate-gray: #64748B;
+    --text-primary: #1E293B;
+    --text-secondary: #64748B;
+    --white: #FFFFFF;
+    --bg-light: #F8FAFC;
+    color: #1E293B;
+    background-color: #F8FAFC;
+}
+
 
 /* Base Reset */
 * {
@@ -1137,6 +1160,17 @@ body {
     border-color: rgba(255, 255, 255, 0.3);
 }
 
+/* Modal secondary button override */
+.modal-content .btn-secondary {
+    color: #475569 !important;
+    border: 1px solid #CBD5E1 !important;
+    background: #F8FAFC !important;
+}
+.modal-content .btn-secondary:hover {
+    background: #F1F5F9 !important;
+    border-color: #94A3B8 !important;
+}
+
 /* ==========================================================================
    TELA 3: PORTAL DO MEMBRO (MOBILE OPTIMIZED APP LAYOUT)
    ========================================================================== */
@@ -1870,7 +1904,7 @@ table.admin-table tr:hover td {
     background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(4px);
     display: none;
-    align-items: center;
+    align-items: flex-start; /* Align to top to allow scroll container to work properly */
     justify-content: center;
     z-index: 1000;
     padding: 20px;
@@ -1889,9 +1923,101 @@ table.admin-table tr:hover td {
     max-width: 500px;
     box-shadow: var(--shadow-lg);
     position: relative;
-    margin: auto; /* Centers when content fits, handles top alignment/scrolling when content exceeds viewport */
+    margin: 40px auto; /* Margin top and bottom to give room and enable scrolling */
+    max-height: calc(100vh - 80px); /* Constrain height to viewport */
+    display: flex;
+    flex-direction: column; /* Force flex column layout to support sticky/fixed regions */
+    overflow: hidden; /* Prevent default scrolling on the main container itself */
     animation: modalScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    color: #1E293B !important;
 }
+
+.modal-header-fixed {
+    flex-shrink: 0;
+    margin-bottom: 20px;
+}
+
+.modal-body-scrollable {
+    flex: 1;
+    overflow-y: auto; /* Scroll only internal body content */
+    padding-right: 8px; /* Room for scrollbar */
+    margin-bottom: 20px;
+}
+
+.modal-footer-fixed {
+    flex-shrink: 0;
+    border-top: 1px solid #E2E8F0;
+    padding-top: 15px;
+    margin-top: auto;
+}
+
+/* Ensure modal text elements are high-contrast dark text */
+.modal-content h2, 
+.modal-content h3, 
+.modal-content h4, 
+.modal-content h5, 
+.modal-content h6, 
+.modal-content p, 
+.modal-content span:not(.badge), 
+.modal-content label {
+    color: #1E293B !important;
+}
+
+.modal-content label {
+    font-weight: 700 !important;
+    font-size: 0.8rem !important;
+    color: #475569 !important;
+}
+
+/* Ensure modal input, select and textarea controls are readable and dark text on white/light grey background */
+.modal-content input[type="text"],
+.modal-content input[type="email"],
+.modal-content input[type="password"],
+.modal-content input[type="date"],
+.modal-content input[type="time"],
+.modal-content select,
+.modal-content textarea {
+    background: #FFFFFF !important;
+    color: #1E293B !important;
+    border: 1px solid #94A3B8 !important; /* Higher contrast border */
+    border-radius: 10px !important;
+    padding: 10px 12px 10px 40px !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important; /* Bold content value text */
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.modal-content input:focus,
+.modal-content select:focus,
+.modal-content textarea:focus {
+    border-color: var(--teal-primary) !important;
+    background: #FFFFFF !important;
+}
+
+/* Visually differentiate disabled/blocked inputs from filled but editable inputs */
+.modal-content input:disabled,
+.modal-content select:disabled,
+.modal-content textarea:disabled {
+    background: #E2E8F0 !important; /* Light grey backdrop */
+    color: #475569 !important; /* Muted but readable dark text */
+    border: 1px solid #CBD5E1 !important; /* Softer border for disabled */
+    cursor: not-allowed !important;
+    font-weight: 500 !important;
+    opacity: 0.85 !important;
+}
+
+/* Fix background select option text to be dark readable */
+.modal-content select option {
+    background: #FFFFFF !important;
+    color: #1E293B !important;
+}
+
+/* Ensure modal icons are visible but distinct */
+.modal-content .input-icon-wrapper i {
+    color: #475569 !important; /* Higher contrast icon */
+}
+
 @keyframes modalScale {
     from { opacity: 0; transform: scale(0.9); }
     to { opacity: 1; transform: scale(1); }

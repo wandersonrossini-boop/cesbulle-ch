@@ -15,6 +15,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Optional;
+import com.tesourariacme.api.domain.ServiceSchedule;
 
 @RestController
 @RequestMapping("/api/fechamento-culto")
@@ -112,17 +116,46 @@ public class ServiceClosingController {
     public ResponseEntity<?> createSession(@RequestBody ServiceClosingSessionRequest request, Authentication authentication) {
         try {
             String user = authentication != null ? authentication.getName() : "anonymous";
-            ServiceClosingSession session = sessionService.getOrCreate(
-                    request.getServiceDate(),
-                    request.getServiceTime(),
-                    request.getServiceEndTime(),
-                    request.getServiceType(),
-                    user
-            );
+            ServiceClosingSession session;
+            if (request.getServiceDate() == null) {
+                session = sessionService.resolveOrCreateSession(LocalDateTime.now(), user);
+            } else {
+                session = sessionService.getOrCreate(
+                        request.getServiceDate(),
+                        request.getServiceTime(),
+                        request.getServiceEndTime(),
+                        request.getServiceType(),
+                        user
+                );
+            }
             return ResponseEntity.ok(ServiceClosingSessionResponse.fromEntity(session));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @GetMapping("/session/current-status")
+    public ResponseEntity<?> getCurrentStatus() {
+        LocalDateTime now = LocalDateTime.now();
+        Optional<ServiceSchedule> scheduleOpt = sessionService.findScheduleForTime(now);
+        Map<String, Object> response = new HashMap<>();
+        
+        if (scheduleOpt.isEmpty()) {
+            response.put("hasSchedule", false);
+            return ResponseEntity.ok(response);
+        }
+        
+        ServiceSchedule schedule = scheduleOpt.get();
+        LocalDate date = now.toLocalDate();
+        Optional<ServiceClosingSession> sessionOpt = sessionService.findSessionByScheduleAndDate(schedule, date);
+        
+        response.put("hasSchedule", true);
+        response.put("schedule", schedule);
+        response.put("hasSession", sessionOpt.isPresent());
+        if (sessionOpt.isPresent()) {
+            response.put("session", ServiceClosingSessionResponse.fromEntity(sessionOpt.get()));
+        }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/session/{id}")
