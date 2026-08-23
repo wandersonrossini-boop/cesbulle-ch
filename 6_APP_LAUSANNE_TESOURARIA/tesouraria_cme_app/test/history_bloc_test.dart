@@ -84,6 +84,16 @@ class FakeFechamentoApiService implements FechamentoApiService {
   Future<Map<String, dynamic>> resolveAutomaticSession() async {
     return {};
   }
+
+  @override
+  Future<List<dynamic>> fetchPendingOccurrences(int withinDays) async {
+    return [];
+  }
+
+  @override
+  Future<Map<String, dynamic>> createLateSession(int scheduleId, String date) async {
+    return {};
+  }
 }
 
 void main() {

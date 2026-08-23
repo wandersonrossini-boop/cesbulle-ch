@@ -175,10 +175,10 @@ class ClosingDetailView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: isZero ? AppTheme.mathGreen : AppTheme.excludeRed,
+                    color: isZero ? AppTheme.primaryGreen : AppTheme.excludeRed,
                   ),
                 ),
-                if (isZero) const Icon(Icons.check_circle, color: AppTheme.mathGreen)
+                if (isZero) const Icon(Icons.check_circle, color: AppTheme.primaryGreen)
                 else const Icon(Icons.error, color: AppTheme.excludeRed)
               ],
             )

@@ -221,4 +221,53 @@ public class ServiceClosingControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST, deleteResponse.getStatusCode());
         assertEquals("Não é permitido alterar o rascunho de uma sessão finalizada.", deleteResponse.getBody());
     }
+
+    @Test
+    public void testGetPendingOccurrences_ReturnsList() {
+        java.util.List<java.util.Map<String, Object>> mockList = new java.util.ArrayList<>();
+        java.util.Map<String, Object> occurrence = new java.util.HashMap<>();
+        com.tesourariacme.api.domain.ServiceSchedule schedule = new com.tesourariacme.api.domain.ServiceSchedule(
+                java.time.DayOfWeek.SUNDAY, LocalTime.of(10, 0), LocalTime.of(12, 0), "Regular", true);
+        schedule.setId(1L);
+        occurrence.put("schedule", schedule);
+        occurrence.put("date", "2026-08-23");
+        occurrence.put("sessionStatus", "NO_SESSION");
+        occurrence.put("sessionId", null);
+        mockList.add(occurrence);
+
+        when(sessionService.findPendingOccurrences(7)).thenReturn(mockList);
+
+        ResponseEntity<?> response = controller.getPendingOccurrences(7);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        java.util.List<?> bodyList = (java.util.List<?>) response.getBody();
+        assertEquals(1, bodyList.size());
+    }
+
+    @Test
+    public void testCreateLateSession_Success() {
+        ServiceClosingController.LateSessionRequest request = new ServiceClosingController.LateSessionRequest();
+        request.setScheduleId(1L);
+        request.setDate(LocalDate.of(2026, 8, 22));
+
+        ServiceClosingSession session = new ServiceClosingSession();
+        session.setId(500L);
+        session.setServiceDate(request.getDate());
+        session.setServiceTime(LocalTime.of(19, 0));
+        session.setStatus(ServiceClosingSessionStatus.ACTIVE);
+        session.setStartedBy("user1");
+        session.setExpiresAt(LocalDateTime.now().plusHours(24));
+        session.setLateOpening(true);
+
+        when(sessionService.createOrResumeLateSession(1L, request.getDate(), "user1")).thenReturn(session);
+
+        ResponseEntity<?> response = controller.createLateSession(request, authUser1);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        ServiceClosingController.ServiceClosingSessionResponse body = (ServiceClosingController.ServiceClosingSessionResponse) response.getBody();
+        assertEquals(500L, body.getId());
+        assertTrue(body.isLateOpening());
+    }
 }

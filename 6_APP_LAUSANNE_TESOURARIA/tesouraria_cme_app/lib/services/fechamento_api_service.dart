@@ -328,4 +328,50 @@ class FechamentoApiService {
       throw Exception('Falha ao obter sessão automática (${response.statusCode}): ${response.body}');
     }
   }
+
+  Future<List<dynamic>> fetchPendingOccurrences(int withinDays) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/fechamento-culto/session/pending-occurrences?withinDays=$withinDays'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(utf8.decode(response.bodyBytes));
+    } else if (response.statusCode == 401) {
+      throw Exception('UNAUTHORIZED');
+    } else {
+      throw Exception('Falha ao buscar ocorrências pendentes (${response.statusCode})');
+    }
+  }
+
+  Future<Map<String, dynamic>> createLateSession(int scheduleId, String date) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/fechamento-culto/session/late'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'scheduleId': scheduleId,
+        'date': date,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(utf8.decode(response.bodyBytes));
+    } else if (response.statusCode == 401) {
+      throw Exception('UNAUTHORIZED');
+    } else {
+      throw Exception('Falha ao criar sessão tardia (${response.statusCode}): ${response.body}');
+    }
+  }
 }

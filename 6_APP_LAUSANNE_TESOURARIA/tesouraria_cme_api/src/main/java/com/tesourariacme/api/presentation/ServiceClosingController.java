@@ -177,6 +177,54 @@ public class ServiceClosingController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    /**
+     * Lists past schedule occurrences without a FINISHED session/closing.
+     * withinDays: how many days back to search (required — Gatekeeper defines the value).
+     */
+    @GetMapping("/session/pending-occurrences")
+    public ResponseEntity<?> getPendingOccurrences(@org.springframework.web.bind.annotation.RequestParam int withinDays) {
+        try {
+            java.util.List<java.util.Map<String, Object>> raw = sessionService.findPendingOccurrences(withinDays);
+            // Project to a serialization-safe structure (avoid lazy-load issues with ServiceSchedule)
+            java.util.List<java.util.Map<String, Object>> out = new java.util.ArrayList<>();
+            for (java.util.Map<String, Object> entry : raw) {
+                com.tesourariacme.api.domain.ServiceSchedule sched =
+                        (com.tesourariacme.api.domain.ServiceSchedule) entry.get("schedule");
+                java.util.Map<String, Object> item = new java.util.HashMap<>();
+                item.put("scheduleId", sched.getId());
+                item.put("serviceType", sched.getServiceType());
+                item.put("startTime", sched.getStartTime().toString());
+                item.put("endTime", sched.getEndTime().toString());
+                item.put("date", entry.get("date"));
+                item.put("sessionStatus", entry.get("sessionStatus"));
+                item.put("sessionId", entry.get("sessionId"));
+                out.add(item);
+            }
+            return ResponseEntity.ok(out);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erro ao buscar ocorrências pendentes: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Creates or resumes a late session.
+     * Data/time/type come exclusively from the schedule — the client only provides scheduleId + date.
+     */
+    @PostMapping("/session/late")
+    public ResponseEntity<?> createLateSession(@RequestBody LateSessionRequest request, Authentication authentication) {
+        if (request.getDate() != null && monthlyPeriodService.isPeriodLocked(request.getDate())) {
+            return ResponseEntity.badRequest().body("O período contábil deste mês está trancado para auditoria.");
+        }
+        try {
+            String user = authentication != null ? authentication.getName() : "anonymous";
+            ServiceClosingSession session = sessionService.createOrResumeLateSession(
+                    request.getScheduleId(), request.getDate(), user);
+            return ResponseEntity.ok(ServiceClosingSessionResponse.fromEntity(session));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PostMapping("/session/{id}/draft")
     public ResponseEntity<?> saveSessionDraft(@PathVariable Long id, @RequestBody Object draft) {
         try {
@@ -228,6 +276,12 @@ public class ServiceClosingController {
     }
 
     @Data
+    public static class LateSessionRequest {
+        private Long scheduleId;
+        private LocalDate date;
+    }
+
+    @Data
     public static class ServiceClosingSessionResponse {
         private Long id;
         private LocalDate serviceDate;
@@ -238,6 +292,7 @@ public class ServiceClosingController {
         private String startedBy;
         private LocalDateTime startedAt;
         private LocalDateTime expiresAt;
+        private boolean lateOpening;
 
         public static ServiceClosingSessionResponse fromEntity(ServiceClosingSession session) {
             ServiceClosingSessionResponse resp = new ServiceClosingSessionResponse();
@@ -250,6 +305,7 @@ public class ServiceClosingController {
             resp.setStartedBy(session.getStartedBy());
             resp.setStartedAt(session.getStartedAt());
             resp.setExpiresAt(session.getExpiresAt());
+            resp.setLateOpening(session.isLateOpening());
             return resp;
         }
     }

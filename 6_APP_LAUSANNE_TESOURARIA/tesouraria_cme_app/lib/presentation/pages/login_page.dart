@@ -386,42 +386,47 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         
                         const SizedBox(height: 20),
-                        
-                        // Lembrar-me e Esqueci minha senha
+                                     // Lembrar-me e Esqueci minha senha
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: Checkbox(
-                                    value: _rememberMe,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _rememberMe = value ?? false;
-                                      });
-                                    },
-                                    activeColor: AppTheme.primaryGreen,
-                                    side: const BorderSide(color: Color(0xFF94A3B8), width: 1.5),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(4),
+                            Expanded(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: Checkbox(
+                                      value: _rememberMe,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _rememberMe = value ?? false;
+                                        });
+                                      },
+                                      activeColor: AppTheme.primaryGreen,
+                                      side: const BorderSide(color: Color(0xFF94A3B8), width: 1.5),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(width: 8),
-                                const Text(
-                                  "Lembrar-me",
-                                  style: TextStyle(
-                                    color: Color(0xFF334155),
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
+                                  const SizedBox(width: 8),
+                                  const Flexible(
+                                    child: Text(
+                                      "Lembrar-me",
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: Color(0xFF334155),
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
+                            const SizedBox(width: 8),
                             GestureDetector(
                               onTap: () {
                                 showDialog(

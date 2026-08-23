@@ -307,9 +307,9 @@ class _ReportsPageState extends State<ReportsPage> {
               const SizedBox(height: 24),
               _buildFiltersCard(isDesktop),
               const SizedBox(height: 24),
-              _buildKpis(report),
+              _buildKpis(report, isDesktop),
               const SizedBox(height: 24),
-              _buildTables(report),
+              _buildTables(report, isDesktop),
               const SizedBox(height: 24),
               _buildExportSection(),
             ],
@@ -473,36 +473,35 @@ class _ReportsPageState extends State<ReportsPage> {
     );
   }
 
-  Widget _buildKpis(MonthlyReportModel report) {
+  Widget _buildKpis(MonthlyReportModel report, bool isDesktop) {
     final balanceColor = report.netBalance >= 0 ? AppTheme.primaryGreen : AppTheme.excludeRed;
-    return GridView.count(
-      crossAxisCount: 3,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
-      childAspectRatio: 2.2,
-      children: [
-        _buildKpiCard(
-          "TOTAL ENTRADAS",
-          "CHF ${_formatCHF(report.totalIncomes)}",
-          const Color(0xFF1E3A8A),
-          Icons.arrow_upward_rounded,
-        ),
-        _buildKpiCard(
-          "DESPESAS APROVADAS",
-          "CHF ${_formatCHF(report.totalExpenses)}",
-          AppTheme.excludeRed,
-          Icons.arrow_downward_rounded,
-        ),
-        _buildKpiCard(
-          "SALDO LÍQUIDO",
-          "CHF ${_formatCHF(report.netBalance)}",
-          balanceColor,
-          Icons.account_balance_rounded,
-        ),
-      ],
-    );
+    
+    if (isDesktop) {
+      return GridView.count(
+        crossAxisCount: 3,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: 2.2,
+        children: [
+          _buildKpiCard("TOTAL ENTRADAS", "CHF ${_formatCHF(report.totalIncomes)}", const Color(0xFF1E3A8A), Icons.arrow_upward_rounded),
+          _buildKpiCard("DESPESAS APROVADAS", "CHF ${_formatCHF(report.totalExpenses)}", AppTheme.excludeRed, Icons.arrow_downward_rounded),
+          _buildKpiCard("SALDO LÍQUIDO", "CHF ${_formatCHF(report.netBalance)}", balanceColor, Icons.account_balance_rounded),
+        ],
+      );
+    } else {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildKpiCard("SALDO LÍQUIDO", "CHF ${_formatCHF(report.netBalance)}", balanceColor, Icons.account_balance_rounded),
+          const SizedBox(height: 16),
+          _buildKpiCard("TOTAL ENTRADAS", "CHF ${_formatCHF(report.totalIncomes)}", const Color(0xFF1E3A8A), Icons.arrow_upward_rounded),
+          const SizedBox(height: 16),
+          _buildKpiCard("DESPESAS APROVADAS", "CHF ${_formatCHF(report.totalExpenses)}", AppTheme.excludeRed, Icons.arrow_downward_rounded),
+        ],
+      );
+    }
   }
 
   Widget _buildKpiCard(String label, String value, Color color, IconData icon) {
@@ -540,19 +539,26 @@ class _ReportsPageState extends State<ReportsPage> {
     );
   }
 
-  Widget _buildTables(MonthlyReportModel report) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: _buildCategoryTable("Entradas por Categoria", report.incomesByCategory, true),
-        ),
-        const SizedBox(width: 24),
-        Expanded(
-          child: _buildCategoryTable("Saídas Aprovadas por Categoria", report.expensesByCategory, false),
-        ),
-      ],
-    );
+  Widget _buildTables(MonthlyReportModel report, bool isDesktop) {
+    if (isDesktop) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(child: _buildCategoryTable("Entradas por Categoria", report.incomesByCategory, true)),
+          const SizedBox(width: 24),
+          Expanded(child: _buildCategoryTable("Saídas Aprovadas por Categoria", report.expensesByCategory, false)),
+        ],
+      );
+    } else {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildCategoryTable("Entradas por Categoria", report.incomesByCategory, true),
+          const SizedBox(height: 24),
+          _buildCategoryTable("Saídas Aprovadas por Categoria", report.expensesByCategory, false),
+        ],
+      );
+    }
   }
 
   Widget _buildCategoryTable(String title, List<CategorySummaryModel> list, bool isInflow) {

@@ -320,21 +320,11 @@ class _DashboardViewState extends State<DashboardView> {
     final isSurplus = currentInputs >= _totalSaidas;
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1E3A8A), Color(0xFF0F172A)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF1E3A8A).withValues(alpha: 0.2),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -345,58 +335,39 @@ class _DashboardViewState extends State<DashboardView> {
               Text(
                 'COMPETÊNCIA $displayMonth',
                 style: const TextStyle(
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF93C5FD),
+                  color: Color(0xFF64748B),
                   letterSpacing: 1.0,
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: isLocked ? const Color(0xFFEF4444).withValues(alpha: 0.2) : const Color(0xFF10B981).withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: isLocked ? const Color(0xFFF87171) : const Color(0xFF34D399), width: 1),
+                  color: isLocked ? const Color(0xFFFEF2F2) : const Color(0xFFECFDF5),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: isLocked ? const Color(0xFFFCA5A5) : const Color(0xFF6EE7B7)),
                 ),
                 child: Text(
                   isLocked ? 'FECHADO' : 'ABERTO',
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: isLocked ? const Color(0xFFF87171) : const Color(0xFF34D399),
+                    color: isLocked ? const Color(0xFFDC2626) : const Color(0xFF059669),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           const Text(
             'Entradas do Mês',
-            style: TextStyle(fontSize: 14, color: Colors.white70),
+            style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
           ),
           const SizedBox(height: 4),
           Text(
             'CHF ${currentInputs.toStringAsFixed(2)}',
-            style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Icon(
-                isSurplus ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
-                size: 16,
-                color: isSurplus ? const Color(0xFF34D399) : const Color(0xFFF87171),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                isSurplus ? 'Superávit operacional parcial' : 'Déficit operacional parcial',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: isSurplus ? const Color(0xFF34D399) : const Color(0xFFF87171),
-                ),
-              ),
-            ],
+            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF0F172A), letterSpacing: -1.0),
           ),
         ],
       ),
@@ -408,7 +379,7 @@ class _DashboardViewState extends State<DashboardView> {
       _buildActionCard(
         context: context,
         icon: Icons.add_circle_outline_rounded,
-        title: 'Novo Fechamento',
+        title: 'Contagem do culto',
         subtitle: 'Submeter ata de culto',
         color: const Color(0xFF1E3A8A),
         onTap: () {
@@ -420,7 +391,7 @@ class _DashboardViewState extends State<DashboardView> {
       _buildActionCard(
         context: context,
         icon: Icons.people_outline_rounded,
-        title: 'Contribuintes',
+        title: 'Cadastro e declarações',
         subtitle: 'Gerenciar dizimistas',
         color: const Color(0xFF0D9488),
         onTap: () {

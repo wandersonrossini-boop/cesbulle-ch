@@ -3,6 +3,8 @@ package com.tesourariacme.api.application;
 import com.tesourariacme.api.domain.ServiceClosingSession;
 import com.tesourariacme.api.domain.ServiceClosingSessionStatus;
 import com.tesourariacme.api.infrastructure.ServiceClosingSessionRepository;
+import com.tesourariacme.api.infrastructure.ServiceClosingRepository;
+import com.tesourariacme.api.application.AuditLogService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -27,13 +29,17 @@ public class ServiceClosingSessionServiceTest {
 
     private ServiceClosingSessionRepository repository;
     private ServiceScheduleRepository scheduleRepository;
+    private ServiceClosingRepository closingRepository;
+    private AuditLogService auditLogService;
     private ServiceClosingSessionService service;
 
     @BeforeEach
     public void setUp() {
         repository = mock(ServiceClosingSessionRepository.class);
         scheduleRepository = mock(ServiceScheduleRepository.class);
-        service = new ServiceClosingSessionService(repository, scheduleRepository);
+        closingRepository = mock(ServiceClosingRepository.class);
+        auditLogService = mock(AuditLogService.class);
+        service = new ServiceClosingSessionService(repository, scheduleRepository, closingRepository, auditLogService);
     }
 
     @Test
@@ -361,5 +367,76 @@ public class ServiceClosingSessionServiceTest {
         assertSame(legacy, resolved);
         assertEquals(schedule, resolved.getServiceSchedule());
         verify(repository, times(1)).saveAndFlush(legacy);
+    }
+
+    @Test
+    public void testCreateOrResumeLateSession_ResumesActive() {
+        LocalDate date = LocalDate.of(2026, 8, 22);
+        ServiceSchedule schedule = new ServiceSchedule(DayOfWeek.SATURDAY, LocalTime.of(19, 30), LocalTime.of(21, 0), "Regular", true);
+        schedule.setId(10L);
+
+        ServiceClosingSession existing = new ServiceClosingSession();
+        existing.setId(200L);
+        existing.setStatus(ServiceClosingSessionStatus.ACTIVE);
+
+        when(scheduleRepository.findById(10L)).thenReturn(Optional.of(schedule));
+        when(repository.findByServiceScheduleAndServiceDate(schedule, date)).thenReturn(Optional.of(existing));
+
+        ServiceClosingSession result = service.createOrResumeLateSession(10L, date, "Admilson");
+        assertSame(existing, result);
+    }
+
+    @Test
+    public void testCreateOrResumeLateSession_ThrowsIfFinished() {
+        LocalDate date = LocalDate.of(2026, 8, 22);
+        ServiceSchedule schedule = new ServiceSchedule(DayOfWeek.SATURDAY, LocalTime.of(19, 30), LocalTime.of(21, 0), "Regular", true);
+        schedule.setId(10L);
+
+        ServiceClosingSession existing = new ServiceClosingSession();
+        existing.setStatus(ServiceClosingSessionStatus.FINISHED);
+
+        when(scheduleRepository.findById(10L)).thenReturn(Optional.of(schedule));
+        when(repository.findByServiceScheduleAndServiceDate(schedule, date)).thenReturn(Optional.of(existing));
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            service.createOrResumeLateSession(10L, date, "Admilson");
+        });
+    }
+
+    @Test
+    public void testCreateOrResumeLateSession_ThrowsIfClosingExists() {
+        LocalDate date = LocalDate.of(2026, 8, 22);
+        ServiceSchedule schedule = new ServiceSchedule(DayOfWeek.SATURDAY, LocalTime.of(19, 30), LocalTime.of(21, 0), "Regular", true);
+        schedule.setId(10L);
+
+        com.tesourariacme.api.domain.ServiceClosing closing = new com.tesourariacme.api.domain.ServiceClosing();
+        closing.setServiceDate(date);
+
+        when(scheduleRepository.findById(10L)).thenReturn(Optional.of(schedule));
+        when(closingRepository.findByServiceDateBetween(date, date)).thenReturn(Arrays.asList(closing));
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            service.createOrResumeLateSession(10L, date, "Admilson");
+        });
+    }
+
+    @Test
+    public void testCreateOrResumeLateSession_CreatesNewWithLateOpeningTrue() {
+        LocalDate date = LocalDate.of(2026, 8, 22);
+        ServiceSchedule schedule = new ServiceSchedule(DayOfWeek.SATURDAY, LocalTime.of(19, 30), LocalTime.of(21, 0), "Regular", true);
+        schedule.setId(10L);
+
+        when(scheduleRepository.findById(10L)).thenReturn(Optional.of(schedule));
+        when(repository.findByServiceScheduleAndServiceDate(schedule, date)).thenReturn(Optional.empty());
+        when(repository.findByServiceDateAndServiceTime(date, schedule.getStartTime())).thenReturn(Optional.empty());
+        when(repository.saveAndFlush(any(ServiceClosingSession.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        ServiceClosingSession result = service.createOrResumeLateSession(10L, date, "Admilson");
+
+        assertNotNull(result);
+        assertTrue(result.isLateOpening());
+        assertEquals("Admilson", result.getStartedBy());
+        assertEquals(ServiceClosingSessionStatus.ACTIVE, result.getStatus());
+        verify(auditLogService, times(1)).logAction(eq("LATE_OPENING"), eq("Admilson"), anyString(), anyString());
     }
 }

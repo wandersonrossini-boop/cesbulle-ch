@@ -46,6 +46,9 @@ public class ServiceClosingSession {
     @Column(nullable = false)
     private LocalDateTime expiresAt;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean lateOpening = false;
+
     @Column(columnDefinition = "TEXT")
     private String draftJson;
 }
