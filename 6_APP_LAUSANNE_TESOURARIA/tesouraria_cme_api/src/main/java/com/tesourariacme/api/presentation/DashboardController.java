@@ -59,10 +59,8 @@ public class DashboardController {
         List<ServiceClosing> closings = serviceClosingRepository.findByServiceDateBetween(start, end);
         BigDecimal inputs = BigDecimal.ZERO;
         for (ServiceClosing c : closings) {
-            BigDecimal diz = c.getTotalDizimos() != null ? c.getTotalDizimos() : BigDecimal.ZERO;
-            BigDecimal ofe = c.getTotalOfertas() != null ? c.getTotalOfertas() : BigDecimal.ZERO;
-            BigDecimal vot = c.getTotalVotos() != null ? c.getTotalVotos() : BigDecimal.ZERO;
-            inputs = inputs.add(diz).add(ofe).add(vot);
+            BigDecimal total = c.getRegisteredTotal() != null ? c.getRegisteredTotal() : (c.getPhysicalTotal() != null ? c.getPhysicalTotal() : BigDecimal.ZERO);
+            inputs = inputs.add(total);
         }
 
         // 3. Pending expenses

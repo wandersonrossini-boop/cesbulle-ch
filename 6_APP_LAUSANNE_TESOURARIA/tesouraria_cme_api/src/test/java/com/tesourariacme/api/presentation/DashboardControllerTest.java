@@ -45,13 +45,12 @@ public class DashboardControllerTest {
 
     @Test
     public void testGetDashboardSummaryAuthorized() {
-        LocalDate start = LocalDate.now().withDayOfMonth(1);
-        LocalDate end = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
+        LocalDate now = LocalDate.now(java.time.ZoneId.of("Europe/Zurich"));
+        LocalDate start = now.withDayOfMonth(1);
+        LocalDate end = now.withDayOfMonth(now.lengthOfMonth());
 
         ServiceClosing closing = new ServiceClosing();
-        closing.setTotalDizimos(BigDecimal.valueOf(100.0));
-        closing.setTotalOfertas(BigDecimal.valueOf(50.0));
-        closing.setTotalVotos(BigDecimal.valueOf(20.0));
+        closing.setRegisteredTotal(BigDecimal.valueOf(170.0));
         when(serviceClosingRepository.findByServiceDateBetween(start, end)).thenReturn(List.of(closing));
 
         Expense expense = new Expense();
