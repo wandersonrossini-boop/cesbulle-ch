@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../domain/movement_models.dart';
 
 class MovementsApiService {
-  static const String baseUrl = 'http://localhost:8080/api/movements';
+  static const String baseUrl = String.fromEnvironment('API_BASE_URL', defaultValue: 'https://tesouraria-cme-api.onrender.com/api') + '/movements';
 
   Future<MovementResponse> fetchMovements(int year, int month) async {
     final prefs = await SharedPreferences.getInstance();
