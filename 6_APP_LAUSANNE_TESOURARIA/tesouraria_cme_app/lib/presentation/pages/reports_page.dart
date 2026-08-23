@@ -638,6 +638,40 @@ class _ReportsPageState extends State<ReportsPage> {
   }
 
   Widget _buildExportSection() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+
+    final buttons = [
+      ElevatedButton.icon(
+        onPressed: _isExportingPdf ? null : _exportPdf,
+        icon: _isExportingPdf
+            ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+            : const Icon(Icons.picture_as_pdf_rounded, color: Colors.white, size: 20),
+        label: const Text('Exportar PDF Oficial', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppTheme.primaryGreen,
+          minimumSize: isMobile ? const Size(double.infinity, 48) : null,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      ),
+      if (isMobile) const SizedBox(height: 10),
+      if (!isMobile) const SizedBox(width: 12),
+      ElevatedButton.icon(
+        onPressed: _isExporting ? null : _exportCsv,
+        icon: _isExporting
+            ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+            : const Icon(Icons.download_rounded, color: Colors.white, size: 20),
+        label: const Text('Exportar CSV', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF1E3A8A),
+          minimumSize: isMobile ? const Size(double.infinity, 48) : null,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      ),
+    ];
+
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -646,58 +680,46 @@ class _ReportsPageState extends State<ReportsPage> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Expanded(
-              child: Column(
+        child: isMobile
+            ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Exportar Balanço Geral',
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
                   ),
-                  SizedBox(height: 4),
-                  Text(
+                  const SizedBox(height: 4),
+                  const Text(
                     'Gere uma exportação oficial em formato CSV ou PDF com todos os detalhes do período para conciliação contábil.',
                     style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
                   ),
+                  const SizedBox(height: 16),
+                  ...buttons,
+                ],
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Exportar Balanço Geral',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Gere uma exportação oficial em formato CSV ou PDF com todos os detalhes do período para conciliação contábil.',
+                          style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 24),
+                  Row(mainAxisSize: MainAxisSize.min, children: buttons),
                 ],
               ),
-            ),
-            const SizedBox(width: 24),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: _isExportingPdf ? null : _exportPdf,
-                  icon: _isExportingPdf
-                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : const Icon(Icons.picture_as_pdf_rounded, color: Colors.white, size: 20),
-                  label: const Text('Exportar PDF Oficial', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primaryGreen,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                ElevatedButton.icon(
-                  onPressed: _isExporting ? null : _exportCsv,
-                  icon: _isExporting
-                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : const Icon(Icons.download_rounded, color: Colors.white, size: 20),
-                  label: const Text('Exportar CSV', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1E3A8A),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
       ),
     );
   }

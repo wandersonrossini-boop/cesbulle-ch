@@ -458,75 +458,78 @@ class _ExpensesPageState extends State<ExpensesPage> {
                           : localRecurrings.isEmpty
                               ? const Center(child: Text('Nenhuma despesa fixa cadastrada.'))
                               : SingleChildScrollView(
-                                  child: Table(
-                                    columnWidths: const {
-                                      0: FlexColumnWidth(2.0), // Desc
-                                      1: FlexColumnWidth(1.2), // Cat
-                                      2: FlexColumnWidth(1.0), // Valor
-                                      3: FlexColumnWidth(0.8), // Venc
-                                      4: FlexColumnWidth(1.0), // Acoes
-                                    },
-                                    border: const TableBorder(
-                                      bottom: BorderSide(color: Color(0xFFE2E8F0)),
-                                      horizontalInside: BorderSide(color: Color(0xFFF1F5F9)),
-                                    ),
-                                    children: [
-                                      const TableRow(
-                                        children: [
-                                          Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text('DESCRIÇÃO', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF64748B)))),
-                                          Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text('CATEGORIA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF64748B)))),
-                                          Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text('VALOR', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF64748B)))),
-                                          Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text('DIA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF64748B)))),
-                                          Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text('AÇÕES', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF64748B)))),
-                                        ],
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Table(
+                                      columnWidths: const {
+                                        0: FixedColumnWidth(160), // Desc
+                                        1: FixedColumnWidth(110), // Cat
+                                        2: FixedColumnWidth(100), // Valor
+                                        3: FixedColumnWidth(70),  // Venc
+                                        4: FixedColumnWidth(90),  // Acoes
+                                      },
+                                      border: const TableBorder(
+                                        bottom: BorderSide(color: Color(0xFFE2E8F0)),
+                                        horizontalInside: BorderSide(color: Color(0xFFF1F5F9)),
                                       ),
-                                      ...localRecurrings.map((rec) {
-                                        return TableRow(
+                                      children: [
+                                        const TableRow(
                                           children: [
-                                            Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 8),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(rec.description, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                                                  const SizedBox(height: 2),
-                                                  Text(rec.active ? 'ATIVA' : 'INATIVA', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: rec.active ? Colors.green : Colors.red)),
-                                                ],
-                                              ),
-                                            ),
-                                            Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text(rec.category, style: const TextStyle(fontSize: 12))),
-                                            Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text('CHF ${rec.amount.toStringAsFixed(2)}', style: const TextStyle(fontSize: 12, fontFamily: 'monospace'))),
-                                            Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text('Dia ${rec.dueDayOfMonth}', style: const TextStyle(fontSize: 12))),
-                                            Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 4),
-                                              child: Row(
-                                                children: [
-                                                  IconButton(
-                                                    icon: const Icon(Icons.edit_outlined, size: 16, color: Colors.blue),
-                                                    onPressed: () => showAddEditRecurringDialog(rec),
-                                                  ),
-                                                  IconButton(
-                                                    icon: const Icon(Icons.delete_outline, size: 16, color: Colors.red),
-                                                    onPressed: () async {
-                                                      setModalState(() => localLoading = true);
-                                                      try {
-                                                        await _apiService.deleteRecurringExpense(int.parse(rec.id));
-                                                        loadLocalRecurrings();
-                                                      } catch (e) {
-                                                        ScaffoldMessenger.of(context).showSnackBar(
-                                                          SnackBar(content: Text('Erro ao excluir: $e'), backgroundColor: Colors.red),
-                                                        );
-                                                        setModalState(() => localLoading = false);
-                                                      }
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
+                                            Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text('DESCRIÇÃO', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF64748B)))),
+                                            Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text('CATEGORIA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF64748B)))),
+                                            Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text('VALOR', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF64748B)))),
+                                            Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text('DIA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF64748B)))),
+                                            Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text('AÇÕES', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF64748B)))),
                                           ],
-                                        );
-                                      }).toList(),
-                                    ],
+                                        ),
+                                        ...localRecurrings.map((rec) {
+                                          return TableRow(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(rec.description, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                                                    const SizedBox(height: 2),
+                                                    Text(rec.active ? 'ATIVA' : 'INATIVA', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: rec.active ? Colors.green : Colors.red)),
+                                                  ],
+                                                ),
+                                              ),
+                                              Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text(rec.category, style: const TextStyle(fontSize: 12))),
+                                              Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text('CHF ${rec.amount.toStringAsFixed(2)}', style: const TextStyle(fontSize: 12, fontFamily: 'monospace'))),
+                                              Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text('Dia ${rec.dueDayOfMonth}', style: const TextStyle(fontSize: 12))),
+                                              Padding(
+                                                padding: const EdgeInsets.symmetric(vertical: 4),
+                                                child: Row(
+                                                  children: [
+                                                    IconButton(
+                                                      icon: const Icon(Icons.edit_outlined, size: 16, color: Colors.blue),
+                                                      onPressed: () => showAddEditRecurringDialog(rec),
+                                                    ),
+                                                    IconButton(
+                                                      icon: const Icon(Icons.delete_outline, size: 16, color: Colors.red),
+                                                      onPressed: () async {
+                                                        setModalState(() => localLoading = true);
+                                                        try {
+                                                          await _apiService.deleteRecurringExpense(int.parse(rec.id));
+                                                          loadLocalRecurrings();
+                                                        } catch (e) {
+                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                            SnackBar(content: Text('Erro ao excluir: $e'), backgroundColor: Colors.red),
+                                                          );
+                                                          setModalState(() => localLoading = false);
+                                                        }
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        }).toList(),
+                                      ],
+                                    ),
                                   ),
                                 ),
                     ),

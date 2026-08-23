@@ -419,18 +419,19 @@ class _MovementsPageState extends State<MovementsPage> {
             child: const Row(
               children: [
                 SizedBox(
-                  width: 90,
+                  width: 72,
                   child: Text('DATA', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
                 ),
                 Expanded(
-                  flex: 2,
+                  flex: 3,
                   child: Text('CONTRIBUINTE / DESCRIÇÃO', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
                 ),
-                Expanded(
-                  child: Text('CATEGORIA', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
+                SizedBox(
+                  width: 70,
+                  child: Text('CAT.', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
                 ),
                 SizedBox(
-                  width: 120,
+                  width: 90,
                   child: Text('VALOR', textAlign: TextAlign.right, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
                 ),
               ],
@@ -456,11 +457,11 @@ class _MovementsPageState extends State<MovementsPage> {
                   child: Row(
                     children: [
                       SizedBox(
-                        width: 90,
+                        width: 72,
                         child: Text(item.date, style: const TextStyle(fontSize: 12, color: Color(0xFF64748B))),
                       ),
                       Expanded(
-                        flex: 2,
+                        flex: 3,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -469,19 +470,20 @@ class _MovementsPageState extends State<MovementsPage> {
                           ],
                         ),
                       ),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          child: Text(item.category, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF475569))),
+                      SizedBox(
+                        width: 70,
+                        child: Text(
+                          item.category.length > 4 ? item.category.substring(0, 4) : item.category,
+                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
                         ),
                       ),
                       SizedBox(
-                        width: 120,
+                        width: 90,
                         child: Text(
                           '${item.isIncome ? '+' : '-'} CHF ${item.amount.toStringAsFixed(2)}',
                           textAlign: TextAlign.right,
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: 11,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'monospace',
                             color: item.isIncome ? const Color(0xFF059669) : const Color(0xFFDC2626),
