@@ -1,4 +1,4 @@
-import '../widgets/attachment_uploader.dart';
+﻿import '../widgets/attachment_uploader.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -302,7 +302,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
           builder: (context, setModalState) {
             void loadLocalRecurrings() async {
               try {
-                final list = await _apiService.getRecurringExpenses();
+                final list = await _apiService.fetchRecurringExpenses();
                 if (mounted) {
                   setModalState(() {
                     localRecurrings = list;
@@ -413,21 +413,9 @@ class _ExpensesPageState extends State<ExpensesPage> {
                       
                       try {
                         if (isEdit) {
-                          await _apiService.updateRecurringExpense(
-                            int.parse(currentEditItem!.id),
-                            descController.text,
-                            amount,
-                            category,
-                            day,
-                            active,
-                          );
+                          await _apiService.updateRecurringExpense(int.parse(currentEditItem!.id), description: descController.text, amount: amount, category: category, dueDayOfMonth: day, active: active);
                         } else {
-                          await _apiService.createRecurringExpense(
-                            descController.text,
-                            amount,
-                            category,
-                            day,
-                          );
+                          await _apiService.createRecurringExpense(description: descController.text, amount: amount, category: category, dueDayOfMonth: day, active: active);
                         }
                         loadLocalRecurrings();
                       } catch (e) {
@@ -1592,3 +1580,4 @@ class _ExpensesPageState extends State<ExpensesPage> {
     );
   }
 }
+

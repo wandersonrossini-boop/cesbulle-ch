@@ -131,6 +131,9 @@ public class ServiceClosingController {
     private final com.tesourariacme.api.application.MonthlyPeriodService monthlyPeriodService;
     private static Object activeDraft = null; // static to persist across controller requests
 
+    @Autowired
+    private com.tesourariacme.api.infrastructure.ServiceClosingAttachmentRepository repository;
+
     public ServiceClosingController(
             SubmitServiceClosingUseCase useCase,
             ServiceClosingSessionService sessionService,
@@ -410,6 +413,7 @@ public class ServiceClosingController {
         }
     }
 }
+
 
 
 
