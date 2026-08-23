@@ -1,3 +1,4 @@
+import '../widgets/attachment_uploader.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -283,210 +284,205 @@ class _ExpensesPageState extends State<ExpensesPage> {
   }
 
   void _showRecurringExpensesModal() {
-    List<RecurringExpenseModel> localRecurrings = [];
     bool localLoading = true;
+    List<dynamic> localRecurrings = [];
+    bool isAddingOrEditing = false;
+    dynamic currentEditItem;
+    
+    final descController = TextEditingController();
+    final amountController = TextEditingController();
+    final dayController = TextEditingController();
+    String category = 'Utilidades';
+    bool active = true;
 
     showDialog(
       context: context,
       builder: (modalContext) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            
-            Future<void> loadLocalRecurrings() async {
+            void loadLocalRecurrings() async {
               try {
-                final list = await _apiService.fetchRecurringExpenses();
-                setModalState(() {
-                  localRecurrings = list;
-                  localLoading = false;
-                });
+                final list = await _apiService.getRecurringExpenses();
+                if (mounted) {
+                  setModalState(() {
+                    localRecurrings = list;
+                    localLoading = false;
+                  });
+                }
               } catch (e) {
-                setModalState(() {
-                  localLoading = false;
-                });
+                if (mounted) {
+                  setModalState(() => localLoading = false);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao carregar recorrentes: $e'), backgroundColor: Colors.red));
+                }
               }
             }
 
-            if (localLoading) {
+            if (localLoading && localRecurrings.isEmpty) {
               loadLocalRecurrings();
             }
 
-            void showAddEditRecurringDialog(RecurringExpenseModel? editItem) {
-              final isEdit = editItem != null;
-              final descController = TextEditingController(text: editItem?.description ?? '');
-              final amountController = TextEditingController(text: editItem?.amount.toString() ?? '');
-              final dayController = TextEditingController(text: editItem?.dueDayOfMonth.toString() ?? '1');
-              String category = editItem?.category ?? 'Utilidades';
-              bool active = editItem?.active ?? true;
+            void showAddEditForm(dynamic editItem) {
+              setModalState(() {
+                isAddingOrEditing = true;
+                currentEditItem = editItem;
+                descController.text = editItem?.description ?? '';
+                amountController.text = editItem?.amount.toString() ?? '';
+                dayController.text = editItem?.dueDayOfMonth.toString() ?? '1';
+                category = editItem?.category ?? 'Utilidades';
+                active = editItem?.active ?? true;
+              });
+            }
 
-              showDialog(
-                context: modalContext,
-                builder: (formContext) {
-                  return StatefulBuilder(
-                    builder: (context, setFormState) {
-                      return AlertDialog(
-                        title: Text(isEdit ? 'Editar Despesa Fixa' : 'Cadastrar Despesa Fixa', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            TextField(
-                              controller: descController,
-                              decoration: const InputDecoration(labelText: 'Descrição', border: OutlineInputBorder()),
-                              style: const TextStyle(fontSize: 13),
-                            ),
-                            const SizedBox(height: 12),
-                            TextField(
-                              controller: amountController,
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                              decoration: const InputDecoration(labelText: 'Valor (CHF)', border: OutlineInputBorder()),
-                              style: const TextStyle(fontSize: 13),
-                            ),
-                            const SizedBox(height: 12),
-                            DropdownButtonFormField<String>(
-                              value: category,
-                              decoration: const InputDecoration(labelText: 'Categoria', border: OutlineInputBorder()),
-                              items: const [
-                                DropdownMenuItem(value: 'Aluguel & Local', child: Text('Aluguel & Local')),
-                                DropdownMenuItem(value: 'Utilidades', child: Text('Utilidades (Água/Luz/Net)')),
-                                DropdownMenuItem(value: 'Manutenção & Equipamento', child: Text('Manutenção & Equipamentos')),
-                                DropdownMenuItem(value: 'Eventos & Ministério', child: Text('Eventos & Ministério')),
-                                DropdownMenuItem(value: 'Outros', child: Text('Outros')),
-                              ],
-                              onChanged: (val) {
-                                if (val != null) setFormState(() => category = val);
-                              },
-                            ),
-                            const SizedBox(height: 12),
-                            TextField(
-                              controller: dayController,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(labelText: 'Dia de Vencimento (1 a 31)', border: OutlineInputBorder()),
-                              style: const TextStyle(fontSize: 13),
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                Checkbox(
-                                  value: active,
-                                  onChanged: (val) {
-                                    if (val != null) setFormState(() => active = val);
-                                  },
-                                ),
-                                const Text('Ativa', style: TextStyle(fontSize: 13)),
-                              ],
-                            ),
-                          ],
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(formContext),
-                            child: const Text('CANCELAR', style: TextStyle(color: Color(0xFF64748B))),
-                          ),
-                          ElevatedButton(
-                            onPressed: () async {
-                              final desc = descController.text.trim();
-                              final amt = double.tryParse(amountController.text.replaceAll(',', '.')) ?? 0;
-                              final day = int.tryParse(dayController.text) ?? 1;
-
-                              if (desc.isNotEmpty && amt > 0 && day >= 1 && day <= 31) {
-                                Navigator.pop(formContext);
-                                setModalState(() => localLoading = true);
-                                try {
-                                  if (isEdit) {
-                                    await _apiService.updateRecurringExpense(
-                                      int.parse(editItem.id),
-                                      description: desc,
-                                      amount: amt,
-                                      category: category,
-                                      dueDayOfMonth: day,
-                                      active: active,
-                                    );
-                                  } else {
-                                    await _apiService.createRecurringExpense(
-                                      description: desc,
-                                      amount: amt,
-                                      category: category,
-                                      dueDayOfMonth: day,
-                                      active: active,
-                                    );
-                                  }
-                                  loadLocalRecurrings();
-                                } catch (e) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Erro ao salvar recorrência: $e'), backgroundColor: Colors.red),
-                                  );
-                                  setModalState(() => localLoading = false);
-                                }
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1E3A8A), foregroundColor: Colors.white),
-                            child: const Text('SALVAR'),
-                          ),
+            if (isAddingOrEditing) {
+              final isEdit = currentEditItem != null;
+              return AlertDialog(
+                title: Text(isEdit ? 'Editar Despesa Fixa' : 'Cadastrar Despesa Fixa', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: descController,
+                        decoration: const InputDecoration(labelText: 'Descrição', border: OutlineInputBorder()),
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: amountController,
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        decoration: const InputDecoration(labelText: 'Valor (CHF)', border: OutlineInputBorder()),
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<String>(
+                        value: category,
+                        decoration: const InputDecoration(labelText: 'Categoria', border: OutlineInputBorder()),
+                        items: const [
+                          DropdownMenuItem(value: 'Aluguel & Local', child: Text('Aluguel & Local')),
+                          DropdownMenuItem(value: 'Utilidades', child: Text('Utilidades (Água/Luz/Net)')),
+                          DropdownMenuItem(value: 'Manutenção & Equipamento', child: Text('Manutenção & Equipamentos')),
+                          DropdownMenuItem(value: 'Eventos & Ministério', child: Text('Eventos & Ministério')),
+                          DropdownMenuItem(value: 'Outros', child: Text('Outros')),
                         ],
-                      );
+                        onChanged: (val) {
+                          if (val != null) setModalState(() => category = val);
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: dayController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(labelText: 'Dia de Vencimento (1 a 31)', border: OutlineInputBorder()),
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                      if (isEdit) ...[
+                        const SizedBox(height: 12),
+                        SwitchListTile(
+                          title: const Text('Despesa Ativa?', style: TextStyle(fontSize: 13)),
+                          value: active,
+                          onChanged: (val) => setModalState(() => active = val),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => setModalState(() => isAddingOrEditing = false),
+                    child: const Text('CANCELAR'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (descController.text.isEmpty || amountController.text.isEmpty || dayController.text.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Preencha os campos obrigatórios.'), backgroundColor: Colors.red));
+                        return;
+                      }
+                      
+                      final amount = double.tryParse(amountController.text.replaceAll(',', '.'));
+                      final day = int.tryParse(dayController.text);
+                      
+                      if (amount == null || day == null || day < 1 || day > 31) {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Valores inválidos.'), backgroundColor: Colors.red));
+                        return;
+                      }
+                      
+                      setModalState(() {
+                        localLoading = true;
+                        isAddingOrEditing = false;
+                      });
+                      
+                      try {
+                        if (isEdit) {
+                          await _apiService.updateRecurringExpense(
+                            int.parse(currentEditItem!.id),
+                            descController.text,
+                            amount,
+                            category,
+                            day,
+                            active,
+                          );
+                        } else {
+                          await _apiService.createRecurringExpense(
+                            descController.text,
+                            amount,
+                            category,
+                            day,
+                          );
+                        }
+                        loadLocalRecurrings();
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao salvar: $e'), backgroundColor: Colors.red));
+                        setModalState(() => localLoading = false);
+                      }
                     },
-                  );
-                },
+                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF16A34A), foregroundColor: Colors.white),
+                    child: const Text('SALVAR'),
+                  ),
+                ],
               );
             }
 
-            return Dialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: Container(
-                width: 650,
-                height: 500,
-                padding: const EdgeInsets.all(24),
+            return AlertDialog(
+              title: const Text('Gerenciar Despesas Fixas', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              content: SizedBox(
+                width: double.maxFinite,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Despesas Fixas & Recorrências',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () => Navigator.pop(modalContext),
-                        ),
-                      ],
-                    ),
+                    const Text('As despesas fixas ativas serão geradas automaticamente no 1º dia de cada mês, com status PENDENTE.', style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
                     const SizedBox(height: 16),
-                    Expanded(
-                      child: localLoading
-                          ? const Center(child: CircularProgressIndicator())
-                          : localRecurrings.isEmpty
-                              ? const Center(child: Text('Nenhuma despesa fixa cadastrada.'))
-                              : SingleChildScrollView(
+                    localLoading
+                        ? const Padding(padding: EdgeInsets.all(32.0), child: Center(child: CircularProgressIndicator()))
+                        : localRecurrings.isEmpty
+                            ? const Padding(padding: EdgeInsets.all(32.0), child: Center(child: Text('Nenhuma despesa fixa cadastrada.', style: TextStyle(color: Color(0xFF94A3B8)))))
+                            : Flexible(
+                                child: Container(
+                                  decoration: BoxDecoration(border: Border.all(color: const Color(0xFFE2E8F0)), borderRadius: BorderRadius.circular(8)),
                                   child: SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
                                     child: Table(
                                       columnWidths: const {
-                                        0: FixedColumnWidth(160), // Desc
-                                        1: FixedColumnWidth(110), // Cat
-                                        2: FixedColumnWidth(100), // Valor
-                                        3: FixedColumnWidth(70),  // Venc
-                                        4: FixedColumnWidth(90),  // Acoes
+                                        0: FlexColumnWidth(2),
+                                        1: FlexColumnWidth(1.2),
+                                        2: FlexColumnWidth(1.2),
+                                        3: FlexColumnWidth(0.8),
+                                        4: IntrinsicColumnWidth(),
                                       },
-                                      border: const TableBorder(
-                                        bottom: BorderSide(color: Color(0xFFE2E8F0)),
-                                        horizontalInside: BorderSide(color: Color(0xFFF1F5F9)),
-                                      ),
                                       children: [
                                         const TableRow(
+                                          decoration: BoxDecoration(color: Color(0xFFF8FAFC), border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0)))),
                                           children: [
-                                            Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text('DESCRIÇÃO', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF64748B)))),
+                                            Padding(padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8), child: Text('DESPESA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF64748B)))),
                                             Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text('CATEGORIA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF64748B)))),
                                             Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text('VALOR', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF64748B)))),
                                             Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text('DIA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF64748B)))),
-                                            Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text('AÇÕES', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF64748B)))),
+                                            Padding(padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8), child: Text('AÇÕES', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF64748B)))),
                                           ],
                                         ),
                                         ...localRecurrings.map((rec) {
                                           return TableRow(
                                             children: [
                                               Padding(
-                                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                                                 child: Column(
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
@@ -497,15 +493,15 @@ class _ExpensesPageState extends State<ExpensesPage> {
                                                 ),
                                               ),
                                               Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text(rec.category, style: const TextStyle(fontSize: 12))),
-                                              Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text('CHF ${rec.amount.toStringAsFixed(2)}', style: const TextStyle(fontSize: 12, fontFamily: 'monospace'))),
-                                              Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text('Dia ${rec.dueDayOfMonth}', style: const TextStyle(fontSize: 12))),
+                                              Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text('CHF ' + rec.amount.toStringAsFixed(2), style: const TextStyle(fontSize: 12, fontFamily: 'monospace'))),
+                                              Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text('Dia ' + rec.dueDayOfMonth.toString(), style: const TextStyle(fontSize: 12))),
                                               Padding(
-                                                padding: const EdgeInsets.symmetric(vertical: 4),
+                                                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                                                 child: Row(
                                                   children: [
                                                     IconButton(
                                                       icon: const Icon(Icons.edit_outlined, size: 16, color: Colors.blue),
-                                                      onPressed: () => showAddEditRecurringDialog(rec),
+                                                      onPressed: () => showAddEditForm(rec),
                                                     ),
                                                     IconButton(
                                                       icon: const Icon(Icons.delete_outline, size: 16, color: Colors.red),
@@ -515,9 +511,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                                                           await _apiService.deleteRecurringExpense(int.parse(rec.id));
                                                           loadLocalRecurrings();
                                                         } catch (e) {
-                                                          ScaffoldMessenger.of(context).showSnackBar(
-                                                            SnackBar(content: Text('Erro ao excluir: $e'), backgroundColor: Colors.red),
-                                                          );
+                                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao excluir: $e'), backgroundColor: Colors.red));
                                                           setModalState(() => localLoading = false);
                                                         }
                                                       },
@@ -532,13 +526,13 @@ class _ExpensesPageState extends State<ExpensesPage> {
                                     ),
                                   ),
                                 ),
-                    ),
+                              ),
                     const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         ElevatedButton.icon(
-                          onPressed: () => showAddEditRecurringDialog(null),
+                          onPressed: () => showAddEditForm(null),
                           icon: const Icon(Icons.add),
                           label: const Text('Adicionar Despesa Fixa'),
                           style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1E3A8A), foregroundColor: Colors.white),

@@ -7,6 +7,8 @@ import com.tesourariacme.api.domain.ServiceClosing;
 import com.tesourariacme.api.domain.ServiceClosingSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.core.Authentication;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
@@ -24,6 +26,104 @@ import com.tesourariacme.api.domain.ServiceSchedule;
 @RequestMapping("/api/fechamento-culto")
 
 public class ServiceClosingController {
+    @Autowired
+    private com.tesourariacme.api.infrastructure.ServiceClosingAttachmentRepository attachmentRepository;
+    @Autowired
+    private com.tesourariacme.api.infrastructure.StorageService storageService;
+
+    @PostMapping("/{closingId}/attachments")
+    public ResponseEntity<?> uploadAttachment(
+            @PathVariable Long closingId,
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file,
+            @RequestParam("documentType") com.tesourariacme.api.domain.DocumentType documentType,
+            org.springframework.security.core.Authentication authentication) {
+
+        return repository.findById(closingId).map(closing -> {
+            if ("REJECTED".equals(closing.getStatus())) {
+                return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                        .body("Nao eh permitido adicionar anexos a fechamentos rejeitados.");
+            }
+
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body("Arquivo vazio.");
+            }
+            if (file.getSize() > 5 * 1024 * 1024) {
+                return ResponseEntity.badRequest().body("Tamanho maximo permitido eh 5MB.");
+            }
+
+            String contentType = file.getContentType();
+            String originalFilename = file.getOriginalFilename();
+            String ext = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                ext = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
+            }
+
+            boolean validMime = "application/pdf".equals(contentType)
+                    || "image/jpeg".equals(contentType)
+                    || "image/png".equals(contentType);
+            boolean validExt = "pdf".equals(ext) || "jpg".equals(ext) || "jpeg".equals(ext) || "png".equals(ext);
+
+            if (!validMime || !validExt) {
+                return ResponseEntity.badRequest().body("Formato nao suportado. Apenas PDF, JPG, PNG.");
+            }
+
+            String uuid = java.util.UUID.randomUUID().toString();
+            String storagePath = "closings/" + closingId + "/" + uuid + "." + ext;
+
+            try {
+                storageService.save(storagePath, file);
+
+                com.tesourariacme.api.domain.ServiceClosingAttachment attachment = new com.tesourariacme.api.domain.ServiceClosingAttachment();
+                attachment.setServiceClosing(closing);
+                attachment.setDocumentType(documentType);
+                attachment.setFileName(originalFilename);
+                attachment.setContentType(contentType);
+                attachment.setStoragePath(storagePath);
+                attachment.setFileSize(file.getSize());
+                attachment.setUploadedBy(authentication.getName());
+                attachment.setUploadedAt(java.time.LocalDateTime.now());
+                attachment.setActive(true);
+
+                com.tesourariacme.api.domain.ServiceClosingAttachment saved = attachmentRepository.save(attachment);
+                
+                closing.getAttachments().add(saved);
+                repository.save(closing);
+
+                return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED).body(saved);
+            } catch (Exception e) {
+                return ResponseEntity.status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Erro ao salvar arquivo: " + e.getMessage());
+            }
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{closingId}/attachments/{attachmentId}")
+    public ResponseEntity<?> downloadAttachment(
+            @PathVariable Long closingId,
+            @PathVariable Long attachmentId) {
+
+        java.util.Optional<com.tesourariacme.api.domain.ServiceClosingAttachment> attachmentOpt = attachmentRepository.findByIdAndServiceClosingId(attachmentId, closingId);
+        if (attachmentOpt.isEmpty()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND)
+                    .body("Anexo nao encontrado.");
+        }
+
+        com.tesourariacme.api.domain.ServiceClosingAttachment attachment = attachmentOpt.get();
+        if (!attachment.isActive()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND).body("Anexo desativado.");
+        }
+
+        try {
+            byte[] data = storageService.load(attachment.getStoragePath());
+            return ResponseEntity.ok()
+                    .header("Content-Type", attachment.getContentType())
+                    .header("Content-Disposition", "inline; filename=\"" + attachment.getFileName() + "\"" )
+                    .body(data);
+        } catch (Exception e) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro ao ler arquivo: " + e.getMessage());
+        }
+    }
 
     private final SubmitServiceClosingUseCase useCase;
     private final ServiceClosingSessionService sessionService;
@@ -310,3 +410,7 @@ public class ServiceClosingController {
         }
     }
 }
+
+
+
+
