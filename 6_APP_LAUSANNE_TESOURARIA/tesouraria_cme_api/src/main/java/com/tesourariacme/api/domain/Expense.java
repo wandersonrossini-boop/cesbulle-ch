@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "expenses", indexes = {
+    @Index(name = "idx_expense_status", columnList = "status"),
+    @Index(name = "idx_expense_date", columnList = "expenseDate")
+})
 @Data
 @NoArgsConstructor
 public class Expense {

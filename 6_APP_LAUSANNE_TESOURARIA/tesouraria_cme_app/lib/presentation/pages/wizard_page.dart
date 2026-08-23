@@ -13,6 +13,7 @@ import '../../core/theme.dart';
 import '../../services/draft_service.dart';
 import '../../services/fechamento_api_service.dart';
 import '../../services/auth_api_service.dart';
+import '../../services/contributor_api_service.dart';
 import '../widgets/app_sidebar_drawer.dart';
 import 'dashboard_page.dart';
 import 'login_page.dart';
@@ -32,6 +33,10 @@ class _WizardPageState extends State<WizardPage> {
   final TextEditingController _memberNameController = TextEditingController();
   final TextEditingController _verifierNameController = TextEditingController();
   final FocusNode _keyboardFocusNode = FocusNode();
+
+  final ContributorApiService _contributorApiService = ContributorApiService();
+  List<ContributorModel> _contributors = [];
+  int? _selectedContributorId;
 
   bool _isTextFieldFocused() {
     final primaryFocus = FocusManager.instance.primaryFocus;
@@ -96,6 +101,18 @@ class _WizardPageState extends State<WizardPage> {
     super.initState();
     _bloc = ServiceClosingBloc()..add(LoadMembersEvent());
     _checkCurrentStatus();
+    _loadContributorsForSelection();
+  }
+
+  Future<void> _loadContributorsForSelection() async {
+    try {
+      final list = await _contributorApiService.fetchContributors();
+      if (mounted) {
+        setState(() {
+          _contributors = list;
+        });
+      }
+    } catch (_) {}
   }
 
   Future<String> _getCurrentUserName() async {
@@ -358,6 +375,15 @@ class _WizardPageState extends State<WizardPage> {
     final schedule = _currentStatus?['schedule'];
     final sessionMap = _currentStatus?['session'];
 
+    String formatTime(String? timeStr) {
+      if (timeStr == null) return '';
+      final parts = timeStr.split(':');
+      if (parts.length >= 2) {
+        return "${parts[0].padLeft(2, '0')}:${parts[1].padLeft(2, '0')}";
+      }
+      return timeStr;
+    }
+
     IconData stateIcon;
     Color iconColor;
     String titleText;
@@ -378,7 +404,7 @@ class _WizardPageState extends State<WizardPage> {
       stateIcon = Icons.play_circle_outline;
       iconColor = const Color(0xFF16A34A);
       titleText = "Iniciar Fechamento";
-      descText = "${schedule['serviceType']} (${schedule['startTime']} - ${schedule['endTime']})";
+      descText = "${schedule['serviceType']} (${formatTime(schedule['startTime'])} - ${formatTime(schedule['endTime'])})";
       buttonText = "INICIAR CONTAGEM FÍSICA";
       onActionButtonPressed = _isConnecting ? null : () async {
         setState(() {
@@ -425,7 +451,7 @@ class _WizardPageState extends State<WizardPage> {
       stateIcon = Icons.group_outlined;
       iconColor = const Color(0xFFEA580C);
       titleText = "Participar da Contagem";
-      descText = "${schedule['serviceType']} (${schedule['startTime']} - ${schedule['endTime']})";
+      descText = "${schedule['serviceType']} (${formatTime(schedule['startTime'])} - ${formatTime(schedule['endTime'])})";
       buttonText = "RETOMAR/PARTICIPAR DA CONTAGEM";
       onActionButtonPressed = _isConnecting ? null : () async {
         setState(() {
@@ -503,6 +529,40 @@ class _WizardPageState extends State<WizardPage> {
           }
         }
       };
+    }
+
+    if (!hasSchedule) {
+      return Container(
+        color: const Color(0xFFFAFAFA),
+        width: double.infinity,
+        height: double.infinity,
+        child: Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 480),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
+            child: Card(
+              color: Colors.white,
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: const BorderSide(color: Color(0xFFE2E8F0)),
+              ),
+              child: const Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Text(
+                  "Nenhum culto agendado para este dia.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF64748B),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
     }
 
     return Container(
@@ -1130,97 +1190,100 @@ class _WizardPageState extends State<WizardPage> {
     Widget selectorContent(StateSetter setDialogState) {
       return BlocBuilder<ServiceClosingBloc, ServiceClosingState>(
         builder: (context, currentState) {
-          final filteredMembers = currentState.knownMembers
-              .where((m) => m.toLowerCase().contains(filterText.toLowerCase()))
+          final filteredContributors = _contributors
+              .where((c) => c.fullName.toLowerCase().contains(filterText.toLowerCase()) || c.contributorNumber.contains(filterText))
               .toList();
           return Container(
-        constraints: const BoxConstraints(maxHeight: 350),
-        width: 320,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                autofocus: true,
-                decoration: const InputDecoration(
-                  labelText: 'Pesquisar Contribuinte',
-                  prefixIcon: Icon(Icons.search),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (val) {
-                  setDialogState(() {
-                    filterText = val;
-                  });
-                },
-              ),
-            ),
-            const Divider(),
-            Expanded(
-              child: filteredMembers.isEmpty
-                  ? Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text("Nenhum contribuinte encontrado", style: TextStyle(color: Colors.grey, fontSize: 13)),
-                            if (filterText.trim().isNotEmpty) ...[
-                              const SizedBox(height: 16),
-                              ElevatedButton.icon(
-                                onPressed: () {
-                                  context.read<ServiceClosingBloc>().add(AddLocalMemberEvent(filterText));
-                                  setState(() {
-                                    _memberNameController.text = filterText.trim();
-                                  });
-                                  Navigator.pop(context);
-                                },
-                                icon: const Icon(Icons.add, size: 18),
-                                label: Text('Adicionar "${filterText.trim()}"'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF1E3A8A),
-                                  foregroundColor: Colors.white,
-                                  elevation: 0,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    )
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: filteredMembers.length,
-                      itemBuilder: (context, index) {
-                        final member = filteredMembers[index];
-                        return ListTile(
-                          title: Text(member, style: const TextStyle(fontSize: 14)),
-                          onTap: () {
-                            setState(() {
-                              _memberNameController.text = member;
-                            });
-                            Navigator.pop(context);
-                          },
-                        );
-                      },
+            constraints: const BoxConstraints(maxHeight: 350),
+            width: 320,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                  child: TextField(
+                    autofocus: true,
+                    style: const TextStyle(fontSize: 14),
+                    decoration: const InputDecoration(
+                      hintText: "Buscar contribuinte...",
+                      prefixIcon: Icon(Icons.search, size: 20),
+                      border: InputBorder.none,
                     ),
+                    onChanged: (val) {
+                      setDialogState(() {
+                        filterText = val;
+                      });
+                    },
+                  ),
+                ),
+                const Divider(),
+                Expanded(
+                  child: filteredContributors.isEmpty
+                      ? Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Text("Nenhum contribuinte encontrado", style: TextStyle(color: Colors.grey, fontSize: 13)),
+                                if (filterText.trim().isNotEmpty) ...[
+                                  const SizedBox(height: 16),
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      setState(() {
+                                        _memberNameController.text = filterText.trim();
+                                        _selectedContributorId = null;
+                                      });
+                                      Navigator.pop(context);
+                                    },
+                                    icon: const Icon(Icons.add, size: 18),
+                                    label: Text('Usar "${filterText.trim()}"'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF1E3A8A),
+                                      foregroundColor: Colors.white,
+                                      elevation: 0,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        )
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: filteredContributors.length,
+                          itemBuilder: (context, index) {
+                            final contributor = filteredContributors[index];
+                            return ListTile(
+                              title: Text(contributor.fullName, style: const TextStyle(fontSize: 14)),
+                              subtitle: Text('Nº ${contributor.contributorNumber} • ${contributor.city}', style: const TextStyle(fontSize: 12)),
+                              onTap: () {
+                                setState(() {
+                                  _memberNameController.text = contributor.fullName;
+                                  _selectedContributorId = int.tryParse(contributor.id);
+                                });
+                                Navigator.pop(context);
+                              },
+                            );
+                          },
+                        ),
+                ),
+                if (_memberNameController.text.isNotEmpty)
+                  ListTile(
+                    leading: const Icon(Icons.clear, color: AppTheme.excludeRed),
+                    title: const Text("Remover / Tornar Anônimo", style: TextStyle(color: AppTheme.excludeRed, fontWeight: FontWeight.bold, fontSize: 13)),
+                    onTap: () {
+                      setState(() {
+                        _memberNameController.clear();
+                        _selectedContributorId = null;
+                      });
+                      Navigator.pop(context);
+                    },
+                  ),
+              ],
             ),
-            if (_memberNameController.text.isNotEmpty)
-              ListTile(
-                leading: const Icon(Icons.clear, color: AppTheme.excludeRed),
-                title: const Text("Remover / Tornar Anônimo", style: TextStyle(color: AppTheme.excludeRed, fontWeight: FontWeight.bold, fontSize: 13)),
-                onTap: () {
-                  setState(() {
-                    _memberNameController.clear();
-                  });
-                  Navigator.pop(context);
-                },
-              ),
-          ],
-        ),
-      );
+          );
         },
       );
     }
@@ -1294,7 +1357,13 @@ class _WizardPageState extends State<WizardPage> {
 
     if (memberName.isNotEmpty) {
       final entryId = DateTime.now().microsecondsSinceEpoch.toString();
-      final envelope = Envelope(id: entryId, memberName: memberName, type: _selectedType, amount: rappen);
+      final envelope = Envelope(
+        id: entryId,
+        memberName: memberName,
+        type: _selectedType,
+        amount: rappen,
+        contributorId: _selectedContributorId,
+      );
       context.read<ServiceClosingBloc>().add(AddEnvelopeEvent(envelope));
     } else {
       // Anonymous
@@ -1307,6 +1376,7 @@ class _WizardPageState extends State<WizardPage> {
     }
 
     _memberNameController.clear();
+    _selectedContributorId = null;
     setState(() {
       _keyboardBuffer = '0';
     });
@@ -1486,9 +1556,11 @@ class _WizardPageState extends State<WizardPage> {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    _buildCategoryReview(context, state, EnvelopeType.dizimo, "DÍZIMO"),
-                    _buildCategoryReview(context, state, EnvelopeType.oferta, "OFERTA"),
-                    _buildCategoryReview(context, state, EnvelopeType.voto, "VOTO", isLast: true),
+                    _mathRow("Dízimos Nominais (CHF)", state.identifiedTotalBy(EnvelopeType.dizimo) + state.anonymousTotalBy(EnvelopeType.dizimo), isBold: true),
+                    const SizedBox(height: 12),
+                    _mathRow("Ofertas Gerais (CHF)", state.identifiedTotalBy(EnvelopeType.oferta) + state.anonymousTotalBy(EnvelopeType.oferta), isBold: true),
+                    const SizedBox(height: 12),
+                    _mathRow("Votos / Missões (CHF)", state.identifiedTotalBy(EnvelopeType.voto) + state.anonymousTotalBy(EnvelopeType.voto), isBold: true),
                   ],
                 ),
               ),
@@ -1501,7 +1573,7 @@ class _WizardPageState extends State<WizardPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("TOTAL REGISTRADO", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1E3A8A))),
+                    const Text("TOTAL FINAL CONSOLIDADO", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1E3A8A))),
                     Text("CHF ${BigDecimalConverter.fromRappen(state.registeredTotal).toStringAsFixed(2)}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1E3A8A))),
                   ],
                 ),

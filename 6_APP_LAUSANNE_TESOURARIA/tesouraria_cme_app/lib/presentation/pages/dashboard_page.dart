@@ -3,9 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/fechamento_api_service.dart';
 import '../../services/auth_api_service.dart';
+import '../../services/expense_api_service.dart';
+import '../../services/dashboard_api_service.dart';
+import '../widgets/audit_logs_dialog.dart';
 import 'login_page.dart';
 import 'placeholder_page.dart';
 import 'closing_detail_page.dart';
+import 'wizard_page.dart';
+import 'members_page.dart';
+import 'reports_page.dart';
+import 'expenses_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/history_bloc.dart';
 import '../widgets/app_sidebar_drawer.dart';
@@ -35,21 +42,69 @@ class DashboardView extends StatefulWidget {
 
 class _DashboardViewState extends State<DashboardView> {
   String _userName = 'Tesoureiro';
+  String? _userRole;
+  double _totalSaidas = 0.0;
+  final DashboardApiService _dashboardApiService = DashboardApiService();
+  DashboardSummaryModel? _summary;
+  bool _loadingSummary = true;
+  String? _summaryError;
 
   @override
   void initState() {
     super.initState();
-    _loadUserName();
+    _loadUserNameAndRole();
+    _loadTotalSaidas();
+    _loadDashboardSummary();
   }
 
-  Future<void> _loadUserName() async {
+  Future<void> _loadDashboardSummary() async {
+    setState(() {
+      _loadingSummary = true;
+      _summaryError = null;
+    });
+    try {
+      final summary = await _dashboardApiService.fetchDashboardSummary();
+      if (mounted) {
+        setState(() {
+          _summary = summary;
+          _loadingSummary = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _summaryError = e.toString().replaceFirst('Exception: ', '');
+          _loadingSummary = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _loadTotalSaidas() async {
+    try {
+      final total = await ExpenseApiService().fetchTotalApprovedExpenses();
+      if (mounted) {
+        setState(() {
+          _totalSaidas = total;
+        });
+      }
+    } catch (_) {
+      // ignore
+    }
+  }
+
+  Future<void> _loadUserNameAndRole() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('jwt_token');
     if (token != null) {
       final savedUser = prefs.getString('username');
-      if (savedUser != null && savedUser.isNotEmpty) {
+      final savedRole = prefs.getString('user_role');
+      if (mounted) {
         setState(() {
-          _userName = savedUser.substring(0, 1).toUpperCase() + savedUser.substring(1);
+          if (savedUser != null && savedUser.isNotEmpty) {
+            _userName = savedUser.substring(0, 1).toUpperCase() + savedUser.substring(1);
+          }
+          _userRole = savedRole;
         });
       }
     }
@@ -127,124 +182,116 @@ class _DashboardViewState extends State<DashboardView> {
   Widget _buildMainContent(BuildContext context, HistoryLoaded state, bool isDesktop) {
     final historico = state.history;
     double totalEntradas = historico.fold(0, (sum, item) => sum + item.physicalTotal);
-    
-    // Dynamic formatted date in Portuguese, lowercase (ex: domingo, 9 de agosto de 2026)
     String dateStr = DateFormat("EEEE, d 'de' MMMM 'de' yyyy", 'pt_BR').format(DateTime.now()).toLowerCase();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Greeting & Header
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Bom dia, $_userName!',
-              style: TextStyle(
-                fontSize: isDesktop ? 24 : 20,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF0F172A),
-                letterSpacing: -0.5,
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Olá, $_userName!',
+                  style: TextStyle(
+                    fontSize: isDesktop ? 24 : 20,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF0F172A),
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  dateStr,
+                  style: TextStyle(
+                    fontSize: isDesktop ? 13 : 12,
+                    color: const Color(0xFF64748B),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 4),
-            Text(
-              dateStr,
-              style: TextStyle(
-                fontSize: isDesktop ? 13 : 12,
-                color: const Color(0xFF64748B),
-              ),
-            ),
+            if (_loadingSummary)
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
           ],
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: 24),
 
-        // Summary container
-        DashboardSummaryCards(
-          entradas: totalEntradas,
-          saidas: 0.0,
-          saldo: totalEntradas,
-        ),
-        const SizedBox(height: 32),
+        // Warning Banner for Pending Expenses
+        if (!_loadingSummary && _summary != null && _summary!.pendingExpensesCount > 0) ...[
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFEF2F2),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFFCA5A5)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.warning_amber_rounded, color: Color(0xFFDC2626), size: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Você tem ${_summary!.pendingExpensesCount} despesa(s) aguardando aprovação (Total: CHF ${_summary!.pendingExpensesTotal.toStringAsFixed(2)}).',
+                    style: const TextStyle(color: Color(0xFF991B1B), fontWeight: FontWeight.w600, fontSize: 13),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (_) => const ExpensesPage(),
+                    ));
+                  },
+                  child: const Text(
+                    'Revisar Saídas',
+                    style: TextStyle(color: Color(0xFFDC2626), fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
 
-        // Layout principal
+        // Layout Principal
         if (isDesktop)
-          _buildDesktopLayout(context, historico)
+          _buildDesktopLayout(context, historico, totalEntradas)
         else
-          _buildMobileLayout(context, historico),
+          _buildMobileLayout(context, historico, totalEntradas),
       ],
     );
   }
 
-  Widget _buildDesktopLayout(BuildContext context, List<ServiceClosingSummary> history) {
-    final monthlyData = _getMonthlyData(history);
-    final hasEnoughData = history.isNotEmpty;
-
+  Widget _buildDesktopLayout(BuildContext context, List<ServiceClosingSummary> history, double totalEntradas) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Left Column (Chart)
+        // Left Column (Hero Card & Quick Actions)
         Expanded(
           flex: 3,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "EVOLUÇÃO MENSAL",
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF64748B),
-                        letterSpacing: 1.0,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    if (hasEnoughData)
-                      SizedBox(
-                        height: 220,
-                        child: CustomPaint(
-                          painter: LineChartPainter(monthlyData),
-                          child: Container(),
-                        ),
-                      )
-                    else
-                      const SizedBox(
-                        height: 220,
-                        child: Center(
-                          child: Text(
-                            "Aguardando dados históricos suficientes para evolução mensal.",
-                            style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
+              _buildHeroCard(totalEntradas),
+              const SizedBox(height: 24),
+              _buildQuickActionsGrid(context),
             ],
           ),
         ),
         const SizedBox(width: 24),
 
-        // Right Column (Pendências & Últimos Movimentos)
+        // Right Column (Recent Activities)
         Expanded(
           flex: 2,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Pendências
-              _buildPendenciasSection(),
-              const SizedBox(height: 24),
-              // Últimos Movimentos
               _buildMovimentosSection(context, history, isDesktop: true),
             ],
           ),
@@ -253,23 +300,172 @@ class _DashboardViewState extends State<DashboardView> {
     );
   }
 
-  Widget _buildMobileLayout(BuildContext context, List<ServiceClosingSummary> history) {
+  Widget _buildMobileLayout(BuildContext context, List<ServiceClosingSummary> history, double totalEntradas) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildPendenciasSection(),
+        _buildHeroCard(totalEntradas),
+        const SizedBox(height: 24),
+        _buildQuickActionsGrid(context),
         const SizedBox(height: 32),
         _buildMovimentosSection(context, history, isDesktop: false),
       ],
     );
   }
 
-  Widget _buildPendenciasSection() {
+  Widget _buildHeroCard(double totalEntradas) {
+    final displayMonth = _summary?.periodLabel ?? '--/----';
+    final currentInputs = _summary?.currentMonthInputs ?? totalEntradas;
+    final isLocked = _summary?.periodLocked ?? false;
+    final isSurplus = currentInputs >= _totalSaidas;
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1E3A8A), Color(0xFF0F172A)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF1E3A8A).withValues(alpha: 0.2),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'COMPETÊNCIA $displayMonth',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF93C5FD),
+                  letterSpacing: 1.0,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isLocked ? const Color(0xFFEF4444).withValues(alpha: 0.2) : const Color(0xFF10B981).withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: isLocked ? const Color(0xFFF87171) : const Color(0xFF34D399), width: 1),
+                ),
+                child: Text(
+                  isLocked ? 'FECHADO' : 'ABERTO',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: isLocked ? const Color(0xFFF87171) : const Color(0xFF34D399),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Entradas do Mês',
+            style: TextStyle(fontSize: 14, color: Colors.white70),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'CHF ${currentInputs.toStringAsFixed(2)}',
+            style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Icon(
+                isSurplus ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
+                size: 16,
+                color: isSurplus ? const Color(0xFF34D399) : const Color(0xFFF87171),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                isSurplus ? 'Superávit operacional parcial' : 'Déficit operacional parcial',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: isSurplus ? const Color(0xFF34D399) : const Color(0xFFF87171),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActionsGrid(BuildContext context) {
+    final List<Widget> actions = [
+      _buildActionCard(
+        context: context,
+        icon: Icons.add_circle_outline_rounded,
+        title: 'Novo Fechamento',
+        subtitle: 'Submeter ata de culto',
+        color: const Color(0xFF1E3A8A),
+        onTap: () {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const WizardPage()),
+          );
+        },
+      ),
+      _buildActionCard(
+        context: context,
+        icon: Icons.people_outline_rounded,
+        title: 'Contribuintes',
+        subtitle: 'Gerenciar dizimistas',
+        color: const Color(0xFF0D9488),
+        onTap: () {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const MembersPage()),
+          );
+        },
+      ),
+      _buildActionCard(
+        context: context,
+        icon: Icons.bar_chart_rounded,
+        title: 'Ver Relatório',
+        subtitle: 'Balancete do mês',
+        color: const Color(0xFFD97706),
+        onTap: () {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const ReportsPage()),
+          );
+        },
+      ),
+    ];
+
+    if (_userRole == 'ADMIN') {
+      actions.add(
+        _buildActionCard(
+          context: context,
+          icon: Icons.history_toggle_off_rounded,
+          title: 'Auditoria',
+          subtitle: 'Trilha de ações',
+          color: const Color(0xFF475569),
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) => const AuditLogsDialog(),
+            );
+          },
+        ),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'PENDÊNCIAS',
+          'AÇÕES RÁPIDAS',
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.bold,
@@ -278,20 +474,73 @@ class _DashboardViewState extends State<DashboardView> {
           ),
         ),
         const SizedBox(height: 12),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
-          ),
-          child: const Text(
-            'Nenhuma pendência no momento.',
-            style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
-          ),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final double cardWidth = (constraints.maxWidth - 16) / 2;
+            return Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children: actions.map((card) {
+                return SizedBox(
+                  width: cardWidth > 150 ? cardWidth : double.infinity,
+                  child: card,
+                );
+              }).toList(),
+            );
+          },
         ),
       ],
+    );
+  }
+
+  Widget _buildActionCard({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: color, size: 22),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

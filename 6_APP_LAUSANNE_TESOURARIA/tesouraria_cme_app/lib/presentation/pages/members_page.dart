@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
 import '../../services/auth_api_service.dart';
-import '../../services/member_api_service.dart';
+import '../../services/contributor_api_service.dart';
 import '../widgets/app_sidebar_drawer.dart';
 import 'login_page.dart';
+import '../../utils/file_download_helper.dart';
 
 class MembersPage extends StatefulWidget {
   const MembersPage({super.key});
@@ -13,9 +14,9 @@ class MembersPage extends StatefulWidget {
 }
 
 class _MembersPageState extends State<MembersPage> {
-  final MemberApiService _apiService = MemberApiService();
-  List<MemberDetail> _allMembers = [];
-  List<MemberDetail> _filtered = [];
+  final ContributorApiService _apiService = ContributorApiService();
+  List<ContributorModel> _allContributors = [];
+  List<ContributorModel> _filtered = [];
   bool _isLoading = true;
   String? _error;
   final TextEditingController _searchController = TextEditingController();
@@ -23,7 +24,7 @@ class _MembersPageState extends State<MembersPage> {
   @override
   void initState() {
     super.initState();
-    _loadMembers();
+    _loadContributors();
     _searchController.addListener(_onSearchChanged);
   }
 
@@ -37,17 +38,24 @@ class _MembersPageState extends State<MembersPage> {
   void _onSearchChanged() {
     final q = _searchController.text.toLowerCase();
     setState(() {
-      _filtered = _allMembers.where((m) => m.name.toLowerCase().contains(q)).toList();
+      _filtered = _allContributors
+          .where((c) =>
+              c.fullName.toLowerCase().contains(q) ||
+              c.contributorNumber.toLowerCase().contains(q))
+          .toList();
     });
   }
 
-  Future<void> _loadMembers() async {
-    setState(() { _isLoading = true; _error = null; });
+  Future<void> _loadContributors() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
     try {
-      final members = await _apiService.fetchMembersDetailed();
+      final list = await _apiService.fetchContributors();
       setState(() {
-        _allMembers = members;
-        _filtered = members;
+        _allContributors = list;
+        _filtered = list;
         _isLoading = false;
       });
     } catch (e) {
@@ -66,14 +74,25 @@ class _MembersPageState extends State<MembersPage> {
         }
         return;
       }
-      setState(() { _error = e.toString(); _isLoading = false; });
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
     }
   }
 
-  void _showCreateDialog() {
-    final ctrl = TextEditingController();
+  void _showAddEditDialog(ContributorModel? item) {
+    final isEdit = item != null;
+    final nameCtrl = TextEditingController(text: item?.fullName ?? '');
+    final numberCtrl = TextEditingController(text: item?.contributorNumber ?? '');
+    final addressCtrl = TextEditingController(text: item?.address ?? '');
+    final zipCtrl = TextEditingController(text: item?.postalCode ?? '');
+    final cityCtrl = TextEditingController(text: item?.city ?? '');
+    final emailCtrl = TextEditingController(text: item?.email ?? '');
+    final phoneCtrl = TextEditingController(text: item?.phone ?? '');
+    bool active = item?.active ?? true;
     bool isSaving = false;
-    String? error;
+    String? dlgError;
 
     showDialog(
       context: context,
@@ -81,20 +100,72 @@ class _MembersPageState extends State<MembersPage> {
         builder: (ctx, setModalState) {
           return AlertDialog(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: const Text('Novo Contribuinte', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: ctrl,
-                  decoration: const InputDecoration(labelText: 'Nome', border: OutlineInputBorder()),
-                  autofocus: true,
-                ),
-                if (error != null) ...[
-                  const SizedBox(height: 8),
-                  Text(error!, style: const TextStyle(color: AppTheme.excludeRed, fontSize: 13)),
-                ]
-              ],
+            title: Text(isEdit ? 'Editar Contribuinte' : 'Novo Contribuinte',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: nameCtrl,
+                    decoration: const InputDecoration(labelText: 'Nome Completo', border: OutlineInputBorder()),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: numberCtrl,
+                    decoration: const InputDecoration(labelText: 'Nº Contribuinte (Único)', border: OutlineInputBorder()),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: addressCtrl,
+                    decoration: const InputDecoration(labelText: 'Endereço', border: OutlineInputBorder()),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: zipCtrl,
+                          decoration: const InputDecoration(labelText: 'NPA', border: OutlineInputBorder()),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextField(
+                          controller: cityCtrl,
+                          decoration: const InputDecoration(labelText: 'Cidade', border: OutlineInputBorder()),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: emailCtrl,
+                    decoration: const InputDecoration(labelText: 'Email', border: OutlineInputBorder()),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: phoneCtrl,
+                    decoration: const InputDecoration(labelText: 'Telefone', border: OutlineInputBorder()),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: active,
+                        onChanged: (val) {
+                          if (val != null) setModalState(() => active = val);
+                        },
+                      ),
+                      const Text('Ativo'),
+                    ],
+                  ),
+                  if (dlgError != null) ...[
+                    const SizedBox(height: 8),
+                    Text(dlgError!, style: const TextStyle(color: AppTheme.excludeRed, fontSize: 13)),
+                  ]
+                ],
+              ),
             ),
             actions: [
               TextButton(
@@ -105,23 +176,44 @@ class _MembersPageState extends State<MembersPage> {
                 onPressed: isSaving
                     ? null
                     : () async {
-                        final name = ctrl.text.trim();
-                        if (name.isEmpty) return;
+                        final name = nameCtrl.text.trim();
+                        final numStr = numberCtrl.text.trim();
+                        if (name.isEmpty || numStr.isEmpty) return;
+
                         setModalState(() {
                           isSaving = true;
-                          error = null;
+                          dlgError = null;
                         });
+
+                        final model = ContributorModel(
+                          id: item?.id ?? '',
+                          fullName: name,
+                          contributorNumber: numStr,
+                          address: addressCtrl.text.trim(),
+                          postalCode: zipCtrl.text.trim(),
+                          city: cityCtrl.text.trim(),
+                          email: emailCtrl.text.trim(),
+                          phone: phoneCtrl.text.trim(),
+                          active: active,
+                        );
+
                         try {
-                          await _apiService.createMember(name);
+                          if (isEdit) {
+                            await _apiService.updateContributor(item.id, model);
+                          } else {
+                            await _apiService.createContributor(model);
+                          }
                           if (ctx.mounted) {
                             Navigator.pop(ctx);
-                            _loadMembers();
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Contribuinte adicionado!')));
+                            _loadContributors();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(isEdit ? 'Contribuinte atualizado!' : 'Contribuinte adicionado!')),
+                            );
                           }
                         } catch (e) {
                           setModalState(() {
                             isSaving = false;
-                            error = e.toString().replaceFirst('Exception: ', '');
+                            dlgError = e.toString().replaceFirst('Exception: ', '');
                           });
                         }
                       },
@@ -137,108 +229,81 @@ class _MembersPageState extends State<MembersPage> {
     );
   }
 
-  Future<void> _showRenameDialog(MemberDetail member) async {
-    final controller = TextEditingController(text: member.name);
-    final formKey = GlobalKey<FormState>();
-    bool isSaving = false;
+  Future<void> _showAttestationDialog(ContributorModel contributor) async {
+    int year = DateTime.now().year;
+    bool isGenerating = false;
 
     await showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDlg) => AlertDialog(
-          title: const Text('Renomear Contribuinte'),
-          content: Form(
-            key: formKey,
-            child: TextFormField(
-              controller: controller,
-              autofocus: true,
-              decoration: const InputDecoration(
-                labelText: 'Nome completo',
-                border: OutlineInputBorder(),
+        builder: (ctx, setDlgState) {
+          return AlertDialog(
+            title: const Text('Emitir Attestation de Dons', style: TextStyle(fontWeight: FontWeight.bold)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Selecione o ano fiscal para ${contributor.fullName}:'),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<int>(
+                  value: year,
+                  decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Ano Fiscal'),
+                  items: [
+                    DropdownMenuItem(value: year, child: Text('$year')),
+                    DropdownMenuItem(value: year - 1, child: Text('${year - 1}')),
+                    DropdownMenuItem(value: year - 2, child: Text('${year - 2}')),
+                  ],
+                  onChanged: (val) {
+                    if (val != null) {
+                      setDlgState(() => year = val);
+                    }
+                  },
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: isGenerating ? null : () => Navigator.pop(ctx),
+                child: const Text('CANCELAR'),
               ),
-              validator: (v) {
-                if (v == null || v.trim().isEmpty) return 'O nome não pode ser vazio.';
-                return null;
-              },
-              onFieldSubmitted: (_) async {
-                if (!formKey.currentState!.validate() || isSaving) return;
-                setDlg(() => isSaving = true);
-                try {
-                  await _apiService.renameMember(member.id, controller.text.trim());
-                  if (ctx.mounted) Navigator.pop(ctx);
-                  await _loadMembers();
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Contribuinte renomeado com sucesso.')),
-                    );
-                  }
-                } catch (e) {
-                  setDlg(() => isSaving = false);
-                  if (ctx.mounted) {
-                    ScaffoldMessenger.of(ctx).showSnackBar(
-                      SnackBar(content: Text('Erro: $e'), backgroundColor: AppTheme.excludeRed),
-                    );
-                  }
-                }
-              },
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('CANCELAR'),
-            ),
-            ElevatedButton(
-              onPressed: isSaving ? null : () async {
-                if (!formKey.currentState!.validate()) return;
-                setDlg(() => isSaving = true);
-                try {
-                  await _apiService.renameMember(member.id, controller.text.trim());
-                  if (ctx.mounted) Navigator.pop(ctx);
-                  await _loadMembers();
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Contribuinte renomeado com sucesso.')),
-                    );
-                  }
-                } catch (e) {
-                  setDlg(() => isSaving = false);
-                  if (ctx.mounted) {
-                    ScaffoldMessenger.of(ctx).showSnackBar(
-                      SnackBar(content: Text('Erro: $e'), backgroundColor: AppTheme.excludeRed),
-                    );
-                  }
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1E3A8A),
-                foregroundColor: Colors.white,
+              ElevatedButton(
+                onPressed: isGenerating
+                    ? null
+                    : () async {
+                        setDlgState(() => isGenerating = true);
+                        try {
+                          final pdfBytes = await _apiService.downloadAttestationPdf(contributor.id, year);
+                          downloadFile(pdfBytes, 'attestation_${contributor.contributorNumber}_$year.pdf');
+                          if (ctx.mounted) {
+                            Navigator.pop(ctx);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Attestation baixada com sucesso!')),
+                            );
+                          }
+                        } catch (e) {
+                          setDlgState(() => isGenerating = false);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Erro ao baixar PDF: $e'), backgroundColor: AppTheme.excludeRed),
+                          );
+                        }
+                      },
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1E3A8A)),
+                child: isGenerating
+                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    : const Text('GERAR PDF', style: TextStyle(color: Colors.white)),
               ),
-              child: isSaving
-                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                  : const Text('SALVAR'),
-            ),
-          ],
-        ),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Future<void> _confirmDelete(MemberDetail member) async {
+  Future<void> _confirmDelete(ContributorModel contributor) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Excluir Contribuinte'),
-        content: RichText(
-          text: TextSpan(
-            style: const TextStyle(fontSize: 14, color: Color(0xFF374151)),
-            children: [
-              const TextSpan(text: 'Tem certeza que deseja excluir '),
-              TextSpan(text: member.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-              const TextSpan(text: '? Esta ação não pode ser desfeita.'),
-            ],
-          ),
-        ),
+        title: const Text('Desativar Contribuinte'),
+        content: Text('Tem certeza que deseja desativar o contribuinte ${contributor.fullName}?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -247,24 +312,36 @@ class _MembersPageState extends State<MembersPage> {
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.excludeRed, foregroundColor: Colors.white),
-            child: const Text('EXCLUIR'),
+            child: const Text('DESATIVAR'),
           ),
         ],
       ),
     );
+
     if (confirm == true) {
       try {
-        await _apiService.deleteMember(member.id);
-        await _loadMembers();
+        final updated = ContributorModel(
+          id: contributor.id,
+          fullName: contributor.fullName,
+          contributorNumber: contributor.contributorNumber,
+          address: contributor.address,
+          postalCode: contributor.postalCode,
+          city: contributor.city,
+          email: contributor.email,
+          phone: contributor.phone,
+          active: false,
+        );
+        await _apiService.updateContributor(contributor.id, updated);
+        _loadContributors();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Contribuinte excluído com sucesso.')),
+            const SnackBar(content: Text('Contribuinte desativado com sucesso.')),
           );
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erro ao excluir: $e'), backgroundColor: AppTheme.excludeRed),
+            SnackBar(content: Text('Erro ao desativar: $e'), backgroundColor: AppTheme.excludeRed),
           );
         }
       }
@@ -312,7 +389,7 @@ class _MembersPageState extends State<MembersPage> {
             ),
       body: body,
       floatingActionButton: isDesktop ? null : FloatingActionButton.extended(
-        onPressed: _showCreateDialog,
+        onPressed: () => _showAddEditDialog(null),
         backgroundColor: AppTheme.primaryGreen,
         icon: const Icon(Icons.add, color: Colors.white),
         label: const Text('NOVO CONTRIBUINTE', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -338,7 +415,7 @@ class _MembersPageState extends State<MembersPage> {
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: _loadMembers,
+            onPressed: _loadContributors,
             icon: const Icon(Icons.refresh_rounded),
             label: const Text('Tentar Novamente'),
             style: ElevatedButton.styleFrom(
@@ -365,16 +442,11 @@ class _MembersPageState extends State<MembersPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Header
               _buildHeader(isDesktop),
               const SizedBox(height: 32),
-
-              // Summary card
               _buildSummaryCard(),
               const SizedBox(height: 32),
-
-              // Search + List
-              _buildMemberList(isDesktop),
+              _buildContributorList(isDesktop),
             ],
           ),
         ),
@@ -420,7 +492,7 @@ class _MembersPageState extends State<MembersPage> {
         ),
         if (isDesktop)
           ElevatedButton.icon(
-            onPressed: _showCreateDialog,
+            onPressed: () => _showAddEditDialog(null),
             icon: const Icon(Icons.add, color: Colors.white, size: 20),
             label: const Text('NOVO CONTRIBUINTE', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             style: ElevatedButton.styleFrom(
@@ -456,7 +528,7 @@ class _MembersPageState extends State<MembersPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${_allMembers.length}',
+                '${_allContributors.length}',
                 style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -475,7 +547,7 @@ class _MembersPageState extends State<MembersPage> {
     );
   }
 
-  Widget _buildMemberList(bool isDesktop) {
+  Widget _buildContributorList(bool isDesktop) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -485,7 +557,6 @@ class _MembersPageState extends State<MembersPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Search bar inside the card
           Padding(
             padding: const EdgeInsets.all(16),
             child: TextField(
@@ -520,8 +591,6 @@ class _MembersPageState extends State<MembersPage> {
               ),
             ),
           ),
-
-          // Table header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: const BoxDecoration(
@@ -538,13 +607,12 @@ class _MembersPageState extends State<MembersPage> {
                 ),
                 if (_filtered.isNotEmpty)
                   Text(
-                    '${_filtered.length} de ${_allMembers.length}',
+                    '${_filtered.length} de ${_allContributors.length}',
                     style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
                   ),
               ],
             ),
           ),
-
           if (_filtered.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 48),
@@ -563,25 +631,23 @@ class _MembersPageState extends State<MembersPage> {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: _filtered.length,
               separatorBuilder: (_, __) => const Divider(height: 1, color: Color(0xFFE2E8F0)),
-              itemBuilder: (context, index) => _buildMemberRow(_filtered[index]),
+              itemBuilder: (context, index) => _buildContributorRow(_filtered[index]),
             ),
         ],
       ),
     );
   }
 
-  Widget _buildMemberRow(MemberDetail member) {
-    // Build initials avatar
-    final parts = member.name.trim().split(' ');
+  Widget _buildContributorRow(ContributorModel contributor) {
+    final parts = contributor.fullName.trim().split(' ');
     final initials = parts.length >= 2
         ? '${parts.first[0]}${parts.last[0]}'.toUpperCase()
-        : member.name.substring(0, 1).toUpperCase();
+        : contributor.fullName.substring(0, 1).toUpperCase();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Row(
         children: [
-          // Avatar
           Container(
             width: 36,
             height: 36,
@@ -601,34 +667,46 @@ class _MembersPageState extends State<MembersPage> {
             ),
           ),
           const SizedBox(width: 14),
-
-          // Name
           Expanded(
-            child: Text(
-              member.name,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF0F172A),
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  contributor.fullName,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF0F172A),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Nº ${contributor.contributorNumber} • ${contributor.city}',
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                ),
+              ],
             ),
           ),
-
-          // Action buttons
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
+                icon: const Icon(Icons.picture_as_pdf_outlined, size: 18),
+                color: const Color(0xFF1E3A8A),
+                tooltip: 'Emitir Attestation',
+                onPressed: () => _showAttestationDialog(contributor),
+              ),
+              IconButton(
                 icon: const Icon(Icons.edit_outlined, size: 18),
                 color: const Color(0xFF64748B),
-                tooltip: 'Renomear',
-                onPressed: () => _showRenameDialog(member),
+                tooltip: 'Editar',
+                onPressed: () => _showAddEditDialog(contributor),
               ),
               IconButton(
                 icon: const Icon(Icons.delete_outline_rounded, size: 18),
                 color: AppTheme.excludeRed,
-                tooltip: 'Excluir',
-                onPressed: () => _confirmDelete(member),
+                tooltip: 'Desativar',
+                onPressed: () => _confirmDelete(contributor),
               ),
             ],
           ),

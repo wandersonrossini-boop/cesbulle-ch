@@ -22,6 +22,7 @@ class ExpenseModel {
   final String? approvedBy;
   final DateTime? approvalDate;
   final String? observations;
+  final List<dynamic>? attachments;
 
   ExpenseModel({
     required this.id,
@@ -43,6 +44,7 @@ class ExpenseModel {
     this.approvedBy,
     this.approvalDate,
     this.observations,
+    this.attachments,
   });
 
   factory ExpenseModel.fromJson(Map<String, dynamic> json) {
@@ -85,6 +87,7 @@ class ExpenseModel {
       approvedBy: json['approvedBy'],
       approvalDate: parseIsoDate(json['approvalDate']),
       observations: json['observations'],
+      attachments: json['attachments'],
     );
   }
 }
@@ -220,5 +223,232 @@ class ExpenseApiService {
       }
       throw Exception('Erro ao estornar despesa: ${response.body}');
     }
+  }
+
+  Future<ExpenseModel> updateExpense(int id, {
+    required String description,
+    required String supplier,
+    required String category,
+    required double amount,
+    required String localDateStr,
+    required String paymentMethod,
+    required String receiptReference,
+  }) async {
+    final parts = localDateStr.split('/');
+    String backendDate = localDateStr;
+    if (parts.length == 3) {
+      backendDate = '${parts[2]}-${parts[1].padLeft(2, '0')}-${parts[0].padLeft(2, '0')}';
+    }
+
+    final payload = {
+      'expenseDate': backendDate,
+      'description': description,
+      'supplier': supplier,
+      'category': category,
+      'amount': amount,
+      'paymentMethod': paymentMethod,
+      'receiptReference': receiptReference,
+    };
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    final response = await http.put(
+      Uri.parse('$_baseUrl/despesas/$id'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(payload),
+    );
+
+    if (response.statusCode == 200) {
+      return ExpenseModel.fromJson(jsonDecode(response.body));
+    } else if (response.statusCode == 401) {
+      throw Exception('UNAUTHORIZED');
+    } else {
+      throw Exception('Falha ao atualizar despesa (${response.statusCode})');
+    }
+  }
+
+  Future<void> deleteExpense(int id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    final response = await http.delete(
+      Uri.parse('$_baseUrl/despesas/$id'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      if (response.statusCode == 401) {
+        throw Exception('UNAUTHORIZED');
+      }
+      throw Exception('Falha ao excluir despesa (${response.statusCode})');
+    }
+  }
+
+  Future<double> fetchTotalApprovedExpenses() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/despesas/total-aprovado'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return (jsonDecode(response.body) as num).toDouble();
+    } else {
+      return 0.0;
+    }
+  }
+
+  Future<List<RecurringExpenseModel>> fetchRecurringExpenses() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/despesas/recorrentes'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List list = jsonDecode(response.body) as List;
+      return list.map((item) => RecurringExpenseModel.fromJson(item)).toList();
+    } else if (response.statusCode == 401) {
+      throw Exception('UNAUTHORIZED');
+    } else {
+      throw Exception('Falha ao obter despesas recorrentes (${response.statusCode})');
+    }
+  }
+
+  Future<RecurringExpenseModel> createRecurringExpense({
+    required String description,
+    required double amount,
+    required String category,
+    required int dueDayOfMonth,
+    required bool active,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/despesas/recorrentes'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'description': description,
+        'amount': amount,
+        'category': category,
+        'dueDayOfMonth': dueDayOfMonth,
+        'active': active,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return RecurringExpenseModel.fromJson(jsonDecode(response.body));
+    } else if (response.statusCode == 401) {
+      throw Exception('UNAUTHORIZED');
+    } else {
+      throw Exception('Falha ao criar despesa recorrente (${response.statusCode})');
+    }
+  }
+
+  Future<RecurringExpenseModel> updateRecurringExpense(int id, {
+    required String description,
+    required double amount,
+    required String category,
+    required int dueDayOfMonth,
+    required bool active,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    final response = await http.put(
+      Uri.parse('$_baseUrl/despesas/recorrentes/$id'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'description': description,
+        'amount': amount,
+        'category': category,
+        'dueDayOfMonth': dueDayOfMonth,
+        'active': active,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return RecurringExpenseModel.fromJson(jsonDecode(response.body));
+    } else if (response.statusCode == 401) {
+      throw Exception('UNAUTHORIZED');
+    } else {
+      throw Exception('Falha ao atualizar despesa recorrente (${response.statusCode})');
+    }
+  }
+
+  Future<void> deleteRecurringExpense(int id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    final response = await http.delete(
+      Uri.parse('$_baseUrl/despesas/recorrentes/$id'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      if (response.statusCode == 401) {
+        throw Exception('UNAUTHORIZED');
+      }
+      throw Exception('Falha ao excluir despesa recorrente (${response.statusCode})');
+    }
+  }
+}
+
+class RecurringExpenseModel {
+  final String id;
+  final String description;
+  final double amount;
+  final String category;
+  final int dueDayOfMonth;
+  final bool active;
+  final String createdBy;
+
+  RecurringExpenseModel({
+    required this.id,
+    required this.description,
+    required this.amount,
+    required this.category,
+    required this.dueDayOfMonth,
+    required this.active,
+    required this.createdBy,
+  });
+
+  factory RecurringExpenseModel.fromJson(Map<String, dynamic> json) {
+    return RecurringExpenseModel(
+      id: json['id']?.toString() ?? '',
+      description: json['description'] ?? '',
+      amount: (json['amount'] ?? 0.0).toDouble(),
+      category: json['category'] ?? '',
+      dueDayOfMonth: json['dueDayOfMonth'] as int? ?? 1,
+      active: json['active'] as bool? ?? true,
+      createdBy: json['createdBy'] ?? '',
+    );
   }
 }

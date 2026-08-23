@@ -28,12 +28,18 @@ public class ServiceClosingController {
     private final SubmitServiceClosingUseCase useCase;
     private final ServiceClosingSessionService sessionService;
     private final ObjectMapper objectMapper;
+    private final com.tesourariacme.api.application.MonthlyPeriodService monthlyPeriodService;
     private static Object activeDraft = null; // static to persist across controller requests
 
-    public ServiceClosingController(SubmitServiceClosingUseCase useCase, ServiceClosingSessionService sessionService, ObjectMapper objectMapper) {
+    public ServiceClosingController(
+            SubmitServiceClosingUseCase useCase,
+            ServiceClosingSessionService sessionService,
+            ObjectMapper objectMapper,
+            com.tesourariacme.api.application.MonthlyPeriodService monthlyPeriodService) {
         this.useCase = useCase;
         this.sessionService = sessionService;
         this.objectMapper = objectMapper;
+        this.monthlyPeriodService = monthlyPeriodService;
     }
 
     @PostMapping("/draft")
@@ -114,6 +120,12 @@ public class ServiceClosingController {
 
     @PostMapping("/session")
     public ResponseEntity<?> createSession(@RequestBody ServiceClosingSessionRequest request, Authentication authentication) {
+        if (request.getServiceDate() != null && monthlyPeriodService.isPeriodLocked(request.getServiceDate())) {
+            return ResponseEntity.badRequest().body("O período contábil deste mês está trancado para auditoria.");
+        }
+        if (request.getServiceDate() == null && monthlyPeriodService.isPeriodLocked(LocalDate.now())) {
+            return ResponseEntity.badRequest().body("O período contábil deste mês está trancado para auditoria.");
+        }
         try {
             String user = authentication != null ? authentication.getName() : "anonymous";
             ServiceClosingSession session;

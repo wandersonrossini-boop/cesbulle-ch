@@ -27,14 +27,20 @@ public class ExpenseController {
     private final ExpenseRepository expenseRepository;
     private final ExpenseAttachmentRepository expenseAttachmentRepository;
     private final StorageService storageService;
+    private final com.tesourariacme.api.application.MonthlyPeriodService monthlyPeriodService;
+    private final com.tesourariacme.api.application.AuditLogService auditLogService;
 
     public ExpenseController(
             ExpenseRepository expenseRepository,
             ExpenseAttachmentRepository expenseAttachmentRepository,
-            StorageService storageService) {
+            StorageService storageService,
+            com.tesourariacme.api.application.MonthlyPeriodService monthlyPeriodService,
+            com.tesourariacme.api.application.AuditLogService auditLogService) {
         this.expenseRepository = expenseRepository;
         this.expenseAttachmentRepository = expenseAttachmentRepository;
         this.storageService = storageService;
+        this.monthlyPeriodService = monthlyPeriodService;
+        this.auditLogService = auditLogService;
     }
 
     @GetMapping
@@ -42,8 +48,16 @@ public class ExpenseController {
         return ResponseEntity.ok(expenseRepository.findAllByOrderByExpenseDateDesc());
     }
 
+    @GetMapping("/total-aprovado")
+    public ResponseEntity<Double> getApprovedExpensesTotal() {
+        return ResponseEntity.ok(expenseRepository.sumApprovedExpenses());
+    }
+
     @PostMapping
-    public ResponseEntity<Expense> createExpense(@RequestBody ExpenseRequest request, Authentication authentication) {
+    public ResponseEntity<?> createExpense(@RequestBody ExpenseRequest request, Authentication authentication) {
+        if (monthlyPeriodService.isPeriodLocked(request.getExpenseDate())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("O período contábil deste mês está trancado para auditoria.");
+        }
         Expense expense = new Expense();
         expense.setExpenseDate(request.getExpenseDate());
         expense.setDescription(request.getDescription());
@@ -62,11 +76,14 @@ public class ExpenseController {
 
     @PutMapping("/{id}/approve")
     public ResponseEntity<?> approveExpense(@PathVariable Long id, Authentication authentication) {
-        if (!isAdmin(authentication)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Apenas administradores podem aprovar despesas.");
+        if (!isAuthorizedToManage(authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Apenas administradores ou tesoureiros podem aprovar despesas.");
         }
 
         return expenseRepository.findById(id).map(expense -> {
+            if (monthlyPeriodService.isPeriodLocked(expense.getExpenseDate())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("O período contábil deste mês está trancado para auditoria.");
+            }
             if (!"PENDING".equals(expense.getStatus())) {
                 return ResponseEntity.badRequest().body("Apenas despesas PENDENTES podem ser aprovadas.");
             }
@@ -74,20 +91,24 @@ public class ExpenseController {
             expense.setApprovedBy(authentication.getName());
             expense.setApprovalDate(LocalDate.now());
             Expense saved = expenseRepository.save(expense);
+            auditLogService.logAction("EXPENSE_APPROVED", authentication.getName(), String.valueOf(saved.getId()), String.format("Aprovado: CHF %s - %s", saved.getAmount(), saved.getDescription()));
             return ResponseEntity.ok(saved);
         }).orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}/reject")
     public ResponseEntity<?> rejectExpense(@PathVariable Long id, @RequestBody RejectionRequest request, Authentication authentication) {
-        if (!isAdmin(authentication)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Apenas administradores podem rejeitar despesas.");
+        if (!isAuthorizedToManage(authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Apenas administradores ou tesoureiros podem rejeitar despesas.");
         }
         if (request.getJustification() == null || request.getJustification().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("Justificativa de rejeição é obrigatória.");
         }
 
         return expenseRepository.findById(id).map(expense -> {
+            if (monthlyPeriodService.isPeriodLocked(expense.getExpenseDate())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("O período contábil deste mês está trancado para auditoria.");
+            }
             if (!"PENDING".equals(expense.getStatus())) {
                 return ResponseEntity.badRequest().body("Apenas despesas PENDENTES podem ser rejeitadas.");
             }
@@ -96,20 +117,24 @@ public class ExpenseController {
             expense.setRejectedBy(authentication.getName());
             expense.setRejectionDate(java.time.LocalDate.now());
             Expense saved = expenseRepository.save(expense);
+            auditLogService.logAction("EXPENSE_REJECTED", authentication.getName(), String.valueOf(saved.getId()), String.format("Rejeitado: %s. Justificativa: %s", saved.getDescription(), request.getJustification()));
             return ResponseEntity.ok(saved);
         }).orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}/reverse")
     public ResponseEntity<?> reverseExpense(@PathVariable Long id, @RequestBody ReversalRequest request, Authentication authentication) {
-        if (!isAdmin(authentication)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Apenas administradores podem estornar despesas.");
+        if (!isAuthorizedToManage(authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Apenas administradores ou tesoureiros podem estornar despesas.");
         }
         if (request.getJustification() == null || request.getJustification().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("Justificativa de estorno é obrigatória.");
         }
 
         return expenseRepository.findById(id).map(expense -> {
+            if (monthlyPeriodService.isPeriodLocked(expense.getExpenseDate())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("O período contábil deste mês está trancado para auditoria.");
+            }
             if (!"APPROVED".equals(expense.getStatus())) {
                 return ResponseEntity.badRequest().body("Apenas despesas APROVADAS podem ser estornadas.");
             }
@@ -118,7 +143,57 @@ public class ExpenseController {
             expense.setReversedBy(authentication.getName());
             expense.setReversalDate(java.time.LocalDate.now());
             Expense saved = expenseRepository.save(expense);
+            auditLogService.logAction("EXPENSE_REVERSED", authentication.getName(), String.valueOf(saved.getId()), String.format("Estornado: %s. Justificativa: %s", saved.getDescription(), request.getJustification()));
             return ResponseEntity.ok(saved);
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateExpense(@PathVariable Long id, @RequestBody ExpenseRequest request, Authentication authentication) {
+        if (!isAuthorizedToManage(authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Apenas administradores ou tesoureiros podem editar despesas.");
+        }
+
+        return expenseRepository.findById(id).map(expense -> {
+            if (monthlyPeriodService.isPeriodLocked(expense.getExpenseDate())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("O período contábil deste mês está trancado para auditoria.");
+            }
+            if (request.getExpenseDate() != null && monthlyPeriodService.isPeriodLocked(request.getExpenseDate())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("O período contábil do novo mês está trancado para auditoria.");
+            }
+            if (!"PENDING".equals(expense.getStatus())) {
+                return ResponseEntity.badRequest().body("Apenas despesas PENDENTES podem ser editadas.");
+            }
+            expense.setAmount(request.getAmount());
+            expense.setDescription(request.getDescription());
+            expense.setCategory(request.getCategory());
+            expense.setReceiptReference(request.getReceiptReference());
+            if (request.getPaymentMethod() != null) {
+                expense.setPaymentMethod(request.getPaymentMethod());
+            }
+            if (request.getExpenseDate() != null) {
+                expense.setExpenseDate(request.getExpenseDate());
+            }
+            Expense saved = expenseRepository.save(expense);
+            return ResponseEntity.ok(saved);
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteExpense(@PathVariable Long id, Authentication authentication) {
+        if (!isAuthorizedToManage(authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Apenas administradores ou tesoureiros podem excluir despesas.");
+        }
+
+        return expenseRepository.findById(id).map(expense -> {
+            if (monthlyPeriodService.isPeriodLocked(expense.getExpenseDate())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("O período contábil deste mês está trancado para auditoria.");
+            }
+            if (!"PENDING".equals(expense.getStatus())) {
+                return ResponseEntity.badRequest().body("Apenas despesas PENDENTES podem ser excluídas.");
+            }
+            expenseRepository.delete(expense);
+            return ResponseEntity.ok().build();
         }).orElse(ResponseEntity.notFound().build());
     }
 
@@ -259,9 +334,9 @@ public class ExpenseController {
         return validMime && validExt;
     }
 
-    private boolean isAdmin(Authentication authentication) {
+    private boolean isAuthorizedToManage(Authentication authentication) {
         return authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_TREASURER"));
     }
 }
 

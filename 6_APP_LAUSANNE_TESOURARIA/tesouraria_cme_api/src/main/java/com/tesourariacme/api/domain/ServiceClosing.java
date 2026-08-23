@@ -37,6 +37,10 @@ public class ServiceClosing {
     private BigDecimal identifiedTotal;
     private BigDecimal registeredTotal;
 
+    private BigDecimal totalDizimos;
+    private BigDecimal totalOfertas;
+    private BigDecimal totalVotos;
+
     public void calculateTotalsAndValidate() {
         if (physicalTotal == null) physicalTotal = BigDecimal.ZERO;
         if (unidentifiedDizimoTotal == null) unidentifiedDizimoTotal = BigDecimal.ZERO;
@@ -49,6 +53,24 @@ public class ServiceClosing {
 
         unidentifiedTotal = unidentifiedDizimoTotal.add(unidentifiedOfertaTotal).add(unidentifiedVotoTotal);
         registeredTotal = identifiedTotal.add(unidentifiedTotal);
+
+        totalDizimos = identifiedEntries.stream()
+                .filter(e -> e.getType() == EnvelopeType.DIZIMO)
+                .map(Envelope::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .add(unidentifiedDizimoTotal);
+
+        totalOfertas = identifiedEntries.stream()
+                .filter(e -> e.getType() == EnvelopeType.OFERTA)
+                .map(Envelope::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .add(unidentifiedOfertaTotal);
+
+        totalVotos = identifiedEntries.stream()
+                .filter(e -> e.getType() == EnvelopeType.VOTO)
+                .map(Envelope::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .add(unidentifiedVotoTotal);
 
         if (physicalTotal.compareTo(registeredTotal) != 0) {
             throw new IllegalArgumentException("Fechamento inválido: total físico difere do total registrado.");

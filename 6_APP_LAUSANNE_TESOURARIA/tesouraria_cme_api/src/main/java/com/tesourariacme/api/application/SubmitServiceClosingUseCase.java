@@ -12,14 +12,25 @@ public class SubmitServiceClosingUseCase {
 
     private final ServiceClosingRepository repository;
     private final MemberRepository memberRepository;
+    private final MonthlyPeriodService monthlyPeriodService;
+    private final AuditLogService auditLogService;
 
-    public SubmitServiceClosingUseCase(ServiceClosingRepository repository, MemberRepository memberRepository) {
+    public SubmitServiceClosingUseCase(
+            ServiceClosingRepository repository,
+            MemberRepository memberRepository,
+            MonthlyPeriodService monthlyPeriodService,
+            AuditLogService auditLogService) {
         this.repository = repository;
         this.memberRepository = memberRepository;
+        this.monthlyPeriodService = monthlyPeriodService;
+        this.auditLogService = auditLogService;
     }
 
     @Transactional
     public ServiceClosing execute(ServiceClosing serviceClosing) {
+        if (monthlyPeriodService.isPeriodLocked(serviceClosing.getServiceDate())) {
+            throw new IllegalStateException("O período contábil deste mês está trancado para auditoria.");
+        }
         serviceClosing.calculateTotalsAndValidate();
         
         // Verifier Validation
@@ -49,7 +60,12 @@ public class SubmitServiceClosingUseCase {
             });
         }
         
-        return repository.save(serviceClosing);
+        ServiceClosing saved = repository.save(serviceClosing);
+        ServiceClosing logged = (saved != null) ? saved : serviceClosing;
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        String user = (auth != null) ? auth.getName() : "SYSTEM";
+        auditLogService.logAction("CLOSING_SUBMITTED", user, logged.getId() != null ? String.valueOf(logged.getId()) : "N/A", String.format("Ata de culto submetida: Data %s - Total físico CHF %s", logged.getServiceDate(), logged.getPhysicalTotal()));
+        return logged;
     }
 
     public java.util.List<com.tesourariacme.api.presentation.ServiceClosingSummaryResponse> getHistory() {
@@ -72,8 +88,10 @@ public class SubmitServiceClosingUseCase {
 
     @Transactional
     public void deleteById(Long id) {
-        if (!repository.existsById(id)) {
-            throw new IllegalArgumentException("Fechamento não encontrado");
+        ServiceClosing closing = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Fechamento não encontrado"));
+        if (monthlyPeriodService.isPeriodLocked(closing.getServiceDate())) {
+            throw new IllegalStateException("O período contábil deste mês está trancado para auditoria.");
         }
         repository.deleteById(id);
     }

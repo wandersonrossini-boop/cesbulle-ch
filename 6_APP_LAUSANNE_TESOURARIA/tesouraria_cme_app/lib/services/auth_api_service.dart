@@ -66,4 +66,23 @@ class AuthApiService {
     final prefs = await SharedPreferences.getInstance();
     return prefs.containsKey('jwt_token');
   }
+
+  Future<Map<String, dynamic>> getProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/users/me'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Falha ao obter perfil (${response.statusCode})');
+    }
+  }
 }

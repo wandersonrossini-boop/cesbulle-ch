@@ -83,8 +83,11 @@ public class ServiceClosingTest {
     public void testSubmitValidation() {
         ServiceClosingRepository repo = org.mockito.Mockito.mock(ServiceClosingRepository.class);
         MemberRepository memberRepo = org.mockito.Mockito.mock(MemberRepository.class);
+        com.tesourariacme.api.application.MonthlyPeriodService monthlyPeriodService = org.mockito.Mockito.mock(com.tesourariacme.api.application.MonthlyPeriodService.class);
+        org.mockito.Mockito.when(monthlyPeriodService.isPeriodLocked(org.mockito.ArgumentMatchers.any(java.time.LocalDate.class))).thenReturn(false);
+        com.tesourariacme.api.application.AuditLogService auditLogService = org.mockito.Mockito.mock(com.tesourariacme.api.application.AuditLogService.class);
         com.tesourariacme.api.application.SubmitServiceClosingUseCase useCase = 
-            new com.tesourariacme.api.application.SubmitServiceClosingUseCase(repo, memberRepo);
+            new com.tesourariacme.api.application.SubmitServiceClosingUseCase(repo, memberRepo, monthlyPeriodService, auditLogService);
 
         // Case 1: SELECTED + nome -> aceito
         ServiceClosing c1 = new ServiceClosing();
@@ -146,8 +149,11 @@ public class ServiceClosingTest {
     public void testDoubleVerificationScenarios() {
         ServiceClosingRepository repo = org.mockito.Mockito.mock(ServiceClosingRepository.class);
         MemberRepository memberRepo = org.mockito.Mockito.mock(MemberRepository.class);
+        com.tesourariacme.api.application.MonthlyPeriodService monthlyPeriodService = org.mockito.Mockito.mock(com.tesourariacme.api.application.MonthlyPeriodService.class);
+        org.mockito.Mockito.when(monthlyPeriodService.isPeriodLocked(org.mockito.ArgumentMatchers.any(java.time.LocalDate.class))).thenReturn(false);
+        com.tesourariacme.api.application.AuditLogService auditLogService = org.mockito.Mockito.mock(com.tesourariacme.api.application.AuditLogService.class);
         com.tesourariacme.api.application.SubmitServiceClosingUseCase useCase = 
-            new com.tesourariacme.api.application.SubmitServiceClosingUseCase(repo, memberRepo);
+            new com.tesourariacme.api.application.SubmitServiceClosingUseCase(repo, memberRepo, monthlyPeriodService, auditLogService);
 
         // Cenário A: mainTreasurer = "Anderson", verifierName = "Anderson" -> REJEITADO
         ServiceClosing cA = new ServiceClosing();
@@ -189,8 +195,11 @@ public class ServiceClosingTest {
     public void testGateT4ScenariosAF() {
         ServiceClosingRepository repo = org.mockito.Mockito.mock(ServiceClosingRepository.class);
         MemberRepository memberRepo = org.mockito.Mockito.mock(MemberRepository.class);
+        com.tesourariacme.api.application.MonthlyPeriodService monthlyPeriodService = org.mockito.Mockito.mock(com.tesourariacme.api.application.MonthlyPeriodService.class);
+        org.mockito.Mockito.when(monthlyPeriodService.isPeriodLocked(org.mockito.ArgumentMatchers.any(java.time.LocalDate.class))).thenReturn(false);
+        com.tesourariacme.api.application.AuditLogService auditLogService = org.mockito.Mockito.mock(com.tesourariacme.api.application.AuditLogService.class);
         com.tesourariacme.api.application.SubmitServiceClosingUseCase useCase = 
-            new com.tesourariacme.api.application.SubmitServiceClosingUseCase(repo, memberRepo);
+            new com.tesourariacme.api.application.SubmitServiceClosingUseCase(repo, memberRepo, monthlyPeriodService, auditLogService);
 
         // Cenário A: main="A", verifier=null, co="B" -> REJEITADO
         ServiceClosing cA = new ServiceClosing();

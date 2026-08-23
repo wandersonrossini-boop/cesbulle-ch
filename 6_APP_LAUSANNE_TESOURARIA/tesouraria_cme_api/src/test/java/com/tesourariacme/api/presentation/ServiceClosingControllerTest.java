@@ -21,6 +21,7 @@ public class ServiceClosingControllerTest {
 
     private SubmitServiceClosingUseCase useCase;
     private ServiceClosingSessionService sessionService;
+    private com.tesourariacme.api.application.MonthlyPeriodService monthlyPeriodService;
     private ServiceClosingController controller;
     private Authentication authUser1;
     private Authentication authUser2;
@@ -29,7 +30,9 @@ public class ServiceClosingControllerTest {
     public void setUp() {
         useCase = mock(SubmitServiceClosingUseCase.class);
         sessionService = mock(ServiceClosingSessionService.class);
-        controller = new ServiceClosingController(useCase, sessionService, new com.fasterxml.jackson.databind.ObjectMapper());
+        monthlyPeriodService = mock(com.tesourariacme.api.application.MonthlyPeriodService.class);
+        when(monthlyPeriodService.isPeriodLocked(any(LocalDate.class))).thenReturn(false);
+        controller = new ServiceClosingController(useCase, sessionService, new com.fasterxml.jackson.databind.ObjectMapper(), monthlyPeriodService);
 
         authUser1 = mock(Authentication.class);
         when(authUser1.getName()).thenReturn("user1");

@@ -252,6 +252,35 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  String _translateDayOfWeek(String englishDay) {
+    switch (englishDay.toUpperCase()) {
+      case 'SUNDAY':
+        return 'Domingo';
+      case 'MONDAY':
+        return 'Segunda-feira';
+      case 'TUESDAY':
+        return 'Terça-feira';
+      case 'WEDNESDAY':
+        return 'Quarta-feira';
+      case 'THURSDAY':
+        return 'Quinta-feira';
+      case 'FRIDAY':
+        return 'Sexta-feira';
+      case 'SATURDAY':
+        return 'Sábado';
+      default:
+        return englishDay;
+    }
+  }
+
+  String _formatTime(String timeStr) {
+    final parts = timeStr.split(':');
+    if (parts.length >= 2) {
+      return "${parts[0].padLeft(2, '0')}:${parts[1].padLeft(2, '0')}";
+    }
+    return timeStr;
+  }
+
   Widget _buildSchedulesCard() {
     return _buildSectionCard(
       title: 'Agenda de Cultos (Administrador)',
@@ -267,7 +296,7 @@ class _SettingsPageState extends State<SettingsPage> {
               return ListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(schedule.serviceType, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                subtitle: Text("${schedule.dayOfWeek} • ${schedule.startTime} - ${schedule.endTime}", style: const TextStyle(fontSize: 12)),
+                subtitle: Text("${_translateDayOfWeek(schedule.dayOfWeek)} • ${_formatTime(schedule.startTime)} - ${_formatTime(schedule.endTime)}", style: const TextStyle(fontSize: 12)),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -342,7 +371,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   value: selectedDay,
                   decoration: const InputDecoration(labelText: 'Dia da Semana'),
                   items: days
-                      .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+                      .map((d) => DropdownMenuItem(value: d, child: Text(_translateDayOfWeek(d))))
                       .toList(),
                   onChanged: (val) {
                     if (val != null) setDlgState(() => selectedDay = val);
@@ -362,20 +391,38 @@ class _SettingsPageState extends State<SettingsPage> {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () async {
-                          final picked = await showTimePicker(context: ctx, initialTime: startTime);
+                          final picked = await showTimePicker(
+                            context: ctx,
+                            initialTime: startTime,
+                            builder: (BuildContext context, Widget? child) {
+                              return MediaQuery(
+                                data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+                                child: child!,
+                              );
+                            },
+                          );
                           if (picked != null) setDlgState(() => startTime = picked);
                         },
-                        child: Text("Início: ${startTime.format(context)}"),
+                        child: Text("Início: ${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}"),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () async {
-                          final picked = await showTimePicker(context: ctx, initialTime: endTime);
+                          final picked = await showTimePicker(
+                            context: ctx,
+                            initialTime: endTime,
+                            builder: (BuildContext context, Widget? child) {
+                              return MediaQuery(
+                                data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+                                child: child!,
+                              );
+                            },
+                          );
                           if (picked != null) setDlgState(() => endTime = picked);
                         },
-                        child: Text("Fim: ${endTime.format(context)}"),
+                        child: Text("Fim: ${endTime.hour.toString().padLeft(2, '0')}:${endTime.minute.toString().padLeft(2, '0')}"),
                       ),
                     ),
                   ],

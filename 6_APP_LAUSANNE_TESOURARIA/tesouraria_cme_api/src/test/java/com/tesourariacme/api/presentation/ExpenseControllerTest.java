@@ -31,6 +31,8 @@ public class ExpenseControllerTest {
     private ExpenseRepository expenseRepository;
     private ExpenseAttachmentRepository expenseAttachmentRepository;
     private StorageService storageService;
+    private com.tesourariacme.api.application.MonthlyPeriodService monthlyPeriodService;
+    private com.tesourariacme.api.application.AuditLogService auditLogService;
     private ExpenseController controller;
     private Authentication authentication;
     private Authentication adminAuth;
@@ -41,7 +43,10 @@ public class ExpenseControllerTest {
         expenseRepository = mock(ExpenseRepository.class);
         expenseAttachmentRepository = mock(ExpenseAttachmentRepository.class);
         storageService = mock(StorageService.class);
-        controller = new ExpenseController(expenseRepository, expenseAttachmentRepository, storageService);
+        monthlyPeriodService = mock(com.tesourariacme.api.application.MonthlyPeriodService.class);
+        auditLogService = mock(com.tesourariacme.api.application.AuditLogService.class);
+        when(monthlyPeriodService.isPeriodLocked(any(LocalDate.class))).thenReturn(false);
+        controller = new ExpenseController(expenseRepository, expenseAttachmentRepository, storageService, monthlyPeriodService, auditLogService);
 
         // Admin authentication mock
         adminAuth = mock(Authentication.class);
@@ -211,19 +216,22 @@ public class ExpenseControllerTest {
         assertNotNull(expense.getReversalDate());
     }
 
-    // Scenario 2: TREASURER + APPROVED + valid justification → 403 Forbidden
+    // Scenario 2: TREASURER + APPROVED + valid justification → 200 OK
     @Test
-    public void reverseTreasurerForbidden() {
+    public void reverseTreasurerAllowed() {
         ReversalRequest request = new ReversalRequest();
         request.setJustification("Justificativa válida");
         Expense expense = new Expense();
         expense.setId(1L);
         expense.setStatus("APPROVED");
         when(expenseRepository.findById(1L)).thenReturn(Optional.of(expense));
+        when(expenseRepository.save(any(Expense.class))).thenAnswer(inv -> inv.getArgument(0));
 
         ResponseEntity<?> response = controller.reverseExpense(1L, request, treasurerAuth);
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
-        verify(expenseRepository, never()).save(any(Expense.class));
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(expenseRepository, times(1)).save(any(Expense.class));
+        assertEquals("REVERSED", expense.getStatus());
+        assertEquals("treasurer", expense.getReversedBy());
     }
 
     // Scenario 3: ADMIN + PENDING → 400 Bad Request (wrong status)
@@ -311,19 +319,38 @@ public class ExpenseControllerTest {
         assertNotNull(expense.getRejectionDate());
     }
 
-    // TREASURER + PENDING → 403 Forbidden, save never called
+    // TREASURER + PENDING → 200 OK
     @Test
-    public void rejectTreasurerForbidden() {
+    public void rejectTreasurerAllowed() {
         RejectionRequest request = new RejectionRequest();
         request.setJustification("Motivo");
         Expense expense = new Expense();
         expense.setId(1L);
         expense.setStatus("PENDING");
         when(expenseRepository.findById(1L)).thenReturn(Optional.of(expense));
+        when(expenseRepository.save(any(Expense.class))).thenAnswer(inv -> inv.getArgument(0));
 
         ResponseEntity<?> response = controller.rejectExpense(1L, request, treasurerAuth);
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
-        verify(expenseRepository, never()).save(any(Expense.class));
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(expenseRepository, times(1)).save(any(Expense.class));
+        assertEquals("REJECTED", expense.getStatus());
+        assertEquals("treasurer", expense.getRejectedBy());
+    }
+
+    // TREASURER + PENDING → 200 OK
+    @Test
+    public void approveTreasurerAllowed() {
+        Expense expense = new Expense();
+        expense.setId(1L);
+        expense.setStatus("PENDING");
+        when(expenseRepository.findById(1L)).thenReturn(Optional.of(expense));
+        when(expenseRepository.save(any(Expense.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        ResponseEntity<?> response = controller.approveExpense(1L, treasurerAuth);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(expenseRepository, times(1)).save(any(Expense.class));
+        assertEquals("APPROVED", expense.getStatus());
+        assertEquals("treasurer", expense.getApprovedBy());
     }
 
     // ADMIN + PENDING + empty justification → 400, save never called
@@ -431,5 +458,69 @@ public class ExpenseControllerTest {
             // ensure no persistence on rejected scenarios
             verify(expenseRepository, never()).save(any(Expense.class));
         }
+    }
+
+    @Test
+    public void testGetApprovedExpensesTotal() {
+        when(expenseRepository.sumApprovedExpenses()).thenReturn(150.0);
+        ResponseEntity<Double> response = (ResponseEntity<Double>) controller.getApprovedExpensesTotal();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(150.0, response.getBody());
+    }
+
+    @Test
+    public void testUpdateExpenseSuccess() {
+        Expense expense = new Expense();
+        expense.setId(1L);
+        expense.setStatus("PENDING");
+        when(expenseRepository.findById(1L)).thenReturn(Optional.of(expense));
+        when(expenseRepository.save(any(Expense.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        ExpenseRequest request = new ExpenseRequest();
+        request.setDescription("New Description");
+        request.setAmount(new BigDecimal("100.00"));
+        request.setCategory("New Category");
+
+        ResponseEntity<?> response = controller.updateExpense(1L, request, treasurerAuth);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("New Description", expense.getDescription());
+        assertEquals(new BigDecimal("100.00"), expense.getAmount());
+    }
+
+    @Test
+    public void testUpdateExpenseBlocksNonPending() {
+        Expense expense = new Expense();
+        expense.setId(1L);
+        expense.setStatus("APPROVED");
+        when(expenseRepository.findById(1L)).thenReturn(Optional.of(expense));
+
+        ExpenseRequest request = new ExpenseRequest();
+
+        ResponseEntity<?> response = controller.updateExpense(1L, request, treasurerAuth);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    public void testDeleteExpenseSuccess() {
+        Expense expense = new Expense();
+        expense.setId(1L);
+        expense.setStatus("PENDING");
+        when(expenseRepository.findById(1L)).thenReturn(Optional.of(expense));
+
+        ResponseEntity<?> response = controller.deleteExpense(1L, treasurerAuth);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(expenseRepository, times(1)).delete(expense);
+    }
+
+    @Test
+    public void testDeleteExpenseBlocksNonPending() {
+        Expense expense = new Expense();
+        expense.setId(1L);
+        expense.setStatus("APPROVED");
+        when(expenseRepository.findById(1L)).thenReturn(Optional.of(expense));
+
+        ResponseEntity<?> response = controller.deleteExpense(1L, treasurerAuth);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        verify(expenseRepository, never()).delete(any(Expense.class));
     }
 }
