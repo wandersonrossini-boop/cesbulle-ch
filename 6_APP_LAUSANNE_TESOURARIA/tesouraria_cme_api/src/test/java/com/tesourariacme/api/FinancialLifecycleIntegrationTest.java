@@ -68,6 +68,9 @@ public class FinancialLifecycleIntegrationTest {
     private ExpenseAttachmentRepository expenseAttachmentRepository;
 
     @MockBean
+    private com.tesourariacme.api.infrastructure.ServiceClosingAttachmentRepository serviceClosingAttachmentRepository;
+
+    @MockBean
     private StorageService storageService;
 
     @MockBean

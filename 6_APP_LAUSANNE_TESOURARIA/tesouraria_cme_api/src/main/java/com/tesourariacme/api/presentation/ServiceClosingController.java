@@ -39,10 +39,7 @@ public class ServiceClosingController {
             org.springframework.security.core.Authentication authentication) {
 
         return repository.findById(closingId).map(closing -> {
-            if ("REJECTED".equals(closing.getStatus())) {
-                return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                        .body("Nao eh permitido adicionar anexos a fechamentos rejeitados.");
-            }
+            // N/A for ServiceClosing
 
             if (file.isEmpty()) {
                 return ResponseEntity.badRequest().body("Arquivo vazio.");
@@ -86,8 +83,8 @@ public class ServiceClosingController {
 
                 com.tesourariacme.api.domain.ServiceClosingAttachment saved = attachmentRepository.save(attachment);
                 
-                closing.getAttachments().add(saved);
-                repository.save(closing);
+                // no bidirectional add
+                // no repository save needed since attachmentRepository.save(attachment) is enough
 
                 return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED).body(saved);
             } catch (Exception e) {
@@ -132,7 +129,7 @@ public class ServiceClosingController {
     private static Object activeDraft = null; // static to persist across controller requests
 
     @Autowired
-    private com.tesourariacme.api.infrastructure.ServiceClosingAttachmentRepository repository;
+    private com.tesourariacme.api.infrastructure.ServiceClosingRepository repository;
 
     public ServiceClosingController(
             SubmitServiceClosingUseCase useCase,

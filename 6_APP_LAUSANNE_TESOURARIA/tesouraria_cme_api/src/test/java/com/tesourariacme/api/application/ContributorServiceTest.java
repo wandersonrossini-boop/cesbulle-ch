@@ -2,6 +2,7 @@ package com.tesourariacme.api.application;
 
 import com.tesourariacme.api.domain.Contributor;
 import com.tesourariacme.api.infrastructure.ContributorRepository;
+import com.tesourariacme.api.infrastructure.EnvelopeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.Optional;
@@ -11,12 +12,14 @@ import static org.mockito.Mockito.*;
 public class ContributorServiceTest {
 
     private ContributorRepository repository;
+    private EnvelopeRepository envelopeRepository;
     private ContributorService service;
 
     @BeforeEach
     public void setUp() {
         repository = mock(ContributorRepository.class);
-        service = new ContributorService(repository);
+        envelopeRepository = mock(EnvelopeRepository.class);
+        service = new ContributorService(repository, envelopeRepository);
     }
 
     @Test

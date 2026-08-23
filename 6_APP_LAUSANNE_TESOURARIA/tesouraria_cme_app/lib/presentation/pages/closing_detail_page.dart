@@ -24,7 +24,7 @@ class ClosingDetailView extends StatelessWidget {
   const ClosingDetailView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Espelho Oficial do Culto'),
@@ -40,12 +40,6 @@ class ClosingDetailView extends StatelessWidget {
             },
           ),
         ],
-                );
-              }
-              return const SizedBox.shrink();
-            },
-          ),
-        ],
       ),
       body: BlocConsumer<HistoryBloc, HistoryState>(
         listener: (context, state) {
@@ -53,7 +47,7 @@ class ClosingDetailView extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
           } else if (state is HistoryDeleteSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Fechamento excluído com sucesso.")));
-            Navigator.of(context).pop(true); // Return true to refresh list
+            Navigator.of(context).pop(true);
           }
         },
         builder: (context, state) {
@@ -65,20 +59,22 @@ class ClosingDetailView extends StatelessWidget {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 900),
                 child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _buildHeader(detail),
-                  const SizedBox(height: 24),
-                  _buildIdentifiedSection(detail),
-                  const SizedBox(height: 24),
-                  _buildUnidentifiedSection(detail),
-                  const SizedBox(height: 24),
-                  _buildSummarySection(detail),
-                ],
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildHeader(detail),
+                      const SizedBox(height: 24),
+                      _buildIdentifiedSection(detail),
+                      const SizedBox(height: 24),
+                      _buildUnidentifiedSection(detail),
+                      const SizedBox(height: 24),
+                      _buildSummarySection(detail),
+                    ],
+                  ),
+                ),
               ),
-            )));
+            );
           }
           return const Center(child: Text("Erro ao carregar detalhes."));
         },

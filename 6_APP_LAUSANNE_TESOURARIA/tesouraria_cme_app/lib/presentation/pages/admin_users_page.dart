@@ -35,7 +35,17 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
     }
   }
 
-  Future<void> _approveUser(AppUser user) async {
+  
+  Future<void> _deleteUser(AppUser user) async {
+    try {
+      await _apiService.deleteUser(user.id);
+      _loadUsers();
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Solicitação de ${user.name} rejeitada.')));
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro: $e')));
+    }
+  }
+Future<void> _approveUser(AppUser user) async {
     try {
       await _apiService.approveUser(user.id);
       _loadUsers();
@@ -142,18 +152,28 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
               child: const Icon(Icons.person, color: AppTheme.primaryGreen),
             ),
             title: Text(u.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text('@${u.username} • ${u.role}'),
+            subtitle: Text('@${u.username} • ${u.role == 'ADMIN' ? 'Administrador' : 'Tesoureiro'}'),
             trailing: isPending
-                ? ElevatedButton(
-                    onPressed: () => _approveUser(u),
-                    style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryGreen),
-                    child: const Text('APROVAR', style: TextStyle(color: Colors.white)),
+                ? Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextButton(
+                        onPressed: () => _deleteUser(u),
+                        child: const Text('REJEITAR', style: TextStyle(color: AppTheme.excludeRed)),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () => _approveUser(u),
+                        style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryGreen),
+                        child: const Text('APROVAR', style: TextStyle(color: Colors.white)),
+                      ),
+                    ],
                   )
                 : IconButton(
-                    icon: const Icon(Icons.block, color: AppTheme.excludeRed),
-                    tooltip: 'Revogar Acesso',
-                    onPressed: () => _revokeUser(u),
-                  ),
+                      icon: const Icon(Icons.block, color: AppTheme.excludeRed),
+                      tooltip: 'Desativar Acesso',
+                      onPressed: () => _revokeUser(u),
+                    ),
           ),
         );
       },

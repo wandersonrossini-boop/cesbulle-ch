@@ -1,5 +1,9 @@
 package com.tesourariacme.api.presentation;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import com.tesourariacme.api.infrastructure.EnvelopeRepository;
 import com.tesourariacme.api.application.ContributorService;
 import com.tesourariacme.api.application.AttestationService;
 import com.tesourariacme.api.domain.Contributor;
@@ -68,8 +72,7 @@ public class ContributorController {
         }
     }
 
-    @PutMapping("/{id}")
-        @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id, Authentication authentication) {
         if (!isAuthorizedToManage(authentication)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");

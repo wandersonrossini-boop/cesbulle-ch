@@ -1,6 +1,7 @@
 package com.tesourariacme.api.presentation;
 
 import com.tesourariacme.api.application.ContributorService;
+import com.tesourariacme.api.infrastructure.EnvelopeRepository;
 import com.tesourariacme.api.application.AttestationService;
 import com.tesourariacme.api.domain.Contributor;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,7 @@ import static org.mockito.Mockito.*;
 public class ContributorControllerTest {
 
     private ContributorService service;
+    private EnvelopeRepository envelopeRepository;
     private AttestationService attestationService;
     private com.tesourariacme.api.application.AuditLogService auditLogService;
     private ContributorController controller;
@@ -31,7 +33,8 @@ public class ContributorControllerTest {
         service = mock(ContributorService.class);
         attestationService = mock(AttestationService.class);
         auditLogService = mock(com.tesourariacme.api.application.AuditLogService.class);
-        controller = new ContributorController(service, attestationService, auditLogService);
+        envelopeRepository = mock(EnvelopeRepository.class);
+        controller = new ContributorController(envelopeRepository, service, attestationService, auditLogService);
 
         treasurerAuth = mock(Authentication.class);
         when(treasurerAuth.getName()).thenReturn("tesoureiro");

@@ -20,6 +20,15 @@ import static org.mockito.Mockito.*;
 public class ServiceClosingControllerTest {
 
     private SubmitServiceClosingUseCase useCase;
+
+    
+    private com.tesourariacme.api.infrastructure.ServiceClosingAttachmentRepository attachmentRepository;
+
+    
+    private com.tesourariacme.api.infrastructure.StorageService storageService;
+
+    
+    private com.tesourariacme.api.infrastructure.ServiceClosingRepository serviceClosingRepository;
     private ServiceClosingSessionService sessionService;
     private com.tesourariacme.api.application.MonthlyPeriodService monthlyPeriodService;
     private ServiceClosingController controller;
@@ -29,6 +38,11 @@ public class ServiceClosingControllerTest {
     @BeforeEach
     public void setUp() {
         useCase = mock(SubmitServiceClosingUseCase.class);
+
+        attachmentRepository = mock(com.tesourariacme.api.infrastructure.ServiceClosingAttachmentRepository.class);
+        storageService = mock(com.tesourariacme.api.infrastructure.StorageService.class);
+        serviceClosingRepository = mock(com.tesourariacme.api.infrastructure.ServiceClosingRepository.class);
+
         sessionService = mock(ServiceClosingSessionService.class);
         monthlyPeriodService = mock(com.tesourariacme.api.application.MonthlyPeriodService.class);
         when(monthlyPeriodService.isPeriodLocked(any(LocalDate.class))).thenReturn(false);

@@ -17,6 +17,8 @@ class _ProfilePageState extends State<ProfilePage> {
   final UserApiService _apiService = UserApiService();
   final _nameCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
+  final _passConfirmCtrl = TextEditingController();
+  bool _obscurePass = true;
   
   bool _isLoading = true;
   bool _isSaving = false;
@@ -62,7 +64,13 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _saveProfile() async {
+    
+    if (_passCtrl.text.isNotEmpty && _passCtrl.text != _passConfirmCtrl.text) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('As senhas não coincidem!'), backgroundColor: AppTheme.excludeRed));
+      return;
+    }
     setState(() => _isSaving = true);
+    
     try {
       await _apiService.updateMyProfile(_nameCtrl.text.trim(), _passCtrl.text.trim(), _base64Avatar);
       if (mounted) {
@@ -167,11 +175,35 @@ class _ProfilePageState extends State<ProfilePage> {
                 decoration: const InputDecoration(labelText: 'Login (Nome de Usuário)', border: OutlineInputBorder(), fillColor: Color(0xFFF1F5F9), filled: true),
               ),
               const SizedBox(height: 16),
+              
+              const SizedBox(height: 16),
+              TextField(
+                controller: TextEditingController(text: 'CME Lausanne'),
+                readOnly: true,
+                decoration: const InputDecoration(labelText: 'Congregação', border: OutlineInputBorder(), fillColor: Color(0xFFF1F5F9), filled: true),
+              ),
+              const SizedBox(height: 32),
+              const Text('SEGURANÇA', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
+              const SizedBox(height: 16),
               TextField(
                 controller: _passCtrl,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: 'Nova Senha (deixe em branco para não alterar)', border: OutlineInputBorder()),
+                obscureText: _obscurePass,
+                decoration: InputDecoration(
+                  labelText: 'Nova Senha (deixe em branco para não alterar)', 
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscurePass ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () => setState(() => _obscurePass = !_obscurePass),
+                  ),
+                ),
               ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _passConfirmCtrl,
+                obscureText: _obscurePass,
+                decoration: const InputDecoration(labelText: 'Confirmar Nova Senha', border: OutlineInputBorder()),
+              ),
+
               const SizedBox(height: 32),
               
               SizedBox(
