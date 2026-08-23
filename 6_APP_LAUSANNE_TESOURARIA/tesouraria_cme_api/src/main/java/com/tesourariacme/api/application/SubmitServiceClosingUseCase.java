@@ -93,6 +93,7 @@ public class SubmitServiceClosingUseCase {
         if (monthlyPeriodService.isPeriodLocked(closing.getServiceDate())) {
             throw new IllegalStateException("O período contábil deste mês está trancado para auditoria.");
         }
-        repository.deleteById(id);
+        throw new IllegalStateException("Não é permitida a exclusão de cultos finalizados.");
     }
 }
+

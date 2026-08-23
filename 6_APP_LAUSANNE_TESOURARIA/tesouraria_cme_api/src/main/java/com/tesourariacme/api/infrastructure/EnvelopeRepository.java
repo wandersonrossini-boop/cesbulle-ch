@@ -12,6 +12,8 @@ import java.util.List;
 @Repository
 public interface EnvelopeRepository extends JpaRepository<Envelope, Long> {
 
+    long countByContributorId(Long contributorId);
+
     @Query("SELECT e FROM ServiceClosing sc JOIN sc.identifiedEntries e WHERE e.contributorId = :contributorId " +
            "AND sc.serviceDate >= :startDate AND sc.serviceDate <= :endDate")
     List<Envelope> findByContributorIdAndDateRange(
@@ -19,3 +21,4 @@ public interface EnvelopeRepository extends JpaRepository<Envelope, Long> {
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 }
+

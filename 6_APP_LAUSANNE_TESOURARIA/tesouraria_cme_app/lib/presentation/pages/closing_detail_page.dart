@@ -29,22 +29,17 @@ class ClosingDetailView extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Espelho Oficial do Culto'),
         actions: [
-          BlocBuilder<HistoryBloc, HistoryState>(
-            builder: (context, state) {
+          IconButton(
+            icon: const Icon(Icons.share),
+            tooltip: 'Compartilhar Relatório',
+            onPressed: () {
+              final state = context.read<HistoryBloc>().state;
               if (state is HistoryDetailLoaded) {
-                return Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.delete, color: AppTheme.excludeRed),
-                      tooltip: 'Excluir Fechamento',
-                      onPressed: () => _confirmDelete(context, state.detail.id),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.share),
-                      tooltip: 'Compartilhar Relatório',
-                      onPressed: () => _shareClosingDetails(state.detail),
-                    ),
-                  ],
+                _shareClosingDetails(state.detail);
+              }
+            },
+          ),
+        ],
                 );
               }
               return const SizedBox.shrink();
@@ -66,7 +61,10 @@ class ClosingDetailView extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           } else if (state is HistoryDetailLoaded) {
             final detail = state.detail;
-            return SingleChildScrollView(
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 900),
+                child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -80,7 +78,7 @@ class ClosingDetailView extends StatelessWidget {
                   _buildSummarySection(detail),
                 ],
               ),
-            );
+            )));
           }
           return const Center(child: Text("Erro ao carregar detalhes."));
         },

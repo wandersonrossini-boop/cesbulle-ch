@@ -13,7 +13,10 @@ public class ContributorService {
 
     private final ContributorRepository contributorRepository;
 
-    public ContributorService(ContributorRepository contributorRepository) {
+    private final com.tesourariacme.api.infrastructure.EnvelopeRepository envelopeRepository;
+
+    public ContributorService(ContributorRepository contributorRepository, com.tesourariacme.api.infrastructure.EnvelopeRepository envelopeRepository) {
+        this.envelopeRepository = envelopeRepository;
         this.contributorRepository = contributorRepository;
     }
 
@@ -70,7 +73,14 @@ public class ContributorService {
     public void delete(Long id) {
         Contributor existing = contributorRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Contribuinte não encontrado."));
-        existing.setActive(false);
-        contributorRepository.save(existing);
+        
+        long envelopeCount = envelopeRepository.countByContributorId(id);
+        if (envelopeCount == 0) {
+            contributorRepository.delete(existing);
+        } else {
+            existing.setActive(false);
+            contributorRepository.save(existing);
+        }
     }
 }
+

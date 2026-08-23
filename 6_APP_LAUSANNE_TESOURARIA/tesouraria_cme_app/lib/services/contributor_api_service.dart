@@ -13,6 +13,7 @@ class ContributorModel {
   final String phone;
   final String contributorNumber;
   final bool active;
+  final bool hasMovements;
 
   ContributorModel({
     required this.id,
@@ -24,6 +25,7 @@ class ContributorModel {
     required this.phone,
     required this.contributorNumber,
     required this.active,
+    this.hasMovements = false,
   });
 
   factory ContributorModel.fromJson(Map<String, dynamic> json) {

@@ -15,14 +15,17 @@ public class ContributorController {
     private final ContributorService contributorService;
     private final AttestationService attestationService;
     private final com.tesourariacme.api.application.AuditLogService auditLogService;
+    private final EnvelopeRepository envelopeRepository;
 
     public ContributorController(
+            EnvelopeRepository envelopeRepository,
             ContributorService contributorService,
             AttestationService attestationService,
             com.tesourariacme.api.application.AuditLogService auditLogService) {
         this.contributorService = contributorService;
         this.attestationService = attestationService;
         this.auditLogService = auditLogService;
+        this.envelopeRepository = envelopeRepository;
     }
 
     private boolean isAuthorizedToManage(Authentication authentication) {
@@ -35,7 +38,22 @@ public class ContributorController {
         if (!isAuthorizedToManage(authentication)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");
         }
-        return ResponseEntity.ok(contributorService.getAll(search));
+        List<Contributor> list = contributorService.getAll(search);
+        List<Map<String, Object>> result = list.stream().map(c -> {
+            Map<String, Object> map = new java.util.HashMap<>();
+            map.put("id", c.getId());
+            map.put("fullName", c.getFullName());
+            map.put("address", c.getAddress());
+            map.put("postalCode", c.getPostalCode());
+            map.put("city", c.getCity());
+            map.put("email", c.getEmail());
+            map.put("phone", c.getPhone());
+            map.put("contributorNumber", c.getContributorNumber());
+            map.put("active", c.isActive());
+            map.put("hasMovements", envelopeRepository.countByContributorId(c.getId()) > 0);
+            return map;
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping
@@ -45,6 +63,21 @@ public class ContributorController {
         }
         try {
             return ResponseEntity.ok(contributorService.create(contributor));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}")
+        @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id, Authentication authentication) {
+        if (!isAuthorizedToManage(authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");
+        }
+        try {
+            contributorService.delete(id);
+            auditLogService.logAction("CONTRIBUTOR_DELETED", authentication.getName(), String.valueOf(id), "Contribuinte removido/desativado.");
+            return ResponseEntity.ok().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -97,3 +130,5 @@ public class ContributorController {
         }
     }
 }
+
+
