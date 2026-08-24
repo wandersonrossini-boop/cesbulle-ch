@@ -39,13 +39,18 @@ public class MovementService {
         for (ServiceClosing closing : closings) {
             BigDecimal total = closing.getPhysicalTotal();
             totalIncomes = totalIncomes.add(total);
-            
+
+            String treasurer = closing.getMainTreasurer() != null ? closing.getMainTreasurer() : "";
+            String incomeDesc = treasurer.isEmpty()
+                    ? "Fechamento do culto"
+                    : "Fechamento do culto — " + treasurer;
+
             items.add(MovementDTO.builder()
-                    .id("INC-" + closing.getId())
+                    .id(String.valueOf(closing.getId()))
                     .date(closing.getServiceDate())
                     .type("INCOME")
                     .category("Fechamento de Culto")
-                    .description("Culto")
+                    .description(incomeDesc)
                     .value(total)
                     .status("COMPLETED")
                     .build());
@@ -56,7 +61,7 @@ public class MovementService {
             totalOutcomes = totalOutcomes.add(val);
 
             items.add(MovementDTO.builder()
-                    .id("OUT-" + expense.getId())
+                    .id(String.valueOf(expense.getId()))
                     .date(expense.getExpenseDate())
                     .type("OUTCOME")
                     .category(expense.getCategory() != null ? expense.getCategory() : "Despesa")
