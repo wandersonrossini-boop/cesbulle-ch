@@ -22,19 +22,12 @@ class DashboardClosingList extends StatelessWidget {
   }
 
   Widget _buildStatusBadge({bool small = false}) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: small ? 6 : 8, vertical: small ? 2 : 4),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE6F4EA), // Soft light green
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        'Fechado',
-        style: TextStyle(
-          color: const Color(0xFF137333), // Soft dark green
-          fontSize: small ? 10 : 11,
-          fontWeight: FontWeight.bold,
-        ),
+    return Text(
+      'Fechado',
+      style: TextStyle(
+        color: const Color(0xFF137333),
+        fontSize: small ? 10 : 11,
+        fontWeight: FontWeight.w600,
       ),
     );
   }

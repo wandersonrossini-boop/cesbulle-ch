@@ -1,7 +1,4 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:image/image.dart' as img;
 import '../../services/user_api_service.dart';
 import '../../core/theme.dart';
 import '../widgets/app_sidebar_drawer.dart';
@@ -24,7 +21,6 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _isSaving = false;
   String? _error;
   AppUser? _user;
-  String? _base64Avatar;
 
   @override
   void initState() {
@@ -39,27 +35,10 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() {
         _user = user;
         _nameCtrl.text = user.name;
-        _base64Avatar = user.avatarBase64;
         _isLoading = false;
       });
     } catch (e) {
       setState(() { _error = e.toString(); _isLoading = false; });
-    }
-  }
-
-  Future<void> _pickAvatar() async {
-    final picker = ImagePicker();
-    final xfile = await picker.pickImage(source: ImageSource.gallery, maxWidth: 300, maxHeight: 300);
-    if (xfile != null) {
-      final bytes = await xfile.readAsBytes();
-      final image = img.decodeImage(bytes);
-      if (image != null) {
-        final resized = img.copyResize(image, width: 150, height: 150);
-        final jpegBytes = img.encodeJpg(resized, quality: 60);
-        setState(() {
-          _base64Avatar = base64Encode(jpegBytes);
-        });
-      }
     }
   }
 
@@ -72,7 +51,7 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() => _isSaving = true);
     
     try {
-      await _apiService.updateMyProfile(_nameCtrl.text.trim(), _passCtrl.text.trim(), _base64Avatar);
+      await _apiService.updateMyProfile(_nameCtrl.text.trim(), _passCtrl.text.trim(), null);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Perfil atualizado!')));
         _passCtrl.clear();
@@ -115,8 +94,8 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: isDesktop
           ? null
           : AppBar(
-              backgroundColor: Colors.white,
-              foregroundColor: const Color(0xFF0F172A),
+              backgroundColor: AppTheme.institutionalBlue,
+              foregroundColor: Colors.white,
               elevation: 0,
               title: const Text('Meu Perfil', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             ),
@@ -138,32 +117,7 @@ class _ProfilePageState extends State<ProfilePage> {
               const Text('Meu Perfil', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
               const SizedBox(height: 32),
               
-              // Avatar Config
-              Center(
-                child: GestureDetector(
-                  onTap: _pickAvatar,
-                  child: Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 60,
-                        backgroundColor: Colors.grey.shade200,
-                        backgroundImage: _base64Avatar != null ? MemoryImage(base64Decode(_base64Avatar!)) : null,
-                        child: _base64Avatar == null ? const Icon(Icons.person, size: 60, color: Colors.grey) : null,
-                      ),
-                      Positioned(
-                        bottom: 0, right: 0,
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: const BoxDecoration(color: AppTheme.primaryGreen, shape: BoxShape.circle),
-                          child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 32),
-              
+
               TextField(
                 controller: _nameCtrl,
                 decoration: const InputDecoration(labelText: 'Nome Completo', border: OutlineInputBorder()),
@@ -211,8 +165,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: _isSaving ? null : _saveProfile,
-                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryGreen),
-                  child: _isSaving ? const CircularProgressIndicator(color: Colors.white) : const Text('SALVAR ALTERAÇÕES', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.institutionalBlue),
+                  child: _isSaving ? const CircularProgressIndicator(color: Colors.white) : const Text('Salvar alterações', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                 ),
               )
             ],

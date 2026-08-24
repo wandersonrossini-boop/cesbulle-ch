@@ -19,6 +19,7 @@ import '../widgets/app_sidebar_drawer.dart';
 import '../widgets/dashboard_summary_cards.dart';
 import '../../domain/service_closing_history_models.dart';
 import '../../core/monetary_utils.dart';
+import '../../core/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -121,8 +122,8 @@ class _DashboardViewState extends State<DashboardView> {
       appBar: isDesktop
           ? null
           : AppBar(
-              backgroundColor: Colors.white,
-              foregroundColor: const Color(0xFF0F172A),
+              backgroundColor: AppTheme.institutionalBlue,
+              foregroundColor: Colors.white,
               elevation: 0,
               shape: const Border(bottom: BorderSide(color: Color(0xFFE5E7EB), width: 1)),
               title: const Text(
@@ -381,7 +382,7 @@ class _DashboardViewState extends State<DashboardView> {
         icon: Icons.add_circle_outline_rounded,
         title: 'Contagem do culto',
         subtitle: 'Submeter ata de culto',
-        color: const Color(0xFF1E3A8A),
+        color: AppTheme.institutionalBlue,
         onTap: () {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => const WizardPage()),
@@ -558,7 +559,7 @@ class _DashboardViewState extends State<DashboardView> {
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E3A8A),
+                  color: AppTheme.institutionalBlue,
                 ),
               ),
             ),
@@ -745,12 +746,12 @@ class LineChartPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     final paintLineSaldo = Paint()
-      ..color = const Color(0xFF1E3A8A) // deep blue
+      ..color = AppTheme.institutionalBlue // deep blue
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 
     final paintPointSaldo = Paint()
-      ..color = const Color(0xFF1E3A8A)
+      ..color = AppTheme.institutionalBlue
       ..style = PaintingStyle.fill;
 
     final paintGrid = Paint()

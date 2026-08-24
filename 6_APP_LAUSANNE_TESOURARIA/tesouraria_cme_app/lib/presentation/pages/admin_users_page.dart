@@ -94,8 +94,8 @@ Future<void> _approveUser(AppUser user) async {
       appBar: isDesktop
           ? null
           : AppBar(
-              backgroundColor: Colors.white,
-              foregroundColor: const Color(0xFF0F172A),
+              backgroundColor: AppTheme.institutionalBlue,
+              foregroundColor: Colors.white,
               elevation: 0,
               title: const Text('Administração de Tesoureiros', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             ),
@@ -148,8 +148,11 @@ Future<void> _approveUser(AppUser user) async {
           margin: const EdgeInsets.only(bottom: 8),
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor: AppTheme.primaryGreen.withOpacity(0.2),
-              child: const Icon(Icons.person, color: AppTheme.primaryGreen),
+              backgroundColor: AppTheme.institutionalBlue.withOpacity(0.1),
+              child: Text(
+                u.name.isNotEmpty ? u.name[0].toUpperCase() : '?',
+                style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.institutionalBlue),
+              ),
             ),
             title: Text(u.name, style: const TextStyle(fontWeight: FontWeight.bold)),
             subtitle: Text('@${u.username} • ${u.role == 'ADMIN' ? 'Administrador' : 'Tesoureiro'}'),
@@ -159,19 +162,19 @@ Future<void> _approveUser(AppUser user) async {
                     children: [
                       TextButton(
                         onPressed: () => _deleteUser(u),
-                        child: const Text('REJEITAR', style: TextStyle(color: AppTheme.excludeRed)),
+                        child: const Text('Rejeitar', style: TextStyle(color: AppTheme.excludeRed)),
                       ),
                       const SizedBox(width: 8),
                       ElevatedButton(
                         onPressed: () => _approveUser(u),
                         style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryGreen),
-                        child: const Text('APROVAR', style: TextStyle(color: Colors.white)),
+                        child: const Text('Aprovar', style: TextStyle(color: Colors.white)),
                       ),
                     ],
                   )
-                : IconButton(
-                      icon: const Icon(Icons.block, color: AppTheme.excludeRed),
-                      tooltip: 'Desativar Acesso',
+                : TextButton.icon(
+                      icon: const Icon(Icons.block, color: AppTheme.excludeRed, size: 18),
+                      label: const Text('Desativar acesso', style: TextStyle(color: AppTheme.excludeRed)),
                       onPressed: () => _revokeUser(u),
                     ),
           ),

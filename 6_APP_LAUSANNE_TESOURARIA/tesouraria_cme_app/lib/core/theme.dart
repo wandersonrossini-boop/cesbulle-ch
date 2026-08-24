@@ -3,9 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // Cores institucionais sóbrias
-  static const Color institutionalBlue = Color(0xFF1E3A8A); // Azul institucional principal
-  static const Color primaryGreen = Color(0xFF10B981); // Verde apenas para confirmação/sucesso
-  static const Color excludeRed = Color(0xFFDC2626); // Vermelho para erro/destrutivo
+  static const Color institutionalBlue = Color(0xFF003366); // Azul institucional principal
+  static const Color primaryGreen = Color(0xFF006B2F); // Verde para aprovação/conciliação
+  static const Color excludeRed = Color(0xFFC41E3A); // Vermelho para erro/destrutivo
   static const Color darkSidebar = Color(0xFF0F172A); // Dark slate para sidebar desktop
   static const Color backgroundLight = Color(0xFFF8FAFC); // Fundo cinza ultraleve contábil
   static const Color textDark = Color(0xFF0F172A); // Texto principal (Slate 900)
@@ -24,18 +24,18 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: backgroundLight,
       appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.white,
-        foregroundColor: textDark,
+        backgroundColor: institutionalBlue,
+        foregroundColor: Colors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
         titleTextStyle: TextStyle(
-          color: textDark,
+          color: Colors.white,
           fontSize: 18,
           fontWeight: FontWeight.w600,
           letterSpacing: -0.5,
         ),
-        iconTheme: IconThemeData(color: textDark),
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(

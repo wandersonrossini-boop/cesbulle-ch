@@ -184,7 +184,7 @@ class _WizardPageState extends State<WizardPage> {
                 Navigator.pop(dlgContext);
                 _startSyncTimer();
               },
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1E3A8A), foregroundColor: Colors.white),
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.institutionalBlue, foregroundColor: Colors.white),
               child: const Text("RETOMAR"),
             ),
           ],
@@ -320,13 +320,13 @@ class _WizardPageState extends State<WizardPage> {
             appBar: (isDesktop && (_phase == ClosingPhase.setup || _phase == ClosingPhase.counting))
                 ? null // Hide AppBar on desktop setup/counting phase to match dashboard and mock
                 : AppBar(
-                    backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFF0F172A),
+                    backgroundColor: AppTheme.institutionalBlue,
+                    foregroundColor: Colors.white,
                     elevation: 0,
-                    shape: const Border(bottom: BorderSide(color: Color(0xFFE5E7EB), width: 1)),
+                    shape: null,
                     title: Text(
                       _getAppBarTitle(),
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF0F172A)),
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
                     ),
                     leading: _phase != ClosingPhase.setup
                         ? IconButton(
@@ -372,7 +372,7 @@ class _WizardPageState extends State<WizardPage> {
       return const Scaffold(
         backgroundColor: Color(0xFFFAFAFA),
         body: Center(
-          child: CircularProgressIndicator(color: Color(0xFF1E3A8A)),
+          child: CircularProgressIndicator(color: AppTheme.institutionalBlue),
         ),
       );
     }
@@ -722,7 +722,7 @@ class _WizardPageState extends State<WizardPage> {
                                       }
                                     },
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: isResume ? const Color(0xFFEA580C) : const Color(0xFF1E3A8A),
+                                      backgroundColor: isResume ? const Color(0xFFEA580C) : AppTheme.institutionalBlue,
                                       foregroundColor: Colors.white,
                                       elevation: 0,
                                       shape: RoundedRectangleBorder(
@@ -806,7 +806,7 @@ class _WizardPageState extends State<WizardPage> {
                         style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF1E3A8A),
+                          color: AppTheme.institutionalBlue,
                         ),
                       ),
                     ],
@@ -814,7 +814,7 @@ class _WizardPageState extends State<WizardPage> {
                     ElevatedButton(
                       onPressed: onActionButtonPressed,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1E3A8A),
+                        backgroundColor: AppTheme.institutionalBlue,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -947,7 +947,7 @@ class _WizardPageState extends State<WizardPage> {
                       Icon(
                         Icons.person_search_outlined,
                         size: 16,
-                        color: _memberNameController.text.isNotEmpty ? const Color(0xFF1E3A8A) : const Color(0xFF64748B),
+                        color: _memberNameController.text.isNotEmpty ? AppTheme.institutionalBlue : const Color(0xFF64748B),
                       ),
                       const SizedBox(width: 6),
                       Text(
@@ -957,7 +957,7 @@ class _WizardPageState extends State<WizardPage> {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: _memberNameController.text.isNotEmpty ? FontWeight.bold : FontWeight.normal,
-                          color: _memberNameController.text.isNotEmpty ? const Color(0xFF1E3A8A) : const Color(0xFF64748B),
+                          color: _memberNameController.text.isNotEmpty ? AppTheme.institutionalBlue : const Color(0xFF64748B),
                           decoration: TextDecoration.underline,
                         ),
                       ),
@@ -1093,7 +1093,7 @@ class _WizardPageState extends State<WizardPage> {
                               style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: _memberNameController.text.isNotEmpty ? FontWeight.bold : FontWeight.normal,
-                                  color: _memberNameController.text.isNotEmpty ? const Color(0xFF1E3A8A) : const Color(0xFF64748B),
+                                  color: _memberNameController.text.isNotEmpty ? AppTheme.institutionalBlue : const Color(0xFF64748B),
                               ),
                             ),
                             const Icon(Icons.arrow_drop_down, color: Color(0xFF64748B)),
@@ -1287,13 +1287,13 @@ class _WizardPageState extends State<WizardPage> {
     return ElevatedButton(
       onPressed: () => _registerEntry(context),
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF1E3A8A),
+        backgroundColor: AppTheme.institutionalBlue,
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 20),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         elevation: 0,
       ),
-      child: const Text("REGISTRAR", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 0.5)),
+      child: const Text("Registrar", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 0.5)),
     );
   }
 
@@ -1304,7 +1304,7 @@ class _WizardPageState extends State<WizardPage> {
           _syncTimer?.cancel();
           setState(() => _phase = ClosingPhase.review);
         },
-        child: const Text("Ir para revisão →", style: TextStyle(color: Color(0xFF1E3A8A), fontSize: 13, fontWeight: FontWeight.bold)),
+        child: const Text("Ir para revisão →", style: TextStyle(color: AppTheme.institutionalBlue, fontSize: 13, fontWeight: FontWeight.bold)),
       ),
     );
   }
@@ -1327,7 +1327,7 @@ class _WizardPageState extends State<WizardPage> {
                     
             return Expanded(
               child: Material(
-                color: isSelected ? const Color(0xFF1E3A8A) : Colors.white,
+                color: isSelected ? AppTheme.institutionalBlue : Colors.white,
                 child: InkWell(
                   onTap: () {
                     setState(() {
@@ -1429,7 +1429,7 @@ class _WizardPageState extends State<WizardPage> {
                                     icon: const Icon(Icons.add, size: 18),
                                     label: Text('Usar "${filterText.trim()}"'),
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF1E3A8A),
+                                      backgroundColor: AppTheme.institutionalBlue,
                                       foregroundColor: Colors.white,
                                       elevation: 0,
                                     ),
@@ -1669,7 +1669,7 @@ class _WizardPageState extends State<WizardPage> {
                   child: Center(
                     child: InkWell(
                       onTap: () => _showAllIdentifiedEntriesDialog(context, state),
-                      child: const Text("Ver todos os lançamentos  >", style: TextStyle(color: Color(0xFF1E3A8A), fontSize: 13, fontWeight: FontWeight.w600)),
+                      child: const Text("Ver todos os lançamentos  >", style: TextStyle(color: AppTheme.institutionalBlue, fontSize: 13, fontWeight: FontWeight.w600)),
                     ),
                   ),
                 ),
@@ -1721,7 +1721,7 @@ class _WizardPageState extends State<WizardPage> {
                   child: Center(
                     child: InkWell(
                       onTap: () => _showAllAnonymousEntriesDialog(context, state),
-                      child: const Text("Ver todos os lançamentos anônimos  >", style: TextStyle(color: Color(0xFF1E3A8A), fontSize: 13, fontWeight: FontWeight.w600)),
+                      child: const Text("Ver todos os lançamentos anônimos  >", style: TextStyle(color: AppTheme.institutionalBlue, fontSize: 13, fontWeight: FontWeight.w600)),
                     ),
                   ),
                 ),
@@ -1745,7 +1745,7 @@ class _WizardPageState extends State<WizardPage> {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    _mathRow("Dízimos Nominais (CHF)", state.identifiedTotalBy(EnvelopeType.dizimo) + state.anonymousTotalBy(EnvelopeType.dizimo), isBold: true),
+                    _mathRow("Dízimos", state.identifiedTotalBy(EnvelopeType.dizimo) + state.anonymousTotalBy(EnvelopeType.dizimo), isBold: true),
                     const SizedBox(height: 12),
                     _mathRow("Ofertas Gerais (CHF)", state.identifiedTotalBy(EnvelopeType.oferta) + state.anonymousTotalBy(EnvelopeType.oferta), isBold: true),
                     const SizedBox(height: 12),
@@ -1762,8 +1762,8 @@ class _WizardPageState extends State<WizardPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("TOTAL FINAL CONSOLIDADO", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1E3A8A))),
-                    Text("CHF ${BigDecimalConverter.fromRappen(state.registeredTotal).toStringAsFixed(2)}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1E3A8A))),
+                    const Text("Total final consolidado", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.institutionalBlue)),
+                    Text("CHF ${BigDecimalConverter.fromRappen(state.registeredTotal).toStringAsFixed(2)}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.institutionalBlue)),
                   ],
                 ),
               ),
@@ -1787,7 +1787,7 @@ class _WizardPageState extends State<WizardPage> {
                 "Diferença", 
                 state.difference, 
                 isBold: true, 
-                color: state.difference == 0 ? const Color(0xFF1E3A8A) : AppTheme.excludeRed
+                color: state.difference == 0 ? AppTheme.institutionalBlue : AppTheme.excludeRed
               ),
               if (state.difference != 0)
                 const Padding(
@@ -1801,8 +1801,8 @@ class _WizardPageState extends State<WizardPage> {
                 icon: const Icon(Icons.calculate_outlined, size: 18),
                 label: const Text("INFORMAR TOTAL FÍSICO"),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFF1E3A8A),
-                  side: const BorderSide(color: Color(0xFF1E3A8A)),
+                  foregroundColor: AppTheme.institutionalBlue,
+                  side: const BorderSide(color: AppTheme.institutionalBlue),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                 ),
@@ -1851,7 +1851,7 @@ class _WizardPageState extends State<WizardPage> {
             );
           } : null,
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF1E3A8A), 
+            backgroundColor: AppTheme.institutionalBlue, 
             foregroundColor: Colors.white,
             disabledBackgroundColor: const Color(0xFFE5E7EB),
             disabledForegroundColor: const Color(0xFF9CA3AF),
@@ -1861,7 +1861,7 @@ class _WizardPageState extends State<WizardPage> {
           ),
           child: state.isSubmitting
               ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-              : const Text("ENVIAR FECHAMENTO", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              : const Text("Finalizar fechamento", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
         ),
         if (state.error != null)
           Padding(
@@ -2052,7 +2052,7 @@ class _WizardPageState extends State<WizardPage> {
                             child: TextButton(
                               onPressed: () => Navigator.pop(dlgContext),
                               style: TextButton.styleFrom(
-                                foregroundColor: const Color(0xFF1E3A8A),
+                                foregroundColor: AppTheme.institutionalBlue,
                                 padding: const EdgeInsets.symmetric(vertical: 16),
                               ),
                               child: const Text("CANCELAR", style: TextStyle(fontWeight: FontWeight.bold)),
@@ -2066,7 +2066,7 @@ class _WizardPageState extends State<WizardPage> {
                                 Navigator.pop(dlgContext);
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF1E3A8A),
+                                backgroundColor: AppTheme.institutionalBlue,
                                 foregroundColor: Colors.white,
                                 padding: const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),

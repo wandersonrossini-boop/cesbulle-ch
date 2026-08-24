@@ -3,6 +3,7 @@ import '../../services/draft_service.dart';
 import '../../services/fechamento_api_service.dart';
 import '../../services/user_api_service.dart';
 import '../../services/service_schedule_api_service.dart';
+import '../../core/theme.dart';
 import '../widgets/app_sidebar_drawer.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -102,8 +103,8 @@ class _SettingsPageState extends State<SettingsPage> {
       appBar: isDesktop
           ? null
           : AppBar(
-              backgroundColor: Colors.white,
-              foregroundColor: const Color(0xFF0F172A),
+              backgroundColor: AppTheme.institutionalBlue,
+              foregroundColor: Colors.white,
               elevation: 0,
               shape: const Border(bottom: BorderSide(color: Color(0xFFE5E7EB), width: 1)),
               title: const Text(
@@ -131,8 +132,28 @@ class _SettingsPageState extends State<SettingsPage> {
                         icon: Icons.church_outlined,
                         children: [
                           _buildInfoRow('Congregação', 'CME Lausanne'),
+                          _buildInfoRow('Endereço', 'Chemin de la Colline 7, 1007 Lausanne'),
                           _buildInfoRow('Moeda Padrão', 'CHF (Franco Suíço)'),
                           _buildInfoRow('Sub-unidade', 'Rappen (1 CHF = 100 Rappen)'),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      _buildSectionCard(
+                        title: 'Sessões',
+                        icon: Icons.manage_accounts_outlined,
+                        children: [
+                          SwitchListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: const Text('Sessões ativas', style: TextStyle(fontSize: 14, color: Color(0xFF0F172A))),
+                            subtitle: const Text('Permite que outros dispositivos mantenham sessão aberta', style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
+                            value: true,
+                            activeColor: AppTheme.institutionalBlue,
+                            onChanged: (val) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Controle de sessões em breve')),
+                              );
+                            },
+                          ),
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -235,7 +256,7 @@ class _SettingsPageState extends State<SettingsPage> {
         children: [
           Row(
             children: [
-              Icon(icon, size: 20, color: const Color(0xFF1E3A8A)),
+              Icon(icon, size: 20, color: AppTheme.institutionalBlue),
               const SizedBox(width: 10),
               Text(
                 title,
@@ -302,7 +323,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   children: [
                     Switch(
                       value: schedule.active,
-                      activeColor: const Color(0xFF1E3A8A),
+                      activeColor: AppTheme.institutionalBlue,
                       onChanged: (val) async {
                         try {
                           await _scheduleApiService.toggleActive(schedule.id);
@@ -331,7 +352,7 @@ class _SettingsPageState extends State<SettingsPage> {
           icon: const Icon(Icons.add),
           label: const Text('Cadastrar Culto Habitual'),
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF1E3A8A),
+            backgroundColor: AppTheme.institutionalBlue,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           ),
@@ -471,7 +492,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   }
                 }
               },
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1E3A8A), foregroundColor: Colors.white),
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.institutionalBlue, foregroundColor: Colors.white),
               child: const Text('SALVAR'),
             ),
           ],

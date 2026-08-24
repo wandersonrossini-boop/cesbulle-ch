@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
+import com.tesourariacme.api.infrastructure.ServiceClosingAttachmentRepository;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -26,8 +27,10 @@ import com.tesourariacme.api.domain.ServiceSchedule;
 @RequestMapping("/api/fechamento-culto")
 
 public class ServiceClosingController {
+
+
     @Autowired
-    private com.tesourariacme.api.infrastructure.ServiceClosingAttachmentRepository attachmentRepository;
+    private ServiceClosingAttachmentRepository attachmentRepository;
     @Autowired
     private com.tesourariacme.api.infrastructure.StorageService storageService;
 
@@ -150,9 +153,7 @@ public class ServiceClosingController {
 
     @GetMapping("/draft")
     public ResponseEntity<?> getDraft() {
-        if (activeDraft == null) {
-            return ResponseEntity.notFound().build();
-        }
+        // Always return 200 with body (may be null) to simplify client handling
         return ResponseEntity.ok(activeDraft);
     }
 

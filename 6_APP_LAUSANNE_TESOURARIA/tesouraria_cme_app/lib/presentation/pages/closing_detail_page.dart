@@ -57,7 +57,7 @@ Widget build(BuildContext context) {
             final detail = state.detail;
             return Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 900),
+                constraints: BoxConstraints(maxWidth: 900),
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
                   child: Column(
