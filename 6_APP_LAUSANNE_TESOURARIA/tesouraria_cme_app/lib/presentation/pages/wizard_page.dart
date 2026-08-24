@@ -539,215 +539,276 @@ class _WizardPageState extends State<WizardPage> {
     }
 
     if (!hasSchedule) {
+      // Helper to build a single occurrence card (shared between mobile and desktop)
+      Widget buildOccurrenceCard(dynamic occ) {
+        final bool isResume = occ['sessionStatus'] != 'NO_SESSION';
+        final String rawDate = occ['date'] as String;
+        String displayDateStr = rawDate;
+        try {
+          final parsedDate = DateTime.parse(rawDate);
+          final weekday = const ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'][parsedDate.weekday - 1];
+          final month = const ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'][parsedDate.month - 1];
+          displayDateStr = "$weekday, ${parsedDate.day} de $month";
+        } catch (_) {}
+
+        final String timeRange = "${formatTime(occ['startTime'])} - ${formatTime(occ['endTime'])}";
+        final String statusLabel = isResume ? 'Contagem em andamento' : 'Contagem não realizada';
+        final Color statusColor = isResume ? const Color(0xFF0369A1) : const Color(0xFF64748B);
+
+        return Card(
+          margin: const EdgeInsets.only(bottom: 10),
+          elevation: 0,
+          color: const Color(0xFFF8FAFC),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+            side: const BorderSide(color: Color(0xFFE2E8F0)),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  displayDateStr,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF0F172A),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  "${occ['serviceType']} · $timeRange",
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  statusLabel,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: statusColor,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                ElevatedButton(
+                  onPressed: _isConnecting ? null : () async {
+                    setState(() { _isConnecting = true; });
+                    try {
+                      final currentUserName = await _getCurrentUserName();
+                      final apiService = FechamentoApiService();
+                      final resolvedSession = await apiService.createLateSession(
+                        occ['scheduleId'] as int,
+                        occ['date'] as String,
+                      );
+
+                      final int? sessId = resolvedSession['id'] as int?;
+                      final DateTime sDate = DateTime.parse(resolvedSession['serviceDate'] as String);
+                      final String sStartTime = resolvedSession['serviceTime'] as String;
+                      final String sEndTime = resolvedSession['serviceEndTime'] as String;
+                      final String? sType = resolvedSession['serviceType'] as String?;
+
+                      ServiceClosingState? sessionDraft;
+                      if (sessId != null && isResume) {
+                        try {
+                          sessionDraft = await apiService.getSessionDraftFromServer(sessId);
+                        } catch (_) {}
+                      }
+
+                      if (sessionDraft != null && mounted) {
+                        ServiceClosingState joinedDraft = sessionDraft;
+                        if (sessionDraft.mainTreasurer != currentUserName) {
+                          String newCoTreasurer = sessionDraft.coTreasurer ?? "";
+                          if (!newCoTreasurer.contains(currentUserName)) {
+                            newCoTreasurer = newCoTreasurer.isEmpty
+                                ? currentUserName
+                                : "$newCoTreasurer, $currentUserName";
+                          }
+                          joinedDraft = sessionDraft.copyWith(coTreasurer: newCoTreasurer);
+                        }
+                        final finalDraft = joinedDraft.copyWith(
+                          sessionId: sessId,
+                          date: sDate,
+                          serviceTime: sStartTime,
+                          serviceEndTime: sEndTime,
+                          serviceType: sType,
+                        );
+                        _bloc.add(RestoreDraftEvent(finalDraft));
+                        setState(() {
+                          _selectedDate = sDate;
+                          _coTreasurerController.text = finalDraft.coTreasurer ?? "";
+                          _verifierNameController.text = finalDraft.verifierName ?? "";
+                          _phase = ClosingPhase.counting;
+                        });
+                        _startSyncTimer();
+                      } else {
+                        _initializeCleanSession(sessId, sDate, currentUserName, sStartTime, sEndTime, sType);
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text('Erro ao iniciar contagem: ${e.toString()}'),
+                          backgroundColor: Colors.red,
+                        ));
+                      }
+                    } finally {
+                      if (mounted) setState(() { _isConnecting = false; });
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.institutionalBlue,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: Text(
+                    isResume ? "CONTINUAR CONTAGEM" : "REGISTRAR CONTAGEM",
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
+      // Sort most recent first
+      final sortedOccurrences = List<dynamic>.from(_pendingOccurrences)
+        ..sort((a, b) => (b['date'] as String).compareTo(a['date'] as String));
+
+      // Status message panel (used in both layouts)
+      Widget statusPanel({CrossAxisAlignment crossAxis = CrossAxisAlignment.center, TextAlign textAlign = TextAlign.center}) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: crossAxis,
+          children: [
+            Icon(Icons.calendar_today_outlined, size: 32, color: const Color(0xFF94A3B8)),
+            const SizedBox(height: 16),
+            Text(
+              "Nenhum culto em horário de contagem agora.",
+              textAlign: textAlign,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF0F172A),
+              ),
+            ),
+            if (sortedOccurrences.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                "Abaixo estão os cultos anteriores que ainda precisam de fechamento.",
+                textAlign: textAlign,
+                style: const TextStyle(fontSize: 13, color: Color(0xFF64748B), height: 1.4),
+              ),
+            ] else ...[
+              const SizedBox(height: 8),
+              Text(
+                "As contagens são liberadas conforme a agenda de cultos.",
+                textAlign: textAlign,
+                style: const TextStyle(fontSize: 13, color: Color(0xFF64748B), height: 1.4),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: _isConnecting ? null : () => _checkCurrentStatus(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.institutionalBlue,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                child: const Text("VERIFICAR NOVAMENTE", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ],
+        );
+      }
+
       return Container(
         color: const Color(0xFFFAFAFA),
         width: double.infinity,
-        height: double.infinity,
         child: Center(
           child: SingleChildScrollView(
-            child: Container(
-              constraints: const BoxConstraints(maxWidth: 480),
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
-              child: Card(
-                color: Colors.white,
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: Color(0xFFE2E8F0)),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(32.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const Icon(Icons.event_busy_outlined, size: 72, color: Color(0xFF64748B)),
-                      const SizedBox(height: 24),
-                      const Text(
-                        "Não há contagem disponível neste momento.",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        "As contagens são liberadas conforme a agenda de cultos.",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Color(0xFF64748B),
-                        ),
-                      ),
-                      if (_pendingOccurrences.isNotEmpty) ...[
-                        const SizedBox(height: 32),
-                        const Divider(),
-                        const SizedBox(height: 16),
-                        const Text(
-                          "Cultos anteriores sem contagem",
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF334155),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 800),
+              child: isDesktop && sortedOccurrences.isNotEmpty
+                  // ── Desktop two-panel layout ──
+                  ? Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Left: status message (1/3)
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            padding: const EdgeInsets.all(28),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: const Color(0xFFE2E8F0)),
+                            ),
+                            child: statusPanel(
+                              crossAxis: CrossAxisAlignment.start,
+                              textAlign: TextAlign.left,
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        ..._pendingOccurrences.map((occ) {
-                          final bool isResume = occ['sessionStatus'] != 'NO_SESSION';
-                          final String rawDate = occ['date'];
-                          // Parse date to format nicely (e.g. "Domingo, 23 de agosto")
-                          String displayDateStr = rawDate;
-                          try {
-                            final parsedDate = DateTime.parse(rawDate);
-                            // Simple formatting matching: Domingo, 23 de agosto
-                            final weekday = const ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'][parsedDate.weekday - 1];
-                            final month = const ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'][parsedDate.month - 1];
-                            displayDateStr = "$weekday, ${parsedDate.day} de $month";
-                          } catch (_) {}
-
-                          final String timeRange = "${formatTime(occ['startTime'])} - ${formatTime(occ['endTime'])}";
-
-                          return Card(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            elevation: 0,
-                            color: const Color(0xFFF8FAFC),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              side: const BorderSide(color: Color(0xFFE2E8F0)),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Text(
-                                    displayDateStr,
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF0F172A),
-                                    ),
+                        const SizedBox(width: 20),
+                        // Right: pending occurrences (2/3)
+                        Expanded(
+                          flex: 2,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(bottom: 10),
+                                child: Text(
+                                  'Cultos anteriores pendentes',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF334155),
+                                    letterSpacing: 0.5,
                                   ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    "${occ['serviceType']} · $timeRange",
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Color(0xFF64748B),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  ElevatedButton(
-                                    onPressed: _isConnecting ? null : () async {
-                                      setState(() {
-                                        _isConnecting = true;
-                                      });
-                                      try {
-                                        final currentUserName = await _getCurrentUserName();
-                                        final apiService = FechamentoApiService();
-                                        
-                                        // POST /session/late to start/resume late counting
-                                        final resolvedSession = await apiService.createLateSession(
-                                          occ['scheduleId'] as int,
-                                          occ['date'] as String,
-                                        );
-
-                                        final int? sessId = resolvedSession['id'] as int?;
-                                        final DateTime sDate = DateTime.parse(resolvedSession['serviceDate'] as String);
-                                        final String sStartTime = resolvedSession['serviceTime'] as String;
-                                        final String sEndTime = resolvedSession['serviceEndTime'] as String;
-                                        final String? sType = resolvedSession['serviceType'] as String?;
-
-                                        ServiceClosingState? sessionDraft;
-                                        if (sessId != null && isResume) {
-                                          try {
-                                            sessionDraft = await apiService.getSessionDraftFromServer(sessId);
-                                          } catch (_) {}
-                                        }
-
-                                        if (sessionDraft != null && mounted) {
-                                          ServiceClosingState joinedDraft = sessionDraft;
-                                          if (sessionDraft.mainTreasurer != currentUserName) {
-                                            String newCoTreasurer = sessionDraft.coTreasurer ?? "";
-                                            if (!newCoTreasurer.contains(currentUserName)) {
-                                              newCoTreasurer = newCoTreasurer.isEmpty
-                                                  ? currentUserName
-                                                  : "$newCoTreasurer, $currentUserName";
-                                            }
-                                            joinedDraft = sessionDraft.copyWith(coTreasurer: newCoTreasurer);
-                                          }
-
-                                          final finalDraft = joinedDraft.copyWith(
-                                            sessionId: sessId,
-                                            date: sDate,
-                                            serviceTime: sStartTime,
-                                            serviceEndTime: sEndTime,
-                                            serviceType: sType,
-                                          );
-                                          _bloc.add(RestoreDraftEvent(finalDraft));
-                                          setState(() {
-                                            _selectedDate = sDate;
-                                            _coTreasurerController.text = finalDraft.coTreasurer ?? "";
-                                            _verifierNameController.text = finalDraft.verifierName ?? "";
-                                            _phase = ClosingPhase.counting;
-                                          });
-                                          _startSyncTimer();
-                                        } else {
-                                          _initializeCleanSession(
-                                            sessId,
-                                            sDate,
-                                            currentUserName,
-                                            sStartTime,
-                                            sEndTime,
-                                            sType,
-                                          );
-                                        }
-                                      } catch (e) {
-                                        if (mounted) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text('Erro ao iniciar contagem tardia: ${e.toString()}'),
-                                              backgroundColor: Colors.red,
-                                            ),
-                                          );
-                                        }
-                                      } finally {
-                                        if (mounted) {
-                                          setState(() {
-                                            _isConnecting = false;
-                                          });
-                                        }
-                                      }
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: isResume ? const Color(0xFFEA580C) : AppTheme.institutionalBlue,
-                                      foregroundColor: Colors.white,
-                                      elevation: 0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
-                                    ),
-                                    child: Text(
-                                      isResume ? "CONTINUAR CONTAGEM" : "REGISTRAR CONTAGEM",
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
-                            ),
-                          );
-                        }),
+                              ...sortedOccurrences.map(buildOccurrenceCard),
+                            ],
+                          ),
+                        ),
                       ],
-                    ],
-                  ),
-                ),
-              ),
+                    )
+                  // ── Mobile single-column layout ──
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                          ),
+                          child: statusPanel(),
+                        ),
+                        if (sortedOccurrences.isNotEmpty) ...[
+                          const SizedBox(height: 24),
+                          const Text(
+                            'Cultos anteriores pendentes',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF334155),
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          ...sortedOccurrences.map(buildOccurrenceCard),
+                        ],
+                      ],
+                    ),
             ),
           ),
         ),
