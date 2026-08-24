@@ -378,12 +378,12 @@ class _DashboardViewState extends State<DashboardView> {
   Widget _buildQuickActionsGrid(BuildContext context) {
     final List<Widget> actions = [
       _buildActionCard(
-        context: context,
-        icon: Icons.add_circle_outline_rounded,
-        title: 'Contagem do culto',
-        subtitle: 'Submeter ata de culto',
-        color: AppTheme.institutionalBlue,
-        onTap: () {
+          context: context,
+          icon: Icons.add_circle_outline_rounded,
+          title: 'Novo Fechamento',
+          subtitle: 'Iniciar ou participar da contagem',
+          color: AppTheme.institutionalBlue,
+          onTap: () {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => const WizardPage()),
           );
@@ -392,9 +392,9 @@ class _DashboardViewState extends State<DashboardView> {
       _buildActionCard(
         context: context,
         icon: Icons.people_outline_rounded,
-        title: 'Cadastro e declarações',
-        subtitle: 'Gerenciar dizimistas',
-        color: const Color(0xFF0D9488),
+        title: 'Contribuintes',
+        subtitle: 'Cadastros e declarações anuais',
+        color: AppTheme.institutionalBlue,
         onTap: () {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => const MembersPage()),
@@ -406,7 +406,7 @@ class _DashboardViewState extends State<DashboardView> {
         icon: Icons.bar_chart_rounded,
         title: 'Ver Relatório',
         subtitle: 'Balancete do mês',
-        color: const Color(0xFFD97706),
+        color: AppTheme.institutionalBlue,
         onTap: () {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => const ReportsPage()),
@@ -529,9 +529,9 @@ class _DashboardViewState extends State<DashboardView> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              isDesktop ? 'ÚLTIMOS MOVIMENTOS' : 'ATIVIDADE RECENTE',
-              style: const TextStyle(
+            const Text(
+              'ÚLTIMOS MOVIMENTOS',
+              style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF64748B),
@@ -554,9 +554,9 @@ class _DashboardViewState extends State<DashboardView> {
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              child: Text(
-                isDesktop ? 'Ver todos' : 'Ver movimentos',
-                style: const TextStyle(
+              child: const Text(
+                'Ver movimentos',
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.institutionalBlue,
