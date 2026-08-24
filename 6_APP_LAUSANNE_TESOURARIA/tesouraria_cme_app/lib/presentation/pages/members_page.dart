@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../core/theme.dart';
 import '../../services/auth_api_service.dart';
 import '../../services/contributor_api_service.dart';
@@ -62,7 +62,7 @@ class _MembersPageState extends State<MembersPage> {
       if (e.toString().contains('UNAUTHORIZED') && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Sessão expirada. Faça login novamente.'),
+            content: Text('Sessao expirada. Faca login novamente.'),
             backgroundColor: Color(0xFFDC2626),
             duration: Duration(seconds: 2),
           ),
@@ -79,6 +79,11 @@ class _MembersPageState extends State<MembersPage> {
         _isLoading = false;
       });
     }
+  }
+
+  bool _validateNPA(String zip) {
+    final npa = int.tryParse(zip);
+    return npa != null && npa >= 1000 && npa <= 9999 && zip.length == 4;
   }
 
   void _showAddEditDialog(ContributorModel? item) {
@@ -108,17 +113,18 @@ class _MembersPageState extends State<MembersPage> {
                 children: [
                   TextField(
                     controller: nameCtrl,
-                    decoration: const InputDecoration(labelText: 'Nome Completo', border: OutlineInputBorder()),
+                    decoration: const InputDecoration(labelText: 'Nome completo (*)', border: OutlineInputBorder()),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: numberCtrl,
-                    decoration: const InputDecoration(labelText: 'Nº Contribuinte (Único)', border: OutlineInputBorder()),
+                    decoration: const InputDecoration(labelText: 'Codigo do contribuinte (*)', border: OutlineInputBorder()),
+                    enabled: !isEdit,
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: addressCtrl,
-                    decoration: const InputDecoration(labelText: 'Endereço', border: OutlineInputBorder()),
+                    decoration: const InputDecoration(labelText: 'Endereco (*)', border: OutlineInputBorder()),
                   ),
                   const SizedBox(height: 12),
                   Row(
@@ -126,14 +132,15 @@ class _MembersPageState extends State<MembersPage> {
                       Expanded(
                         child: TextField(
                           controller: zipCtrl,
-                          decoration: const InputDecoration(labelText: 'NPA', border: OutlineInputBorder()),
+                          decoration: const InputDecoration(labelText: 'NPA (*)', border: OutlineInputBorder()),
+                          keyboardType: TextInputType.number,
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: TextField(
                           controller: cityCtrl,
-                          decoration: const InputDecoration(labelText: 'Cidade', border: OutlineInputBorder()),
+                          decoration: const InputDecoration(labelText: 'Cidade (*)', border: OutlineInputBorder()),
                         ),
                       ),
                     ],
@@ -141,12 +148,12 @@ class _MembersPageState extends State<MembersPage> {
                   const SizedBox(height: 12),
                   TextField(
                     controller: emailCtrl,
-                    decoration: const InputDecoration(labelText: 'Email', border: OutlineInputBorder()),
+                    decoration: const InputDecoration(labelText: 'E-mail (Opcional)', border: OutlineInputBorder()),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: phoneCtrl,
-                    decoration: const InputDecoration(labelText: 'Telefone', border: OutlineInputBorder()),
+                    decoration: const InputDecoration(labelText: 'Telefone (Opcional)', border: OutlineInputBorder()),
                   ),
                   const SizedBox(height: 12),
                   Row(
@@ -178,7 +185,23 @@ class _MembersPageState extends State<MembersPage> {
                     : () async {
                         final name = nameCtrl.text.trim();
                         final numStr = numberCtrl.text.trim();
-                        if (name.isEmpty || numStr.isEmpty) return;
+                        final address = addressCtrl.text.trim();
+                        final zip = zipCtrl.text.trim();
+                        final city = cityCtrl.text.trim();
+
+                        if (name.isEmpty || numStr.isEmpty || address.isEmpty || zip.isEmpty || city.isEmpty) {
+                          setModalState(() {
+                            dlgError = 'Por favor, preencha todos os campos obrigatorios (*).';
+                          });
+                          return;
+                        }
+
+                        if (!_validateNPA(zip)) {
+                          setModalState(() {
+                            dlgError = 'NPA invalido. Deve ser um numero de 4 digitos (1000 a 9999).';
+                          });
+                          return;
+                        }
 
                         setModalState(() {
                           isSaving = true;
@@ -189,9 +212,9 @@ class _MembersPageState extends State<MembersPage> {
                           id: item?.id ?? '',
                           fullName: name,
                           contributorNumber: numStr,
-                          address: addressCtrl.text.trim(),
-                          postalCode: zipCtrl.text.trim(),
-                          city: cityCtrl.text.trim(),
+                          address: address,
+                          postalCode: zip,
+                          city: city,
                           email: emailCtrl.text.trim(),
                           phone: phoneCtrl.text.trim(),
                           active: active,
@@ -217,7 +240,7 @@ class _MembersPageState extends State<MembersPage> {
                           });
                         }
                       },
-                style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryGreen),
+                style: ElevatedButton.styleFrom(backgroundColor: AppTheme.institutionalBlue),
                 child: isSaving
                     ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                     : const Text('SALVAR', style: TextStyle(color: Colors.white)),
@@ -286,7 +309,7 @@ class _MembersPageState extends State<MembersPage> {
                           );
                         }
                       },
-                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1E3A8A)),
+                style: ElevatedButton.styleFrom(backgroundColor: AppTheme.institutionalBlue),
                 child: isGenerating
                     ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                     : const Text('GERAR PDF', style: TextStyle(color: Colors.white)),
@@ -298,12 +321,19 @@ class _MembersPageState extends State<MembersPage> {
     );
   }
 
-  Future<void> _confirmDelete(ContributorModel contributor) async {
+  Future<void> _confirmDeleteOrDeactivate(ContributorModel contributor) async {
+    final hasMovements = contributor.hasMovements;
+    final titleText = hasMovements ? 'Desativar Contribuinte' : 'Excluir Contribuinte';
+    final buttonText = hasMovements ? 'DESATIVAR' : 'EXCLUIR';
+    final contentText = hasMovements
+        ? 'Este contribuinte possui historico de contribuicoes e sera desativado para preservar os registros fiscais. Confirmar?'
+        : 'Tem certeza que deseja excluir permanentemente o contribuinte ${contributor.fullName}?';
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Desativar Contribuinte'),
-        content: Text('Tem certeza que deseja desativar o contribuinte ${contributor.fullName}?'),
+        title: Text(titleText),
+        content: Text(contentText),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -312,7 +342,7 @@ class _MembersPageState extends State<MembersPage> {
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.excludeRed, foregroundColor: Colors.white),
-            child: const Text('DESATIVAR'),
+            child: Text(buttonText),
           ),
         ],
       ),
@@ -320,28 +350,33 @@ class _MembersPageState extends State<MembersPage> {
 
     if (confirm == true) {
       try {
-        final updated = ContributorModel(
-          id: contributor.id,
-          fullName: contributor.fullName,
-          contributorNumber: contributor.contributorNumber,
-          address: contributor.address,
-          postalCode: contributor.postalCode,
-          city: contributor.city,
-          email: contributor.email,
-          phone: contributor.phone,
-          active: false,
-        );
-        await _apiService.updateContributor(contributor.id, updated);
-        _loadContributors();
-        if (mounted) {
+        if (hasMovements) {
+          final updated = ContributorModel(
+            id: contributor.id,
+            fullName: contributor.fullName,
+            contributorNumber: contributor.contributorNumber,
+            address: contributor.address,
+            postalCode: contributor.postalCode,
+            city: contributor.city,
+            email: contributor.email,
+            phone: contributor.phone,
+            active: false,
+          );
+          await _apiService.updateContributor(contributor.id, updated);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Contribuinte desativado com sucesso.')),
           );
+        } else {
+          await _apiService.deleteContributor(contributor.id);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Contribuinte excluido com sucesso.')),
+          );
         }
+        _loadContributors();
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erro ao desativar: $e'), backgroundColor: AppTheme.excludeRed),
+            SnackBar(content: Text('Erro: $e'), backgroundColor: AppTheme.excludeRed),
           );
         }
       }
@@ -378,13 +413,12 @@ class _MembersPageState extends State<MembersPage> {
       appBar: isDesktop
           ? null
           : AppBar(
-              backgroundColor: Colors.white,
-              foregroundColor: const Color(0xFF0F172A),
+              backgroundColor: AppTheme.institutionalBlue,
+              foregroundColor: Colors.white,
               elevation: 0,
-              shape: const Border(bottom: BorderSide(color: Color(0xFFE5E7EB), width: 1)),
               title: const Text(
                 'Contribuintes',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF0F172A)),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ),
       body: body,
@@ -410,7 +444,7 @@ class _MembersPageState extends State<MembersPage> {
           ),
           const SizedBox(height: 8),
           const Text(
-            'Verifique sua conexão e tente novamente.',
+            'Verifique sua conexao e tente novamente.',
             style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
           ),
           const SizedBox(height: 24),
@@ -419,7 +453,7 @@ class _MembersPageState extends State<MembersPage> {
             icon: const Icon(Icons.refresh_rounded),
             label: const Text('Tentar Novamente'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1E3A8A),
+              backgroundColor: AppTheme.institutionalBlue,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -438,13 +472,11 @@ class _MembersPageState extends State<MembersPage> {
       ),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1100),
+          constraints: const BoxConstraints(maxWidth: 950),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _buildHeader(isDesktop),
-              const SizedBox(height: 32),
-              _buildSummaryCard(),
               const SizedBox(height: 32),
               _buildContributorList(isDesktop),
             ],
@@ -458,37 +490,52 @@ class _MembersPageState extends State<MembersPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'MEMBROS',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF64748B),
-                letterSpacing: 1.5,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'CONTRIBUINTES',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF64748B),
+                  letterSpacing: 1.5,
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Contribuintes',
-              style: TextStyle(
-                fontSize: isDesktop ? 24 : 20,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF0F172A),
-                letterSpacing: -0.5,
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Text(
+                    'Contribuintes',
+                    style: TextStyle(
+                      fontSize: isDesktop ? 24 : 20,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF0F172A),
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '(${_allContributors.length})',
+                    style: TextStyle(
+                      fontSize: isDesktop ? 16 : 14,
+                      fontWeight: FontWeight.normal,
+                      color: const Color(0xFF64748B),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Gerencie os membros cadastrados na base de dados da tesouraria.',
-              style: TextStyle(
-                fontSize: isDesktop ? 13 : 12,
-                color: const Color(0xFF64748B),
+              const SizedBox(height: 4),
+              Text(
+                'Cadastro de contribuintes e dados para declaracoes anuais.',
+                style: TextStyle(
+                  fontSize: isDesktop ? 13 : 12,
+                  color: const Color(0xFF64748B),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         if (isDesktop)
           ElevatedButton.icon(
@@ -502,48 +549,6 @@ class _MembersPageState extends State<MembersPage> {
             ),
           ),
       ],
-    );
-  }
-
-  Widget _buildSummaryCard() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E3A8A).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(Icons.people_rounded, color: Color(0xFF1E3A8A), size: 24),
-          ),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${_allContributors.length}',
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
-                  letterSpacing: -1,
-                ),
-              ),
-              const Text(
-                'Contribuintes cadastrados',
-                style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 
@@ -586,7 +591,7 @@ class _MembersPageState extends State<MembersPage> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Color(0xFF1E3A8A)),
+                  borderSide: const BorderSide(color: AppTheme.institutionalBlue),
                 ),
               ),
             ),
@@ -631,18 +636,22 @@ class _MembersPageState extends State<MembersPage> {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: _filtered.length,
               separatorBuilder: (_, __) => const Divider(height: 1, color: Color(0xFFE2E8F0)),
-              itemBuilder: (context, index) => _buildContributorRow(_filtered[index]),
+              itemBuilder: (context, index) => _buildContributorRow(_filtered[index], isDesktop),
             ),
         ],
       ),
     );
   }
 
-  Widget _buildContributorRow(ContributorModel contributor) {
+  Widget _buildContributorRow(ContributorModel contributor, bool isDesktop) {
     final parts = contributor.fullName.trim().split(' ');
     final initials = parts.length >= 2
         ? '${parts.first[0]}${parts.last[0]}'.toUpperCase()
         : contributor.fullName.substring(0, 1).toUpperCase();
+
+    final hasMovements = contributor.hasMovements;
+    final statusText = contributor.active ? 'Ativo' : 'Inativo';
+    final statusColor = contributor.active ? const Color(0xFF059669) : const Color(0xFF64748B);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -652,7 +661,7 @@ class _MembersPageState extends State<MembersPage> {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: const Color(0xFF1E3A8A).withValues(alpha: 0.1),
+              color: AppTheme.institutionalBlue.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Center(
@@ -661,7 +670,7 @@ class _MembersPageState extends State<MembersPage> {
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E3A8A),
+                  color: AppTheme.institutionalBlue,
                 ),
               ),
             ),
@@ -671,45 +680,96 @@ class _MembersPageState extends State<MembersPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  contributor.fullName,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF0F172A),
-                  ),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        contributor.fullName,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF0F172A),
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      statusText,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: statusColor,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Nº ${contributor.contributorNumber} • ${contributor.city}',
+                  'Codigo: ${contributor.contributorNumber} • ${contributor.city}',
                   style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
                 ),
               ],
             ),
           ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.picture_as_pdf_outlined, size: 18),
-                color: const Color(0xFF1E3A8A),
-                tooltip: 'Emitir Attestation',
-                onPressed: () => _showAttestationDialog(contributor),
+          if (isDesktop) ...[
+            TextButton(
+              onPressed: () => _showAttestationDialog(contributor),
+              child: const Text('Declaracao', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.institutionalBlue)),
+            ),
+            const SizedBox(width: 8),
+            TextButton(
+              onPressed: () => _showAddEditDialog(contributor),
+              child: const Text('Editar', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF64748B))),
+            ),
+            const SizedBox(width: 8),
+            TextButton(
+              onPressed: () => _confirmDeleteOrDeactivate(contributor),
+              child: Text(
+                hasMovements ? 'Desativar' : 'Excluir',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.excludeRed),
               ),
-              IconButton(
-                icon: const Icon(Icons.edit_outlined, size: 18),
-                color: const Color(0xFF64748B),
-                tooltip: 'Editar',
-                onPressed: () => _showAddEditDialog(contributor),
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete_outline_rounded, size: 18),
-                color: AppTheme.excludeRed,
-                tooltip: 'Desativar',
-                onPressed: () => _confirmDelete(contributor),
-              ),
-            ],
-          ),
+            ),
+          ] else ...[
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert_rounded, color: Color(0xFF64748B)),
+              onSelected: (val) {
+                if (val == 'pdf') {
+                  _showAttestationDialog(contributor);
+                } else if (val == 'edit') {
+                  _showAddEditDialog(contributor);
+                } else if (val == 'delete') {
+                  _confirmDeleteOrDeactivate(contributor);
+                }
+              },
+              itemBuilder: (ctx) => [
+                const PopupMenuItem(
+                  value: 'pdf',
+                  child: ListTile(
+                    leading: Icon(Icons.picture_as_pdf_outlined, size: 20),
+                    title: Text('Gerar Declaracao Fiscal'),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'edit',
+                  child: ListTile(
+                    leading: Icon(Icons.edit_outlined, size: 20),
+                    title: Text('Editar'),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'delete',
+                  child: ListTile(
+                    leading: Icon(hasMovements ? Icons.block : Icons.delete_outline_rounded, size: 20, color: AppTheme.excludeRed),
+                    title: Text(hasMovements ? 'Desativar' : 'Excluir', style: const TextStyle(color: AppTheme.excludeRed)),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );

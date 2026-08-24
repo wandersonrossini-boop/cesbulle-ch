@@ -22,9 +22,15 @@ public class ContributorService {
 
     public List<Contributor> getAll(String search) {
         if (search != null && !search.trim().isEmpty()) {
-            return contributorRepository.searchActive(search.trim());
+            return contributorRepository.findAll().stream()
+                .filter(c -> c.getFullName().toLowerCase().contains(search.trim().toLowerCase()) ||
+                             c.getContributorNumber().toLowerCase().contains(search.trim().toLowerCase()))
+                .sorted((a, b) -> a.getFullName().compareToIgnoreCase(b.getFullName()))
+                .toList();
         }
-        return contributorRepository.findAllByActiveTrue();
+        return contributorRepository.findAll().stream()
+            .sorted((a, b) -> a.getFullName().compareToIgnoreCase(b.getFullName()))
+            .toList();
     }
 
     public Optional<Contributor> getById(Long id) {

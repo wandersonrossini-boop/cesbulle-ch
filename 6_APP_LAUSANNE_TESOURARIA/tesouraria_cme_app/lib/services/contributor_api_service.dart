@@ -39,6 +39,7 @@ class ContributorModel {
       phone: json['phone'] ?? '',
       contributorNumber: json['contributorNumber'] ?? '',
       active: json['active'] as bool? ?? true,
+      hasMovements: json['hasMovements'] as bool? ?? false,
     );
   }
 
@@ -145,6 +146,25 @@ class ContributorApiService {
       return response.bodyBytes;
     } else {
       throw Exception('Falha ao baixar Attestation PDF (${response.statusCode})');
+    }
+  }
+
+  Future<void> deleteContributor(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    final response = await http.delete(
+      Uri.parse('$_baseUrl/contributors/$id'),
+      headers: {
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      if (response.statusCode == 401) {
+        throw Exception('UNAUTHORIZED');
+      }
+      throw Exception('Falha ao excluir contribuinte: ${response.body}');
     }
   }
 }
