@@ -1,4 +1,4 @@
-﻿import '../widgets/attachment_uploader.dart';
+import '../widgets/attachment_uploader.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -165,11 +165,10 @@ class _ExpensesPageState extends State<ExpensesPage> {
                           border: OutlineInputBorder(),
                         ),
                         items: const [
-                          DropdownMenuItem(value: 'Aluguel & Local', child: Text('Aluguel & Local')),
-                          DropdownMenuItem(value: 'Utilidades', child: Text('Utilidades (Água/Luz/Net)')),
-                          DropdownMenuItem(value: 'Manutenção & Equipamento', child: Text('Manutenção & Equipamentos')),
-                          DropdownMenuItem(value: 'Eventos & Ministério', child: Text('Eventos & Ministério')),
-                          DropdownMenuItem(value: 'Outros', child: Text('Outros')),
+                          DropdownMenuItem(value: 'Aluguel', child: Text('Aluguel')),
+                          DropdownMenuItem(value: 'Utilidades', child: Text('Utilidades')),
+                          DropdownMenuItem(value: 'Ministério', child: Text('Ministério')),
+                          DropdownMenuItem(value: 'Manutenção', child: Text('Manutenção')),
                         ],
                         onChanged: (val) {
                           if (val != null) setDlgState(() => category = val);
@@ -244,7 +243,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                                     setState(() => _isLoading = true);
                                     await _apiService.createExpense(
                                       description: desc,
-                                      supplier: supplier.isEmpty ? 'N/I' : supplier,
+                                      supplier: supplier,
                                       category: category,
                                       amount: amount,
                                       localDateStr: dateVal,
@@ -709,11 +708,10 @@ class _ExpensesPageState extends State<ExpensesPage> {
                           border: OutlineInputBorder(),
                         ),
                         items: const [
-                          DropdownMenuItem(value: 'Aluguel & Local', child: Text('Aluguel & Local')),
-                          DropdownMenuItem(value: 'Utilidades', child: Text('Utilidades (Água/Luz/Net)')),
-                          DropdownMenuItem(value: 'Manutenção & Equipamento', child: Text('Manutenção & Equipamentos')),
-                          DropdownMenuItem(value: 'Eventos & Ministério', child: Text('Eventos & Ministério')),
-                          DropdownMenuItem(value: 'Outros', child: Text('Outros')),
+                          DropdownMenuItem(value: 'Aluguel', child: Text('Aluguel')),
+                          DropdownMenuItem(value: 'Utilidades', child: Text('Utilidades')),
+                          DropdownMenuItem(value: 'Ministério', child: Text('Ministério')),
+                          DropdownMenuItem(value: 'Manutenção', child: Text('Manutenção')),
                         ],
                         onChanged: (val) {
                           if (val != null) setDlgState(() => category = val);
@@ -788,7 +786,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                                     await _apiService.updateExpense(
                                       int.parse(expense.id),
                                       description: desc,
-                                      supplier: supplier.isEmpty ? 'N/I' : supplier,
+                                      supplier: supplier,
                                       category: category,
                                       amount: amount,
                                       localDateStr: dateVal,
@@ -948,6 +946,21 @@ class _ExpensesPageState extends State<ExpensesPage> {
     }
   }
 
+  Future<void> _handlePay(ExpenseModel expense) async {
+    try {
+      setState(() => _isLoading = true);
+      await _apiService.payExpense(int.parse(expense.id));
+      _loadInitialData();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao registrar pagamento: $e'), backgroundColor: Colors.red),
+        );
+        _loadInitialData();
+      }
+    }
+  }
+
   void _showRejectionDialog(ExpenseModel expense) {
     final justificationController = TextEditingController();
 
@@ -1019,9 +1032,12 @@ class _ExpensesPageState extends State<ExpensesPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 800;
 
-    // Only approved expenses sum up for consolidated outflow reports
-    final totalApproved = _expenses
-        .where((item) => item.status == 'APPROVED')
+    final totalPaid = _expenses
+        .where((item) => item.status == 'PAID')
+        .fold(0.0, (sum, item) => sum + item.amount);
+
+    final totalPending = _expenses
+        .where((item) => item.status == 'PENDING')
         .fold(0.0, (sum, item) => sum + item.amount);
 
     final filteredExpenses = _expenses.where((item) {
@@ -1068,7 +1084,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                                 const SizedBox(height: 16),
                                 const Divider(color: Color(0xFFE2E8F0), height: 1),
                                 const SizedBox(height: 16),
-                                _buildSummaryCard(totalApproved, _expenses.length),
+                                _buildSummaryCard(totalPaid, totalPending, _expenses.length),
                                 const SizedBox(height: 24),
                                 _buildFiltersRow(),
                                 const SizedBox(height: 16),
@@ -1163,33 +1179,87 @@ class _ExpensesPageState extends State<ExpensesPage> {
     );
   }
 
-  Widget _buildSummaryCard(double total, int totalCount) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildSummaryCard(double totalPaid, double totalPending, int totalCount) {
+    return Row(
       children: [
-        const Text(
-          'TOTAL DESPESAS APROVADAS',
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF64748B),
-            letterSpacing: 1.0,
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'DESPESAS PAGAS',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1E293B),
+                    letterSpacing: 1.0,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'CHF ${_formatCHF(totalPaid)}',
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF0F172A),
+                    fontFamily: 'monospace',
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Valores pagos no período',
+                  style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                ),
+              ],
+            ),
           ),
         ),
-        const SizedBox(height: 4),
-        Text(
-          'CHF ${_formatCHF(total)}',
-          style: const TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF0F172A),
-            fontFamily: 'monospace',
+        const SizedBox(width: 16),
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'PENDENTES',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFFE11D48),
+                    letterSpacing: 1.0,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'CHF ${_formatCHF(totalPending)}',
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF0F172A),
+                    fontFamily: 'monospace',
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Obrigações / Previsões',
+                  style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                ),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'Total acumulado e validado em despesas ($totalCount lançamentos cadastrados)',
-          style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
         ),
       ],
     );
@@ -1289,7 +1359,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
               child: Text('Nenhuma despesa correspondente aos filtros.', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13)),
             ),
           )
-        else
+        else if (isDesktop)
           Table(
             columnWidths: const {
               0: FlexColumnWidth(1.2), // Data
@@ -1306,6 +1376,98 @@ class _ExpensesPageState extends State<ExpensesPage> {
               _buildTableHeader(['DATA', 'DESCRIÇÃO / FORNECEDOR', 'CATEGORIA / MEIO', 'VALOR / STATUS', 'AÇÕES']),
               ...filteredExpenses.map((item) => _buildTableRow(item)),
             ],
+          )
+        else
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: filteredExpenses.length,
+            itemBuilder: (context, index) {
+              final item = filteredExpenses[index];
+              Color statusColor;
+              switch (item.status) {
+                case 'APPROVED':
+                  statusColor = Colors.green;
+                  break;
+                case 'REJECTED':
+                  statusColor = Colors.red;
+                  break;
+                case 'REVERSED':
+                  statusColor = Colors.orange;
+                  break;
+                case 'PAID':
+                  statusColor = Colors.teal;
+                  break;
+                case 'PENDING':
+                default:
+                  statusColor = const Color(0xFF64748B);
+                  break;
+              }
+              return Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  side: const BorderSide(color: Color(0xFFE2E8F0)),
+                ),
+                margin: const EdgeInsets.only(bottom: 8),
+                child: InkWell(
+                  onTap: () => _showExpenseDetailsDialog(item),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                item.description,
+                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                              ),
+                            ),
+                            Text(
+                              'CHF ${_formatCHF(item.amount)}',
+                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF0F172A), fontFamily: 'monospace'),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${item.category} • ${item.date}',
+                              style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: statusColor.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                item.status == 'PENDING'
+                                    ? 'Pendente'
+                                    : item.status == 'APPROVED'
+                                        ? 'Aprovada'
+                                        : item.status == 'PAID'
+                                            ? 'Paga'
+                                            : item.status == 'REJECTED'
+                                                ? 'Rejeitada'
+                                                : 'Estornada',
+                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: statusColor),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
       ],
     );
@@ -1341,6 +1503,9 @@ class _ExpensesPageState extends State<ExpensesPage> {
     switch (item.status) {
       case 'APPROVED':
         statusBadge = const Text('APROVADA', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.green));
+        break;
+      case 'PAID':
+        statusBadge = const Text('PAGA', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.teal));
         break;
       case 'REJECTED':
         statusBadge = const Text('REJEITADA', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.red));
@@ -1470,7 +1635,19 @@ class _ExpensesPageState extends State<ExpensesPage> {
                   onPressed: () => _showDeleteConfirmation(item),
                 ),
               ],
-              if (item.status == 'APPROVED' && _isAuthorized)
+              if (item.status == 'APPROVED' && _isAuthorized) ...[
+                IconButton(
+                  icon: const Icon(Icons.payment, size: 18, color: Colors.indigo),
+                  tooltip: 'Registrar Pagamento',
+                  onPressed: () => _handlePay(item),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.undo_outlined, size: 18, color: Color(0xFFDC2626)),
+                  tooltip: 'Estornar',
+                  onPressed: () => _showReversalDialog(item),
+                ),
+              ],
+              if (item.status == 'PAID' && _isAuthorized)
                 IconButton(
                   icon: const Icon(Icons.undo_outlined, size: 18, color: Color(0xFFDC2626)),
                   tooltip: 'Estornar',
@@ -1535,46 +1712,95 @@ class _ExpensesPageState extends State<ExpensesPage> {
     showDialog(
       context: context,
       builder: (dlgContext) {
-        return AlertDialog(
-          title: const Text('Detalhes da despesa', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          content: SizedBox(
-            width: 420,
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  buildSection('Dados Principais'),
-                  buildRow('Criado por', item.createdBy.isNotEmpty ? item.createdBy : null),
-                  buildRow('Data', item.date),
-                  buildRow('Descrição', item.description),
-                  buildRow('Beneficiário', item.supplier),
-                  buildRow('Categoria', item.category),
-                  buildRow('Meio de pagamento', item.paymentMethod),
-                  buildRow('Referência', item.receiptReference.isNotEmpty ? item.receiptReference : null),
-                  buildRow('Observações', item.observations),
-                  buildSection('Histórico'),
-                  // PENDING: sem campos de histórico adicionais
-                  // APPROVED
-                  buildRow('Aprovado por', item.approvedBy),
-                  buildRow('Data de aprovação', fmtDate(item.approvalDate)),
-                  // REJECTED
-                  buildRow('Rejeitado por', item.rejectedBy),
-                  buildRow('Data de rejeição', item.rejectionDate != null ? fmtDate(item.rejectionDate) : null),
-                  buildRow('Justificativa da rejeição', item.rejectionJustification),
-                  // REVERSED
-                  buildRow('Estornado por', item.reversedBy),
-                  buildRow('Data de estorno', item.reversalDate != null ? fmtDate(item.reversalDate) : null),
-                  buildRow('Justificativa do estorno', item.reversalJustification),
-                ],
+        final activeAttachments = (item.attachments as List?)?.where((att) => att['active'] == true).toList() ?? [];
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Detalhes da despesa', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              content: SizedBox(
+                width: 420,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      buildSection('Dados Principais'),
+                      buildRow('Status', item.status),
+                      buildRow('Criado por', item.createdBy.isNotEmpty ? item.createdBy : null),
+                      buildRow('Data', item.date),
+                      buildRow('Descrição', item.description),
+                      buildRow('Beneficiário', item.supplier),
+                      buildRow('Categoria', item.category),
+                      buildRow('Meio de pagamento', item.paymentMethod),
+                      buildRow('Referência', item.receiptReference.isNotEmpty ? item.receiptReference : null),
+                      buildRow('Observações', item.observations),
+                      buildSection('Histórico'),
+                      buildRow('Aprovado por', item.approvedBy),
+                      buildRow('Data de aprovação', fmtDate(item.approvalDate)),
+                      buildRow('Rejeitado por', item.rejectedBy),
+                      buildRow('Data de rejeição', item.rejectionDate != null ? fmtDate(item.rejectionDate) : null),
+                      buildRow('Justificativa da rejeição', item.rejectionJustification),
+                      buildRow('Estornado por', item.reversedBy),
+                      buildRow('Data de estorno', item.reversalDate != null ? fmtDate(item.reversalDate) : null),
+                      buildRow('Justificativa do estorno', item.reversalJustification),
+                      
+                      buildSection('Comprovantes / Anexos'),
+                      if (activeAttachments.isNotEmpty)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: activeAttachments.map<Widget>((att) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: InkWell(
+                                onTap: () => _viewAttachment(item.id, att as Map<String, dynamic>),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.attachment, size: 16, color: Colors.blue),
+                                    const SizedBox(width: 6),
+                                    Expanded(
+                                      child: Text(
+                                        att['fileName'] ?? 'Ver Anexo',
+                                        style: const TextStyle(fontSize: 12, color: Colors.blue, decoration: TextDecoration.underline),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        )
+                      else
+                        const Text('Nenhum comprovante anexado.', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      if ((item.status == 'PENDING' || item.status == 'APPROVED') && _isAuthorized) ...[
+                        const SizedBox(height: 12),
+                        AttachmentUploader(
+                          entityType: 'despesas',
+                          entityId: item.id,
+                          onUploadSuccess: () {
+                            Navigator.pop(dlgContext);
+                            _loadInitialData();
+                          },
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: const Text('Fechar'),
-              onPressed: () => Navigator.of(dlgContext).pop(),
-            ),
-          ],
+              actions: [
+                if ((item.status == 'APPROVED' || item.status == 'PAID') && _isAuthorized)
+                  TextButton(
+                    child: const Text('ESTORNAR', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                    onPressed: () {
+                      Navigator.pop(dlgContext);
+                      _showReversalDialog(item);
+                    },
+                  ),
+                TextButton(
+                  child: const Text('Fechar'),
+                  onPressed: () => Navigator.of(dlgContext).pop(),
+                ),
+              ],
+            );
+          }
         );
       },
     );

@@ -5,6 +5,7 @@ import '../../services/user_api_service.dart';
 import '../../services/service_schedule_api_service.dart';
 import '../../core/theme.dart';
 import '../widgets/app_sidebar_drawer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -24,11 +25,39 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _isLoadingProfile = true;
   List<ServiceSchedule> _schedules = [];
   bool _isLoadingSchedules = false;
+  final TextEditingController _sheetsUrlController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _checkRoleAndLoadSchedules();
+    _loadSettings();
+  }
+
+  @override
+  void dispose() {
+    _sheetsUrlController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    final url = prefs.getString('google_sheets_url') ?? '';
+    if (mounted) {
+      setState(() {
+        _sheetsUrlController.text = url;
+      });
+    }
+  }
+
+  Future<void> _saveSheetsUrl() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('google_sheets_url', _sheetsUrlController.text.trim());
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Link da planilha Google salvo com sucesso!')),
+      );
+    }
   }
 
   Future<void> _checkRoleAndLoadSchedules() async {
@@ -135,6 +164,41 @@ class _SettingsPageState extends State<SettingsPage> {
                           _buildInfoRow('Endereço', 'Chemin de la Colline 7, 1007 Lausanne'),
                           _buildInfoRow('Moeda Padrão', 'CHF (Franco Suíço)'),
                           _buildInfoRow('Sub-unidade', 'Rappen (1 CHF = 100 Rappen)'),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      _buildSectionCard(
+                        title: 'Google Planilhas',
+                        icon: Icons.table_chart_outlined,
+                        children: [
+                          const Text(
+                            'Cadastre o link da planilha Google oficial da tesouraria para abertura direta após exportar o CSV.',
+                            style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                          ),
+                          const SizedBox(height: 16),
+                          TextField(
+                            controller: _sheetsUrlController,
+                            style: const TextStyle(fontSize: 14),
+                            decoration: const InputDecoration(
+                              labelText: 'URL da Planilha Google',
+                              hintText: 'https://docs.google.com/spreadsheets/d/...',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: ElevatedButton.icon(
+                              onPressed: _saveSheetsUrl,
+                              icon: const Icon(Icons.save_outlined, size: 18),
+                              label: const Text('Salvar Link da Planilha'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.institutionalBlue,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 20),

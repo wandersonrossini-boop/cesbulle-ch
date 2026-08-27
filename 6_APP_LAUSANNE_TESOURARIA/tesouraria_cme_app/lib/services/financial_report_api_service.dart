@@ -8,6 +8,7 @@ class MonthlyReportModel {
   final int year;
   final double totalIncomes;
   final double totalExpenses;
+  final double totalCommitted;
   final double netBalance;
   final List<CategorySummaryModel> incomesByCategory;
   final List<CategorySummaryModel> expensesByCategory;
@@ -18,6 +19,7 @@ class MonthlyReportModel {
     required this.year,
     required this.totalIncomes,
     required this.totalExpenses,
+    required this.totalCommitted,
     required this.netBalance,
     required this.incomesByCategory,
     required this.expensesByCategory,
@@ -42,6 +44,7 @@ class MonthlyReportModel {
       year: period['year'] ?? 0,
       totalIncomes: (summary['totalIncomes'] as num? ?? 0.0).toDouble(),
       totalExpenses: (summary['totalExpenses'] as num? ?? 0.0).toDouble(),
+      totalCommitted: (summary['totalCommitted'] as num? ?? 0.0).toDouble(),
       netBalance: (summary['netBalance'] as num? ?? 0.0).toDouble(),
       incomesByCategory: incomes,
       expensesByCategory: expenses,
@@ -181,6 +184,26 @@ class FinancialReportApiService {
 
     if (response.statusCode != 200) {
       throw Exception(response.body.isNotEmpty ? response.body : 'Falha ao reabrir o período.');
+    }
+  }
+
+  Future<String> createGoogleSheetsReport(int month, int year) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/relatorios/google-sheets?month=$month&year=$year'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['spreadsheetUrl'] ?? '';
+    } else {
+      throw Exception(response.body.isNotEmpty ? response.body : 'Falha ao gerar planilha no Google Sheets.');
     }
   }
 }

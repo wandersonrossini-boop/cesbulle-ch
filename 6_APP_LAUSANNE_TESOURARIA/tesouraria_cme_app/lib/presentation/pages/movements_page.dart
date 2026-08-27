@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../../core/theme.dart';
 import '../../services/auth_api_service.dart';
 import '../../services/movements_api_service.dart';
@@ -167,9 +167,20 @@ class _MovementsPageState extends State<MovementsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildHeader(isDesktop),
-        const SizedBox(height: 20),
-        _buildMonthSelector(),
+        if (isDesktop)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              _buildHeader(isDesktop),
+              _buildMonthSelector(),
+            ],
+          )
+        else ...[
+          _buildHeader(isDesktop),
+          const SizedBox(height: 16),
+          _buildMonthSelector(),
+        ],
         const SizedBox(height: 20),
         _buildSummaryCards(isDesktop),
         const SizedBox(height: 24),
@@ -182,16 +193,6 @@ class _MovementsPageState extends State<MovementsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'FLUXO DE CAIXA',
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF64748B),
-            letterSpacing: 1.5,
-          ),
-        ),
-        const SizedBox(height: 4),
         Text(
           'Movimentos Financeiros',
           style: TextStyle(
@@ -207,21 +208,22 @@ class _MovementsPageState extends State<MovementsPage> {
 
   Widget _buildMonthSelector() {
     const months = [
-      'Janeiro', 'Fevereiro', 'Marco', 'Abril', 'Maio', 'Junho',
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
       'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
     ];
 
     Widget styledDropdown({required Widget child}) => Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.zero,
             border: Border.all(color: const Color(0xFFE2E8F0)),
           ),
           child: child,
         );
 
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         styledDropdown(
           child: DropdownButtonHideUnderline(
@@ -240,7 +242,7 @@ class _MovementsPageState extends State<MovementsPage> {
             ),
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 8),
         styledDropdown(
           child: DropdownButtonHideUnderline(
             child: DropdownButton<int>(
@@ -269,94 +271,56 @@ class _MovementsPageState extends State<MovementsPage> {
     final outcomes = _response?.totalOutcomes ?? 0.0;
     final balance = _response?.balance ?? 0.0;
 
-    final cards = [
-      _summaryCard(
-        label: 'Entradas',
-        value: 'CHF ${incomes.toStringAsFixed(2)}',
-        icon: Icons.arrow_downward_rounded,
-        color: const Color(0xFF059669),
-      ),
-      _summaryCard(
-        label: 'Saidas',
-        value: 'CHF ${outcomes.toStringAsFixed(2)}',
-        icon: Icons.arrow_upward_rounded,
-        color: const Color(0xFFDC2626),
-      ),
-      _summaryCard(
-        label: 'Saldo',
-        value: 'CHF ${balance.toStringAsFixed(2)}',
-        icon: Icons.account_balance_wallet_outlined,
-        color: AppTheme.institutionalBlue,
-      ),
-    ];
-
     if (isDesktop) {
-      return Row(
-        children: [
-          Expanded(child: cards[0]),
-          const SizedBox(width: 16),
-          Expanded(child: cards[1]),
-          const SizedBox(width: 16),
-          Expanded(child: cards[2]),
-        ],
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          children: [
+            const Text('Entradas: ', style: TextStyle(fontSize: 13, color: Color(0xFF64748B))),
+            Text('CHF ${incomes.toStringAsFixed(2)}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF059669))),
+            const SizedBox(width: 16),
+            const Text('·', style: TextStyle(color: Color(0xFFCBD5E1))),
+            const SizedBox(width: 16),
+            const Text('Saídas: ', style: TextStyle(fontSize: 13, color: Color(0xFF64748B))),
+            Text('CHF ${outcomes.toStringAsFixed(2)}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFFDC2626))),
+            const SizedBox(width: 16),
+            const Text('·', style: TextStyle(color: Color(0xFFCBD5E1))),
+            const SizedBox(width: 16),
+            const Text('Saldo: ', style: TextStyle(fontSize: 13, color: Color(0xFF64748B))),
+            Text('CHF ${balance.toStringAsFixed(2)}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: balance < 0 ? const Color(0xFFDC2626) : const Color(0xFF059669))),
+          ],
+        ),
       );
     }
 
-    // Mobile: 2-column top row + full-width saldo
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(child: cards[0]),
-            const SizedBox(width: 12),
-            Expanded(child: cards[1]),
-          ],
-        ),
-        const SizedBox(height: 12),
-        cards[2],
-      ],
-    );
-  }
-
-  Widget _summaryCard({
-    required String label,
-    required String value,
-    required IconData icon,
-    required Color color,
-  }) {
     return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Icon(icon, size: 14, color: color),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Entradas', style: TextStyle(fontSize: 13, color: Color(0xFF64748B))),
+              Text('CHF ${incomes.toStringAsFixed(2)}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF059669))),
+            ],
           ),
-          const SizedBox(height: 8),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'monospace',
-              ),
-            ),
+          const SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Saídas', style: TextStyle(fontSize: 13, color: Color(0xFF64748B))),
+              Text('CHF ${outcomes.toStringAsFixed(2)}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFFDC2626))),
+            ],
           ),
-          const SizedBox(height: 2),
-          Text(label, style: const TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+          const SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Saldo', style: TextStyle(fontSize: 13, color: Color(0xFF64748B))),
+              Text('CHF ${balance.toStringAsFixed(2)}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: balance < 0 ? const Color(0xFFDC2626) : const Color(0xFF059669))),
+            ],
+          ),
         ],
       ),
     );
@@ -364,10 +328,11 @@ class _MovementsPageState extends State<MovementsPage> {
 
   Widget _buildMovementsTable(List<MovementItem> items, bool isDesktop) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.symmetric(
+          horizontal: BorderSide(color: Color(0xFFE2E8F0)),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -377,10 +342,6 @@ class _MovementsPageState extends State<MovementsPage> {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: const BoxDecoration(
               color: Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(8),
-                topRight: Radius.circular(8),
-              ),
               border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
             ),
             child: const Row(
@@ -400,7 +361,7 @@ class _MovementsPageState extends State<MovementsPage> {
                   ),
                 ),
                 SizedBox(
-                  width: 96,
+                  width: 120,
                   child: Text(
                     'VALOR',
                     textAlign: TextAlign.right,
@@ -488,10 +449,12 @@ class _MovementsPageState extends State<MovementsPage> {
                           ),
                         ),
                         SizedBox(
-                          width: 96,
+                          width: 120,
                           child: Text(
                             '${isIncome ? '+' : '-'} CHF ${item.value.toStringAsFixed(2)}',
                             textAlign: TextAlign.right,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,

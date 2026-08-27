@@ -123,7 +123,17 @@ class DashboardClosingList extends StatelessWidget {
                   separatorBuilder: (context, index) => const Divider(height: 1, color: Color(0xFFE5E7EB)),
                   itemBuilder: (context, index) {
                     final item = history[index];
-                    final dateStr = item.serviceDate.isNotEmpty && item.serviceDate != '-' ? item.serviceDate : 'Culto sem data';
+                    final rawDate = item.serviceDate.isNotEmpty && item.serviceDate != '-' ? item.serviceDate : 'Culto sem data';
+                    String dateStr = rawDate;
+                    try {
+                      final parts = rawDate.split('/');
+                      if (parts.length == 3) {
+                        final day = parts[0];
+                        final month = int.tryParse(parts[1]) ?? 1;
+                        const months = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+                        dateStr = "$day / ${months[month - 1]}";
+                      }
+                    } catch (_) {}
 
                     if (isWide) {
                       return InkWell(

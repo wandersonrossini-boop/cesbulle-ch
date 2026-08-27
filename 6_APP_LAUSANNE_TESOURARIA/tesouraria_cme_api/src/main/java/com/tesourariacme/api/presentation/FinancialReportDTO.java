@@ -27,11 +27,25 @@ public class FinancialReportDTO {
 
     @Data
     @NoArgsConstructor
-    @AllArgsConstructor
     public static class Summary {
         private BigDecimal totalIncomes;
         private BigDecimal totalExpenses;
+        private BigDecimal totalCommitted; // APPROVED ainda não pago — informativo, não integra o saldo realizado
         private BigDecimal netBalance;
+
+        public Summary(BigDecimal totalIncomes, BigDecimal totalExpenses, BigDecimal netBalance) {
+            this.totalIncomes = totalIncomes;
+            this.totalExpenses = totalExpenses;
+            this.totalCommitted = java.math.BigDecimal.ZERO;
+            this.netBalance = netBalance;
+        }
+
+        public Summary(BigDecimal totalIncomes, BigDecimal totalExpenses, BigDecimal totalCommitted, BigDecimal netBalance) {
+            this.totalIncomes = totalIncomes;
+            this.totalExpenses = totalExpenses;
+            this.totalCommitted = totalCommitted;
+            this.netBalance = netBalance;
+        }
     }
 
     @Data

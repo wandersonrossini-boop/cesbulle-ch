@@ -134,7 +134,7 @@ class _HistoryView extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1100),
+            constraints: const BoxConstraints(maxWidth: 1300),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -143,7 +143,7 @@ class _HistoryView extends StatelessWidget {
                 const SizedBox(height: 32),
 
                 // Summary Cards
-                _buildSummaryCards(totalCultos, totalArrecadado, mediaCulto),
+                _buildSummaryCards(totalCultos, totalArrecadado, mediaCulto, isDesktop),
                 const SizedBox(height: 32),
 
                 // History Table
@@ -163,7 +163,7 @@ class _HistoryView extends StatelessWidget {
         children: [
           _buildHeader(isDesktop),
           const SizedBox(height: 24),
-          _buildSummaryCards(totalCultos, totalArrecadado, mediaCulto),
+          _buildSummaryCards(totalCultos, totalArrecadado, mediaCulto, isDesktop),
           const SizedBox(height: 24),
           _buildHistoryList(context, history),
         ],
@@ -175,16 +175,18 @@ class _HistoryView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'HISTÓRICO',
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF64748B),
-            letterSpacing: 1.5,
+        if (!isDesktop) ...[
+          const Text(
+            'HISTÓRICO',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF64748B),
+              letterSpacing: 1.5,
+            ),
           ),
-        ),
-        const SizedBox(height: 4),
+          const SizedBox(height: 4),
+        ],
         Text(
           'Fechamentos de Culto',
           style: TextStyle(
@@ -206,90 +208,79 @@ class _HistoryView extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryCards(int totalCultos, double totalArrecadado, double mediaCulto) {
-    return Row(
-      children: [
-        Expanded(child: _summaryCard(
-          icon: Icons.church_rounded,
-          label: 'Cultos Registrados',
-          value: '$totalCultos',
-          color: const Color(0xFF1E3A8A),
-        )),
-        const SizedBox(width: 16),
-        Expanded(child: _summaryCard(
-          icon: Icons.savings_rounded,
-          label: 'Total Arrecadado',
-          value: 'CHF ${totalArrecadado.toStringAsFixed(2)}',
-          color: const Color(0xFF059669),
-        )),
-        const SizedBox(width: 16),
-        Expanded(child: _summaryCard(
-          icon: Icons.bar_chart_rounded,
-          label: 'Média por Culto',
-          value: 'CHF ${mediaCulto.toStringAsFixed(2)}',
-          color: const Color(0xFF7C3AED),
-        )),
-      ],
-    );
+  Widget _buildSummaryCards(int totalCultos, double totalArrecadado, double mediaCulto, bool isDesktop) {
+    if (isDesktop) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 4.0, bottom: 8.0),
+        child: Text(
+          '$totalCultos cultos finalizados  ·  Total CHF ${totalArrecadado.toStringAsFixed(2)}  ·  Média CHF ${mediaCulto.toStringAsFixed(2)}',
+          style: const TextStyle(
+            fontSize: 14,
+            color: Color(0xFF475569),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      );
+    } else {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildMobileSummaryRow('Cultos Registrados', '$totalCultos'),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Divider(color: Color(0xFFE2E8F0)),
+            ),
+            _buildMobileSummaryRow('Total Arrecadado', 'CHF ${totalArrecadado.toStringAsFixed(2)}'),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Divider(color: Color(0xFFE2E8F0)),
+            ),
+            _buildMobileSummaryRow('Média por Culto', 'CHF ${mediaCulto.toStringAsFixed(2)}'),
+          ],
+        ),
+      );
+    }
   }
 
-  Widget _summaryCard({
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Icon(icon, size: 16, color: color),
-              ),
-            ],
+  Widget _buildMobileSummaryRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: Color(0xFF475569),
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
           ),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF0F172A),
-              letterSpacing: -0.5,
-            ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            color: AppTheme.institutionalBlue,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            fontFamily: 'monospace',
           ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Color(0xFF64748B),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget _buildHistoryTable(BuildContext context, List<ServiceClosingSummary> history) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.symmetric(
+          horizontal: BorderSide(color: Color(0xFFE2E8F0)),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -299,26 +290,25 @@ class _HistoryView extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
             decoration: const BoxDecoration(
               color: Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(8),
-                topRight: Radius.circular(8),
-              ),
               border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
             ),
             child: const Row(
               children: [
                 SizedBox(
-                  width: 100,
+                  width: 110,
                   child: Text('DATA', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF64748B), letterSpacing: 1.0)),
                 ),
                 Expanded(
                   child: Text('TESOUREIRO', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF64748B), letterSpacing: 1.0)),
                 ),
+                Expanded(
+                  child: Text('CONFERENTE', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF64748B), letterSpacing: 1.0)),
+                ),
                 SizedBox(
                   width: 160,
                   child: Text('TOTAL FÍSICO', textAlign: TextAlign.right, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF64748B), letterSpacing: 1.0)),
                 ),
-                SizedBox(width: 80),
+                SizedBox(width: 40),
               ],
             ),
           ),
@@ -347,16 +337,9 @@ class _HistoryView extends StatelessWidget {
   }
 
   Widget _buildTableRow(BuildContext context, ServiceClosingSummary item) {
-    String shortDate = item.serviceDate;
-    try {
-      final parts = item.serviceDate.split('/');
-      if (parts.length == 3) {
-        final day = parts[0];
-        final month = int.tryParse(parts[1]) ?? 1;
-        const months = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-        shortDate = "$day ${months[month - 1]}".toUpperCase();
-      }
-    } catch (_) {}
+    final verifierText = (item.verifierName != null && item.verifierName!.isNotEmpty && item.verifierName != '-')
+        ? item.verifierName!
+        : '-';
 
     return InkWell(
       onTap: () async {
@@ -371,47 +354,33 @@ class _HistoryView extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Row(
           children: [
-            // Date badge
+            // Date as simple text standard DD/MM/AAAA
             SizedBox(
-              width: 100,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEFF6FF),
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: const Color(0xFFBFDBFE)),
-                ),
-                child: Text(
-                  shortDate,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E40AF),
-                    letterSpacing: 0.5,
-                  ),
+              width: 110,
+              child: Text(
+                item.serviceDate,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Color(0xFF0F172A),
                 ),
               ),
             ),
-            const SizedBox(width: 16),
 
             // Treasurer
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.mainTreasurer,
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFF0F172A)),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (item.verifierName != null && item.verifierName!.isNotEmpty && item.verifierName != '-')
-                    Text(
-                      'Conf.: ${item.verifierName}',
-                      style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                ],
+              child: Text(
+                item.mainTreasurer,
+                style: const TextStyle(fontSize: 13, color: Color(0xFF0F172A)),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+
+            // Verifier (Conferente)
+            Expanded(
+              child: Text(
+                verifierText,
+                style: const TextStyle(fontSize: 13, color: Color(0xFF0F172A)),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
 
@@ -422,23 +391,20 @@ class _HistoryView extends StatelessWidget {
                 'CHF ${item.physicalTotal.toStringAsFixed(2)}',
                 textAlign: TextAlign.right,
                 style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
                   color: Color(0xFF0F172A),
                   fontFamily: 'monospace',
                 ),
               ),
             ),
 
-            // Arrow icon
-            const SizedBox(width: 16),
+            // Discreet arrow icon
             const SizedBox(
-              width: 64,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Icon(Icons.chevron_right_rounded, color: Color(0xFF94A3B8), size: 20),
-                ],
+              width: 40,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Icon(Icons.chevron_right_rounded, color: Color(0xFF94A3B8), size: 20),
               ),
             ),
           ],
@@ -504,7 +470,7 @@ class _HistoryView extends StatelessWidget {
         final day = parts[0];
         final month = int.tryParse(parts[1]) ?? 1;
         const months = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-        shortDate = "$day ${months[month - 1]}".toUpperCase();
+        shortDate = "$day / ${months[month - 1]}".toUpperCase();
       }
     } catch (_) {}
 

@@ -163,17 +163,30 @@ public class FinancialLifecycleIntegrationTest {
         ResponseEntity<?> approveResp = expenseController.approveExpense(100L, adminAuth);
         assertEquals(HttpStatus.OK, approveResp.getStatusCode());
 
+        // Pay the expense (mock attachments so check passes)
+        ExpenseAttachment att = new ExpenseAttachment();
+        att.setActive(true);
+        expense.getAttachments().add(att);
+        ResponseEntity<?> payResp = expenseController.payExpense(100L, adminAuth);
+        assertEquals(HttpStatus.OK, payResp.getStatusCode());
+        expense.setStatus("PAID"); // Update mock status to match business logic
+
         // 4. Consultar relatório contábil mensal
         when(serviceClosingRepository.findByServiceDateBetween(any(LocalDate.class), any(LocalDate.class)))
                 .thenReturn(List.of(closing));
-        when(expenseRepository.findByExpenseDateBetweenAndStatusIn(any(LocalDate.class), any(LocalDate.class), anyList()))
+        // Mock findByExpenseDateBetweenAndStatusIn for PAID (called by FinancialReportService to fetch PAID expenses)
+        when(expenseRepository.findByExpenseDateBetweenAndStatusIn(any(LocalDate.class), any(LocalDate.class), eq(List.of("PAID"))))
                 .thenReturn(List.of(expense));
+        // Mock findByExpenseDateBetweenAndStatusIn for APPROVED (called by FinancialReportService to fetch APPROVED committed expenses)
+        when(expenseRepository.findByExpenseDateBetweenAndStatusIn(any(LocalDate.class), any(LocalDate.class), eq(List.of("APPROVED"))))
+                .thenReturn(List.of());
 
         ResponseEntity<?> reportResp = financialReportController.getMonthlyReport(LocalDate.now().getMonthValue(), LocalDate.now().getYear(), adminAuth);
         assertEquals(HttpStatus.OK, reportResp.getStatusCode());
         FinancialReportDTO reportDto = (FinancialReportDTO) reportResp.getBody();
         assertNotNull(reportDto);
         assertEquals(BigDecimal.valueOf(100.0), reportDto.getSummary().getTotalIncomes());
+        assertEquals(BigDecimal.ZERO, reportDto.getSummary().getTotalCommitted());
 
         // 5. Executar trava do mês contábil
         MonthlyPeriod period = new MonthlyPeriod();

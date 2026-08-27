@@ -9,3 +9,7 @@ void downloadFile(Uint8List bytes, String fileName) {
     ..click();
   html.Url.revokeObjectUrl(url);
 }
+
+void openUrl(String url) {
+  html.window.open(url, '_blank');
+}

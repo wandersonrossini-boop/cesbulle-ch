@@ -30,7 +30,7 @@ public class MovementService {
         LocalDate endDate = yearMonth.atEndOfMonth();
 
         List<ServiceClosing> closings = serviceClosingRepository.findByServiceDateBetween(startDate, endDate);
-        List<Expense> expenses = expenseRepository.findByExpenseDateBetweenAndStatusIn(startDate, endDate, Arrays.asList("APPROVED", "PAID"));
+        List<Expense> expenses = expenseRepository.findByExpenseDateBetweenAndStatusIn(startDate, endDate, Arrays.asList("PAID"));
 
         List<MovementDTO> items = new ArrayList<>();
         BigDecimal totalIncomes = BigDecimal.ZERO;

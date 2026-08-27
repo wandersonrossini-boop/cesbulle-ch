@@ -183,6 +183,26 @@ class ExpenseApiService {
     }
   }
 
+  Future<void> payExpense(int id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    final response = await http.put(
+      Uri.parse('$_baseUrl/despesas/$id/pay'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      if (response.statusCode == 401) {
+        throw Exception('UNAUTHORIZED');
+      }
+      throw Exception('Erro ao registrar pagamento: ${response.body}');
+    }
+  }
+
   Future<void> rejectExpense(int id, String justification) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('jwt_token');

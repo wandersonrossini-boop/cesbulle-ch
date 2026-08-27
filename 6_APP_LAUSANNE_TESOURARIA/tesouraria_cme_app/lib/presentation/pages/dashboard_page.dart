@@ -604,7 +604,7 @@ class _DashboardViewState extends State<DashboardView> {
                     final day = parts[0];
                     final month = int.tryParse(parts[1]) ?? 1;
                     const months = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-                    shortDate = "$day ${months[month - 1]}".toUpperCase();
+                    shortDate = "$day / ${months[month - 1]}".toUpperCase();
                   }
                 } catch (_) {}
 

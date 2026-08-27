@@ -7,6 +7,7 @@ import '../widgets/app_sidebar_drawer.dart';
 import '../widgets/audit_logs_dialog.dart';
 import 'login_page.dart';
 import '../../utils/file_download_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ReportsPage extends StatefulWidget {
   const ReportsPage({super.key});
@@ -28,6 +29,7 @@ class _ReportsPageState extends State<ReportsPage> {
   int _selectedMonth = DateTime.now().month;
   int _selectedYear = DateTime.now().year;
   bool _isExporting = false;
+  bool _isCreatingSheets = false;
 
   final List<int> _years = List.generate(5, (index) => DateTime.now().year - index);
   final List<Map<String, dynamic>> _months = [
@@ -100,7 +102,7 @@ class _ReportsPageState extends State<ReportsPage> {
 
   bool _isExportingPdf = false;
 
-  Future<void> _exportCsv() async {
+  Future<void> _exportCsv({bool openSheets = false}) async {
     setState(() {
       _isExporting = true;
     });
@@ -108,10 +110,44 @@ class _ReportsPageState extends State<ReportsPage> {
       final csvBytes = await _apiService.downloadMonthlyReportCsv(_selectedMonth, _selectedYear);
       final monthString = _selectedMonth.toString().padLeft(2, '0');
       downloadFile(csvBytes, 'relatorio_${monthString}_$_selectedYear.csv');
+      
+      if (openSheets) {
+        final prefs = await SharedPreferences.getInstance();
+        final sheetsUrl = prefs.getString('google_sheets_url') ?? '';
+        if (sheetsUrl.isNotEmpty && sheetsUrl.startsWith('http')) {
+          openUrl(sheetsUrl);
+        } else {
+          openUrl('https://docs.google.com/spreadsheets');
+        }
+      }
+
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Relatório CSV exportado com sucesso!')),
-        );
+        if (openSheets) {
+          showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: const Text('Arquivo baixado e pronto para importação'),
+              content: const Text(
+                'O arquivo CSV foi baixado no seu navegador e o Google Planilhas foi aberto em uma nova aba.\n\n'
+                'Como visualizar os dados no Google Planilhas:\n'
+                '1. Na página do Google Planilhas, crie uma planilha em branco ("Em branco").\n'
+                '2. Clique no menu superior: "Arquivo" > "Importar".\n'
+                '3. Vá para a aba "Fazer upload" e selecione o arquivo CSV baixado.\n'
+                '4. Mantenha as opções padrões e clique em "Importar dados".',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('ENTENDIDO'),
+                ),
+              ],
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Relatório CSV exportado com sucesso!')),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -123,6 +159,37 @@ class _ReportsPageState extends State<ReportsPage> {
       setState(() {
         _isExporting = false;
       });
+    }
+  }
+
+  Future<void> _openGoogleSheetsDirectly() async {
+    setState(() {
+      _isCreatingSheets = true;
+    });
+    try {
+      final url = await _apiService.createGoogleSheetsReport(_selectedMonth, _selectedYear);
+      if (url.isNotEmpty) {
+        openUrl(url);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Planilha criada e aberta no Google Planilhas!')),
+          );
+        }
+      } else {
+        throw Exception('A URL da planilha retornou vazia.');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao abrir planilha: $e'), backgroundColor: AppTheme.excludeRed),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCreatingSheets = false;
+        });
+      }
     }
   }
 
@@ -325,90 +392,143 @@ class _ReportsPageState extends State<ReportsPage> {
     final statusText = isLocked ? 'TRAVADO PARA AUDITORIA' : 'COMPETÊNCIA ABERTA';
     final statusIcon = isLocked ? Icons.lock_rounded : Icons.lock_open_rounded;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    Widget titleAndStatus = Wrap(
+      spacing: 12,
+      runSpacing: 8,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        Text(
+          'Relatório Financeiro Oficial',
+          style: TextStyle(
+            fontSize: isDesktop ? 24 : 20,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF0F172A),
+            letterSpacing: -0.5,
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: statusColor.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: statusColor.withValues(alpha: 0.5)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                children: [
-                  Text(
-                    'Relatório Financeiro Oficial',
-                    style: TextStyle(
-                      fontSize: isDesktop ? 24 : 20,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF0F172A),
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: statusColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: statusColor.withValues(alpha: 0.5)),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(statusIcon, size: 12, color: statusColor),
-                        const SizedBox(width: 6),
-                        Text(
-                          statusText,
-                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: statusColor),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                'Demonstrativo mensal consolidado de arrecadações e despesas liquidadas.',
-                style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+              Icon(statusIcon, size: 12, color: statusColor),
+              const SizedBox(width: 6),
+              Text(
+                statusText,
+                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: statusColor),
               ),
             ],
           ),
         ),
-        if (_currentUser?.role == 'ADMIN')
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              OutlinedButton.icon(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => const AuditLogsDialog(),
-                  );
-                },
-                icon: const Icon(Icons.history_toggle_off_rounded, size: 16, color: Color(0xFF1E3A8A)),
-                label: const Text('TRILHA DE AUDITORIA', style: TextStyle(color: Color(0xFF1E3A8A), fontWeight: FontWeight.bold)),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  side: const BorderSide(color: Color(0xFF1E3A8A)),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              ElevatedButton.icon(
-                onPressed: _isLockingOrUnlocking ? null : _togglePeriodLock,
-                icon: _isLockingOrUnlocking
-                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                    : Icon(isLocked ? Icons.lock_open_rounded : Icons.lock_rounded, size: 16, color: Colors.white),
-                label: Text(isLocked ? 'REABRIR COMPETÊNCIA' : 'TRANCAR MES/PERÍODO', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isLocked ? AppTheme.primaryGreen : const Color(0xFFDC2626),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-              ),
-            ],
-          ),
       ],
     );
+
+    Widget description = const Text(
+      'Demonstrativo mensal consolidado de arrecadações e despesas liquidadas.',
+      style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+    );
+
+    if (isDesktop) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                titleAndStatus,
+                const SizedBox(height: 4),
+                description,
+              ],
+            ),
+          ),
+          if (_currentUser?.role == 'ADMIN')
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const AuditLogsDialog(),
+                    );
+                  },
+                  icon: const Icon(Icons.history_toggle_off_rounded, size: 16, color: Color(0xFF1E3A8A)),
+                  label: const Text('TRILHA DE AUDITORIA', style: TextStyle(color: Color(0xFF1E3A8A), fontWeight: FontWeight.bold)),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    side: const BorderSide(color: Color(0xFF1E3A8A)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                ElevatedButton.icon(
+                  onPressed: _isLockingOrUnlocking ? null : _togglePeriodLock,
+                  icon: _isLockingOrUnlocking
+                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : Icon(isLocked ? Icons.lock_open_rounded : Icons.lock_rounded, size: 16, color: Colors.white),
+                  label: Text(isLocked ? 'REABRIR COMPETÊNCIA' : 'TRANCAR MES/PERÍODO', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isLocked ? AppTheme.primaryGreen : const Color(0xFFDC2626),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
+              ],
+            ),
+        ],
+      );
+    } else {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          titleAndStatus,
+          const SizedBox(height: 8),
+          description,
+          if (_currentUser?.role == 'ADMIN') ...[
+            const SizedBox(height: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const AuditLogsDialog(),
+                    );
+                  },
+                  icon: const Icon(Icons.history_toggle_off_rounded, size: 16, color: Color(0xFF1E3A8A)),
+                  label: const Text('TRILHA DE AUDITORIA', style: TextStyle(color: Color(0xFF1E3A8A), fontWeight: FontWeight.bold)),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    side: const BorderSide(color: Color(0xFF1E3A8A)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton.icon(
+                  onPressed: _isLockingOrUnlocking ? null : _togglePeriodLock,
+                  icon: _isLockingOrUnlocking
+                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : Icon(isLocked ? Icons.lock_open_rounded : Icons.lock_rounded, size: 16, color: Colors.white),
+                  label: Text(isLocked ? 'REABRIR COMPETÊNCIA' : 'TRANCAR MES/PERÍODO', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isLocked ? AppTheme.primaryGreen : const Color(0xFFDC2626),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      );
+    }
   }
 
   Widget _buildFiltersCard(bool isDesktop) {
@@ -478,30 +598,69 @@ class _ReportsPageState extends State<ReportsPage> {
     
     if (isDesktop) {
       return GridView.count(
-        crossAxisCount: 3,
+        crossAxisCount: 4,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
-        childAspectRatio: 2.2,
+        childAspectRatio: 1.8,
         children: [
           _buildKpiCard("TOTAL ENTRADAS", "CHF ${_formatCHF(report.totalIncomes)}", const Color(0xFF1E3A8A), Icons.arrow_upward_rounded),
-          _buildKpiCard("DESPESAS APROVADAS", "CHF ${_formatCHF(report.totalExpenses)}", AppTheme.excludeRed, Icons.arrow_downward_rounded),
-          _buildKpiCard("SALDO LÍQUIDO", "CHF ${_formatCHF(report.netBalance)}", balanceColor, Icons.account_balance_rounded),
+          _buildKpiCard("SAÍDAS PAGAS", "CHF ${_formatCHF(report.totalExpenses)}", AppTheme.excludeRed, Icons.arrow_downward_rounded),
+          _buildKpiCard("DESPESAS APROVADAS A PAGAR", "CHF ${_formatCHF(report.totalCommitted)}", const Color(0xFFD97706), Icons.hourglass_empty_rounded),
+          _buildKpiCard("SALDO LÍQUIDO REALIZADO", "CHF ${_formatCHF(report.netBalance)}", balanceColor, Icons.account_balance_rounded),
         ],
       );
     } else {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildKpiCard("SALDO LÍQUIDO", "CHF ${_formatCHF(report.netBalance)}", balanceColor, Icons.account_balance_rounded),
-          const SizedBox(height: 16),
-          _buildKpiCard("TOTAL ENTRADAS", "CHF ${_formatCHF(report.totalIncomes)}", const Color(0xFF1E3A8A), Icons.arrow_upward_rounded),
-          const SizedBox(height: 16),
-          _buildKpiCard("DESPESAS APROVADAS", "CHF ${_formatCHF(report.totalExpenses)}", AppTheme.excludeRed, Icons.arrow_downward_rounded),
-        ],
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildMobileKpiRow("Saldo Líquido Realizado", "CHF ${_formatCHF(report.netBalance)}", amountColor: balanceColor, isBold: true),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Divider(color: Color(0xFFE2E8F0)),
+            ),
+            _buildMobileKpiRow("Total Entradas", "CHF ${_formatCHF(report.totalIncomes)}", amountColor: AppTheme.institutionalBlue),
+            const SizedBox(height: 10),
+            _buildMobileKpiRow("Saídas Pagas", "CHF ${_formatCHF(report.totalExpenses)}", amountColor: AppTheme.excludeRed),
+            const SizedBox(height: 10),
+            _buildMobileKpiRow("Despesas Aprovadas a Pagar", "CHF ${_formatCHF(report.totalCommitted)}", amountColor: const Color(0xFFD97706)),
+          ],
+        ),
       );
     }
+  }
+
+  Widget _buildMobileKpiRow(String label, String value, {required Color amountColor, bool isBold = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: const Color(0xFF475569),
+            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+            fontSize: 13,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            color: amountColor,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            fontFamily: 'monospace',
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildKpiCard(String label, String value, Color color, IconData icon) {
@@ -546,7 +705,7 @@ class _ReportsPageState extends State<ReportsPage> {
         children: [
           Expanded(child: _buildCategoryTable("Entradas por Categoria", report.incomesByCategory, true)),
           const SizedBox(width: 24),
-          Expanded(child: _buildCategoryTable("Saídas Aprovadas por Categoria", report.expensesByCategory, false)),
+          Expanded(child: _buildCategoryTable("Saídas Pagas por Categoria", report.expensesByCategory, false)),
         ],
       );
     } else {
@@ -555,7 +714,7 @@ class _ReportsPageState extends State<ReportsPage> {
         children: [
           _buildCategoryTable("Entradas por Categoria", report.incomesByCategory, true),
           const SizedBox(height: 24),
-          _buildCategoryTable("Saídas Aprovadas por Categoria", report.expensesByCategory, false),
+          _buildCategoryTable("Saídas Pagas por Categoria", report.expensesByCategory, false),
         ],
       );
     }
@@ -645,38 +804,65 @@ class _ReportsPageState extends State<ReportsPage> {
 
   Widget _buildExportSection() {
     final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth < 600;
+    final isMobile = screenWidth < 800;
 
-    final buttons = [
-      ElevatedButton.icon(
-        onPressed: _isExportingPdf ? null : _exportPdf,
-        icon: _isExportingPdf
-            ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-            : const Icon(Icons.picture_as_pdf_rounded, color: Colors.white, size: 20),
-        label: const Text('Exportar PDF Oficial', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppTheme.primaryGreen,
-          minimumSize: isMobile ? const Size(double.infinity, 48) : null,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
+    final btnPdf = ElevatedButton.icon(
+      onPressed: _isExportingPdf ? null : _exportPdf,
+      icon: _isExportingPdf
+          ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+          : const Icon(Icons.picture_as_pdf_rounded, color: Colors.white, size: 20),
+      label: const Text('Exportar PDF Oficial', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppTheme.primaryGreen,
+        minimumSize: isMobile ? const Size(double.infinity, 48) : null,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
-      if (isMobile) const SizedBox(height: 10),
-      if (!isMobile) const SizedBox(width: 12),
-      ElevatedButton.icon(
-        onPressed: _isExporting ? null : _exportCsv,
-        icon: _isExporting
-            ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-            : const Icon(Icons.download_rounded, color: Colors.white, size: 20),
-        label: const Text('Exportar CSV', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF1E3A8A),
-          minimumSize: isMobile ? const Size(double.infinity, 48) : null,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
+    );
+
+    final btnCsv = ElevatedButton.icon(
+      onPressed: _isExporting ? null : () => _exportCsv(openSheets: false),
+      icon: _isExporting
+          ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+          : const Icon(Icons.download_rounded, color: Colors.white, size: 20),
+      label: const Text('Baixar CSV', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF1E3A8A),
+        minimumSize: isMobile ? const Size(double.infinity, 48) : null,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
-    ];
+    );
+
+    final btnSheets = ElevatedButton.icon(
+      onPressed: (_isExporting || _isCreatingSheets) ? null : _openGoogleSheetsDirectly,
+      icon: _isCreatingSheets
+          ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+          : const Icon(Icons.table_chart_rounded, color: Colors.white, size: 20),
+      label: const Text('Abrir no Google Planilhas', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF15803D), // Spreadsheet Green
+        minimumSize: isMobile ? const Size(double.infinity, 48) : null,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+
+    final List<Widget> buttonsList = isMobile
+        ? [
+            btnPdf,
+            const SizedBox(height: 10),
+            btnCsv,
+            const SizedBox(height: 10),
+            btnSheets,
+          ]
+        : [
+            btnPdf,
+            const SizedBox(width: 12),
+            btnCsv,
+            const SizedBox(width: 12),
+            btnSheets,
+          ];
 
     return Card(
       elevation: 0,
@@ -700,7 +886,7 @@ class _ReportsPageState extends State<ReportsPage> {
                     style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
                   ),
                   const SizedBox(height: 16),
-                  ...buttons,
+                  ...buttonsList,
                 ],
               )
             : Row(
@@ -723,7 +909,7 @@ class _ReportsPageState extends State<ReportsPage> {
                     ),
                   ),
                   const SizedBox(width: 24),
-                  Row(mainAxisSize: MainAxisSize.min, children: buttons),
+                  Row(mainAxisSize: MainAxisSize.min, children: buttonsList),
                 ],
               ),
       ),

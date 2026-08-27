@@ -399,7 +399,7 @@ public class ExpenseControllerTest {
 
     @Test
     public void testStatusTransitionMatrix() {
-        // Matriz de Testes 1 a 12:
+        // Matriz de Testes 1 a 14 (incluindo ações de pagamento):
         
         // 1. PENDING -> APPROVED = ACEITA
         checkTransition("PENDING", "approve", HttpStatus.OK);
@@ -407,26 +407,30 @@ public class ExpenseControllerTest {
         checkTransition("PENDING", "reject", HttpStatus.OK);
         // 3. PENDING -> REVERSED = REJEITA
         checkTransition("PENDING", "reverse", HttpStatus.BAD_REQUEST);
+        // 4. PENDING -> PAY = REJEITA (atalho removido — deve aprovar primeiro)
+        checkTransition("PENDING", "pay", HttpStatus.BAD_REQUEST);
         
-        // 4. APPROVED -> APPROVED = REJEITA
+        // 5. APPROVED -> APPROVED = REJEITA
         checkTransition("APPROVED", "approve", HttpStatus.BAD_REQUEST);
-        // 5. APPROVED -> REJECTED = REJEITA
+        // 6. APPROVED -> REJECTED = REJEITA
         checkTransition("APPROVED", "reject", HttpStatus.BAD_REQUEST);
-        // 6. APPROVED -> REVERSED = ACEITA
+        // 7. APPROVED -> REVERSED = ACEITA
         checkTransition("APPROVED", "reverse", HttpStatus.OK);
+        // 8. APPROVED -> PAY = ACEITA (com comprovante)
+        checkTransition("APPROVED", "pay", HttpStatus.OK);
         
-        // 7. REJECTED -> APPROVED = REJEITA
+        // 9. REJECTED -> APPROVED = REJEITA
         checkTransition("REJECTED", "approve", HttpStatus.BAD_REQUEST);
-        // 8. REJECTED -> REJECTED = REJEITA
+        // 10. REJECTED -> REJECTED = REJEITA
         checkTransition("REJECTED", "reject", HttpStatus.BAD_REQUEST);
-        // 9. REJECTED -> REVERSED = REJEITA
+        // 11. REJECTED -> REVERSED = REJEITA
         checkTransition("REJECTED", "reverse", HttpStatus.BAD_REQUEST);
         
-        // 10. REVERSED -> APPROVED = REJEITA
+        // 12. REVERSED -> APPROVED = REJEITA
         checkTransition("REVERSED", "approve", HttpStatus.BAD_REQUEST);
-        // 11. REVERSED -> REJECTED = REJEITA
+        // 13. REVERSED -> REJECTED = REJEITA
         checkTransition("REVERSED", "reject", HttpStatus.BAD_REQUEST);
-        // 12. REVERSED -> REVERSED = REJEITA
+        // 14. REVERSED -> REVERSED = REJEITA
         checkTransition("REVERSED", "reverse", HttpStatus.BAD_REQUEST);
     }
 
@@ -434,6 +438,13 @@ public class ExpenseControllerTest {
         Expense expense = new Expense();
         expense.setId(1L);
         expense.setStatus(initialStatus);
+
+        // Para ação 'pay' com APPROVED, adicionar comprovante ativo
+        if ("pay".equals(action) && "APPROVED".equals(initialStatus)) {
+            ExpenseAttachment att = new ExpenseAttachment();
+            att.setActive(true);
+            expense.getAttachments().add(att);
+        }
 
         reset(expenseRepository);
         when(expenseRepository.findById(1L)).thenReturn(Optional.of(expense));
@@ -446,6 +457,8 @@ public class ExpenseControllerTest {
             RejectionRequest rejReq = new RejectionRequest();
             rejReq.setJustification("Justificativa de rejeição");
             response = controller.rejectExpense(1L, rejReq, authentication);
+        } else if ("pay".equals(action)) {
+            response = controller.payExpense(1L, authentication);
         } else { // reverse
             ReversalRequest request = new ReversalRequest();
             request.setJustification("Justificativa de estorno");
@@ -466,6 +479,76 @@ public class ExpenseControllerTest {
         ResponseEntity<Double> response = (ResponseEntity<Double>) controller.getApprovedExpensesTotal();
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(150.0, response.getBody());
+    }
+
+    @Test
+    public void testGetPaidExpensesTotal() {
+        when(expenseRepository.sumPaidExpenses()).thenReturn(250.0);
+        ResponseEntity<Double> response = (ResponseEntity<Double>) controller.getPaidExpensesTotal();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(250.0, response.getBody());
+    }
+
+    @Test
+    public void testGetPendingExpensesTotal() {
+        when(expenseRepository.sumPendingExpenses()).thenReturn(50.0);
+        ResponseEntity<Double> response = (ResponseEntity<Double>) controller.getPendingExpensesTotal();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(50.0, response.getBody());
+    }
+
+    @Test
+    public void testPayExpenseSuccessWithReceipt() {
+        Expense expense = new Expense();
+        expense.setId(1L);
+        expense.setStatus("APPROVED");
+        ExpenseAttachment att = new ExpenseAttachment();
+        att.setActive(true);
+        expense.getAttachments().add(att);
+        
+        when(expenseRepository.findById(1L)).thenReturn(Optional.of(expense));
+        when(expenseRepository.save(any(Expense.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        ResponseEntity<?> response = controller.payExpense(1L, authentication);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("PAID", expense.getStatus());
+    }
+
+    @Test
+    public void testPayExpenseFailsWithoutReceipt() {
+        Expense expense = new Expense();
+        expense.setId(1L);
+        expense.setStatus("APPROVED");
+        
+        when(expenseRepository.findById(1L)).thenReturn(Optional.of(expense));
+
+        ResponseEntity<?> response = controller.payExpense(1L, authentication);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("É obrigatório anexar um comprovante antes de registrar o pagamento.", response.getBody());
+    }
+
+    /**
+     * Gate: Correção do ciclo de despesas.
+     * PENDING → PAID deve ser REJEITADO — o atalho foi removido.
+     * Fluxo correto: PENDING → APPROVED → PAID.
+     */
+    @Test
+    public void testPayExpenseFailsFromPending() {
+        Expense expense = new Expense();
+        expense.setId(1L);
+        expense.setStatus("PENDING");
+        // Adicionar comprovante para garantir que a rejeição é pelo status, não pelo comprovante
+        ExpenseAttachment att = new ExpenseAttachment();
+        att.setActive(true);
+        expense.getAttachments().add(att);
+
+        when(expenseRepository.findById(1L)).thenReturn(Optional.of(expense));
+
+        ResponseEntity<?> response = controller.payExpense(1L, authentication);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("APROVADAS"),
+                "Mensagem de erro deve mencionar APROVADAS. Recebido: " + response.getBody());
+        verify(expenseRepository, never()).save(any(Expense.class));
     }
 
     @Test

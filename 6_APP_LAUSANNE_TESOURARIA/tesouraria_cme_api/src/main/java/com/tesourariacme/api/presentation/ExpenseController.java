@@ -53,6 +53,16 @@ public class ExpenseController {
         return ResponseEntity.ok(expenseRepository.sumApprovedExpenses());
     }
 
+    @GetMapping("/total-paga")
+    public ResponseEntity<Double> getPaidExpensesTotal() {
+        return ResponseEntity.ok(expenseRepository.sumPaidExpenses());
+    }
+
+    @GetMapping("/total-pendente")
+    public ResponseEntity<Double> getPendingExpensesTotal() {
+        return ResponseEntity.ok(expenseRepository.sumPendingExpenses());
+    }
+
     @PostMapping
     public ResponseEntity<?> createExpense(@RequestBody ExpenseRequest request, Authentication authentication) {
         if (monthlyPeriodService.isPeriodLocked(request.getExpenseDate())) {
@@ -96,6 +106,33 @@ public class ExpenseController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PutMapping("/{id}/pay")
+    public ResponseEntity<?> payExpense(@PathVariable Long id, Authentication authentication) {
+        if (!isAuthorizedToManage(authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Apenas administradores ou tesoureiros podem pagar despesas.");
+        }
+
+        return expenseRepository.findById(id).map(expense -> {
+            if (monthlyPeriodService.isPeriodLocked(expense.getExpenseDate())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("O período contábil deste mês está trancado para auditoria.");
+            }
+            if (!"APPROVED".equals(expense.getStatus())) {
+                return ResponseEntity.badRequest().body("Apenas despesas APROVADAS podem ser pagas. Uma despesa PENDENTE deve ser aprovada antes de ser liquidada.");
+            }
+            // Check if there is an active attachment (receipt) before paying
+            boolean hasReceipt = expense.getAttachments().stream().anyMatch(ExpenseAttachment::isActive);
+            if (!hasReceipt) {
+                return ResponseEntity.badRequest().body("É obrigatório anexar um comprovante antes de registrar o pagamento.");
+            }
+            expense.setStatus("PAID");
+            expense.setApprovedBy(authentication.getName());
+            expense.setApprovalDate(LocalDate.now());
+            Expense saved = expenseRepository.save(expense);
+            auditLogService.logAction("EXPENSE_PAID", authentication.getName(), String.valueOf(saved.getId()), String.format("Paga: CHF %s - %s", saved.getAmount(), saved.getDescription()));
+            return ResponseEntity.ok(saved);
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
     @PutMapping("/{id}/reject")
     public ResponseEntity<?> rejectExpense(@PathVariable Long id, @RequestBody RejectionRequest request, Authentication authentication) {
         if (!isAuthorizedToManage(authentication)) {
@@ -135,8 +172,8 @@ public class ExpenseController {
             if (monthlyPeriodService.isPeriodLocked(expense.getExpenseDate())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("O período contábil deste mês está trancado para auditoria.");
             }
-            if (!"APPROVED".equals(expense.getStatus())) {
-                return ResponseEntity.badRequest().body("Apenas despesas APROVADAS podem ser estornadas.");
+            if (!"APPROVED".equals(expense.getStatus()) && !"PAID".equals(expense.getStatus())) {
+                return ResponseEntity.badRequest().body("Apenas despesas APROVADAS ou PAGAS podem ser estornadas.");
             }
             expense.setStatus("REVERSED");
             expense.setReversalJustification(request.getJustification());

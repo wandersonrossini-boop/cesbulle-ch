@@ -12,6 +12,12 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     @Query("SELECT COALESCE(SUM(e.amount), 0.0) FROM Expense e WHERE e.status = 'APPROVED'")
     Double sumApprovedExpenses();
 
+    @Query("SELECT COALESCE(SUM(e.amount), 0.0) FROM Expense e WHERE e.status = 'PAID'")
+    Double sumPaidExpenses();
+
+    @Query("SELECT COALESCE(SUM(e.amount), 0.0) FROM Expense e WHERE e.status = 'PENDING'")
+    Double sumPendingExpenses();
+
     List<Expense> findByExpenseDateBetweenAndStatusIn(LocalDate startDate, LocalDate endDate, List<String> statuses);
 
     List<Expense> findByStatus(String status);
