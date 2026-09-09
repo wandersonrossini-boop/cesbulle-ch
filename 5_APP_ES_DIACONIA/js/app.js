@@ -10352,13 +10352,18 @@ const App = {
     },
 
     async openMinhasEscalasModal() {
-        if (!this.currentUser) return;
-        
         const container = document.getElementById('minhas-escalas-list-container');
+        const modal = document.getElementById('modal-minhas-escalas');
+        
+        if (modal) modal.classList.add('active');
         if (!container) return;
         
+        if (!this.currentUser) {
+            container.innerHTML = '<div style="text-align:center; padding: 40px; color: var(--slate-gray);"><i class="fa-solid fa-user-lock" style="font-size: 2.5rem; margin-bottom: 15px; color: var(--teal-primary);"></i><p style="font-weight: 700; margin: 0;">Sessão não identificada</p><p style="font-size: 0.85rem; margin-top: 5px;">Por favor, faça login novamente para visualizar suas escalas.</p></div>';
+            return;
+        }
+        
         container.innerHTML = '<div style="text-align:center; padding: 40px;"><i class="fa-solid fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--teal-primary);"></i><p style="margin-top:15px; color:var(--slate-gray); font-weight: 600;">Buscando suas escalas...</p></div>';
-        document.getElementById('modal-minhas-escalas').classList.add('active');
         
         try {
             const escalas = await DbService.getEscalasDoMembro(this.currentUser.id);
