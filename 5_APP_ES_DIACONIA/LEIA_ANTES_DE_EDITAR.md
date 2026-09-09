@@ -12,7 +12,7 @@
 | **Congregação** | CES Lausanne (Produção) |
 | **Tipo** | Aplicativo PWA Standalone — Controle de escalas e serviços diaconais |
 | **Status Geral** | 🟢 **ESTÁVEL / PRODUÇÃO VALIDADA / FCM EM VALIDAÇÃO FINAL** |
-| **Modelo Operacional** | **Híbrido de Transição** (Hospedagem atual no legado / pronto para migração Infomaniak) |
+| **Modelo Operacional** | **Produção Exclusiva** (`diaconia-a38f1` / pronto para migração Infomaniak) |
 | **Faturamento** | **Plano Spark (100% Gratuito)**. Cloud Functions e plano Blaze **NÃO** autorizados. |
 | **PWA & Instalação** | **Instalador Integrado Ativo** (captura instalação e solicita notificações automaticamente) |
 
@@ -24,8 +24,7 @@ O mapeamento de projetos, hospedagens e redirecionamento está estruturado da se
 
 | Ambiente | Projeto Firebase ID | Domínio/URL de Hospedagem | Status Operacional |
 | :--- | :--- | :--- | :--- |
-| **Legado (Transição)** | `catedral-connect-267b2` | `https://catedral-connect-267b2.web.app` | **ATIVO** (Servindo o PWA híbrido) |
-| **Produção Novo** | `diaconia-a38f1` | `https://diaconia-a38f1.web.app` | **ATIVO** (Firestore de produção + PWA) |
+| **Produção Oficial** | `diaconia-a38f1` | `https://diaconia-a38f1.web.app` | **ATIVO** (Firestore de produção + PWA) |
 | **Hospedagem Oficial** | *(Pronto para migrar)* | **Infomaniak** (ex: `diaconia.cesbulle.ch`) | **CONFIGURAÇÃO PRONTA** |
 | **Desenvolvimento** | `ces-diaconia-dev` | `https://ces-diaconia-dev.web.app` | **ATIVO** (Para testes isolados) |
 
