@@ -1,14 +1,5 @@
 // Firebase Configuration for CES Diaconia (Standalone SPA)
-// Supporting Multi-Environment (Dev, Prod, and Old Project Migration Fallback)
-
-var firebaseConfigOld = {
-    apiKey: "AIzaSyAtwHODax7kq0keaLuON1ZxbNfdaBP7yfo",
-    authDomain: "catedral-connect-267b2.firebaseapp.com",
-    projectId: "catedral-connect-267b2",
-    storageBucket: "catedral-connect-267b2.firebasestorage.app",
-    messagingSenderId: "524359049819",
-    appId: "1:524359049819:web:d4788e1c64767e0818557e"
-};
+// Environment: Production (diaconia-a38f1) & Dev (ces-diaconia-dev)
 
 var firebaseConfigDev = {
     apiKey: "AIzaSyC5aYjN7SoiuITUrtsxxU03HvARVotYdjI",
@@ -35,13 +26,12 @@ let useLegacyNamespace = false;
 const hostname = window.location.hostname;
 const isDefinitiveDomain = (hostname === 'diaconato.ch' || hostname === 'www.diaconato.ch');
 const isCurrentOfficialDomain = (hostname === 'diaconia-a38f1.web.app' || hostname === 'diaconia-a38f1.firebaseapp.com');
-const isLegacyDomain = (hostname === 'catedral-connect-267b2.web.app' || hostname === 'catedral-connect-267b2.firebaseapp.com');
 const isDevDomain = (hostname === 'ces-diaconia-dev.web.app' || hostname === 'localhost' || hostname === '127.0.0.1');
 
-if (isDefinitiveDomain || isCurrentOfficialDomain || isLegacyDomain) {
+if (isDefinitiveDomain || isCurrentOfficialDomain) {
     selectedConfig = firebaseConfigProd;
     useLegacyNamespace = false;
-    console.log(`Diaconia rodando no ambiente de PRODUÇÃO (${hostname}) com coleções limpas.`);
+    console.log(`Diaconia rodando no ambiente de PRODUÇÃO (${hostname}).`);
 } else if (isDevDomain) {
     selectedConfig = firebaseConfigDev;
     useLegacyNamespace = false;
