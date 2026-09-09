@@ -6830,97 +6830,76 @@ table.admin-table tr:hover td {
     bottom: 0 !important;
     left: 0 !important;
     width: 100% !important;
-    border-top-left-radius: 20px !important;
-    border-top-right-radius: 20px !important;
-    background: rgba(15, 23, 42, 0.95) !important;
-    backdrop-filter: blur(24px) !important;
-    -webkit-backdrop-filter: blur(24px) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background: #0F172A !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
     display: flex !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
     align-items: center !important;
-    padding: 10px 20px !important;
-    padding-bottom: env(safe-area-inset-bottom, 15px) !important;
-    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.2) !important;
+    padding: 10px 16px !important;
+    padding-bottom: env(safe-area-inset-bottom, 14px) !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
     z-index: 9999 !important;
     box-sizing: border-box !important;
-}
-
-.selector-nav-brand {
-    display: flex !important;
-    align-items: baseline !important;
-    gap: 3px !important;
-    user-select: none !important;
-}
-
-.selector-nav-brand .nav-brand-main {
-    font-family: 'Outfit', sans-serif !important;
-    font-weight: 900 !important;
-    font-size: 1.15rem !important;
-    letter-spacing: -0.5px !important;
-    color: #ffffff !important;
-}
-
-.selector-nav-brand .nav-brand-sub {
-    font-family: 'Outfit', sans-serif !important;
-    font-weight: 500 !important;
-    font-size: 0.85rem !important;
-    color: #14b8a6 !important;
-    text-transform: none !important;
-}
-
-/* Modo Imersivo */
-.bottom-nav-hidden {
-    transform: translateY(100%) !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
 }
 
 .selector-nav-actions {
     display: flex !important;
     align-items: center !important;
-    gap: 16px !important;
+    justify-content: space-around !important;
+    width: 100% !important;
+    max-width: 460px !important;
+    gap: 8px !important;
 }
 
 .nav-action-btn {
-    background: transparent !important;
-    border: none !important;
-    padding: 4px 8px !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 8px !important;
+    padding: 10px 16px !important;
     cursor: pointer !important;
-    display: flex;
-    flex-direction: column !important;
+    display: flex !important;
+    flex-direction: row !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 4px !important;
-    color: rgba(255, 255, 255, 0.6) !important;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    gap: 8px !important;
+    color: #94A3B8 !important;
+    transition: all 0.15s ease-in-out !important;
     outline: none !important;
+    flex: 1 !important;
+    height: 42px !important;
+    box-sizing: border-box !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 2px 4px rgba(0, 0, 0, 0.2) !important;
 }
 
 .nav-action-btn i {
-    font-size: 1.05rem !important;
-    transition: all 0.2s ease !important;
+    font-size: 0.9rem !important;
+    color: #94A3B8 !important;
+    transition: all 0.15s ease !important;
 }
 
 .nav-action-btn span {
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-size: 0.65rem !important;
-    font-weight: 800 !important;
-    letter-spacing: 0.3px !important;
+    font-family: system-ui, -apple-system, sans-serif !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.8px !important;
     text-transform: uppercase !important;
+    color: inherit !important;
 }
 
-.nav-action-btn:hover {
-    color: #ffffff !important;
+.nav-action-btn.active {
+    background: #0F766E !important;
+    border-color: #14B8A6 !important;
+    color: #FFFFFF !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 3px 6px rgba(0, 0, 0, 0.3) !important;
 }
 
-.nav-action-btn:hover i {
-    color: #14b8a6 !important;
-    transform: translateY(-1px) !important;
+.nav-action-btn.active i {
+    color: #FFFFFF !important;
 }
 
-.nav-btn-logout:hover i {
-    color: #ef4444 !important;
+.nav-action-btn:active {
+    transform: translateY(1px) !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* Adjustments for Title Block Spacing (v3.10.4A) */

@@ -1095,48 +1095,38 @@ const App = {
 
                     const mainLabel = isOp ? sectorName : next.funcao;
                     const subLabel = isOp ? next.funcao : sectorName;
-                    const displayFuncText = (mainLabel === subLabel || !subLabel)
-                        ? `<span style="font-weight: 700; color: #FFFFFF; font-size: 0.95rem;">${mainLabel}</span>`
-                        : `<span style="font-weight: 700; color: #FFFFFF; font-size: 0.95rem;">${mainLabel}</span> <span style="opacity: 0.7; font-size: 0.8rem;">(${subLabel})</span>`;
+                    const cleanFuncText = (mainLabel === subLabel || !subLabel) ? mainLabel : `${mainLabel} (${subLabel})`;
+                    const fullDateStr = `${String(dNum).padStart(2, '0')}/${String(mIdx + 1).padStart(2, '0')}/${y}`;
 
                     premiumNextContainer.innerHTML = `
-                        <div class="premium-next-scale-card" onclick="App.navigateToNextService('${next.id}', '${next.data}', '${next.cultoId || 'sem-culto'}', '${next.horarioInicio || '00:00'}', '${next.setorId}', '${(next.funcao || '').replace(/'/g, '\\\'')}');" style="display: flex; flex-direction: column; gap: 8px; padding: 18px 20px; border-radius: 16px; box-shadow: 0 8px 24px rgba(18,115,105,0.25); border: 1px solid rgba(255,255,255,0.15);">
-                            <!-- Linha Superior -->
-                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 4px;">
-                                <span style="font-size: 0.75rem; color: #E2E8F0; font-weight: 600; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
-                                    <i class="fa-solid fa-map-marker-alt" style="color: #6EE7B7;"></i> Templo Central
+                        <div class="premium-next-scale-card operational-mission-card" onclick="App.navigateToNextService('${next.id}', '${next.data}', '${next.cultoId || 'sem-culto'}', '${next.horarioInicio || '00:00'}', '${next.setorId}', '${(next.funcao || '').replace(/'/g, '\\\'')}');" style="cursor: pointer;">
+                            <!-- Header Operacional -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 12px;">
+                                <span style="font-size: 0.75rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;">
+                                    ${fullDateStr} • TEMPLO CENTRAL
                                 </span>
-                                <span class="scale-status-badge ${badgeClass}" style="margin: 0; padding: 4px 8px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">${statusText}</span>
+                                <span class="scale-status-badge ${badgeClass}" style="margin: 0; padding: 3px 10px; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 6px;">${statusText}</span>
                             </div>
                             
-                            <!-- Corpo -->
-                            <div class="scale-info-row" style="display: flex; align-items: center; gap: 16px; margin-top: 4px;">
-                                <!-- Bloco Data Compacto -->
-                                <div class="scale-date-badge" style="display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px; padding: 8px 10px; min-width: 54px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1);">
-                                    <div class="day" style="font-size: 1.4rem; font-weight: 800; color: #FFFFFF; line-height: 1;">${String(dNum).padStart(2, '0')}</div>
-                                    <div class="month" style="font-size: 0.65rem; color: #A7F3D0; font-weight: 700; margin-top: 2px; text-transform: uppercase; letter-spacing: 1px;">${monthAbbrev}</div>
+                            <!-- Grade de Informações Operacionais -->
+                            <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                                <div style="font-size: 1.1rem; font-weight: 700; color: #FFFFFF; letter-spacing: -0.2px;">
+                                    ${eventTitle}
                                 </div>
-                                
-                                <!-- Detalhes da Escala -->
-                                <div class="scale-details" style="flex: 1; min-width: 0; text-align: left;">
-                                    <h4 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: #FFFFFF; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${eventTitle}</h4>
-                                    <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #A7F3D0; font-weight: 500; display: flex; align-items: center; gap: 6px;"><i class="fa-regular fa-clock"></i> ${next.horarioInicio || '00:00'}</p>
-                                    <p style="margin: 6px 0 0 0; font-size: 0.85rem; color: #F8FAFC; line-height: 1.3;">
-                                        <span style="font-weight: 500; color: #94A3B8; font-size: 0.75rem; text-transform: uppercase;">${funcLabel}</span><br>
-                                        ${displayFuncText}
-                                    </p>
+                                <div style="display: flex; flex-wrap: wrap; gap: 14px; margin-top: 4px; font-size: 0.85rem; color: #CBD5E1;">
+                                    <div><span style="color: #64748B; font-weight: 600; font-size: 0.72rem; text-transform: uppercase; display: block;">Horário</span><strong style="color: #F8FAFC;">${next.horarioInicio || '00:00'}</strong></div>
+                                    <div><span style="color: #64748B; font-weight: 600; font-size: 0.72rem; text-transform: uppercase; display: block;">${funcLabel}</span><strong style="color: #F8FAFC;">${cleanFuncText}</strong></div>
                                 </div>
                             </div>
                             
-                            ${btnConfirmHtml ? `<div style="margin-top: 10px;">${btnConfirmHtml}</div>` : ''}
+                            ${btnConfirmHtml ? `<div style="margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px;">${btnConfirmHtml}</div>` : ''}
                         </div>
                     `;
                 } else {
                     premiumNextContainer.innerHTML = `
-                        <div class="premium-next-scale-card" onclick="App.handleMobileNavClick('escala')" style="align-items: center; text-align: center; justify-content: center; padding: 24px; cursor: pointer; border-radius: 16px;">
-                            <i class="fa-regular fa-calendar-check" style="font-size: 2rem; opacity: 0.6; margin-bottom: 12px; color: white;"></i>
-                            <h4 style="margin: 0; color: white; font-weight: 800; font-size: 1.1rem;">Nenhuma Missão Pendente</h4>
-                            <p style="opacity: 0.8; margin: 6px 0 0 0; font-size: 0.85rem; color: #E2E8F0;">Você está com tudo em dia. Toque para ver a escala geral.</p>
+                        <div class="premium-next-scale-card operational-mission-card" onclick="App.handleMobileNavClick('escala')" style="align-items: center; text-align: center; justify-content: center; padding: 24px; cursor: pointer; border-radius: 12px;">
+                            <h4 style="margin: 0; color: white; font-weight: 700; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px;">Nenhuma Missão Pendente</h4>
+                            <p style="opacity: 0.75; margin: 6px 0 0 0; font-size: 0.82rem; color: #E2E8F0;">Você está em dia com suas escalas. Toque para acessar o calendário geral.</p>
                         </div>
                     `;
                 }
@@ -9960,19 +9950,26 @@ const App = {
         dotsContainer.innerHTML = '';
 
         this.carouselItems.forEach((item, index) => {
+            const dateHtml = item.date ? `<span style="font-size: 0.78rem; color: #64748B; font-weight: 600;">${item.date}</span>` : '<span></span>';
+            
             track.innerHTML += `
-                <div class="carousel-slide premium-dark-slide" onclick="App.handleCarouselInteraction(); ${item.action}">
-                    <div class="slide-content-dark" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+                <div class="carousel-slide premium-white-comunicado" onclick="App.handleCarouselInteraction(); ${item.action}" style="background: #FFFFFF; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06); border: 1px solid #E2E8F0; cursor: pointer; height: 100%; box-sizing: border-box; display: flex; flex-direction: row; position: relative;">
+                    <!-- Area de Texto (65% da largura) -->
+                    <div style="flex: 1; min-width: 0; padding: 18px 16px 18px 20px; display: flex; flex-direction: column; justify-content: space-between; z-index: 2;">
                         <div>
-                            <span class="slide-tag-dark" style="font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: var(--teal-primary, #0F766E); letter-spacing: 1.5px; display: block; margin-bottom: 6px;">${item.category}</span>
-                            <h4 class="slide-title-dark" style="margin-bottom: 6px; font-size: 1.25rem; line-height: 1.25;">${item.title}</h4>
-                            <span class="slide-subtitle-dark" style="display: block; margin-bottom: 8px; font-size: 0.95rem; color: #64748B;">${item.subtitle}</span>
-                            <p class="slide-desc-dark" style="margin-bottom: 8px; font-size: 0.95rem; color: #475569; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">${item.description}</p>
+                            <span style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: #0F766E; letter-spacing: 1.5px; display: block; margin-bottom: 6px;">COMUNICADO</span>
+                            <h4 style="margin: 0 0 6px 0; font-size: 1.1rem; font-weight: 800; color: #0F172A; line-height: 1.25;">${item.title}</h4>
+                            ${item.subtitle ? `<p style="margin: 0 0 8px 0; font-size: 0.82rem; color: #475569; font-weight: 500; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${item.subtitle}</p>` : ''}
                         </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #E2E8F0; padding-top: 10px; margin-top: auto;">
-                            <span style="font-size: 0.85rem; color: #94A3B8; font-weight: 600;">${item.date}</span>
-                            <span class="slide-action-link" style="margin-top: 0; font-size: 0.9rem; font-weight: 700; color: var(--teal-primary, #0F766E);">Ler mais →</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #F1F5F9; padding-top: 10px; margin-top: 8px;">
+                            ${dateHtml}
+                            <span style="font-size: 0.8rem; font-weight: 700; color: #0F766E;">Ler comunicado →</span>
                         </div>
+                    </div>
+                    
+                    <!-- Fotografia Editorial Real (35% da largura, lado direito com vaso) -->
+                    <div style="width: 35%; height: 100%; position: relative; overflow: hidden; background: #F1F5F9;">
+                        <img src="assets/comunicado_vaso.jpg" alt="Vaso com oliveira" style="width: 100%; height: 100%; object-fit: cover; object-position: 85% center; display: block;">
                     </div>
                 </div>
             `;
@@ -10046,35 +10043,29 @@ const App = {
     showMuralAvisosDetail() {
         const avisos = this.cachedAvisosList || [];
         if (avisos.length === 0) {
-            this.showAlert('Nenhum aviso importante no momento.', 'Mural de Avisos');
+            this.showAlert('Nenhum comunicado importante no momento.', 'Comunicado');
             return;
         }
         
-        let html = '<div class="mural-reader-container">';
+        let html = '<div class="fullscreen-comunicado-reader" style="max-width: 680px; margin: 0 auto; text-align: left; font-family: system-ui, -apple-system, sans-serif;">';
         avisos.forEach(a => {
             const dateStr = a.data && typeof a.data.toDate === 'function' ? a.data.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' • ' + a.data.toDate().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : (a.data ? new Date(a.data).toLocaleDateString('pt-BR') : '');
             html += `
-                <div class="mural-reader-card">
-                    <div class="mural-accent-bar"></div>
-                    <div class="mural-card-content">
-                        <span class="mural-card-tag">RESUMO</span>
-                        <h3 class="mural-card-title">${a.titulo}</h3>
-                        ${a.subtitulo ? `<h4 class="mural-card-subtitle">${a.subtitulo}</h4>` : ''}
-                        
-                        <hr class="mural-card-divider">
-                        
-                        <div class="mural-card-body">${a.conteudo || a.texto || ''}</div>
-                        
-                        <hr class="mural-card-divider">
-                        
-                        <span class="mural-card-date">${dateStr}</span>
+                <div style="background: #FFFFFF; border-radius: 16px; padding: 28px 24px; color: #0F172A; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #F1F5F9; padding-bottom: 12px; margin-bottom: 16px;">
+                        <span style="font-size: 0.78rem; font-weight: 800; color: #0F766E; letter-spacing: 1.5px; text-transform: uppercase;">COMUNICADO OFICIAL</span>
+                        <span style="font-size: 0.8rem; color: #64748B; font-weight: 600;">${dateStr}</span>
                     </div>
+                    <h2 style="font-size: 1.5rem; font-weight: 800; color: #0F172A; margin: 0 0 10px 0; line-height: 1.3;">${a.titulo}</h2>
+                    ${a.subtitulo ? `<h4 style="font-size: 1.05rem; font-weight: 600; color: #475569; margin: 0 0 20px 0; line-height: 1.4;">${a.subtitulo}</h4>` : ''}
+                    
+                    <div style="font-size: 1.02rem; color: #334155; line-height: 1.7; font-weight: 400; margin-bottom: 20px; white-space: pre-wrap;">${a.conteudo || a.texto || ''}</div>
                 </div>
             `;
         });
         html += '</div>';
         
-        this.showAlert(html, 'Mural de Avisos');
+        this.showAlert(html, 'Leitura de Comunicado');
     },
 
     showChecklistDetail(type) {
