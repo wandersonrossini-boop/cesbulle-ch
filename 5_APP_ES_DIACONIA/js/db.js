@@ -941,10 +941,17 @@ const DbService = {
         await db.collection('notificacoes').add(data);
     },
 
-    async getNotificacoesUsuario(usuarioId) {
-        const snap = await db.collection('notificacoes')
-            .where('paraUsuarioId', '==', usuarioId)
-            .get();
+    async getNotificacoesUsuario(usuarioId, isAdmin = false) {
+        let snap;
+        if (isAdmin && usuarioId !== 'admin_default') {
+            snap = await db.collection('notificacoes')
+                .where('paraUsuarioId', 'in', [usuarioId, 'admin_default'])
+                .get();
+        } else {
+            snap = await db.collection('notificacoes')
+                .where('paraUsuarioId', '==', usuarioId)
+                .get();
+        }
         const list = snap.docs.map(doc => {
             const data = doc.data();
             return {
@@ -958,11 +965,19 @@ const DbService = {
         return list.slice(0, 30);
     },
 
-    async marcarNotificacoesComoLidas(usuarioId) {
-        const snap = await db.collection('notificacoes')
-            .where('paraUsuarioId', '==', usuarioId)
-            .where('lida', '==', false)
-            .get();
+    async marcarNotificacoesComoLidas(usuarioId, isAdmin = false) {
+        let snap;
+        if (isAdmin && usuarioId !== 'admin_default') {
+            snap = await db.collection('notificacoes')
+                .where('paraUsuarioId', 'in', [usuarioId, 'admin_default'])
+                .where('lida', '==', false)
+                .get();
+        } else {
+            snap = await db.collection('notificacoes')
+                .where('paraUsuarioId', '==', usuarioId)
+                .where('lida', '==', false)
+                .get();
+        }
         
         if (snap.empty) return;
         

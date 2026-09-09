@@ -589,6 +589,36 @@ const App = {
 
     _notificationInterval: null,   // Reference to the setInterval for reminders
     _swRegistration: null,          // Service Worker registration reference
+    _notificacoesUnsubscribe: null, // Cancelador do listener de notificações
+
+    cleanupNotificacoesListener() {
+        if (this._notificacoesUnsubscribe) {
+            this._notificacoesUnsubscribe();
+            this._notificacoesUnsubscribe = null;
+        }
+    },
+
+    setupNotificacoesRealtimeListener() {
+        this.cleanupNotificacoesListener();
+
+        if (!this.currentUser) return;
+
+        const isAdmin = this.currentUser.perfil === 'admin';
+        const usuarioId = this.currentUser.id;
+
+        let query = db.collection('notificacoes').where('lida', '==', false);
+        if (isAdmin && usuarioId !== 'admin_default') {
+            query = query.where('paraUsuarioId', 'in', [usuarioId, 'admin_default']);
+        } else {
+            query = query.where('paraUsuarioId', '==', usuarioId);
+        }
+
+        this._notificacoesUnsubscribe = query.onSnapshot(snapshot => {
+            this.updateBadgesFromCount(snapshot.size);
+        }, err => {
+            console.warn('[Realtime Notificações] Erro ao escutar mudanças:', err);
+        });
+    },
 
     isIOS() {
         return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -706,6 +736,7 @@ const App = {
 
         // Request permission and start reminder loop
         await this.requestNotificationPermission();
+        this.setupNotificacoesRealtimeListener();
     },
 
     async requestNotificationPermission() {
@@ -901,6 +932,7 @@ const App = {
     },
 
     async handleLogout() {
+        this.cleanupNotificacoesListener();
         // Remove FCM token before logging out
         await this.removeTokenFromFirestore();
         
@@ -1061,39 +1093,11 @@ const App = {
                     const eventTitle = isOp ? (next.funcao || 'Plantão') : (next.cultoNome || 'Culto');
                     const funcLabel = isOp ? 'Atividade' : 'Função';
 
-                    let instructionsHtml = '';
-                    if (!isOp) {
-                        let nodeId = null;
-                        const funcLower = (next.funcao || '').toLowerCase();
-                        const obsLower = (next.observacoes || '').toLowerCase();
-                        if (next.setorId === 'escala_livre' || funcLower.includes('escala livre')) nodeId = 'escala_livre';
-                        else if (next.setorId === 'acolhimento' || funcLower.includes('acolhimento')) nodeId = 'acolhimento';
-                        else if (next.setorId === 'entrada' || next.setorId === 'check_in' || funcLower.includes('entrada') || funcLower.includes('portaria')) {
-                            if (funcLower.includes('check')) nodeId = 'checkin';
-                            else nodeId = 'portaria';
-                        } else if (next.setorId === 'apoio_templo_ronda_dir' || next.setorId === 'apoio_templo_ronda_esq' || funcLower.includes('apoio')) {
-                            const isDir = funcLower.includes('direito') || obsLower.includes('direito') || funcLower.includes('dir');
-                            if (funcLower.includes('ronda')) {
-                                nodeId = isDir ? 'ronda-direito' : 'ronda-esquerdo';
-                            } else {
-                                nodeId = isDir ? 'apoio-direito' : 'apoio-esquerdo';
-                            }
-                        }
-                        
-                        const staticData = this.areaStaticData[nodeId];
-                        if (staticData && staticData.instrucoes) {
-                            instructionsHtml = `
-                                <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
-                                    <div style="font-size: 0.75rem; font-weight: 700; color: #6EE7B7; text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
-                                        <i class="fa-solid fa-circle-info"></i> O que fazer:
-                                    </div>
-                                    <div style="font-size: 0.85rem; color: #E2E8F0; line-height: 1.4;">
-                                        ${staticData.instrucoes}
-                                    </div>
-                                </div>
-                            `;
-                        }
-                    }
+                    const mainLabel = isOp ? sectorName : next.funcao;
+                    const subLabel = isOp ? next.funcao : sectorName;
+                    const displayFuncText = (mainLabel === subLabel || !subLabel)
+                        ? `<span style="font-weight: 700; color: #FFFFFF; font-size: 0.95rem;">${mainLabel}</span>`
+                        : `<span style="font-weight: 700; color: #FFFFFF; font-size: 0.95rem;">${mainLabel}</span> <span style="opacity: 0.7; font-size: 0.8rem;">(${subLabel})</span>`;
 
                     premiumNextContainer.innerHTML = `
                         <div class="premium-next-scale-card" onclick="App.navigateToNextService('${next.id}', '${next.data}', '${next.cultoId || 'sem-culto'}', '${next.horarioInicio || '00:00'}', '${next.setorId}', '${(next.funcao || '').replace(/'/g, '\\\'')}');" style="display: flex; flex-direction: column; gap: 8px; padding: 18px 20px; border-radius: 16px; box-shadow: 0 8px 24px rgba(18,115,105,0.25); border: 1px solid rgba(255,255,255,0.15);">
@@ -1119,12 +1123,10 @@ const App = {
                                     <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #A7F3D0; font-weight: 500; display: flex; align-items: center; gap: 6px;"><i class="fa-regular fa-clock"></i> ${next.horarioInicio || '00:00'}</p>
                                     <p style="margin: 6px 0 0 0; font-size: 0.85rem; color: #F8FAFC; line-height: 1.3;">
                                         <span style="font-weight: 500; color: #94A3B8; font-size: 0.75rem; text-transform: uppercase;">${funcLabel}</span><br>
-                                        <span style="font-weight: 700; color: #FFFFFF; font-size: 0.95rem;">${isOp ? sectorName : next.funcao}</span> <span style="opacity: 0.7; font-size: 0.8rem;">(${isOp ? next.funcao : sectorName})</span>
+                                        ${displayFuncText}
                                     </p>
                                 </div>
                             </div>
-                            
-                            ${instructionsHtml}
                             
                             ${btnConfirmHtml ? `<div style="margin-top: 10px;">${btnConfirmHtml}</div>` : ''}
                         </div>
@@ -1480,11 +1482,13 @@ const App = {
             
             // 1. Fetch personal notifications
             if (this.currentUser) {
-                const notificacoes = await DbService.getNotificacoesUsuario(this.currentUser.id);
+                const isAdmin = this.currentUser.perfil === 'admin';
+                const notificacoes = await DbService.getNotificacoesUsuario(this.currentUser.id, isAdmin);
                 
                 // Mark notifications as read since user is viewing them
                 if (notificacoes.some(n => !n.lida)) {
-                    await DbService.marcarNotificacoesComoLidas(this.currentUser.id);
+                    await DbService.marcarNotificacoesComoLidas(this.currentUser.id, isAdmin);
+                    notificacoes.forEach(n => n.lida = true);
                 }
 
                 if (notificacoes.length > 0) {
@@ -1545,21 +1549,12 @@ const App = {
         }
     },
 
-    async updateAvisosBadgesCount(cachedAvisos = null) {
+    async updateBadgesFromCount(personalUnreadCount = 0) {
         try {
-            const avisos = cachedAvisos || await DbService.getAvisos();
+            const avisos = await DbService.getAvisos();
             const readAvisosStr = localStorage.getItem('diaconia_read_avisos');
             const readIds = readAvisosStr ? JSON.parse(readAvisosStr) : [];
-            let unreadCount = avisos.filter(a => !readIds.includes(a.id)).length;
-            
-            // Add unread personal notifications count
-            if (this.currentUser) {
-                const notificationsSnap = await db.collection('notificacoes')
-                    .where('paraUsuarioId', '==', this.currentUser.id)
-                    .where('lida', '==', false)
-                    .get();
-                unreadCount += notificationsSnap.size;
-            }
+            let unreadCount = avisos.filter(a => !readIds.includes(a.id)).length + personalUnreadCount;
             
             const summaryBadge = document.getElementById('summary-unread-badge');
             const mobileBadge = document.getElementById('mobile-bell-badge');
@@ -1612,6 +1607,31 @@ const App = {
                     unreadSubEl.innerText = 'Tudo atualizado';
                 }
             }
+        } catch (e) {
+            console.error("Error updating badges from count:", e);
+        }
+    },
+
+    async updateAvisosBadgesCount(cachedAvisos = null) {
+        try {
+            let personalUnreadCount = 0;
+            if (this.currentUser) {
+                const isAdmin = this.currentUser.perfil === 'admin';
+                let notificationsSnap;
+                if (isAdmin && this.currentUser.id !== 'admin_default') {
+                    notificationsSnap = await db.collection('notificacoes')
+                        .where('paraUsuarioId', 'in', [this.currentUser.id, 'admin_default'])
+                        .where('lida', '==', false)
+                        .get();
+                } else {
+                    notificationsSnap = await db.collection('notificacoes')
+                        .where('paraUsuarioId', '==', this.currentUser.id)
+                        .where('lida', '==', false)
+                        .get();
+                }
+                personalUnreadCount = notificationsSnap.size;
+            }
+            await this.updateBadgesFromCount(personalUnreadCount);
         } catch (e) {
             console.error("Error updating notices count:", e);
         }
@@ -3596,6 +3616,16 @@ const App = {
         }
     },
 
+
+    openMonthlyCalendar() {
+        this.showMonthlyCalendar();
+    },
+
+    showMonthlyCalendar() {
+        this.showingMonthlyCalendar = true;
+        this.navigateTo('view-member');
+        this.renderPremiumCalendar(false);
+    },
 
     changeMemberCalendarMonth(offset) {
         this.memberCurrentDate.setMonth(this.memberCurrentDate.getMonth() + offset);

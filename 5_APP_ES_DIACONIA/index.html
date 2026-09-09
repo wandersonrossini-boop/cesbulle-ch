@@ -143,38 +143,24 @@
                                 <!-- Dots injetados via JS -->
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Bloco 3: Cards Inteligentes (Discretos - Ultra Compactos) -->
-                    <div class="mural-header-row" style="margin-top: 10px; margin-bottom: 10px; text-align: left;">
-                        <span style="font-size: 0.72rem; font-weight: 700; color: #8AA6A3; letter-spacing: 1.2px; text-transform: uppercase;">Indicadores Rápidos</span>
-                    </div>
-                    <div class="smart-cards-container" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 40px; width: 100%; border: none; background: transparent;">
-                        <!-- Card 1: Aniversários -->
-                        <div class="smart-card-discrete" id="smart-card-birthdays" onclick="App.showMuralBirthdaysDetail()" style="flex: 1; margin: 0; padding: 6px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: transparent; border: none; cursor: pointer; color: #8AA6A3; font-weight: 600;">
-                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                                <span class="smart-card-icon" style="font-size: 1.1rem;"><i class="fa-solid fa-cake-candles"></i></span>
-                                <span class="smart-card-badge" id="smart-card-birthdays-count" style="color: #FFFFFF; background: rgba(255,255,255,0.15); padding: 2px 6px; border-radius: 10px; font-size: 0.75rem;">0</span>
-                            </div>
-                            <span class="smart-card-title" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">Aniversários</span>
+                        
+                        <!-- Bloco 3: Cards Inteligentes (Ocultos a pedido) -->
+                        <div class="mural-header-row" style="display: none !important;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: #8AA6A3; letter-spacing: 1.2px; text-transform: uppercase;">Indicadores Rápidos</span>
                         </div>
-
-                        <!-- Card 2: Pedidos de Oração -->
-                        <div class="smart-card-discrete" id="smart-card-prayers" onclick="App.openPrayersModal()" style="flex: 1; margin: 0; padding: 6px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: transparent; border: none; cursor: pointer; color: #8AA6A3; font-weight: 600;">
-                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                                <span class="smart-card-icon" style="font-size: 1.1rem;"><i class="fa-solid fa-hands-praying"></i></span>
-                                <span class="smart-card-badge" id="smart-card-prayers-count" style="color: #FFFFFF; background: rgba(255,255,255,0.15); padding: 2px 6px; border-radius: 10px; font-size: 0.75rem;">0</span>
+                        <div class="smart-cards-container" style="display: none !important;">
+                            <!-- Card 1: Aniversários -->
+                            <div class="smart-card-discrete" id="smart-card-birthdays" onclick="App.showMuralBirthdaysDetail()">
+                                <span class="smart-card-badge" id="smart-card-birthdays-count">0</span>
                             </div>
-                            <span class="smart-card-title" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">Oração</span>
-                        </div>
-
-                        <!-- Card 3: Ausências -->
-                        <div class="smart-card-discrete" id="smart-card-away" onclick="App.showMuralAwayDetail()" style="flex: 1; margin: 0; padding: 6px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: transparent; border: none; cursor: pointer; color: #8AA6A3; font-weight: 600;">
-                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                                <span class="smart-card-icon" style="font-size: 1.1rem;"><i class="fa-solid fa-user-slash"></i></span>
-                                <span class="smart-card-badge" id="smart-card-away-count" style="color: #FFFFFF; background: rgba(255,255,255,0.15); padding: 2px 6px; border-radius: 10px; font-size: 0.75rem;">0</span>
+                            <!-- Card 2: Pedidos de Oração -->
+                            <div class="smart-card-discrete" id="smart-card-prayers" onclick="App.openPrayersModal()">
+                                <span class="smart-card-badge" id="smart-card-prayers-count">0</span>
                             </div>
-                            <span class="smart-card-title" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">Ausências</span>
+                            <!-- Card 3: Ausências -->
+                            <div class="smart-card-discrete" id="smart-card-away" onclick="App.showMuralAwayDetail()">
+                                <span class="smart-card-badge" id="smart-card-away-count">0</span>
+                            </div>
                         </div>
                     </div>
 
