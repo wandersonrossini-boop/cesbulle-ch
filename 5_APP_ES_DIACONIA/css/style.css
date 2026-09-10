@@ -116,6 +116,8 @@ body {
     flex-direction: column;
     width: 100%;
     height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
     animation: fadeIn 0.4s ease;
 }
 
@@ -6824,94 +6826,51 @@ table.admin-table tr:hover td {
 }
 
 
-/* Bottom Navigation Bar (Selector/Mural) */
-.selector-bottom-nav {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    background: #FFFFFF !important; /* White like the Comunicado card */
-    border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    padding: 10px 16px !important;
-    padding-bottom: env(safe-area-inset-bottom, 14px) !important;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06) !important;
-    z-index: 9999 !important;
-    box-sizing: border-box !important;
-}
-
-
-.selector-nav-actions {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-around !important;
-    width: 100% !important;
-    max-width: 460px !important;
-    gap: 8px !important;
-}
-
-.nav-action-btn {
+/* Home Access Cards (Substitui antiga barra inferior) */
+.home-access-card {
     display: flex !important;
     background: #FFFFFF !important;
-    border: 1px solid #E2E8F0 !important;
+    border: 1px solid rgba(226, 232, 240, 0.6) !important;
     border-radius: 12px !important;
-    padding: 12px 4px !important;
+    padding: 16px 4px !important;
     cursor: pointer !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 4px !important;
-    transition: all 0.2s ease-in-out !important;
+    gap: 6px !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
     outline: none !important;
     flex: 1 !important;
-    max-width: 31% !important;
-    height: auto !important;
-    min-height: 64px !important;
+    max-width: none !important;
+    min-height: 86px !important;
     box-sizing: border-box !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
     text-align: center !important;
 }
 
-.nav-title {
-    font-family: system-ui, -apple-system, sans-serif !important;
-    font-size: 0.95rem !important;
+.access-title {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    font-size: 1.05rem !important;
     font-weight: 800 !important;
-    letter-spacing: 0.3px !important;
-    text-transform: uppercase !important;
-    color: #1E293B !important;
+    letter-spacing: -0.3px !important;
+    color: #0F172A !important;
     display: block !important;
-    line-height: 1.1 !important;
+    line-height: 1 !important;
 }
 
-.nav-subtitle {
-    font-family: system-ui, -apple-system, sans-serif !important;
+.access-subtitle {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
     font-size: 0.65rem !important;
     font-weight: 400 !important;
     color: #64748B !important;
     display: block !important;
-    line-height: 1.2 !important;
+    line-height: 1.1 !important;
 }
 
-.nav-action-btn.active {
+.home-access-card:active {
+    transform: translateY(2px) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
     background: #F8FAFC !important;
-    border-color: #14B8A6 !important;
-    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.08) !important;
-}
-
-.nav-action-btn.active .nav-title {
-    color: #0F766E !important;
-}
-
-.nav-action-btn.active .nav-subtitle {
-    color: #0F766E !important;
-    opacity: 0.8 !important;
-}
-
-.nav-action-btn:active {
-    transform: translateY(1px) !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
 }
 
 /* Adjustments for Title Block Spacing (v3.10.4A) */

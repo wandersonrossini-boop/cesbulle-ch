@@ -10576,9 +10576,9 @@ const App = {
 
     // --- NAV NAVIGATION AND MODAL HANDLERS (v3.10) ---
     setActiveNavBtn(btnId) {
-        document.querySelectorAll('.nav-action-btn').forEach(btn => {
+        document.querySelectorAll('.home-access-card').forEach(btn => {
             btn.classList.remove('active');
-            btn.style.color = '#94A3B8';
+            btn.style.color = '#1E293B'; // Default color for the new cards
         });
         const activeBtn = document.getElementById(btnId);
         if (activeBtn) {

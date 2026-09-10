@@ -19,7 +19,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=3.10.9">
+    <link rel="stylesheet" href="css/style.css?v=3.10.10">
     
     <!-- Firebase SDK (v8 Compat) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -102,7 +102,7 @@
                     <div id="selector-date-banner-container" style="display: none;"></div>
 
                     <!-- Bloco 2: Carrossel de Comunicados (Mural - Protagonista) -->
-                    <div id="premium-carousel-container" style="margin-bottom: 40px;">
+                    <div id="premium-carousel-container" style="margin-bottom: 20px;">
                         <div class="mural-header-row" style="margin-bottom: 10px; text-align: left;">
                             <span style="font-size: 0.75rem; font-weight: 700; color: #8AA6A3; letter-spacing: 1.5px; text-transform: uppercase;">COMUNICADO</span>
                         </div>
@@ -157,13 +157,42 @@
 
 
                     <!-- ÁREA DE MISSÃO PRIMÁRIA -->
-                    <div id="missao-primaria-container" style="margin-top: 40px; margin-bottom: 40px;">
+                    <div id="missao-primaria-container" style="margin-top: 10px; margin-bottom: 20px;">
                         <div class="mural-header-row" style="margin-bottom: 10px; text-align: left;">
                             <span style="font-size: 0.75rem; font-weight: 700; color: #8AA6A3; letter-spacing: 1.5px; text-transform: uppercase;">MISSÃO PRIMÁRIA</span>
                         </div>
                         <div id="premium-next-scale-container">
                             <!-- Dynamic next scale injected here by JS -->
                             <div class="skeleton-loader" style="height: 110px; border-radius: 12px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- ACESSOS INFERIORES DA HOME (Ex-Barra Inferior) -->
+                    <div id="main-bottom-nav" style="width: 90%; margin: 20px auto 40px auto;">
+                        <div class="selector-nav-actions" style="display: flex; justify-content: space-between; gap: 8px; width: 100%;">
+                            <button class="home-access-card" id="nav-btn-home" onclick="App.navigateTo('view-setor-select'); App.setActiveNavBtn('nav-btn-home');">
+                                <span class="access-title">INÍCIO</span>
+                                <span class="access-subtitle">Página principal</span>
+                            </button>
+                            <button class="home-access-card" id="nav-btn-escalas" onclick="App.openMinhasEscalasModal(); App.setActiveNavBtn('nav-btn-escalas');">
+                                <span class="access-title">ESCALAS</span>
+                                <span class="access-subtitle">Minhas escalas</span>
+                            </button>
+                            
+                            <!-- Botões Dinâmicos (invisíveis por padrão, mantidos p/ não quebrar JS) -->
+                            <button class="home-access-card" id="nav-btn-painel" onclick="App.navigateTo('view-admin'); App.switchAdminTab('dashboard'); App.setActiveNavBtn('nav-btn-painel');" style="display: none;">
+                                <span class="access-title">PAINEL</span>
+                                <span class="access-subtitle">Gerencial</span>
+                            </button>
+                            <button class="home-access-card" id="nav-btn-servicos" onclick="App.navigateTo('view-member'); App.switchMemberTab('reposicao'); App.setActiveNavBtn('nav-btn-servicos');" style="display: none;">
+                                <span class="access-title">SERVIÇOS</span>
+                                <span class="access-subtitle">Atividades</span>
+                            </button>
+
+                            <button class="home-access-card" id="nav-btn-mais" onclick="App.openMaisModal(); App.setActiveNavBtn('nav-btn-mais');">
+                                <span class="access-title">MENU</span>
+                                <span class="access-subtitle">Mais opções</span>
+                            </button>
                         </div>
                     </div>
 
@@ -174,39 +203,7 @@
                     <div id="admin-shortcut-container" style="display: none !important;"></div>
                 </div>
             </div>
-
-            <!-- Espaçamento extra no fundo da tela para os 3 cards -->
-            <div style="height: 60px;"></div>
         </div>
-
-        <!-- Bottom Navigation Bar Global (v4.0) -->
-        <nav class="selector-bottom-nav" id="main-bottom-nav" style="justify-content: center; padding: 12px 16px; transition: transform 0.3s ease, opacity 0.3s ease;">
-            <div class="selector-nav-actions" style="width: 100%; max-width: 400px; justify-content: space-between; gap: 8px;">
-                <button class="nav-action-btn active" id="nav-btn-home" onclick="App.navigateTo('view-setor-select'); App.setActiveNavBtn('nav-btn-home');" title="Início">
-                    <span class="nav-title">INÍCIO</span>
-                    <span class="nav-subtitle">Página principal</span>
-                </button>
-                <button class="nav-action-btn" id="nav-btn-escalas" onclick="App.openMinhasEscalasModal(); App.setActiveNavBtn('nav-btn-escalas');" title="Escalas">
-                    <span class="nav-title">ESCALAS</span>
-                    <span class="nav-subtitle">Minhas escalas</span>
-                </button>
-                
-                <!-- Botões Dinâmicos (3º Botão) -->
-                <button class="nav-action-btn" id="nav-btn-painel" onclick="App.navigateTo('view-admin'); App.switchAdminTab('dashboard'); App.setActiveNavBtn('nav-btn-painel');" title="Painel" style="display: none;">
-                    <span class="nav-title">PAINEL</span>
-                    <span class="nav-subtitle">Gerencial</span>
-                </button>
-                <button class="nav-action-btn" id="nav-btn-servicos" onclick="App.navigateTo('view-member'); App.switchMemberTab('reposicao'); App.setActiveNavBtn('nav-btn-servicos');" title="Serviços" style="display: none;">
-                    <span class="nav-title">SERVIÇOS</span>
-                    <span class="nav-subtitle">Atividades</span>
-                </button>
-
-                <button class="nav-action-btn" id="nav-btn-mais" onclick="App.openMaisModal(); App.setActiveNavBtn('nav-btn-mais');" title="Menu">
-                    <span class="nav-title">MENU</span>
-                    <span class="nav-subtitle">Mais opções</span>
-                </button>
-            </div>
-        </nav>
 
         <!-- ==========================================
              3. PORTAL DO MEMBRO (MOBILE)
@@ -2416,6 +2413,6 @@
         <script src="js/firebase-config.js?v=3.11.3"></script>
         <script src="js/db.js?v=3.11.3"></script>
         <script src="js/config/sectorsData.js?v=3.11.3"></script>
-        <script src="js/app.js?v=3.11.20"></script>
+        <script src="js/app.js?v=3.11.21"></script>
 </body>
 </html>
