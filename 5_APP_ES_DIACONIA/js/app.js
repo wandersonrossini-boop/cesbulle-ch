@@ -552,27 +552,31 @@ const App = {
         const isRepositor = this.currentUser && this.currentUser.eRepositor === true;
         
         const userSectors = this.currentUser ? (Array.isArray(this.currentUser.setores) ? this.currentUser.setores : (this.currentUser.setor ? [this.currentUser.setor] : [])) : [];
+        const isLimpeza = userSectors.some(s => s === 'limpeza' || s === 'produtos') || isRepositor;
         const hasOnlyOpSectors = userSectors.length > 0 && userSectors.every(s => this.isOperationalSector(s));
         
         const btnPainel = document.getElementById('nav-btn-painel');
         const btnServicos = document.getElementById('nav-btn-servicos');
         const btnEscalas = document.getElementById('nav-btn-escalas');
         
-        if (btnPainel) btnPainel.style.display = 'none';
-        if (btnServicos) btnServicos.style.display = 'none';
-        if (btnEscalas) btnEscalas.style.display = 'flex'; // Padrão visível
+        if (btnPainel) btnPainel.style.setProperty('display', 'none', 'important');
+        if (btnServicos) btnServicos.style.setProperty('display', 'none', 'important');
+        if (btnEscalas) btnEscalas.style.setProperty('display', 'flex', 'important');
 
+        // 1. Apenas Admin possui acesso ao Painel
         if (isAdmin) {
-            if (btnPainel) btnPainel.style.display = 'flex';
-            if (btnEscalas) btnEscalas.style.display = 'none';
+            if (btnPainel) btnPainel.style.setProperty('display', 'flex', 'important');
+            if (btnEscalas) btnEscalas.style.setProperty('display', 'none', 'important');
         }
         
+        // 2. Se for membro exclusivo de setor operacional (ex: Limpeza), oculta Escalas normais
         if (hasOnlyOpSectors && !isAdmin) {
-            if (btnEscalas) btnEscalas.style.display = 'none';
+            if (btnEscalas) btnEscalas.style.setProperty('display', 'none', 'important');
         }
         
-        if (isRepositor || isAdmin) {
-            if (btnServicos) btnServicos.style.display = 'flex';
+        // 3. Apenas quem for da Limpeza (ou Repositor/Admin) possui acesso a Serviços
+        if (isLimpeza || isAdmin) {
+            if (btnServicos) btnServicos.style.setProperty('display', 'flex', 'important');
         }
     },
 
@@ -1096,30 +1100,41 @@ const App = {
                     const mainLabel = isOp ? sectorName : next.funcao;
                     const subLabel = isOp ? next.funcao : sectorName;
                     const cleanFuncText = (mainLabel === subLabel || !subLabel) ? mainLabel : `${mainLabel} (${subLabel})`;
-                    const fullDateStr = `${String(dNum).padStart(2, '0')}/${String(mIdx + 1).padStart(2, '0')}/${y}`;
+                    const dayFormatted = String(dNum).padStart(2, '0');
 
                     premiumNextContainer.innerHTML = `
-                        <div class="premium-next-scale-card operational-mission-card" onclick="App.navigateToNextService('${next.id}', '${next.data}', '${next.cultoId || 'sem-culto'}', '${next.horarioInicio || '00:00'}', '${next.setorId}', '${(next.funcao || '').replace(/'/g, '\\\'')}');" style="cursor: pointer;">
-                            <!-- Header Operacional -->
-                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 12px;">
-                                <span style="font-size: 0.75rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;">
-                                    ${fullDateStr} • TEMPLO CENTRAL
-                                </span>
-                                <span class="scale-status-badge ${badgeClass}" style="margin: 0; padding: 3px 10px; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 6px;">${statusText}</span>
+                        <div class="premium-next-scale-card operational-mission-card" onclick="App.navigateToNextService('${next.id}', '${next.data}', '${next.cultoId || 'sem-culto'}', '${next.horarioInicio || '00:00'}', '${next.setorId}', '${(next.funcao || '').replace(/'/g, '\\\'')}');" style="cursor: pointer; padding: 22px 20px; display: flex; flex-direction: column; gap: 14px; position: relative;">
+                            <!-- Header: Data Amigavel & Status Perfeitamente Alinhados -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <div style="display: flex; align-items: baseline; gap: 6px;">
+                                    <span style="font-size: 1.5rem; font-weight: 900; color: #FFFFFF; line-height: 1;">${dayFormatted}</span>
+                                    <span style="font-size: 0.9rem; font-weight: 800; color: #6EE7B7; text-transform: uppercase; letter-spacing: 1px;">${monthAbbrev}</span>
+                                </div>
+                                <span class="scale-status-badge ${badgeClass}" style="margin: 0; padding: 4px 12px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; position: relative; top: 0; right: 0;">${statusText}</span>
                             </div>
                             
-                            <!-- Grade de Informações Operacionais -->
-                            <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
-                                <div style="font-size: 1.1rem; font-weight: 700; color: #FFFFFF; letter-spacing: -0.2px;">
-                                    ${eventTitle}
-                                </div>
-                                <div style="display: flex; flex-wrap: wrap; gap: 14px; margin-top: 4px; font-size: 0.85rem; color: #CBD5E1;">
-                                    <div><span style="color: #64748B; font-weight: 600; font-size: 0.72rem; text-transform: uppercase; display: block;">Horário</span><strong style="color: #F8FAFC;">${next.horarioInicio || '00:00'}</strong></div>
-                                    <div><span style="color: #64748B; font-weight: 600; font-size: 0.72rem; text-transform: uppercase; display: block;">${funcLabel}</span><strong style="color: #F8FAFC;">${cleanFuncText}</strong></div>
-                                </div>
+                            <!-- Local -->
+                            <div style="font-size: 0.78rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; margin-top: -4px;">
+                                TEMPLO CENTRAL
+                            </div>
+
+                            <!-- Nome do Culto / Evento -->
+                            <div style="font-size: 1.25rem; font-weight: 800; color: #FFFFFF; line-height: 1.25;">
+                                ${eventTitle}
+                            </div>
+
+                            <!-- Horario -->
+                            <div style="font-size: 1.1rem; font-weight: 800; color: #6EE7B7;">
+                                ${next.horarioInicio || '00:00'}
+                            </div>
+
+                            <!-- Função -->
+                            <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px;">
+                                <span style="color: #64748B; font-weight: 700; font-size: 0.72rem; text-transform: uppercase; display: block; margin-bottom: 3px;">${funcLabel}</span>
+                                <span style="color: #FFFFFF; font-size: 0.95rem; font-weight: 700; line-height: 1.3; display: block;">${cleanFuncText}</span>
                             </div>
                             
-                            ${btnConfirmHtml ? `<div style="margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px;">${btnConfirmHtml}</div>` : ''}
+                            ${btnConfirmHtml ? `<div style="margin-top: 4px;">${btnConfirmHtml}</div>` : ''}
                         </div>
                     `;
                 } else {

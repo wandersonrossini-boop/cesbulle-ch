@@ -6857,7 +6857,6 @@ table.admin-table tr:hover td {
     border-radius: 8px !important;
     padding: 10px 16px !important;
     cursor: pointer !important;
-    display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
     justify-content: center !important;
@@ -7567,9 +7566,6 @@ body.area-detail-active .side-nav-zone {
 }
 
 .scale-status-badge {
-    position: absolute;
-    top: 28px;
-    right: 28px;
     padding: 6px 12px;
     border-radius: 8px;
     font-size: 0.75rem;
