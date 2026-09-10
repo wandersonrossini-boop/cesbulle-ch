@@ -1089,7 +1089,7 @@ const App = {
                     if (status !== 'Confirmada') {
                         btnConfirmHtml = `
                             <button class="btn-confirm-huge" style="height: 40px !important; font-size: 0.85rem; border-radius: 10px;" onclick="event.stopPropagation(); App.confirmarPresencaDireto('${next.id}', '${next.data}')">
-                                <i class="fa-solid fa-circle-check"></i> CONFIRMAR PRESENÇA
+                                CONFIRMAR PRESENÇA
                             </button>
                         `;
                     }
@@ -9617,7 +9617,7 @@ const App = {
                 const dateStr = dateObj ? dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
                 carouselItems.push({
                     type: 'warning',
-                    category: '📢 COMUNICADO',
+                    category: 'COMUNICADO',
                     title: a.titulo,
                     subtitle: 'Aviso Geral',
                     description: a.texto || a.conteudo || 'Toque para ver mais detalhes.',
@@ -9642,7 +9642,7 @@ const App = {
         activePrayers.forEach(p => {
             carouselItems.push({
                 type: 'prayer',
-                category: '🙏 PEDIDO DE ORAÇÃO',
+                category: 'PEDIDO DE ORAÇÃO',
                 title: p.obreiro,
                 subtitle: 'Pedido de Intercessão',
                 description: p.motivo,
@@ -9682,7 +9682,7 @@ const App = {
                     const month = parts[1];
                     carouselItems.push({
                         type: 'birthday',
-                        category: '🎂 ANIVERSARIANTE',
+                        category: 'ANIVERSARIANTE',
                         title: m.nome,
                         subtitle: 'Aniversariante do Mês',
                         description: 'Que tal enviar uma mensagem de parabéns e celebrar a vida deste obreiro?',
@@ -9723,7 +9723,7 @@ const App = {
                 const lPlural = isOp ? 'Voluntários' : 'Obreiros';
                 carouselItems.push({
                     type: 'away',
-                    category: '👥 AUSÊNCIAS DA SEMANA',
+                    category: 'AUSÊNCIAS DA SEMANA',
                     title: `${away.length} ${lSingular}(s) Ausente(s)`,
                     subtitle: 'Ausências da Semana',
                     description: `${lPlural} temporariamente indisponíveis: ${away.map(m => m.nome).join(', ')}`,
@@ -9800,7 +9800,7 @@ const App = {
             if (hasPortaria) {
                 dynamicItems.push({
                     type: 'system',
-                    category: '📋 SUA ÁREA',
+                    category: 'SUA ÁREA',
                     title: 'Checklist: Portaria',
                     subtitle: 'Suas responsabilidades de hoje',
                     description: 'Toque para ver a lista completa de atribuições e o que nunca fazer na Portaria.',
@@ -9812,7 +9812,7 @@ const App = {
             if (hasCheckin) {
                 dynamicItems.push({
                     type: 'system',
-                    category: '📋 SUA ÁREA',
+                    category: 'SUA ÁREA',
                     title: 'Checklist: Check-in',
                     subtitle: 'Suas responsabilidades de hoje',
                     description: 'Toque para ver a lista completa de responsabilidades do Check-in.',
@@ -9824,7 +9824,7 @@ const App = {
             if (hasTemplo && hasRonda) {
                 dynamicItems.push({
                     type: 'system',
-                    category: '📋 SUA ÁREA',
+                    category: 'SUA ÁREA',
                     title: 'Checklist: Templo & Ronda',
                     subtitle: 'Suas responsabilidades de hoje',
                     description: 'Toque para ver a lista completa de atribuições de Templo e Ronda.',
@@ -9835,7 +9835,7 @@ const App = {
                 if (hasTemplo) {
                     dynamicItems.push({
                         type: 'system',
-                        category: '📋 SUA ÁREA',
+                        category: 'SUA ÁREA',
                         title: 'Checklist: Templo',
                         subtitle: 'Suas responsabilidades de hoje',
                         description: 'Toque para ver a lista completa de atribuições do Templo.',
@@ -9846,7 +9846,7 @@ const App = {
                 if (hasRonda) {
                     dynamicItems.push({
                         type: 'system',
-                        category: '📋 SUA ÁREA',
+                        category: 'SUA ÁREA',
                         title: 'Checklist: Ronda',
                         subtitle: 'Suas responsabilidades de hoje',
                         description: 'Toque para ver a lista completa de atribuições da Ronda.',
@@ -9869,7 +9869,7 @@ const App = {
                 if (timeUntilStart > 0 && timeUntilStart <= 45) {
                     dynamicItems.push({
                         type: 'system',
-                        category: '👋 BEM VINDO',
+                        category: 'BEM VINDO',
                         title: 'Bem vindo ao Serviço Diaconal',
                         subtitle: 'Preparação para o Culto das ' + c.horarioInicio,
                         description: 'Não esqueça de orar com seus companheiros de trabalho, e organizar seu setor de trabalho antes do culto começar.',
@@ -9882,7 +9882,7 @@ const App = {
                 if (timeUntilEnd > 0 && timeUntilEnd <= 10) {
                     dynamicItems.push({
                         type: 'system',
-                        category: '🔚 ENCERRAMENTO',
+                        category: 'ENCERRAMENTO',
                         title: 'Encerramento do Culto das ' + c.horarioInicio,
                         subtitle: 'Procedimentos Finais',
                         description: 'Antes de ir embora: Verificar templo, banheiros, salas, estacionamento, recolher objetos perdidos, ajudar na saída dos membros e fazer oração final com a equipe.',
@@ -9897,7 +9897,7 @@ const App = {
         if (hasCultoToday) {
             dynamicItems.push({
                 type: 'system',
-                category: '🚨 EMERGÊNCIAS',
+                category: 'EMERGÊNCIAS',
                 title: 'Atendimento em Emergências',
                 subtitle: 'Diretrizes de Segurança',
                 description: 'Caso alguém passe mal: Manter calma, Chamar líder, Acionar equipe médica, Liberar espaço, Não gerar tumulto. Incêndio: Comunicar liderança, Auxiliar evacuação, Não correr.',
@@ -9910,7 +9910,7 @@ const App = {
         if (dayOfWeek === 0 || dayOfWeek === 6) {
             dynamicItems.push({
                 type: 'system',
-                category: '🤝 ATENDIMENTO',
+                category: 'ATENDIMENTO',
                 title: 'Atendimento ao Público',
                 subtitle: 'Excelência e Simpatia',
                 description: 'Sempre sorria, seja educado, ouça antes de responder. Evite frases como "Não sei", prefira "Vou verificar para o senhor". Resolva ou encaminhe.',
@@ -9923,7 +9923,7 @@ const App = {
         if (dayOfWeek === 3) {
             dynamicItems.push({
                 type: 'system',
-                category: '📖 COMPROMISSO',
+                category: 'COMPROMISSO',
                 title: 'Nosso Chamado',
                 subtitle: 'Compromisso Diaconal',
                 description: '"Comprometo-me a servir ao Senhor e à Sua Igreja com amor, fidelidade, integridade e excelência, honrando meu chamado e servindo ao próximo com dedicação."',
