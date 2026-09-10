@@ -553,15 +553,16 @@ const App = {
         
         const userSectors = this.currentUser ? (Array.isArray(this.currentUser.setores) ? this.currentUser.setores : (this.currentUser.setor ? [this.currentUser.setor] : [])) : [];
         const isLimpeza = userSectors.some(s => s === 'limpeza' || s === 'produtos') || isRepositor;
-        const hasOnlyOpSectors = userSectors.length > 0 && userSectors.every(s => this.isOperationalSector(s));
         
         const btnPainel = document.getElementById('nav-btn-painel');
         const btnServicos = document.getElementById('nav-btn-servicos');
         const btnEscalas = document.getElementById('nav-btn-escalas');
+        const btnMais = document.getElementById('nav-btn-mais');
         
         if (btnPainel) btnPainel.style.setProperty('display', 'none', 'important');
         if (btnServicos) btnServicos.style.setProperty('display', 'none', 'important');
         if (btnEscalas) btnEscalas.style.setProperty('display', 'flex', 'important');
+        if (btnMais) btnMais.style.setProperty('display', 'flex', 'important');
 
         // 1. Apenas Admin possui acesso ao Painel
         if (isAdmin) {
@@ -569,12 +570,7 @@ const App = {
             if (btnEscalas) btnEscalas.style.setProperty('display', 'none', 'important');
         }
         
-        // 2. Se for membro exclusivo de setor operacional (ex: Limpeza), oculta Escalas normais
-        if (hasOnlyOpSectors && !isAdmin) {
-            if (btnEscalas) btnEscalas.style.setProperty('display', 'none', 'important');
-        }
-        
-        // 3. Apenas quem for da Limpeza (ou Repositor/Admin) possui acesso a Serviços
+        // 2. Apenas quem for da Limpeza (ou Repositor/Admin) possui acesso a Serviços
         if (isLimpeza || isAdmin) {
             if (btnServicos) btnServicos.style.setProperty('display', 'flex', 'important');
         }
