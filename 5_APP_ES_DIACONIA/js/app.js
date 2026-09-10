@@ -1124,11 +1124,7 @@ const App = {
                                 ${next.horarioInicio || '00:00'}
                             </div>
 
-                            <!-- Função -->
-                            <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px;">
-                                <span style="color: #64748B; font-weight: 700; font-size: 0.72rem; text-transform: uppercase; display: block; margin-bottom: 3px;">${funcLabel}</span>
-                                <span style="color: #FFFFFF; font-size: 0.95rem; font-weight: 700; line-height: 1.3; display: block;">${cleanFuncText}</span>
-                            </div>
+                            <!-- Função (Removida a pedido do usuário) -->
                             
                             ${btnConfirmHtml ? `<div style="margin-top: 4px;">${btnConfirmHtml}</div>` : ''}
                         </div>

@@ -6830,17 +6830,18 @@ table.admin-table tr:hover td {
     bottom: 0 !important;
     left: 0 !important;
     width: 100% !important;
-    background: #0F172A !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: #FFFFFF !important; /* White like the Comunicado card */
+    border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
     padding: 10px 16px !important;
     padding-bottom: env(safe-area-inset-bottom, 14px) !important;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06) !important;
     z-index: 9999 !important;
     box-sizing: border-box !important;
 }
+
 
 .selector-nav-actions {
     display: flex !important;
@@ -6852,53 +6853,65 @@ table.admin-table tr:hover td {
 }
 
 .nav-action-btn {
-    background: rgba(255, 255, 255, 0.04) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-radius: 8px !important;
-    padding: 10px 16px !important;
+    display: flex !important;
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 12px !important;
+    padding: 12px 4px !important;
     cursor: pointer !important;
-    flex-direction: row !important;
+    flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 8px !important;
-    color: #94A3B8 !important;
-    transition: all 0.15s ease-in-out !important;
+    gap: 4px !important;
+    transition: all 0.2s ease-in-out !important;
     outline: none !important;
     flex: 1 !important;
-    height: 42px !important;
+    max-width: 31% !important;
+    height: auto !important;
+    min-height: 64px !important;
     box-sizing: border-box !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
+    text-align: center !important;
 }
 
-.nav-action-btn i {
-    font-size: 0.9rem !important;
-    color: #94A3B8 !important;
-    transition: all 0.15s ease !important;
-}
-
-.nav-action-btn span {
+.nav-title {
     font-family: system-ui, -apple-system, sans-serif !important;
-    font-size: 0.72rem !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.8px !important;
+    font-size: 0.95rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.3px !important;
     text-transform: uppercase !important;
-    color: inherit !important;
+    color: #1E293B !important;
+    display: block !important;
+    line-height: 1.1 !important;
+}
+
+.nav-subtitle {
+    font-family: system-ui, -apple-system, sans-serif !important;
+    font-size: 0.65rem !important;
+    font-weight: 400 !important;
+    color: #64748B !important;
+    display: block !important;
+    line-height: 1.2 !important;
 }
 
 .nav-action-btn.active {
-    background: #0F766E !important;
+    background: #F8FAFC !important;
     border-color: #14B8A6 !important;
-    color: #FFFFFF !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 3px 6px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.08) !important;
 }
 
-.nav-action-btn.active i {
-    color: #FFFFFF !important;
+.nav-action-btn.active .nav-title {
+    color: #0F766E !important;
+}
+
+.nav-action-btn.active .nav-subtitle {
+    color: #0F766E !important;
+    opacity: 0.8 !important;
 }
 
 .nav-action-btn:active {
     transform: translateY(1px) !important;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
 }
 
 /* Adjustments for Title Block Spacing (v3.10.4A) */
@@ -7988,8 +8001,8 @@ body.area-detail-active .side-nav-zone {
 .premium-next-scale-card {
     padding: 10px 14px;
     min-height: auto;
-    background: rgba(255,255,255,0.02) !important;
-    border: 1px solid rgba(255,255,255,0.08) !important;
+    background: transparent !important; /* Fundo transparente */
+    border: none !important; /* Remover borda visível */
     box-shadow: none !important;
     gap: 10px;
 }

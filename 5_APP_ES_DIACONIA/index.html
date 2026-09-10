@@ -101,31 +101,8 @@
                     <!-- Date Banner (Keep existing element container for backward compatibility if needed, or hide) -->
                     <div id="selector-date-banner-container" style="display: none;"></div>
 
-                    <!-- ÁREA DE MISSÃO PRIMÁRIA -->
-                    <div id="missao-primaria-container" style="margin-top: 24px; margin-bottom: 28px;">
-                        <div class="mural-header-row" style="margin-bottom: 10px; text-align: left;">
-                            <span style="font-size: 0.75rem; font-weight: 700; color: #8AA6A3; letter-spacing: 1.5px; text-transform: uppercase;">MISSÃO PRIMÁRIA</span>
-                        </div>
-                        <div id="premium-next-scale-container">
-                            <!-- Dynamic next scale injected here by JS -->
-                            <div class="skeleton-loader" style="height: 110px; border-radius: 12px;"></div>
-                        </div>
-                    </div>
-
-                    <!-- ALERTAS GERENCIAIS (Apenas Admin/Repositor) -->
-                    <div id="alertas-gerenciais-container" style="display: none; margin-bottom: 24px;">
-                        <div class="mural-header-row" style="margin-bottom: 8px; text-align: left;">
-                            <span style="font-size: 0.72rem; font-weight: 700; color: #F59E0B; letter-spacing: 1.2px; text-transform: uppercase;"><i class="fa-solid fa-triangle-exclamation"></i> Atenção Requerida</span>
-                        </div>
-                        <div id="alertas-gerenciais-list" style="display: flex; flex-direction: column; gap: 8px;">
-                            <!-- Injetado dinamicamente -->
-                        </div>
-                    </div>
-
-
-
                     <!-- Bloco 2: Carrossel de Comunicados (Mural - Protagonista) -->
-                    <div id="premium-carousel-container" style="margin-bottom: 30px;">
+                    <div id="premium-carousel-container" style="margin-bottom: 40px;">
                         <div class="mural-header-row" style="margin-bottom: 10px; text-align: left;">
                             <span style="font-size: 0.75rem; font-weight: 700; color: #8AA6A3; letter-spacing: 1.5px; text-transform: uppercase;">COMUNICADO</span>
                         </div>
@@ -167,6 +144,29 @@
                         </div>
                     </div>
 
+                    <!-- ALERTAS GERENCIAIS (Apenas Admin/Repositor) -->
+                    <div id="alertas-gerenciais-container" style="display: none; margin-bottom: 24px;">
+                        <div class="mural-header-row" style="margin-bottom: 8px; text-align: left;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: #F59E0B; letter-spacing: 1.2px; text-transform: uppercase;"><i class="fa-solid fa-triangle-exclamation"></i> Atenção Requerida</span>
+                        </div>
+                        <div id="alertas-gerenciais-list" style="display: flex; flex-direction: column; gap: 8px;">
+                            <!-- Injetado dinamicamente -->
+                        </div>
+                    </div>
+
+
+
+                    <!-- ÁREA DE MISSÃO PRIMÁRIA -->
+                    <div id="missao-primaria-container" style="margin-top: 40px; margin-bottom: 40px;">
+                        <div class="mural-header-row" style="margin-bottom: 10px; text-align: left;">
+                            <span style="font-size: 0.75rem; font-weight: 700; color: #8AA6A3; letter-spacing: 1.5px; text-transform: uppercase;">MISSÃO PRIMÁRIA</span>
+                        </div>
+                        <div id="premium-next-scale-container">
+                            <!-- Dynamic next scale injected here by JS -->
+                            <div class="skeleton-loader" style="height: 110px; border-radius: 12px;"></div>
+                        </div>
+                    </div>
+
                     <!-- Container Legado Oculto (para não quebrar lógicas antigas caso existam buscas diretas) -->
                     <div id="selector-next-service-highlight" style="display: none;"></div>
 
@@ -175,37 +175,35 @@
                 </div>
             </div>
 
-            <!-- Footer (centered below columns) -->
-            <div class="select-footer-text" style="margin-bottom: 85px;">
-                Diaconato © 2024 - Todos os direitos reservados
-            </div>
+            <!-- Espaçamento extra no fundo da tela para os 3 cards -->
+            <div style="height: 60px;"></div>
         </div>
 
         <!-- Bottom Navigation Bar Global (v4.0) -->
-        <nav class="selector-bottom-nav" id="main-bottom-nav" style="justify-content: center; padding: 10px 0; transition: transform 0.3s ease, opacity 0.3s ease;">
-            <div class="selector-nav-actions" style="width: 100%; justify-content: space-around; gap: 0;">
-                <button class="nav-action-btn active" id="nav-btn-home" onclick="App.navigateTo('view-setor-select'); App.setActiveNavBtn('nav-btn-home');" style="color: var(--teal-primary);" title="Início">
-                    <i class="fa-solid fa-house"></i>
-                    <span>Início</span>
+        <nav class="selector-bottom-nav" id="main-bottom-nav" style="justify-content: center; padding: 12px 16px; transition: transform 0.3s ease, opacity 0.3s ease;">
+            <div class="selector-nav-actions" style="width: 100%; max-width: 400px; justify-content: space-between; gap: 8px;">
+                <button class="nav-action-btn active" id="nav-btn-home" onclick="App.navigateTo('view-setor-select'); App.setActiveNavBtn('nav-btn-home');" title="Início">
+                    <span class="nav-title">INÍCIO</span>
+                    <span class="nav-subtitle">Página principal</span>
                 </button>
                 <button class="nav-action-btn" id="nav-btn-escalas" onclick="App.openMinhasEscalasModal(); App.setActiveNavBtn('nav-btn-escalas');" title="Escalas">
-                    <i class="fa-regular fa-calendar-days"></i>
-                    <span>Escalas</span>
+                    <span class="nav-title">ESCALAS</span>
+                    <span class="nav-subtitle">Minhas escalas</span>
                 </button>
                 
                 <!-- Botões Dinâmicos (3º Botão) -->
                 <button class="nav-action-btn" id="nav-btn-painel" onclick="App.navigateTo('view-admin'); App.switchAdminTab('dashboard'); App.setActiveNavBtn('nav-btn-painel');" title="Painel" style="display: none;">
-                    <i class="fa-solid fa-chart-line"></i>
-                    <span>Painel</span>
+                    <span class="nav-title">PAINEL</span>
+                    <span class="nav-subtitle">Gerencial</span>
                 </button>
                 <button class="nav-action-btn" id="nav-btn-servicos" onclick="App.navigateTo('view-member'); App.switchMemberTab('reposicao'); App.setActiveNavBtn('nav-btn-servicos');" title="Serviços" style="display: none;">
-                    <i class="fa-solid fa-briefcase"></i>
-                    <span>Serviços</span>
+                    <span class="nav-title">SERVIÇOS</span>
+                    <span class="nav-subtitle">Atividades</span>
                 </button>
 
                 <button class="nav-action-btn" id="nav-btn-mais" onclick="App.openMaisModal(); App.setActiveNavBtn('nav-btn-mais');" title="Menu">
-                    <i class="fa-solid fa-bars"></i>
-                    <span>Menu</span>
+                    <span class="nav-title">MENU</span>
+                    <span class="nav-subtitle">Mais opções</span>
                 </button>
             </div>
         </nav>
@@ -1327,7 +1325,8 @@
                         
                     </div>
                 </main>
-            </div>    <div class="premium-modal" id="modal-membro-form">
+            </div>
+    <div class="premium-modal" id="modal-membro-form">
         <div class="modal-content light-bg" style="max-width: 600px; padding: 25px;">
             <button class="modal-close-btn" onclick="App.closeMembroFormModal()"><i class="fa-solid fa-xmark"></i></button>
             <h3 id="membro-modal-title" style="margin-bottom: 15px; font-size: 1.2rem; font-weight: 700; color: #1E293B;">Cadastrar Novo Membro</h3>
@@ -1694,7 +1693,7 @@
     </div>
 
     <!-- ===== MODAL: RASCUNHO DE ESCALA (Geração Automática por IA) ===== -->
-    <div class="premium-modal glass-modal" id="modal-escala-rascunho" style="z-index: 2000;">
+    <div class="premium-modal glass-modal" id="modal-escala-rascunho" style="z-index: 10000;">
         <div class="modal-content" style="max-width: 900px; width: 95%; max-height: 90vh; overflow-y: auto; border-radius: 20px; padding: 0; background: var(--bg-card); border: 1px solid var(--border-color);">
             <!-- Header -->
             <div style="background: linear-gradient(135deg, var(--teal-primary), var(--teal-dark)); padding: 22px 28px; border-radius: 20px 20px 0 0; display: flex; align-items: center; justify-content: space-between;">
@@ -2106,21 +2105,21 @@
     </div>
 
     <!-- Alert / Confirm Global Dynamic Modal -->
-    <div id="custom-alert-modal" class="premium-modal" style="z-index: 2000;">
-        <div class="modal-content light-bg" style="max-width: 320px; text-align: center; padding: 25px;">
+    <div id="custom-alert-modal" class="premium-modal" style="z-index: 10000;">
+        <div class="modal-content light-bg" style="max-width: 90%; width: 400px; text-align: center; padding: 25px;">
             <div id="alert-icon" style="font-size: 2.5rem; color: var(--theme-color); margin-bottom: 15px;">
                 <i class="fa-solid fa-circle-info"></i>
             </div>
             <h4 id="alert-title" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">Aviso</h4>
-            <p id="alert-message" style="font-size: 0.9rem; color: var(--slate-gray); margin-bottom: 20px;">Mensagem de aviso aqui.</p>
-            <button onclick="App.closeAlert()" class="btn-primary" style="padding: 10px 0;">OK</button>
+            <div id="alert-message" style="font-size: 0.95rem; color: var(--slate-gray); margin-bottom: 20px; overflow-y: auto; max-height: 60vh; text-align: left;">Mensagem de aviso aqui.</div>
+            <button onclick="App.closeAlert()" class="btn-primary" style="padding: 12px 0; width: 100%; font-weight: bold;">FECHAR</button>
         </div>
     </div>
 
     <!-- ==========================================
          FASE 2: MODAL MINHAS ESCALAS (Premium)
          ========================================== -->
-    <div class="premium-modal glass-modal" id="modal-minhas-escalas" style="z-index: 2500;">
+    <div class="premium-modal glass-modal" id="modal-minhas-escalas" style="z-index: 10000;">
         <div class="modal-content" style="max-width: 500px; height: 90vh; display: flex; flex-direction: column; padding: 0; background: #F8FAFC; overflow: hidden; border-radius: 24px 24px 0 0; margin-top: auto;">
             <div class="modal-header" style="padding: 20px 24px; background: white; border-bottom: 1px solid #E2E8F0; position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="margin:0; font-size: 1.25rem; color: var(--navy-dark); font-weight: 800;"><i class="fa-solid fa-calendar-days" style="color: var(--teal-primary); margin-right: 8px;"></i> Minhas Escalas</h3>
@@ -2135,7 +2134,7 @@
     <!-- ==========================================
          FASE 3: MODAL MEU PERFIL (Premium)
          ========================================== -->
-    <div class="premium-modal glass-modal" id="modal-meu-perfil" style="z-index: 2500;">
+    <div class="premium-modal glass-modal" id="modal-meu-perfil" style="z-index: 10000;">
         <div class="modal-content" style="max-width: 500px; height: 90vh; display: flex; flex-direction: column; padding: 0; background: #F8FAFC; overflow: hidden; border-radius: 24px 24px 0 0; margin-top: auto;">
             <div class="modal-header" style="padding: 20px 24px; background: white; border-bottom: 1px solid #E2E8F0; position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="margin:0; font-size: 1.25rem; color: var(--navy-dark); font-weight: 800;"><i class="fa-solid fa-circle-user" style="color: var(--teal-primary); margin-right: 8px;"></i> Centro do Obreiro</h3>
@@ -2217,7 +2216,7 @@
     <!-- ==========================================
          MODAL MAIS (v3.10)
          ========================================== -->
-    <div class="premium-modal glass-modal" id="modal-mais" style="z-index: 2500;">
+    <div class="premium-modal glass-modal" id="modal-mais" style="z-index: 10000;">
         <div class="modal-content" style="max-width: 500px; height: auto; display: flex; flex-direction: column; padding: 0; background: #F8FAFC; overflow: hidden; border-radius: 24px 24px 0 0; margin-top: auto;">
             <div class="modal-header" style="padding: 20px 24px; background: white; border-bottom: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="margin:0; font-size: 1.25rem; color: var(--navy-dark); font-weight: 800;"><i class="fa-solid fa-bars" style="color: var(--teal-primary); margin-right: 8px;"></i> Menu</h3>
