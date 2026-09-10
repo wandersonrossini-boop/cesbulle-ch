@@ -9622,7 +9622,7 @@ const App = {
                     subtitle: 'Aviso Geral',
                     description: a.texto || a.conteudo || 'Toque para ver mais detalhes.',
                     date: dateStr,
-                    action: 'App.showMuralAvisosDetail()'
+                    action: `App.showMuralAvisosDetail('${a.id || ''}')`
                 });
             });
             this.cachedAvisosList = avisos;
@@ -10055,15 +10055,27 @@ const App = {
         return 1;
     },
 
-    showMuralAvisosDetail() {
-        const avisos = this.cachedAvisosList || [];
+    async showMuralAvisosDetail(avisoId) {
+        let avisos = this.cachedAvisosList || [];
         if (avisos.length === 0) {
+            try {
+                avisos = await DbService.getAvisos();
+                this.cachedAvisosList = avisos;
+            } catch (e) {
+                console.error("Error fetching avisos:", e);
+            }
+        }
+
+        if (!avisos || avisos.length === 0) {
             this.showAlert('Nenhum comunicado importante no momento.', 'Comunicado');
             return;
         }
         
+        const targetAvisos = avisoId ? avisos.filter(a => a.id === avisoId) : avisos;
+        const displayAvisos = targetAvisos.length > 0 ? targetAvisos : avisos;
+
         let html = '<div class="fullscreen-comunicado-reader" style="max-width: 680px; margin: 0 auto; text-align: left; font-family: system-ui, -apple-system, sans-serif;">';
-        avisos.forEach(a => {
+        displayAvisos.forEach(a => {
             const dateStr = a.data && typeof a.data.toDate === 'function' ? a.data.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' • ' + a.data.toDate().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : (a.data ? new Date(a.data).toLocaleDateString('pt-BR') : '');
             html += `
                 <div style="background: #FFFFFF; border-radius: 16px; padding: 28px 24px; color: #0F172A; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 24px;">
