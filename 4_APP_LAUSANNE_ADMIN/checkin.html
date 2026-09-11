@@ -369,16 +369,72 @@
             }
         }
 
+        // HELPER FUNCTIONS FOR NORMALIZATION AND DETERMINISTIC KEYS
+        function normalizeText(str) {
+            if (!str) return '';
+            return str.toLowerCase()
+                      .normalize('NFD')
+                      .replace(/[\u0300-\u036f]/g, '')
+                      .replace(/[^a-z0-9]/g, '')
+                      .trim();
+        }
+
+        function normalizePhone(phone) {
+            if (!phone) return '';
+            return phone.replace(/\D/g, '');
+        }
+
+        function setButtonLoading(btn, isLoading, originalText) {
+            if (!btn) return;
+            if (isLoading) {
+                btn.disabled = true;
+                btn.dataset.originalText = originalText || btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = btn.dataset.originalText || originalText;
+            }
+        }
+
         async function doWalkinRegistration() {
-            const name = document.getElementById('walkin-name').value;
-            const phone = document.getElementById('walkin-phone').value;
+            const nameInput = document.getElementById('walkin-name');
+            const phoneInput = document.getElementById('walkin-phone');
+            const btn = document.querySelector('#walkin-section button');
+            const name = nameInput ? nameInput.value.trim() : '';
+            const phone = phoneInput ? phoneInput.value.trim() : '';
 
             if (!name || !phone) {
                 alert("Por favor, preencha Nome e Telefone para o cadastro na portaria.");
                 return;
             }
 
+            const normName = normalizeText(name);
+            const normPhone = normalizePhone(phone);
+
+            // Check in-memory participants list for matching name + phone
+            const existingParticipant = participants.find(p => {
+                const pName = normalizeText(p.name);
+                const pPhone = normalizePhone(p.phone || p.contact);
+                return pName === normName && normPhone.length >= 7 && pPhone === normPhone;
+            });
+
+            if (existingParticipant) {
+                console.log("Walk-in match found in existing list. Re-routing to transaction check-in...");
+                await doClosedCheckin(existingParticipant);
+                return;
+            }
+
+            setButtonLoading(btn, true, 'CADASTRAR E ENTRAR');
+
             try {
+                const normName = normalizeText(name);
+                const normPhone = normalizePhone(phone);
+                
+                let docId = currentEvent.id + '_' + normName;
+                if (normPhone) {
+                    docId += '_' + normPhone;
+                }
+
                 // Register and check-in immediately
                 await db.collection('event_registrations').add({
                     eventId: currentEvent.id,
@@ -391,48 +447,74 @@
                 });
                 
                 // [RULE v63.2] - Sync to Secretariat but SKIP Integration
-                await syncToSecretariat(name, phone);
+                await syncToSecretariat(name, phone, docId);
                 
                 showSuccess();
             } catch (e) {
                 alert("Erro ao realizar cadastro: " + e.message);
+                setButtonLoading(btn, false, 'CADASTRAR E ENTRAR');
             }
         }
 
         async function doOpenCheckin() {
-            const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
+            const nameInput = document.getElementById('name');
+            const phoneInput = document.getElementById('phone');
+            const btn = document.querySelector('.btn-checkin');
+            const name = nameInput ? nameInput.value.trim() : '';
+            const phone = phoneInput ? phoneInput.value.trim() : '';
 
             if (!name) {
                 alert("Por favor, digite seu nome.");
                 return;
             }
 
+            setButtonLoading(btn, true, 'Realizar Check-in');
+
             try {
-                await db.collection('event_attendance').add({
+                const normName = normalizeText(name);
+                const normPhone = normalizePhone(phone);
+                
+                // Deterministic key: eventId + normName + (normPhone if present)
+                let docId = currentEvent.id + '_' + normName;
+                if (normPhone) {
+                    docId += '_' + normPhone;
+                }
+
+                await db.collection('event_attendance').doc(docId).set({
                     eventId: currentEvent.id,
                     name: name,
                     phone: phone,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                }, { merge: true });
                 
                 // [RULE v63.2] - Sync to Secretariat but SKIP Integration
-                await syncToSecretariat(name, phone);
+                await syncToSecretariat(name, phone, docId);
 
                 showSuccess();
             } catch (e) {
                 alert("Erro: " + e.message);
+                setButtonLoading(btn, false, 'Realizar Check-in');
             }
         }
 
-        async function syncToSecretariat(name, phone) {
+        async function syncToSecretariat(name, phone, customDocId) {
             try {
-                const normPhone = (phone || '').replace(/[^\d]/g, '');
+                const normName = normalizeText(name);
+                const normPhone = normalizePhone(phone);
                 const hasPhone = normPhone.length >= 7;
+
+                let triageDocId = customDocId;
+                if (!triageDocId && currentEvent && currentEvent.id) {
+                    triageDocId = currentEvent.id + '_' + normName;
+                    if (normPhone) {
+                        triageDocId += '_' + normPhone;
+                    }
+                }
 
                 if (hasPhone) {
                     // Send directly to integration triage
-                    await db.collection('integracao').add({
+                    const ref = triageDocId ? db.collection('integracao').doc(triageDocId) : db.collection('integracao').doc();
+                    await ref.set({
                         name: name.trim(),
                         person_name: name.trim(),
                         contact: phone.trim(),
@@ -443,17 +525,18 @@
                         status: 'pending_integracao',
                         origem: 'checkin_evento',
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
+                    }, { merge: true });
                 } else {
                     // Send to Secretariat triage (pending collection)
-                    await db.collection('pending').add({
+                    const ref = triageDocId ? db.collection('pending').doc(triageDocId) : db.collection('pending').doc();
+                    await ref.set({
                         type: 'visitante_evento',
                         name: name.trim(),
                         contact: (phone || '').trim(),
                         extra: `Check-in no evento: ${currentEvent.name}`,
                         status: 'pending',
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
+                    }, { merge: true });
                 }
             } catch(e) { console.error("Sync Error:", e); }
         }
@@ -513,13 +596,29 @@
             if (!confirm(`Confirmar check-in para ${p.name}?`)) return;
 
             try {
-                await db.collection('event_registrations').doc(p.id).update({
-                    checkedIn: true,
-                    checkinTime: firebase.firestore.FieldValue.serverTimestamp()
+                const regRef = db.collection('event_registrations').doc(p.id);
+
+                await db.runTransaction(async (transaction) => {
+                    const doc = await transaction.get(regRef);
+                    if (!doc.exists) {
+                        throw new Error("Registro de inscrição não encontrado.");
+                    }
+                    if (doc.data().checkedIn === true) {
+                        throw new Error("CHECKIN_ALREADY_DONE");
+                    }
+                    transaction.update(regRef, {
+                        checkedIn: true,
+                        checkinTime: firebase.firestore.FieldValue.serverTimestamp()
+                    });
                 });
+
                 showSuccess();
             } catch (e) {
-                alert("Erro: " + e.message);
+                if (e.message === "CHECKIN_ALREADY_DONE") {
+                    alert("Este check-in já foi confirmado por outro operador!");
+                } else {
+                    alert("Erro ao confirmar check-in: " + e.message);
+                }
             }
         }
 

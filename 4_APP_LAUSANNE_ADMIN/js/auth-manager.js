@@ -105,7 +105,7 @@ const AuthManager = {
         // ADMIN GROUP: Higher level access
         if (e.includes('admin') || e.includes('master') || e.includes('secretaria') || e.includes('pastor') || e.includes('lider') || e.includes('ministerio') || e.includes('ministério')) return 'admin';
         // DEPARTMENTAL GROUP
-        if (e.includes('recepcao')) return 'reception';
+        if (e.includes('recepcao') || e.includes('checkin') || e.includes('eventos')) return 'reception';
         if (e.includes('kids') || e.includes('infantil')) return 'kids';
         if (e.includes('midia') || e.includes('media')) return 'altar';
         if (e.includes('altar')) return 'altar';
