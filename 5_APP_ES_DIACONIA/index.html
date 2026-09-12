@@ -2158,8 +2158,8 @@
     </div><div class="premium-modal glass-modal" id="modal-meu-perfil" style="z-index: 10000;">
         <div class="modal-content" style="max-width: 500px; height: 90vh; display: flex; flex-direction: column; padding: 0; background: #F8FAFC; overflow: hidden; border-radius: 24px 24px 0 0;">
             <div class="modal-header" style="padding: 20px 24px; background: white; border-bottom: 1px solid #E2E8F0; position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center;">
-                <h3 style="margin:0; font-size: 1.25rem; color: var(--navy-dark); font-weight: 800;"><i class="fa-solid fa-circle-user" style="color: var(--teal-primary); margin-right: 8px;"></i> Centro do Obreiro</h3>
-                <button onclick="document.getElementById('modal-meu-perfil').classList.remove('active')" style="background:none; border:none; font-size: 1.5rem; color: #94A3B8; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+                <h3 style="margin:0; font-size: 1.2rem; color: #1E293B; font-weight: 800;">Centro do Obreiro</h3>
+                <button onclick="document.getElementById('modal-meu-perfil').classList.remove('active')" style="background:none; border:none; font-size: 1.3rem; color: #94A3B8; cursor: pointer;">✕</button>
             </div>
             <div class="modal-body" style="padding: 24px; overflow-y: auto; flex: 1; text-align: left;">
                 <!-- 1. DADOS -->
@@ -2168,7 +2168,7 @@
                 </div>
 
                 <!-- 5. HISTÓRICO / ESTATÍSTICAS -->
-                <h4 style="font-size: 0.9rem; color: var(--navy-dark); margin-bottom: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Meu Histórico</h4>
+                <h4 style="font-size: 0.9rem; color: #1E293B; margin-bottom: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Meu Histórico</h4>
                 <div id="meu-perfil-stats-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
                     <!-- Stats injected here -->
                 </div>
@@ -2176,35 +2176,35 @@
                 <div id="meu-perfil-tools-container" style="display: none;"></div>
 
                 <!-- 2. PARTICIPAÇÃO -->
-                <h4 style="font-size: 0.9rem; color: var(--navy-dark); margin-bottom: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Participação</h4>
-                <div style="background: white; border-radius: 16px; padding: 15px; border: 1px solid #E2E8F0; display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px;">
-                    <button onclick="App.openDisponibilidadeModal()" style="background: none; border: none; font-size: 0.88rem; font-weight: 600; color: var(--navy-dark); display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px 0; text-align: left; width: 100%;">
-                        <i class="fa-regular fa-clock" style="color: var(--teal-primary); font-size: 1.1rem; width: 20px;"></i> Minha Disponibilidade
+                <h4 style="font-size: 0.9rem; color: #1E293B; margin-bottom: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Participação</h4>
+                <div style="background: white; border-radius: 12px; padding: 15px; border: 1px solid #E2E8F0; display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px;">
+                    <button onclick="App.openDisponibilidadeModal()" style="background: none; border: none; font-size: 0.88rem; font-weight: 600; color: #1E293B; display: flex; align-items: center; cursor: pointer; padding: 5px 0; text-align: left; width: 100%;">
+                        Minha Disponibilidade
                     </button>
-                    <button onclick="App.openSolicitarFeriasModal()" style="background: none; border: none; font-size: 0.88rem; font-weight: 600; color: var(--navy-dark); display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px 0; text-align: left; width: 100%;">
-                        <i class="fa-solid fa-umbrella-beach" style="color: var(--teal-primary); font-size: 1.1rem; width: 20px;"></i> Solicitar Férias / Ausência
+                    <button onclick="App.openSolicitarFeriasModal()" style="background: none; border: none; font-size: 0.88rem; font-weight: 600; color: #1E293B; display: flex; align-items: center; cursor: pointer; padding: 5px 0; text-align: left; width: 100%;">
+                        Solicitar Férias / Ausência
                     </button>
-                    <button onclick="App.openSolicitarSubstituicaoModal()" style="background: none; border: none; font-size: 0.88rem; font-weight: 600; color: var(--navy-dark); display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px 0; text-align: left; width: 100%;">
-                        <i class="fa-solid fa-user-minus" style="color: var(--teal-primary); font-size: 1.1rem; width: 20px;"></i> Solicitar Substituição
+                    <button onclick="App.openSolicitarSubstituicaoModal()" style="background: none; border: none; font-size: 0.88rem; font-weight: 600; color: #1E293B; display: flex; align-items: center; cursor: pointer; padding: 5px 0; text-align: left; width: 100%;">
+                        Solicitar Substituição
                     </button>
                 </div>
 
                 <!-- 3. COMUNICAÇÃO -->
-                <h4 style="font-size: 0.9rem; color: var(--navy-dark); margin-bottom: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Comunicação</h4>
-                <div style="background: white; border-radius: 16px; padding: 15px; border: 1px solid #E2E8F0; display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px;">
-                    <button onclick="App.openPrayersModal()" style="background: none; border: none; font-size: 0.88rem; font-weight: 600; color: var(--navy-dark); display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px 0; text-align: left; width: 100%;">
-                        <i class="fa-solid fa-hands-praying" style="color: var(--teal-primary); font-size: 1.1rem; width: 20px;"></i> Pedido de Oração
+                <h4 style="font-size: 0.9rem; color: #1E293B; margin-bottom: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Comunicação</h4>
+                <div style="background: white; border-radius: 12px; padding: 15px; border: 1px solid #E2E8F0; display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px;">
+                    <button onclick="App.openPrayersModal()" style="background: none; border: none; font-size: 0.88rem; font-weight: 600; color: #1E293B; display: flex; align-items: center; cursor: pointer; padding: 5px 0; text-align: left; width: 100%;">
+                        Pedido de Oração
                     </button>
-                    <button onclick="App.openSupervisionMsgModal()" style="background: none; border: none; font-size: 0.88rem; font-weight: 600; color: var(--navy-dark); display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px 0; text-align: left; width: 100%;">
-                        <i class="fa-regular fa-comment-dots" style="color: var(--teal-primary); font-size: 1.1rem; width: 20px;"></i> Mensagem para Supervisão
+                    <button onclick="App.openSupervisionMsgModal()" style="background: none; border: none; font-size: 0.88rem; font-weight: 600; color: #1E293B; display: flex; align-items: center; cursor: pointer; padding: 5px 0; text-align: left; width: 100%;">
+                        Mensagem para Supervisão
                     </button>
                 </div>
 
                 <!-- 4. NOTIFICAÇÕES -->
-                <h4 style="font-size: 0.9rem; color: var(--navy-dark); margin-bottom: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Notificações</h4>
-                <div style="background: white; border-radius: 16px; padding: 15px; border: 1px solid #E2E8F0; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
-                    <button onclick="App.openNotificationPreferences()" style="background: none; border: none; font-size: 0.88rem; font-weight: 600; color: var(--navy-dark); display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px 0; text-align: left; width: 100%;">
-                        <i class="fa-regular fa-bell" style="color: var(--teal-primary); font-size: 1.1rem; width: 20px;"></i> Preferências de Notificação
+                <h4 style="font-size: 0.9rem; color: #1E293B; margin-bottom: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Notificações</h4>
+                <div style="background: white; border-radius: 12px; padding: 15px; border: 1px solid #E2E8F0; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
+                    <button onclick="App.openNotificationPreferences()" style="background: none; border: none; font-size: 0.88rem; font-weight: 600; color: #1E293B; display: flex; align-items: center; cursor: pointer; padding: 5px 0; text-align: left; width: 100%;">
+                        Preferências de Notificação
                     </button>
                 </div>
             </div>

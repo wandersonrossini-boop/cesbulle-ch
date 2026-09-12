@@ -10516,19 +10516,13 @@ const App = {
             }, { total: 0, confirmadas: 0, pendentes: 0 });
             
             statsContainer.innerHTML = `
-                <div style="background: white; border-radius: 16px; padding: 20px 15px; border: 1px solid #E2E8F0; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
-                    <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 10px;">
-                        <i class="fa-solid fa-check-double"></i>
-                    </div>
-                    <span style="font-size: 1.5rem; font-weight: 800; color: var(--navy-dark); line-height: 1;">${stats.confirmadas}</span>
-                    <span style="font-size: 0.75rem; color: var(--slate-gray); font-weight: 600; text-transform: uppercase; margin-top: 5px;">Confirmadas</span>
+                <div style="background: white; border-radius: 12px; padding: 16px 12px; border: 1px solid #E2E8F0; display: flex; flex-direction: column; align-items: center;">
+                    <span style="font-size: 1.6rem; font-weight: 800; color: #1E293B; line-height: 1;">${stats.confirmadas}</span>
+                    <span style="font-size: 0.75rem; color: #64748B; font-weight: 700; text-transform: uppercase; margin-top: 6px;">Confirmadas</span>
                 </div>
-                <div style="background: white; border-radius: 16px; padding: 20px 15px; border: 1px solid #E2E8F0; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
-                    <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(59, 130, 246, 0.1); color: #3B82F6; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 10px;">
-                        <i class="fa-solid fa-clipboard-list"></i>
-                    </div>
-                    <span style="font-size: 1.5rem; font-weight: 800; color: var(--navy-dark); line-height: 1;">${stats.total}</span>
-                    <span style="font-size: 0.75rem; color: var(--slate-gray); font-weight: 600; text-transform: uppercase; margin-top: 5px;">Total</span>
+                <div style="background: white; border-radius: 12px; padding: 16px 12px; border: 1px solid #E2E8F0; display: flex; flex-direction: column; align-items: center;">
+                    <span style="font-size: 1.6rem; font-weight: 800; color: #1E293B; line-height: 1;">${stats.total}</span>
+                    <span style="font-size: 0.75rem; color: #64748B; font-weight: 700; text-transform: uppercase; margin-top: 6px;">Total</span>
                 </div>
             `;
             
@@ -10612,13 +10606,13 @@ const App = {
         const pref = (this.currentUser && this.currentUser.disponibilidade) ? this.currentUser.disponibilidade : 'Todos os Cultos';
         this.showAlert(
             `<div style="text-align: left;">
-                <p style="font-size: 0.9rem; margin-bottom: 12px; color: var(--navy-dark); font-weight: 600;">Preferência Cadastrada:</p>
-                <div style="background: #F1F5F9; border-radius: 10px; padding: 12px 15px; margin-bottom: 15px; border-left: 4px solid var(--teal-primary); font-weight: 700; color: var(--navy-dark); font-size: 0.95rem;">
-                    <i class="fa-regular fa-clock" style="color: var(--teal-primary); margin-right: 8px;"></i> ${pref}
+                <p style="font-size: 0.9rem; margin-bottom: 12px; color: #1E293B; font-weight: 600;">Preferência Cadastrada:</p>
+                <div style="background: #F1F5F9; border-radius: 10px; padding: 12px 15px; margin-bottom: 15px; border-left: 4px solid #0D9488; font-weight: 700; color: #1E293B; font-size: 0.95rem;">
+                    ${pref}
                 </div>
-                <p style="font-size: 0.85rem; margin-bottom: 15px; color: var(--slate-gray); line-height: 1.4;">Para marcar indisponibilidades em cultos específicos ou voluntariar-se, acesse a aba de Escalas.</p>
-                <button onclick="App.closeAlert(); App.navigateTo('view-escalas');" class="btn-primary" style="width:100%; padding:12px; border-radius:10px; font-weight:700; background: var(--teal-primary); border: none; color: white; cursor: pointer;">
-                    <i class="fa-solid fa-calendar-days" style="margin-right: 8px;"></i> Ir para Escalas
+                <p style="font-size: 0.85rem; margin-bottom: 15px; color: #475569; line-height: 1.4;">Para marcar indisponibilidades em cultos específicos ou voluntariar-se, acesse a aba de Escalas.</p>
+                <button onclick="App.closeAlert(); App.navigateTo('view-escalas');" class="btn-primary" style="width:100%; padding:12px; border-radius:10px; font-weight:700; background: #0D9488; border: none; color: white; cursor: pointer;">
+                    Ir para Escalas
                 </button>
             </div>`,
             "Minha Disponibilidade"
