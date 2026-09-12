@@ -16,8 +16,8 @@ const firebaseConfigProd = {
 firebase.initializeApp(firebaseConfigProd);
 const messaging = firebase.messaging();
 
-const CACHE_NAME = 'diaconia-cache-v3.11.11-PWA';
-const SW_VERSION = 'v3.11.11-PWA';
+const CACHE_NAME = 'diaconia-cache-v3.11.12-PWA';
+const SW_VERSION = 'v3.11.12-PWA';
 const APP_URL = '/';
 
 // App Shell: Recursos vitais a serem pré-cacheados na instalação
@@ -121,20 +121,20 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // 4. STALE WHILE REVALIDATE (JS e CSS)
-    if (event.request.destination === 'script' || event.request.destination === 'style') {
+    // 4. NETWORK FIRST (JS e CSS) -> Fallback Cache Storage
+    if (event.request.destination === 'script' || event.request.destination === 'style' || url.pathname.endsWith('.js') || url.pathname.endsWith('.css')) {
         event.respondWith(
-            caches.match(event.request).then(cachedResponse => {
-                const fetchPromise = fetch(event.request).then(networkResponse => {
+            fetch(event.request)
+                .then(networkResponse => {
                     if (networkResponse && networkResponse.ok) {
                         const responseClone = networkResponse.clone();
                         caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseClone));
                     }
                     return networkResponse;
-                }).catch(err => console.warn('[SW PWA] Falha no revalidate (Offline):', err));
-                
-                return cachedResponse || fetchPromise;
-            })
+                })
+                .catch(() => {
+                    return caches.match(event.request);
+                })
         );
         return;
     }
