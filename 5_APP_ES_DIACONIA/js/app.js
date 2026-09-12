@@ -778,8 +778,33 @@ const App = {
         }
 
         // Permission granted — init FCM
+        this.updateNotificationStatusBadge();
         this.showToast('🔔 Notificações ativadas!', 'success');
         this.initializeFCM();
+    },
+
+    updateNotificationStatusBadge() {
+        const badge = document.getElementById('notification-status-badge');
+        if (!badge) return;
+        if (!('Notification' in window)) {
+            badge.textContent = 'Não Suportado';
+            badge.style.background = '#FEE2E2';
+            badge.style.color = '#991B1B';
+            return;
+        }
+        if (Notification.permission === 'granted') {
+            badge.textContent = 'Ativas';
+            badge.style.background = '#D1FAE5';
+            badge.style.color = '#065F46';
+        } else if (Notification.permission === 'denied') {
+            badge.textContent = 'Bloqueadas';
+            badge.style.background = '#FEE2E2';
+            badge.style.color = '#991B1B';
+        } else {
+            badge.textContent = 'Não Configurado';
+            badge.style.background = '#FEF3C7';
+            badge.style.color = '#92400E';
+        }
     },
 
     _resolveNotifPrompt(value) {
@@ -788,6 +813,7 @@ const App = {
             this._notifPromptResolve(value);
             this._notifPromptResolve = null;
         }
+        this.updateNotificationStatusBadge();
     },
 
     async initializeFCM() {
@@ -10458,6 +10484,7 @@ const App = {
 
     async openMeuPerfilModal() {
         if (!this.currentUser) return;
+        this.updateNotificationStatusBadge();
         
         const headerContainer = document.getElementById('meu-perfil-header-container');
         const statsContainer = document.getElementById('meu-perfil-stats-container');

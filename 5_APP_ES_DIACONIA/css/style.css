@@ -3353,10 +3353,61 @@ table.admin-table tr:hover td {
    PREMIUM DARK MODE THEME - ES DIACONIA
    ========================================================================== */
 
-#view-setor-select, 
-#view-member {
+#view-setor-select {
     background: radial-gradient(circle at 50% 0%, #10403B 0%, #010101 100%) !important;
     color: #F8FAFC !important;
+}
+
+#view-member {
+    background: #F8FAFC !important;
+    color: #1E293B !important;
+}
+
+#view-member .member-app-container {
+    background: #F8FAFC !important;
+    color: #1E293B !important;
+}
+
+#view-member .org-header-card,
+#view-member .org-node-card-horizontal,
+#view-member .org-card-detail-expanded,
+#view-member .member-card,
+#view-member .perfil-card,
+#view-member .org-area-card {
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+    color: #1E293B !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+#view-member .org-date-nav-banner {
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 8px !important;
+    color: #1E293B !important;
+}
+
+#view-member .org-date-nav-label {
+    color: #1E293B !important;
+    font-weight: 700 !important;
+}
+
+#view-member .org-date-nav-sub {
+    color: #64748B !important;
+}
+
+#view-member .org-date-nav-arrow,
+#view-member .carousel-arrow,
+#view-member .side-arrow {
+    display: none !important;
+}
+
+#view-member .member-bottom-nav,
+#view-member .bottom-nav-bar {
+    display: none !important;
 }
 
 /* Header Redesign */
