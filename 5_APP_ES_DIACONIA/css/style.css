@@ -6840,7 +6840,7 @@ table.admin-table tr:hover td {
     outline: none !important;
     flex: 1 !important;
     max-width: none !important;
-    min-height: 86px !important;
+    min-height: 105px !important;
     box-sizing: border-box !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
     text-align: center !important;
@@ -6851,23 +6851,25 @@ table.admin-table tr:hover td {
 #main-bottom-nav {
     position: relative !important;
     z-index: 10 !important;
+    width: 94% !important;
+    margin: 24px auto 40px auto !important;
 }
 
 .access-title {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-    font-size: 1.05rem !important;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+    font-size: 1.1rem !important;
     font-weight: 800 !important;
-    letter-spacing: -0.3px !important;
-    color: #0F172A !important;
+    letter-spacing: -0.2px !important;
+    color: #1E293B !important;
     display: block !important;
     line-height: 1 !important;
 }
 
 .access-subtitle {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-    font-size: 0.65rem !important;
-    font-weight: 400 !important;
-    color: #64748B !important;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+    font-size: 0.7rem !important;
+    font-weight: 500 !important;
+    color: #64748b !important;
     display: block !important;
     line-height: 1.1 !important;
 }
@@ -7964,12 +7966,13 @@ body.area-detail-active .side-nav-zone {
 
 /* Next Scale Card Utilitarian Reduction */
 .premium-next-scale-card {
-    padding: 10px 14px;
+    padding: 16px 14px;
     min-height: auto;
-    background: transparent !important; /* Fundo transparente */
-    border: none !important; /* Remover borda visível */
-    box-shadow: none !important;
-    gap: 10px;
+    background: rgba(20, 184, 166, 0.05) !important; /* Verde extremamente leve */
+    border: none !important; /* Sem borda externa visível */
+    box-shadow: none !important; /* Sem sombra pesada */
+    border-radius: 12px;
+    gap: 12px;
 }
 .premium-next-scale-card::before {
     display: none;
