@@ -3411,6 +3411,66 @@ table.admin-table tr:hover td {
     display: none !important;
 }
 
+/* Correção cirúrgica de contraste nos componentes do Portal do Membro */
+#view-member .panel-card {
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    color: #1E293B !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+#view-member .panel-title {
+    color: #1E293B !important;
+}
+
+#view-member .summary-col {
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    color: #1E293B !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+#view-member .summary-label {
+    color: #64748B !important;
+}
+
+#view-member .summary-val-main {
+    color: #1E293B !important;
+}
+
+#view-member .summary-val-sub {
+    color: #64748B !important;
+}
+
+#view-member #supervision-msg-text {
+    background: #FFFFFF !important;
+    border: 1px solid #CBD5E1 !important;
+    color: #1E293B !important;
+}
+
+#view-member #supervision-msg-form label {
+    color: #64748B !important;
+}
+
+#view-member #member-profile-name {
+    color: #1E293B !important;
+}
+
+#view-member #member-profile-role,
+#view-member #member-profile-email {
+    color: #64748B !important;
+}
+
+#view-member .profile-card p {
+    color: #64748B !important;
+}
+
+/* Ocultar ícones, stickers e emojis no Portal do Membro */
+#view-member i,
+#view-member .summary-icon-wrap {
+    display: none !important;
+}
+
 /* Header Redesign */
 #view-setor-select .selector-header {
     background: rgba(16, 64, 59, 0.45) !important;
