@@ -16,8 +16,8 @@ const firebaseConfigProd = {
 firebase.initializeApp(firebaseConfigProd);
 const messaging = firebase.messaging();
 
-const CACHE_NAME = 'diaconia-cache-v3.11.12-PWA';
-const SW_VERSION = 'v3.11.12-PWA';
+const CACHE_NAME = 'diaconia-cache-v3.12.0-PWA';
+const SW_VERSION = 'v3.12.0-PWA';
 const APP_URL = '/';
 
 // App Shell: Recursos vitais a serem pré-cacheados na instalação

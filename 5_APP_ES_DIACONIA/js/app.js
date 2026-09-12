@@ -703,7 +703,7 @@ const App = {
 
         // Register Service Worker
         try {
-            this._swRegistration = await navigator.serviceWorker.register('/sw-notifications.js?v=3.11.12-PWA', { scope: '/' });
+            this._swRegistration = await navigator.serviceWorker.register('/sw-notifications.js?v=3.12.0-PWA', { scope: '/' });
             console.log('[Notificações] Service Worker registrado:', this._swRegistration.scope);
         } catch (err) {
             console.warn('[Notificações] Falha ao registrar Service Worker:', err);
