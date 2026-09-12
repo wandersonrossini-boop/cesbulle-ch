@@ -1913,6 +1913,19 @@ table.admin-table tr:hover td {
 
 .premium-modal.active {
     display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.premium-modal.glass-modal.active {
+    align-items: flex-end !important;
+    justify-content: center !important;
+    padding: 0 !important;
+}
+
+.glass-modal .modal-content {
+    margin: 0 auto !important;
+    width: 100% !important;
 }
 
 .modal-content {
