@@ -10575,7 +10575,7 @@ const App = {
         const isAdmin = this.currentUser && this.currentUser.perfil === 'admin';
         const adminBtn = document.getElementById('modal-mais-btn-admin');
         if (adminBtn) {
-            adminBtn.style.display = isAdmin ? 'flex' : 'none';
+            adminBtn.style.display = isAdmin ? 'block' : 'none';
         }
         const modal = document.getElementById('modal-mais');
         if (modal) modal.classList.add('active');

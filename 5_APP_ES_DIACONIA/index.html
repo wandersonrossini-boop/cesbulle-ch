@@ -2209,28 +2209,30 @@
                 </div>
             </div>
         </div>
-    </div><div class="premium-modal glass-modal" id="modal-mais" style="z-index: 10000;">
-        <div class="modal-content" style="max-width: 500px; height: auto; display: flex; flex-direction: column; padding: 0; background: #F8FAFC; overflow: hidden; border-radius: 24px 24px 0 0;">
-            <div class="modal-header" style="padding: 20px 24px; background: white; border-bottom: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
-                <h3 style="margin:0; font-size: 1.25rem; color: var(--navy-dark); font-weight: 800;"><i class="fa-solid fa-bars" style="color: var(--teal-primary); margin-right: 8px;"></i> Menu</h3>
-                <button onclick="document.getElementById('modal-mais').classList.remove('active')" style="background:none; border:none; font-size: 1.5rem; color: #94A3B8; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+    </div><div class="premium-modal" id="modal-mais" style="z-index: 10000;">
+        <div class="modal-content" style="max-width: 440px; height: auto; display: flex; flex-direction: column; padding: 0; background: #FFFFFF; overflow: hidden; border-radius: 16px; border: 1px solid #E2E8F0;">
+            <div style="padding: 20px 24px; background: white; border-bottom: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin:0; font-size: 1.15rem; color: #1E293B; font-weight: 800; letter-spacing: -0.3px;">MENU</h3>
+                <button onclick="document.getElementById('modal-mais').classList.remove('active')" style="background:none; border:none; font-size: 1.3rem; color: #64748B; cursor: pointer; padding: 4px;">✕</button>
             </div>
-            <div class="modal-body" style="padding: 24px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="padding: 8px 0; display: flex; flex-direction: column;">
                 <!-- Painel Admin (Exibido apenas para Administradores) -->
-                <button id="modal-mais-btn-admin" onclick="document.getElementById('modal-mais').classList.remove('active'); App.navigateTo('view-admin'); App.switchAdminTab('dashboard');" class="btn-secondary" style="width: 100%; height: 48px; border-radius: 12px; display: none; align-items: center; gap: 12px; font-weight: 700; background: #FEF3C7; border: 1px solid #F59E0B; color: #92400E; cursor: pointer; text-align: left; padding: 0 16px;">
-                    <i class="fa-solid fa-user-gear" style="color: #D97706; font-size: 1.1rem; width: 20px;"></i>
-                    Painel Administrativo
-                </button>
+                <div id="modal-mais-btn-admin" onclick="document.getElementById('modal-mais').classList.remove('active'); App.navigateTo('view-admin'); App.switchAdminTab('dashboard');" style="display: none; padding: 16px 24px; border-bottom: 1px solid #E2E8F0; cursor: pointer; background: #FFFBEB;">
+                    <div style="font-weight: 800; font-size: 0.95rem; color: #B45309; margin-bottom: 2px;">Painel Administrativo</div>
+                    <div style="font-size: 0.82rem; color: #D97706;">Acesso completo à gestão de escalas e membros</div>
+                </div>
+
                 <!-- Meu Perfil -->
-                <button onclick="document.getElementById('modal-mais').classList.remove('active'); App.openMeuPerfilModal();" class="btn-secondary" style="width: 100%; height: 48px; border-radius: 12px; display: flex; align-items: center; gap: 12px; font-weight: 700; background: white; border: 1px solid #E2E8F0; color: var(--navy-dark); cursor: pointer; text-align: left; padding: 0 16px;">
-                    <i class="fa-regular fa-circle-user" style="color: var(--teal-primary); font-size: 1.1rem; width: 20px;"></i>
-                    Meu Perfil
-                </button>
-                <!-- Sair -->
-                <button onclick="document.getElementById('modal-mais').classList.remove('active'); App.handleLogout();" class="btn-secondary" style="width: 100%; height: 48px; border-radius: 12px; display: flex; align-items: center; gap: 12px; font-weight: 700; background: white; border: 1px solid rgba(239, 68, 68, 0.2); color: #EF4444; cursor: pointer; text-align: left; padding: 0 16px;">
-                    <i class="fa-solid fa-arrow-right-from-bracket" style="font-size: 1.1rem; width: 20px;"></i>
-                    Sair da Conta
-                </button>
+                <div onclick="document.getElementById('modal-mais').classList.remove('active'); App.openMeuPerfilModal();" style="padding: 18px 24px; border-bottom: 1px solid #E2E8F0; cursor: pointer; transition: background 0.15s ease;" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='transparent'">
+                    <div style="font-weight: 800; font-size: 0.95rem; color: #1E293B; margin-bottom: 3px;">Meu Perfil</div>
+                    <div style="font-size: 0.82rem; color: #64748B;">Acesso aos seus dados, disponibilidade e recursos pessoais</div>
+                </div>
+
+                <!-- Sair da Conta -->
+                <div onclick="document.getElementById('modal-mais').classList.remove('active'); App.handleLogout();" style="padding: 18px 24px; cursor: pointer; transition: background 0.15s ease;" onmouseover="this.style.background='#FEF2F2'" onmouseout="this.style.background='transparent'">
+                    <div style="font-weight: 800; font-size: 0.95rem; color: #DC2626; margin-bottom: 2px;">Sair da Conta</div>
+                    <div style="font-size: 0.82rem; color: #EF4444;">Encerrar a sessão ativa neste dispositivo</div>
+                </div>
             </div>
         </div>
     </div><div class="premium-modal glass-modal" id="modal-pedir-material" style="z-index: 2600;">
