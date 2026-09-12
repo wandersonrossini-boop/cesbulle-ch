@@ -8127,24 +8127,13 @@ body.area-detail-active .side-nav-zone {
 }
 
 #custom-alert-modal #alert-title {
-    font-size: 42px !important;
-    font-weight: 700 !important;
-    color: var(--navy-dark) !important;
-    margin-bottom: 4px !important;
+    font-size: 1.35rem !important;
+    font-weight: 800 !important;
+    color: #1E293B !important;
+    margin-bottom: 12px !important;
     font-family: var(--font-primary) !important;
     text-align: left !important;
-    letter-spacing: -1px !important;
-}
-
-/* Subtítulo dinâmico ou inserido para contextualização */
-#custom-alert-modal #alert-title::after {
-    content: "Fique por dentro das novidades da diaconia.";
-    display: block;
-    font-size: 16px;
-    font-weight: 400;
-    color: var(--slate-gray);
-    margin-top: 6px;
-    letter-spacing: normal;
+    letter-spacing: -0.5px !important;
 }
 
 #custom-alert-modal #alert-message {
@@ -8469,18 +8458,54 @@ body.area-detail-active .side-nav-zone {
 #custom-alert-modal {
     --navy-dark: #1E293B;
     --navy-primary: #1E293B;
-    --slate-gray: #64748B;
+    --slate-gray: #475569;
     --text-primary: #1E293B;
-    --text-secondary: #64748B;
+    --text-secondary: #475569;
     color: #1E293B;
 }
 
-#custom-alert-modal .modal-header h3,
+#custom-alert-modal .modal-content {
+    background: #FFFFFF !important;
+    border-radius: 20px !important;
+    padding: 24px !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25) !important;
+    border: 1px solid #E2E8F0 !important;
+}
+
+#custom-alert-modal #alert-title,
 #custom-alert-modal h3,
 #custom-alert-modal h4,
-#custom-alert-modal #custom-alert-title,
 #custom-alert-modal p,
-#custom-alert-modal label {
+#custom-alert-modal label,
+#custom-alert-modal span,
+#custom-alert-modal div {
     color: #1E293B !important;
+}
+
+#custom-alert-modal textarea,
+#custom-alert-modal input,
+#custom-alert-modal select {
+    color: #1E293B !important;
+    background: #F8FAFC !important;
+    border: 1px solid #CBD5E1 !important;
+}
+
+#custom-alert-modal textarea::placeholder,
+#custom-alert-modal input::placeholder {
+    color: #94A3B8 !important;
+}
+
+#custom-alert-modal .btn-primary {
+    background: #0D9488 !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    height: 46px !important;
+}
+
+#custom-alert-modal .btn-primary:hover {
+    background: #0F766E !important;
 }
 
