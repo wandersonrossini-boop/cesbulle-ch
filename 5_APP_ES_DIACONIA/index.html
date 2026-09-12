@@ -2198,23 +2198,6 @@
                     <button onclick="App.openSupervisionMsgModal()" style="background: none; border: none; font-size: 0.88rem; font-weight: 600; color: var(--navy-dark); display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px 0; text-align: left; width: 100%;">
                         <i class="fa-regular fa-comment-dots" style="color: var(--teal-primary); font-size: 1.1rem; width: 20px;"></i> Mensagem para Supervisão
                     </button>
-                    <button onclick="App.openFeedbackModal()" style="background: none; border: none; font-size: 0.88rem; font-weight: 600; color: var(--navy-dark); display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px 0; text-align: left; width: 100%;">
-                        <i class="fa-regular fa-message" style="color: var(--teal-primary); font-size: 1.1rem; width: 20px;"></i> Enviar Feedback
-                    </button>
-                </div>
-
-                <!-- RECONHECIMENTO -->
-                <h4 style="font-size: 0.9rem; color: var(--navy-dark); margin-bottom: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Reconhecimento</h4>
-                <div style="background: white; border-radius: 16px; padding: 15px; border: 1px solid #E2E8F0; display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px;">
-                    <button onclick="App.openParabenizarModal()" style="background: none; border: none; font-size: 0.88rem; font-weight: 600; color: var(--navy-dark); display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px 0; text-align: left; width: 100%;">
-                        <i class="fa-solid fa-cake-candles" style="color: #EC4899; font-size: 1.1rem; width: 20px;"></i> 🎂 Parabenizar aniversariante
-                    </button>
-                    <button onclick="App.openAgradecerModal()" style="background: none; border: none; font-size: 0.88rem; font-weight: 600; color: var(--navy-dark); display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px 0; text-align: left; width: 100%;">
-                        <i class="fa-solid fa-hands-clapping" style="color: #F59E0B; font-size: 1.1rem; width: 20px;"></i> 👏 Agradecer um obreiro
-                    </button>
-                    <button onclick="App.openIncentivarModal()" style="background: none; border: none; font-size: 0.88rem; font-weight: 600; color: var(--navy-dark); display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px 0; text-align: left; width: 100%;">
-                        <i class="fa-solid fa-gift" style="color: #10B981; font-size: 1.1rem; width: 20px;"></i> 🎉 Enviar mensagem de incentivo
-                    </button>
                 </div>
 
                 <!-- 4. NOTIFICAÇÕES -->
@@ -2222,12 +2205,6 @@
                 <div style="background: white; border-radius: 16px; padding: 15px; border: 1px solid #E2E8F0; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
                     <button onclick="App.openNotificationPreferences()" style="background: none; border: none; font-size: 0.88rem; font-weight: 600; color: var(--navy-dark); display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px 0; text-align: left; width: 100%;">
                         <i class="fa-regular fa-bell" style="color: var(--teal-primary); font-size: 1.1rem; width: 20px;"></i> Preferências de Notificação
-                    </button>
-                    <button onclick="App.showBackgroundOptimizationGuide()" style="background: none; border: none; font-size: 0.88rem; font-weight: 600; color: var(--navy-dark); display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px 0; text-align: left; width: 100%;">
-                        <i class="fa-solid fa-battery-three-quarters" style="color: var(--teal-primary); font-size: 1.1rem; width: 20px;"></i> Guia de Bateria
-                    </button>
-                    <button onclick="App.requestNotificationPermission(true)" style="background: none; border: none; font-size: 0.88rem; font-weight: 600; color: var(--navy-dark); display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px 0; text-align: left; width: 100%;">
-                        <i class="fa-solid fa-gears" style="color: var(--teal-primary); font-size: 1.1rem; width: 20px;"></i> Configurações de Alertas
                     </button>
                 </div>
             </div>
@@ -2248,21 +2225,6 @@
                 <button onclick="document.getElementById('modal-mais').classList.remove('active'); App.openMeuPerfilModal();" class="btn-secondary" style="width: 100%; height: 48px; border-radius: 12px; display: flex; align-items: center; gap: 12px; font-weight: 700; background: white; border: 1px solid #E2E8F0; color: var(--navy-dark); cursor: pointer; text-align: left; padding: 0 16px;">
                     <i class="fa-regular fa-circle-user" style="color: var(--teal-primary); font-size: 1.1rem; width: 20px;"></i>
                     Meu Perfil
-                </button>
-                <!-- Configurações -->
-                <button onclick="document.getElementById('modal-mais').classList.remove('active'); App.openConfiguracoes();" class="btn-secondary" style="width: 100%; height: 48px; border-radius: 12px; display: flex; align-items: center; gap: 12px; font-weight: 700; background: white; border: 1px solid #E2E8F0; color: var(--navy-dark); cursor: pointer; text-align: left; padding: 0 16px;">
-                    <i class="fa-solid fa-gears" style="color: var(--teal-primary); font-size: 1.1rem; width: 20px;"></i>
-                    Configurações
-                </button>
-                <!-- Ajuda -->
-                <button onclick="document.getElementById('modal-mais').classList.remove('active'); App.showBackgroundOptimizationGuide();" class="btn-secondary" style="width: 100%; height: 48px; border-radius: 12px; display: flex; align-items: center; gap: 12px; font-weight: 700; background: white; border: 1px solid #E2E8F0; color: var(--navy-dark); cursor: pointer; text-align: left; padding: 0 16px;">
-                    <i class="fa-solid fa-circle-question" style="color: var(--teal-primary); font-size: 1.1rem; width: 20px;"></i>
-                    Ajuda / Guia de Bateria
-                </button>
-                <!-- Sobre o Aplicativo -->
-                <button onclick="document.getElementById('modal-mais').classList.remove('active'); App.showSobre();" class="btn-secondary" style="width: 100%; height: 48px; border-radius: 12px; display: flex; align-items: center; gap: 12px; font-weight: 700; background: white; border: 1px solid #E2E8F0; color: var(--navy-dark); cursor: pointer; text-align: left; padding: 0 16px;">
-                    <i class="fa-solid fa-circle-info" style="color: var(--teal-primary); font-size: 1.1rem; width: 20px;"></i>
-                    Sobre o Aplicativo
                 </button>
                 <!-- Sair -->
                 <button onclick="document.getElementById('modal-mais').classList.remove('active'); App.handleLogout();" class="btn-secondary" style="width: 100%; height: 48px; border-radius: 12px; display: flex; align-items: center; gap: 12px; font-weight: 700; background: white; border: 1px solid rgba(239, 68, 68, 0.2); color: #EF4444; cursor: pointer; text-align: left; padding: 0 16px;">

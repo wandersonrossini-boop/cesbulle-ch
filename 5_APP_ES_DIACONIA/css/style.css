@@ -8441,3 +8441,46 @@ body.area-detail-active .side-nav-zone {
     transform: none !important;
     animation: none !important;
 }
+
+/* Scoped Light Theme Override for Centro do Obreiro (#modal-meu-perfil) */
+#modal-meu-perfil {
+    --navy-dark: #1E293B;
+    --navy-primary: #1E293B;
+    --slate-gray: #64748B;
+    --text-primary: #1E293B;
+    --text-secondary: #64748B;
+    color: #1E293B;
+}
+
+#modal-meu-perfil .modal-header h3,
+#modal-meu-perfil h4,
+#modal-meu-perfil button,
+#modal-meu-perfil span,
+#modal-meu-perfil p,
+#modal-meu-perfil div {
+    color: #1E293B;
+}
+
+#modal-meu-perfil .modal-body {
+    color: #1E293B;
+}
+
+/* Scoped Light Theme Override for Custom Alert Modals (#custom-alert-modal) */
+#custom-alert-modal {
+    --navy-dark: #1E293B;
+    --navy-primary: #1E293B;
+    --slate-gray: #64748B;
+    --text-primary: #1E293B;
+    --text-secondary: #64748B;
+    color: #1E293B;
+}
+
+#custom-alert-modal .modal-header h3,
+#custom-alert-modal h3,
+#custom-alert-modal h4,
+#custom-alert-modal #custom-alert-title,
+#custom-alert-modal p,
+#custom-alert-modal label {
+    color: #1E293B !important;
+}
+

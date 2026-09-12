@@ -10402,7 +10402,7 @@ const App = {
             let html = '<div style="display: flex; flex-direction: column; gap: 16px;">';
             
             sortedEscalas.forEach(e => {
-                const isConfirmed = e.status === 'confirmado';
+                const isConfirmed = e.statusPresenca === 'Confirmada';
                 const statusBadge = isConfirmed 
                     ? `<span style="background: rgba(16, 185, 129, 0.15); color: #059669; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.3);"><i class="fa-solid fa-check" style="margin-right: 4px;"></i> Confirmada</span>`
                     : `<span style="background: rgba(245, 158, 11, 0.15); color: #D97706; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(245, 158, 11, 0.3);"><i class="fa-solid fa-hourglass-half" style="margin-right: 4px;"></i> Pendente</span>`;
@@ -10607,7 +10607,22 @@ const App = {
         this.navigateTo('view-admin');
     },
     openDisponibilidadeModal() {
-        this.showAlert("Para ajustar sua disponibilidade ou candidatar-se a voluntariado, utilize a aba de Escalas do aplicativo.", "Disponibilidade");
+        const msgModal = document.getElementById('modal-meu-perfil');
+        if (msgModal) msgModal.classList.remove('active');
+        const pref = (this.currentUser && this.currentUser.disponibilidade) ? this.currentUser.disponibilidade : 'Todos os Cultos';
+        this.showAlert(
+            `<div style="text-align: left;">
+                <p style="font-size: 0.9rem; margin-bottom: 12px; color: var(--navy-dark); font-weight: 600;">Preferência Cadastrada:</p>
+                <div style="background: #F1F5F9; border-radius: 10px; padding: 12px 15px; margin-bottom: 15px; border-left: 4px solid var(--teal-primary); font-weight: 700; color: var(--navy-dark); font-size: 0.95rem;">
+                    <i class="fa-regular fa-clock" style="color: var(--teal-primary); margin-right: 8px;"></i> ${pref}
+                </div>
+                <p style="font-size: 0.85rem; margin-bottom: 15px; color: var(--slate-gray); line-height: 1.4;">Para marcar indisponibilidades em cultos específicos ou voluntariar-se, acesse a aba de Escalas.</p>
+                <button onclick="App.closeAlert(); App.navigateTo('view-escalas');" class="btn-primary" style="width:100%; padding:12px; border-radius:10px; font-weight:700; background: var(--teal-primary); border: none; color: white; cursor: pointer;">
+                    <i class="fa-solid fa-calendar-days" style="margin-right: 8px;"></i> Ir para Escalas
+                </button>
+            </div>`,
+            "Minha Disponibilidade"
+        );
     },
     openSolicitarFeriasModal() {
         const msgModal = document.getElementById('modal-meu-perfil');
@@ -10885,7 +10900,7 @@ const App = {
                 <hr style="border: 0; border-top: 1px solid #E2E8F0; margin: 15px 0;">
                 <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 6px;">Novo Pedido de Oração</label>
                 <textarea id="novo-pedido-oracao-texto" rows="3" placeholder="Escreva seu pedido de oração..." style="width:100%; border: 1px solid #E2E8F0; border-radius:12px; padding:10px; font-family:inherit; font-size:0.88rem; box-sizing:border-box; resize:none;"></textarea>
-                <button onclick="App.salvarNovoPedidoOracao()" class="btn-primary" style="width:100%; margin-top:15px; padding:12px; border-radius:10px; font-weight:700;">Publicar Pedido 🙏</button>
+                <button onclick="App.salvarNovoPedidoOracao()" class="btn-primary" style="width:100%; margin-top:15px; padding:12px; border-radius:10px; font-weight:700;">Publicar Pedido</button>
             </div>`,
             "Pedidos de Oração"
         );
