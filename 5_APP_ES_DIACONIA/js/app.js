@@ -548,32 +548,17 @@ const App = {
     // ── SISTEMA DE NOTIFICAÇÕES ──────────────────────────────────────
 
     buildBottomNav() {
-        const isAdmin = this.currentUser && this.currentUser.perfil === 'admin';
-        const isRepositor = this.currentUser && this.currentUser.eRepositor === true;
-        
-        const userSectors = this.currentUser ? (Array.isArray(this.currentUser.setores) ? this.currentUser.setores : (this.currentUser.setor ? [this.currentUser.setor] : [])) : [];
-        const isLimpeza = userSectors.some(s => s === 'limpeza' || s === 'produtos') || isRepositor;
-        
         const btnPainel = document.getElementById('nav-btn-painel');
         const btnServicos = document.getElementById('nav-btn-servicos');
         const btnEscalas = document.getElementById('nav-btn-escalas');
+        const btnHome = document.getElementById('nav-btn-home');
         const btnMais = document.getElementById('nav-btn-mais');
         
         if (btnPainel) btnPainel.style.setProperty('display', 'none', 'important');
         if (btnServicos) btnServicos.style.setProperty('display', 'none', 'important');
+        if (btnHome) btnHome.style.setProperty('display', 'flex', 'important');
         if (btnEscalas) btnEscalas.style.setProperty('display', 'flex', 'important');
         if (btnMais) btnMais.style.setProperty('display', 'flex', 'important');
-
-        // 1. Apenas Admin possui acesso ao Painel
-        if (isAdmin) {
-            if (btnPainel) btnPainel.style.setProperty('display', 'flex', 'important');
-            if (btnEscalas) btnEscalas.style.setProperty('display', 'none', 'important');
-        }
-        
-        // 2. Apenas quem for da Limpeza (ou Repositor/Admin) possui acesso a Serviços
-        if (isLimpeza || isAdmin) {
-            if (btnServicos) btnServicos.style.setProperty('display', 'flex', 'important');
-        }
     },
 
     toggleBottomNav(show) {
@@ -10587,6 +10572,11 @@ const App = {
         }
     },
     openMaisModal() {
+        const isAdmin = this.currentUser && this.currentUser.perfil === 'admin';
+        const adminBtn = document.getElementById('modal-mais-btn-admin');
+        if (adminBtn) {
+            adminBtn.style.display = isAdmin ? 'flex' : 'none';
+        }
         const modal = document.getElementById('modal-mais');
         if (modal) modal.classList.add('active');
     },
