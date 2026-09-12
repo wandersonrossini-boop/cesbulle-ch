@@ -4266,67 +4266,105 @@ table.admin-table tr:hover td {
 }
 
 /* ==========================================================================
-   TELA DE DETALHE DA ÁREA (PORTAL DO MEMBRO)
+   TELA DE DETALHE DA ÁREA (PORTAL DO MEMBRO - CONTRASTE INSTITUCIONAL PLANO)
    ========================================================================== */
 #member-sub-area-detail {
     display: none;
     flex-direction: column;
     padding: 0 16px 24px 16px;
     animation: fadeIn 0.4s ease;
+    background: #F8FAFC !important;
+    color: #1E293B !important;
 }
 
-.detail-header {
+#member-sub-area-detail .detail-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 12px 0;
     margin-bottom: 18px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid #E2E8F0 !important;
 }
 
-.detail-header-title {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 800;
-    font-size: 1.15rem;
-    color: #ffffff;
-    letter-spacing: -0.2px;
+#member-sub-area-detail .detail-header-title,
+#member-sub-area-detail header span,
+#member-sub-area-detail header button {
+    color: #1E293B !important;
 }
 
-.detail-area-banner {
-    border-radius: 20px;
-    padding: 22px;
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 18px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: var(--shadow-glass);
-    transition: var(--transition-smooth);
+#member-sub-area-detail .detail-area-banner {
+    border-radius: 8px !important;
+    padding: 16px !important;
+    margin-bottom: 18px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 
-.detail-area-banner::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at 0% 0%, var(--theme-color-glow) 0%, transparent 65%);
-    pointer-events: none;
-    z-index: 0;
+#member-sub-area-detail .detail-area-banner::before {
+    display: none !important;
 }
 
-.status-box {
-    border-radius: 14px;
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 18px;
-    font-size: 0.85rem;
-    text-align: left;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+#member-sub-area-detail .detail-area-banner h2 {
+    color: #1E293B !important;
+}
+
+#member-sub-area-detail .detail-area-banner p {
+    color: #64748B !important;
+}
+
+#member-sub-area-detail .status-box {
+    border-radius: 8px !important;
+    padding: 12px 16px !important;
+    margin-bottom: 18px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+#member-sub-area-detail .status-box div {
+    color: #1E293B !important;
+}
+
+#member-sub-area-detail .panel-card {
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    color: #1E293B !important;
+}
+
+#member-sub-area-detail span[style*="color: #fff"],
+#member-sub-area-detail span[style*="color:#fff"],
+#member-sub-area-detail div[style*="color: #fff"],
+#member-sub-area-detail div[style*="color:#fff"] {
+    color: #1E293B !important;
+}
+
+#member-sub-area-detail span[style*="color: #8AA6A3"],
+#member-sub-area-detail span[style*="color: #BFBFBF"],
+#member-sub-area-detail div[style*="color: #8AA6A3"],
+#member-sub-area-detail div[style*="color: #BFBFBF"],
+#member-sub-area-detail label[style*="color: #BFBFBF"],
+#member-sub-area-detail p[style*="color: #8AA6A3"],
+#member-sub-area-detail p[style*="color: #BFBFBF"] {
+    color: #64748B !important;
+}
+
+#member-sub-area-detail .btn-secondary {
+    background: #F1F5F9 !important;
+    color: #1E293B !important;
+    border: 1px solid #CBD5E1 !important;
+    box-shadow: none !important;
+}
+
+/* Ocultar ícones / emojis em #member-sub-area-detail */
+#member-sub-area-detail i,
+#member-sub-area-detail .org-area-icon-wrap-premium i,
+#member-sub-area-detail .org-area-pattern-overlay {
+    display: none !important;
 }
 
 .status-box.status-ready {
