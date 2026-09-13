@@ -4288,18 +4288,28 @@ table.admin-table tr:hover td {
 }
 
 .member-header {
-    background: rgba(16, 64, 59, 0.5) !important;
+    background: rgba(16, 64, 59, 0.95) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
-    border-bottom: 1px solid rgba(138, 166, 163, 0.15) !important;
+    border-bottom: 1px solid rgba(138, 166, 163, 0.25) !important;
     color: #F8FAFC !important;
     box-shadow: none !important;
+}
+.member-header .btn-icon {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #FFFFFF !important;
+}
+.member-header .btn-icon i {
+    color: inherit;
+}
+.member-header .btn-icon i.fa-power-off {
+    color: #FCA5A5 !important;
 }
 .member-header-title {
     color: #F8FAFC !important;
 }
 .member-header-subtitle {
-    color: #8AA6A3 !important;
+    color: #E2E8F0 !important;
 }
 .member-app-shell {
     background: transparent !important;
