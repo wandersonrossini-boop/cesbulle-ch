@@ -10445,41 +10445,41 @@ const App = {
             sortedEscalas.forEach(e => {
                 const isConfirmed = e.statusPresenca === 'Confirmada';
                 const statusBadge = isConfirmed 
-                    ? `<span style="background: rgba(16, 185, 129, 0.15); color: #059669; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.3);"><i class="fa-solid fa-check" style="margin-right: 4px;"></i> Confirmada</span>`
-                    : `<span style="background: rgba(245, 158, 11, 0.15); color: #D97706; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(245, 158, 11, 0.3);"><i class="fa-solid fa-hourglass-half" style="margin-right: 4px;"></i> Pendente</span>`;
+                    ? `<span style="background: #D1FAE5; color: #065F46; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">Confirmada</span>`
+                    : `<span style="background: #FEF3C7; color: #92400E; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">Pendente</span>`;
                 
                 const dateObj = parseScaleDate(e.data, e.horarioInicio);
                 const dayNum = String(dateObj.getDate()).padStart(2, '0');
                 const monthName = dateObj.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '').toUpperCase();
 
                 const isToday = dateObj.toDateString() === new Date().toDateString();
-                const dayLabel = isToday ? '<span style="color: #EF4444; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 4px;">HOJE</span>' : '';
+                const dayLabel = isToday ? '<span style="color: #EF4444; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 2px;">HOJE</span>' : '';
                 
                 html += `
-                    <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #E2E8F0; display: flex; gap: 15px; align-items: stretch;">
-                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 65px; border-right: 1px dashed #E2E8F0; padding-right: 15px;">
+                    <div style="background: #FFFFFF; border-radius: 8px; padding: 16px; border: 1px solid #E2E8F0; display: flex; gap: 14px; align-items: stretch; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 58px; border-right: 1px solid #E2E8F0; padding-right: 14px;">
                             ${dayLabel}
-                            <span style="font-size: 1.8rem; font-weight: 900; color: var(--navy-primary); line-height: 1;">${dayNum}</span>
-                            <span style="font-size: 0.85rem; font-weight: 600; color: var(--slate-gray); text-transform: uppercase;">${monthName}</span>
+                            <span style="font-size: 1.6rem; font-weight: 800; color: #1E293B; line-height: 1;">${dayNum}</span>
+                            <span style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; margin-top: 2px;">${monthName}</span>
                         </div>
                         <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                                <h4 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--navy-dark);">${e.cultoNome || 'Serviço'}</h4>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                                <h4 style="margin: 0; font-size: 1rem; font-weight: 800; color: #1E293B;">${e.cultoNome || 'Serviço'}</h4>
                                 ${statusBadge}
                             </div>
-                            <div style="display: flex; align-items: center; gap: 15px; color: var(--slate-gray); font-size: 0.85rem; font-weight: 500; margin-bottom: 10px;">
-                                <span><i class="fa-regular fa-clock" style="color: var(--teal-primary); margin-right: 4px;"></i> ${e.horarioInicio || '--'} às ${e.horarioFim || '--'}</span>
+                            <div style="color: #64748B; font-size: 0.82rem; font-weight: 500; margin-bottom: 4px;">
+                                ${e.horarioInicio || '--'} às ${e.horarioFim || '--'}
                             </div>
-                            <div style="background: #F8FAFC; padding: 8px 12px; border-radius: 8px; border: 1px solid #F1F5F9; font-size: 0.85rem; color: var(--navy-primary); font-weight: 600; display: inline-block; align-self: flex-start; margin-bottom: 10px;">
-                                <i class="fa-solid fa-user-tag" style="color: #64748B; margin-right: 6px;"></i> ${e.funcao || 'Voluntário'}
+                            <div style="font-size: 0.82rem; color: #1E293B; font-weight: 700; margin-bottom: 6px;">
+                                ${e.funcao || 'Voluntário'}
                             </div>
                             ${e.statusPresenca === 'Pendente' ? `
-                            <div style="display: flex; gap: 8px; margin-top: auto;">
-                                <button class="btn-scale-action btn-confirm-presenca" onclick="App.handleConfirmPresenca('${e.id}', 'Confirmada')" style="flex: 1; padding: 8px; font-size: 0.8rem;">
-                                    <i class="fa-solid fa-check"></i> Aceitar
+                            <div style="display: flex; gap: 8px; margin-top: 6px;">
+                                <button class="btn-primary" onclick="App.handleConfirmPresenca('${e.id}', 'Confirmada')" style="flex: 1; height: 36px; padding: 0 12px; font-size: 0.8rem; font-weight: 700; border-radius: 6px; background: #0D9488; color: white; border: none; cursor: pointer;">
+                                    Aceitar
                                 </button>
-                                <button class="btn-scale-action btn-recusar-presenca" onclick="App.handleConfirmPresenca('${e.id}', 'Recusada')" style="flex: 1; padding: 8px; font-size: 0.8rem;">
-                                    <i class="fa-solid fa-xmark"></i> Recusar
+                                <button class="btn-secondary" onclick="App.handleConfirmPresenca('${e.id}', 'Recusada')" style="flex: 1; height: 36px; padding: 0 12px; font-size: 0.8rem; font-weight: 600; border-radius: 6px; background: #F1F5F9; color: #EF4444; border: 1px solid #CBD5E1; cursor: pointer;">
+                                    Recusar
                                 </button>
                             </div>
                             ` : ''}
