@@ -3389,6 +3389,12 @@ const App = {
             } else {
                 this.showToast(`Presença atualizada com sucesso!`, 'success');
             }
+
+            const modalMinhasEscalas = document.getElementById('modal-minhas-escalas');
+            if (modalMinhasEscalas && modalMinhasEscalas.classList.contains('active')) {
+                await this.openMinhasEscalasModal();
+            }
+
             await this.loadAndRenderMemberScales();
             this.closeAreaDetail();
         } catch (e) {
@@ -3944,9 +3950,13 @@ const App = {
             } else {
                 this.showToast(`Presença atualizada com sucesso!`, 'success');
             }
-            this.loadAndRenderMemberScales();
-            // Re-evaluate notification reminders (both pending and confirmed tomorrow)
-            // runNotificationChecks removed (function deprecated)
+
+            const modalMinhasEscalas = document.getElementById('modal-minhas-escalas');
+            if (modalMinhasEscalas && modalMinhasEscalas.classList.contains('active')) {
+                await this.openMinhasEscalasModal();
+            }
+
+            await this.loadAndRenderMemberScales();
         } catch (e) {
             this.showAlert('Erro ao atualizar presença no servidor.', 'Erro');
         }
@@ -3958,8 +3968,13 @@ const App = {
             await DbService.updatePresenca(escalaId, 'Confirmada');
             App.hideLoading();
             this.showToast(`Presença confirmada com sucesso!`, 'success');
-            this.loadAndRenderMemberScales();
-            // runNotificationChecks removed (function deprecated)
+
+            const modalMinhasEscalas = document.getElementById('modal-minhas-escalas');
+            if (modalMinhasEscalas && modalMinhasEscalas.classList.contains('active')) {
+                await this.openMinhasEscalasModal();
+            }
+
+            await this.loadAndRenderMemberScales();
         } catch (e) {
             App.hideLoading();
             console.error("Erro em confirmarPresencaDireto:", e);
