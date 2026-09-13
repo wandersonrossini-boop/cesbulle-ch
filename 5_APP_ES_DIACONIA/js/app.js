@@ -4665,6 +4665,8 @@ const App = {
             this.loadAdminReposicoes();
         } else if (this.adminActiveTab === 'produtos') {
             this.loadAdminProdutos();
+        } else if (this.adminActiveTab === 'central') {
+            this.loadCentralAdministrativa();
         } else if (this.adminActiveTab === 'relatorios') {
             this.loadAdminRelatorios();
         } else if (this.adminActiveTab === 'avisos') {
@@ -4707,6 +4709,7 @@ const App = {
     getAdminTabTitle(tabName) {
         switch (tabName) {
             case 'dashboard': return 'Painel Geral';
+            case 'central': return 'Central Administrativa';
             case 'setores': return 'Estrutura de Setores';
             case 'membros': return 'Membros da Equipe';
             case 'afastamentos': return 'Gestão de Afastamentos';
@@ -5007,10 +5010,260 @@ const App = {
         }
     },
 
-    navigateToTabFromDashboard(tabName) {
-        const el = Array.from(document.querySelectorAll('.admin-menu-item')).find(item => item.innerHTML.includes(tabName === 'reposicoes' ? 'Reposição' : tabName));
-        if (el) {
-            this.switchAdminTab(tabName, el);
+    switchCentralSubTab(subTab) {
+        const btnPendencias = document.getElementById('btn-central-tab-pendencias');
+        const btnSolicitacoes = document.getElementById('btn-central-tab-solicitacoes');
+        const viewPendencias = document.getElementById('central-view-pendencias');
+        const viewSolicitacoes = document.getElementById('central-view-solicitacoes');
+
+        if (subTab === 'pendencias') {
+            if (btnPendencias) {
+                btnPendencias.style.background = '#1E293B';
+                btnPendencias.style.color = '#FFFFFF';
+            }
+            if (btnSolicitacoes) {
+                btnSolicitacoes.style.background = '#FFFFFF';
+                btnSolicitacoes.style.color = '#64748B';
+            }
+            if (viewPendencias) viewPendencias.style.display = 'block';
+            if (viewSolicitacoes) viewSolicitacoes.style.display = 'none';
+        } else {
+            if (btnSolicitacoes) {
+                btnSolicitacoes.style.background = '#1E293B';
+                btnSolicitacoes.style.color = '#FFFFFF';
+            }
+            if (btnPendencias) {
+                btnPendencias.style.background = '#FFFFFF';
+                btnPendencias.style.color = '#64748B';
+            }
+            if (viewSolicitacoes) viewSolicitacoes.style.display = 'block';
+            if (viewPendencias) viewPendencias.style.display = 'none';
+        }
+    },
+
+    async loadCentralAdministrativa() {
+        try {
+            const [cultos, escalas, mensagens, reposicoes] = await Promise.all([
+                DbService.getCultos(),
+                DbService.getEscalas(),
+                DbService.getSupervisionMessages(),
+                DbService.getReposicoes()
+            ]);
+
+            this.renderCentralAdministrativaContent(cultos, escalas, mensagens, reposicoes);
+        } catch (e) {
+            console.error('[Central Administrativa] Erro ao carregar:', e);
+        }
+    },
+
+    renderCentralAdministrativaContent(cultos, escalas, mensagens = [], reposicoes = []) {
+        const listPendencias = document.getElementById('central-list-pendencias');
+        const listSolicitacoes = document.getElementById('central-list-solicitacoes');
+        const badgePendencias = document.getElementById('central-badge-pendencias');
+        const badgeSolicitacoes = document.getElementById('central-badge-solicitacoes');
+
+        const agora = new Date();
+        const hojeStr = agora.toISOString().split('T')[0];
+        const horaAtual = agora.toTimeString().split(' ')[0].substring(0, 5);
+
+        // 1. Pendências Operacionais
+        const cultosPassados = cultos.filter(c => {
+            if (c.status === 'Finalizado') return false;
+            if (c.data < hojeStr) return true;
+            if (c.data === hojeStr) {
+                const fim = c.horarioFim || '23:59';
+                return horaAtual > fim;
+            }
+            return false;
+        }).filter(c => escalas.some(e => e.cultoId === c.id));
+
+        const aceitesPendentes = escalas.filter(e => {
+            if (e.statusPresenca !== 'Pendente' || !e.membroId || e.membroNome === 'Vaga Pendente' || !e.cultoId) return false;
+            const c = cultos.find(culto => culto.id === e.cultoId);
+            return c && c.status !== 'Finalizado';
+        });
+
+        const recusasPendentes = escalas.filter(e => e.statusPresenca === 'Recusada' && !e.rejeicaoResolvida);
+        const faltasSemJustificativa = escalas.filter(e => {
+            if (e.statusPresenca !== 'Ausente') return false;
+            const c = cultos.find(culto => culto.id === e.cultoId);
+            return c && c.data < hojeStr;
+        });
+
+        const totalPendencias = cultosPassados.length + aceitesPendentes.length + recusasPendentes.length + faltasSemJustificativa.length;
+        if (badgePendencias) badgePendencias.innerText = totalPendencias;
+
+        if (listPendencias) {
+            if (totalPendencias === 0) {
+                listPendencias.innerHTML = `
+                    <div style="text-align: center; color: #64748B; padding: 24px; font-size: 0.9rem; background: #F8FAFC; border-radius: 8px; border: 1px dashed #E2E8F0;">
+                        Tudo em dia nas escalas e cultos. Nenhuma pendência operacional ativa.
+                    </div>
+                `;
+            } else {
+                let html = '';
+
+                cultosPassados.forEach(c => {
+                    const dataFmt = c.data.split('-').reverse().join('/');
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 8px; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <strong style="color: #991B1B; font-size: 0.9rem; display: block;">Culto PENDENTE de Fechamento</strong>
+                                <span style="font-size: 0.82rem; color: #7F1D1D;">${c.nome || 'Culto'} (${dataFmt}) - Culto encerrado aguardando fechamento de lista</span>
+                            </div>
+                            <button onclick="App.switchAdminTab('escalas'); App.selectCulto('${c.id}');" style="padding: 6px 12px; background: #991B1B; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+                                Fechar Culto
+                            </button>
+                        </div>
+                    `;
+                });
+
+                recusasPendentes.forEach(e => {
+                    const c = cultos.find(culto => culto.id === e.cultoId);
+                    const cultoNome = c ? `${c.nome} (${c.data.split('-').reverse().join('/')})` : 'Culto';
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #FFFBEB; border: 1px solid #FCD34D; border-radius: 8px; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <strong style="color: #92400E; font-size: 0.9rem; display: block;">Recusa de Escala Exigindo Substituição</strong>
+                                <span style="font-size: 0.82rem; color: #78350F;">${e.membroNome || 'Obreiro'} recusou a escala de ${e.funcao || 'Serviço'} no ${cultoNome}</span>
+                            </div>
+                            <button onclick="App.switchAdminTab('escalas'); App.selectCulto('${e.cultoId}');" style="padding: 6px 12px; background: #D97706; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+                                Substituir
+                            </button>
+                        </div>
+                    `;
+                });
+
+                if (aceitesPendentes.length > 0) {
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <strong style="color: #1E293B; font-size: 0.9rem; display: block;">Aceites de Escala Pendentes</strong>
+                                <span style="font-size: 0.82rem; color: #64748B;">Há ${aceitesPendentes.length} voluntário(s) que ainda não confirmaram a presença nas escalas vigentes.</span>
+                            </div>
+                            <button onclick="App.switchAdminTab('escalas');" style="padding: 6px 12px; background: #1E293B; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+                                Ver Escalas
+                            </button>
+                        </div>
+                    `;
+                }
+
+                if (faltasSemJustificativa.length > 0) {
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <strong style="color: #1E293B; font-size: 0.9rem; display: block;">Ausências em Cultos Anteriores</strong>
+                                <span style="font-size: 0.82rem; color: #64748B;">Registradas ${faltasSemJustificativa.length} ausência(s) em cultos passados.</span>
+                            </div>
+                            <button onclick="App.switchAdminTab('relatorios');" style="padding: 6px 12px; background: #475569; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+                                Ver Relatórios
+                            </button>
+                        </div>
+                    `;
+                }
+
+                listPendencias.innerHTML = html;
+            }
+        }
+
+        // 2. Solicitações & Mensagens
+        const reposicoesPendentes = reposicoes.filter(r => r.status === 'Pendente');
+        const totalSolicitacoes = mensagens.length + reposicoesPendentes.length;
+        if (badgeSolicitacoes) badgeSolicitacoes.innerText = totalSolicitacoes;
+
+        if (listSolicitacoes) {
+            if (totalSolicitacoes === 0) {
+                listSolicitacoes.innerHTML = `
+                    <div style="text-align: center; color: #64748B; padding: 24px; font-size: 0.9rem; background: #F8FAFC; border-radius: 8px; border: 1px dashed #E2E8F0;">
+                        Nenhuma mensagem ou solicitação pendente dos obreiros.
+                    </div>
+                `;
+            } else {
+                let html = '';
+
+                mensagens.forEach(m => {
+                    const dataFmt = m.dataCriacao ? new Date(m.dataCriacao.seconds ? m.dataCriacao.seconds * 1000 : m.dataCriacao).toLocaleDateString('pt-BR') : '';
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 14px 16px; background: #F0F9FF; border: 1px solid #BAE6FD; border-radius: 8px; flex-wrap: wrap; gap: 10px;">
+                            <div style="flex: 1; min-width: 240px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                    <strong style="color: #0369A1; font-size: 0.9rem;">${m.remetenteNome || 'Obreiro'}</strong>
+                                    <span style="font-size: 0.75rem; color: #0369A1;">${dataFmt}</span>
+                                </div>
+                                <p style="font-size: 0.85rem; color: #1E293B; margin: 0;">${m.mensagem || m.texto || 'Solicitação enviada'}</p>
+                            </div>
+                            <button onclick="App.marcarMensagemSupervisaoLida('${m.id}')" style="padding: 6px 12px; background: #0284C7; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+                                Marcar Lida
+                            </button>
+                        </div>
+                    `;
+                });
+
+                if (reposicoesPendentes.length > 0) {
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <strong style="color: #1E293B; font-size: 0.9rem; display: block;">Pedidos de Reposição de Estoque</strong>
+                                <span style="font-size: 0.82rem; color: #64748B;">Há ${reposicoesPendentes.length} pedido(s) de reposição de materiais pendente(s).</span>
+                            </div>
+                            <button onclick="App.switchAdminTab('reposicoes');" style="padding: 6px 12px; background: #1E293B; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+                                Gerenciar Estoque
+                            </button>
+                        </div>
+                    `;
+                }
+
+                listSolicitacoes.innerHTML = html;
+            }
+        }
+    },
+
+    async marcarMensagemSupervisaoLida(msgId) {
+        try {
+            await DbService.marcarMensagemComoLida(msgId);
+            this.showToast('Mensagem marcada como lida.', 'success');
+            this.loadCentralAdministrativa();
+        } catch (e) {
+            console.error('[Central] Erro ao marcar mensagem:', e);
+            this.showToast('Erro ao atualizar mensagem.', 'danger');
+        }
+    },
+
+    renderOperationalPendingPanel(cultos, escalas) {
+        const titleEl = document.getElementById('hero-central-status-title');
+        const descEl = document.getElementById('hero-central-status-desc');
+
+        const agora = new Date();
+        const hojeStr = agora.toISOString().split('T')[0];
+        const horaAtual = agora.toTimeString().split(' ')[0].substring(0, 5);
+
+        const cultosPassados = cultos.filter(c => {
+            if (c.status === 'Finalizado') return false;
+            if (c.data < hojeStr) return true;
+            if (c.data === hojeStr) {
+                const fim = c.horarioFim || '23:59';
+                return horaAtual > fim;
+            }
+            return false;
+        }).filter(c => escalas.some(e => e.cultoId === c.id));
+
+        const aceitesPendentes = escalas.filter(e => {
+            if (e.statusPresenca !== 'Pendente' || !e.membroId || e.membroNome === 'Vaga Pendente' || !e.cultoId) return false;
+            const c = cultos.find(culto => culto.id === e.cultoId);
+            return c && c.status !== 'Finalizado';
+        });
+
+        const recusasPendentes = escalas.filter(e => e.statusPresenca === 'Recusada' && !e.rejeicaoResolvida);
+        const totalAcoes = cultosPassados.length + aceitesPendentes.length + recusasPendentes.length;
+
+        if (titleEl && descEl) {
+            if (totalAcoes === 0) {
+                titleEl.innerText = 'Tudo em dia';
+                descEl.innerText = 'Nenhuma pendência operacional ou recusa pendente no momento.';
+            } else {
+                titleEl.innerText = `${totalAcoes} ação(ões) pendente(s)`;
+                descEl.innerText = `${aceitesPendentes.length} aceite(s) pendente(s) · ${recusasPendentes.length} recusa(s) a substituir · ${cultosPassados.length} culto(s) a fechar`;
+            }
         }
     },
 

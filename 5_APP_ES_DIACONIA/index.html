@@ -17,7 +17,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=3.12.7">
+    <link rel="stylesheet" href="css/style.css?v=3.13.0">
     
     <!-- Firebase SDK (v8 Compat) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -452,49 +452,46 @@
                     </div>
                     
                     <div class="admin-sidebar-menu">
+                        <div class="admin-nav-group-label" style="font-size: 0.65rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px 4px 12px;">Principal</div>
                         <a class="admin-menu-item active" onclick="App.switchAdminTab('dashboard', this)">
                             <i class="fa-solid fa-chart-line"></i>
                             <span>Painel Geral</span>
                         </a>
-                        <a class="admin-menu-item" onclick="App.switchAdminTab('setores', this)">
-                            <i class="fa-solid fa-network-wired"></i>
-                            <span>Setores</span>
-                        </a>
-                        <a class="admin-menu-item" onclick="App.switchAdminTab('membros', this)">
-                            <i class="fa-solid fa-users"></i>
-                            <span>Membros</span>
-                        </a>
-                        <a class="admin-menu-item" onclick="App.switchAdminTab('afastamentos', this)">
-                            <i class="fa-solid fa-person-walking-luggage"></i>
-                            <span>Afastamentos</span>
-                        </a>
+
+                        <div class="admin-nav-group-label" style="font-size: 0.65rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 12px 4px 12px;">Operação & Escalas</div>
                         <a class="admin-menu-item" onclick="App.switchAdminTab('escalas', this)">
                             <i class="fa-solid fa-calendar-days"></i>
                             <span>Escalas</span>
                         </a>
+
+                        <div class="admin-nav-group-label" style="font-size: 0.65rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 12px 4px 12px;">Equipe & Ações</div>
+                        <a class="admin-menu-item" onclick="App.switchAdminTab('membros', this)">
+                            <i class="fa-solid fa-users"></i>
+                            <span>Membros</span>
+                        </a>
+                        <a class="admin-menu-item" onclick="App.switchAdminTab('central', this)">
+                            <i class="fa-solid fa-clipboard-check"></i>
+                            <span>Central Administrativa</span>
+                        </a>
+
+                        <div class="admin-nav-group-label" style="font-size: 0.65rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 12px 4px 12px;">Comunicação</div>
+                        <a class="admin-menu-item" onclick="App.switchAdminTab('avisos', this)">
+                            <i class="fa-solid fa-bullhorn"></i>
+                            <span>Informativos</span>
+                        </a>
+
+                        <div class="admin-nav-group-label" style="font-size: 0.65rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 12px 4px 12px;">Gestão Operacional</div>
                         <a class="admin-menu-item" onclick="App.switchAdminTab('reposicoes', this)">
                             <i class="fa-solid fa-boxes-packing"></i>
                             <span>Reposição</span>
-                        </a>
-                        <a class="admin-menu-item" onclick="App.switchAdminTab('produtos', this)">
-                            <i class="fa-solid fa-box-open"></i>
-                            <span>Produtos</span>
                         </a>
                         <a class="admin-menu-item" onclick="App.switchAdminTab('relatorios', this)">
                             <i class="fa-solid fa-file-invoice"></i>
                             <span>Relatórios</span>
                         </a>
-                        <a class="admin-menu-item" onclick="App.switchAdminTab('avisos', this)">
-                            <i class="fa-solid fa-bullhorn"></i>
-                            <span>Informativos</span>
-                        </a>
-                        <a class="admin-menu-item" onclick="App.switchAdminTab('mensagens', this)">
-                            <i class="fa-solid fa-comments"></i>
-                            <span>Mensagens</span>
-                        </a>
                         
-                        <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-                            <a class="admin-menu-item" onclick="App.navigateTo('view-setor-select')" style="color: #38bdf8 !important;">
+                        <div style="margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 15px;">
+                            <a class="admin-menu-item" onclick="App.navigateTo('view-setor-select')" style="color: #0284c7 !important;">
                                 <i class="fa-solid fa-right-left"></i>
                                 <span>Mudar para Membro</span>
                             </a>
@@ -563,17 +560,19 @@
                                 <!-- Dynamic stats cards generated from sectorsData -->
                             </div>
                             
-                            <!-- Pendências Administrativas Section -->
-                            <div class="panel-card" style="margin-bottom: 25px; box-shadow: var(--shadow-sm); border-radius: 12px; border: 1px solid var(--border-color);">
-                                <div class="panel-header" style="border-bottom: 1px solid #F1F5F9; padding-bottom: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
-                                    <div class="panel-title" style="font-size: 1.05rem; font-weight: 700; color: var(--navy-dark); display: flex; align-items: center; gap: 8px;">
-                                        <i class="fa-solid fa-triangle-exclamation" style="color: #EF4444;"></i> 
-                                        Pendências Administrativas
+                            <!-- Synthetic Central Administrativa Status Hero Card -->
+                            <div class="panel-card" id="central-summary-hero-card" style="margin-bottom: 25px; box-shadow: var(--shadow-sm); border-radius: 12px; border: 1px solid var(--border-color); background: #FFFFFF; padding: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                                    <div>
+                                        <div style="font-size: 0.75rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Status do Diaconato</div>
+                                        <h3 id="hero-central-status-title" style="font-size: 1.15rem; font-weight: 700; color: #1E293B; margin: 0 0 6px 0;">Central Administrativa</h3>
+                                        <p id="hero-central-status-desc" style="font-size: 0.88rem; color: #64748B; margin: 0;">Carregando resumo de ações...</p>
                                     </div>
-                                    <span class="badge" id="pendencias-count-badge" style="background: #FEF2F2; color: #EF4444; border: 1px solid #FCA5A5; font-size: 0.75rem; font-weight: 700; padding: 4px 8px; border-radius: 6px;">0 Pendência(s)</span>
-                                </div>
-                                <div id="admin-dashboard-pendencias" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px;">
-                                    <div style="grid-column: 1 / -1; text-align: center; color: var(--slate-gray); padding: 20px; font-size: 0.9rem;">Carregando pendências...</div>
+                                    <div>
+                                        <button onclick="App.switchAdminTab('central')" style="padding: 10px 18px; background: #1E293B; color: #FFFFFF; border: none; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                                            <span>Ver Central Administrativa</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -636,8 +635,44 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- TAB: Setores -->
+
+                        <!-- TAB: Central Administrativa -->
+                        <div id="admin-sub-central" class="admin-tabview" style="display: none;">
+                            <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #E2E8F0; padding-bottom: 10px;">
+                                <button id="btn-central-tab-pendencias" onclick="App.switchCentralSubTab('pendencias')" style="padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; border: 1px solid #E2E8F0; background: #1E293B; color: #FFFFFF;">
+                                    Pendências Operacionais <span id="central-badge-pendencias" style="margin-left: 6px; background: #EF4444; color: #FFFFFF; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px;">0</span>
+                                </button>
+                                <button id="btn-central-tab-solicitacoes" onclick="App.switchCentralSubTab('solicitacoes')" style="padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; border: 1px solid #E2E8F0; background: #FFFFFF; color: #64748B;">
+                                    Solicitações & Mensagens <span id="central-badge-solicitacoes" style="margin-left: 6px; background: #0284C7; color: #FFFFFF; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px;">0</span>
+                                </button>
+                            </div>
+
+                            <div id="central-view-pendencias" style="display: block;">
+                                <div class="panel-card" style="margin-bottom: 20px; border: 1px solid #E2E8F0; background: #FFFFFF;">
+                                    <div class="panel-header" style="border-bottom: 1px solid #F1F5F9; padding-bottom: 12px; margin-bottom: 15px;">
+                                        <div class="panel-title" style="font-size: 1rem; font-weight: 700; color: #1E293B;">
+                                            Pendências de Escala e Cultos
+                                        </div>
+                                    </div>
+                                    <div id="central-list-pendencias" style="display: flex; flex-direction: column; gap: 12px;">
+                                        <div style="text-align: center; color: #64748B; padding: 20px; font-size: 0.9rem;">Carregando pendências...</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="central-view-solicitacoes" style="display: none;">
+                                <div class="panel-card" style="margin-bottom: 20px; border: 1px solid #E2E8F0; background: #FFFFFF;">
+                                    <div class="panel-header" style="border-bottom: 1px solid #F1F5F9; padding-bottom: 12px; margin-bottom: 15px;">
+                                        <div class="panel-title" style="font-size: 1rem; font-weight: 700; color: #1E293B;">
+                                            Mensagens e Pedidos dos Obreiros
+                                        </div>
+                                    </div>
+                                    <div id="central-list-solicitacoes" style="display: flex; flex-direction: column; gap: 12px;">
+                                        <div style="text-align: center; color: #64748B; padding: 20px; font-size: 0.9rem;">Carregando solicitações...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div id="admin-sub-setores" class="admin-tabview" style="display: none;">
                             <div class="panel-card" style="background: #F8FAFC; border: none; box-shadow: none; padding: 0;">
                                 <div id="admin-organogram-container">
@@ -2378,10 +2413,10 @@
         </div>
 
         <!-- Import Main App Control logic -->
-        <script src="js/firebase-config.js?v=3.12.7"></script>
-        <script src="js/db.js?v=3.12.7"></script>
-        <script src="js/config/sectorsData.js?v=3.12.7"></script>
-        <script src="js/app.js?v=3.12.7"></script>
+        <script src="js/firebase-config.js?v=3.13.0"></script>
+        <script src="js/db.js?v=3.13.0"></script>
+        <script src="js/config/sectorsData.js?v=3.13.0"></script>
+        <script src="js/app.js?v=3.13.0"></script>
 
 
 </div></body></html>
