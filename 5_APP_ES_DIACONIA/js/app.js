@@ -4783,60 +4783,6 @@ const App = {
                 }
             });
 
-            // Renderizar tabela compacta de status dos setores (substituindo 8 cards)
-            const statsGrid = document.getElementById('admin-dashboard-stats-grid');
-            if (statsGrid) {
-                let tableHtml = `
-                    <div style="overflow:hidden; border-radius:8px; border:1px solid #E2E8F0;">
-                        <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
-                            <thead>
-                                <tr style="background:#F8FAFC; border-bottom:1px solid #E2E8F0;">
-                                    <th style="padding:10px 14px; text-align:left; font-weight:700; color:#64748B; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px;">Setor</th>
-                                    <th style="padding:10px 14px; text-align:center; font-weight:700; color:#64748B; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px;">Membros</th>
-                                    <th style="padding:10px 14px; text-align:center; font-weight:700; color:#64748B; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px;">Escalas Ativas</th>
-                                    <th style="padding:10px 14px; text-align:center; font-weight:700; color:#64748B; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px;">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                `;
-
-                const hojeStr = new Date().toISOString().split('T')[0];
-
-                for (const [key, sector] of Object.entries(this.sectorsData)) {
-                    const vol = sectorVoluntarios[key] || 0;
-                    // Only count escalas for future/active cultos
-                    const escalasAtivas = escalas.filter(e => {
-                        if (e.setorId !== key) return false;
-                        if (e.statusServico === 'Finalizado') return false;
-                        const c = cultos.find(cu => cu.id === e.cultoId);
-                        return !c || c.data >= hojeStr;
-                    }).length;
-
-                    const statusColor = escalasAtivas > 0 ? '#10B981' : '#94A3B8';
-                    const statusText = escalasAtivas > 0 ? 'Com escala' : 'Sem escala';
-                    const statusBg = escalasAtivas > 0 ? '#ECFDF5' : '#F1F5F9';
-
-                    tableHtml += `
-                        <tr style="border-bottom:1px solid #F1F5F9; transition:background 0.15s;" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background=''">
-                            <td style="padding:11px 14px;">
-                                <div style="display:flex; align-items:center; gap:10px;">
-                                    <div style="width:10px; height:10px; border-radius:50%; background:${sector.cor}; flex-shrink:0;"></div>
-                                    <span style="font-weight:600; color:#1E293B;">${sector.nome}</span>
-                                </div>
-                            </td>
-                            <td style="padding:11px 14px; text-align:center; font-weight:700; color:#1E293B;">${vol}</td>
-                            <td style="padding:11px 14px; text-align:center; font-weight:700; color:#1E293B;">${escalasAtivas}</td>
-                            <td style="padding:11px 14px; text-align:center;">
-                                <span style="background:${statusBg}; color:${statusColor}; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:600;">${statusText}</span>
-                            </td>
-                        </tr>
-                    `;
-                }
-
-                tableHtml += `</tbody></table></div>`;
-                statsGrid.innerHTML = tableHtml;
-            }
-
             // 2. Load Services in Progress
             const activeServices = await DbService.getServicosEmAndamento();
             const serviceContainer = document.getElementById('admin-dashboard-active-services');
