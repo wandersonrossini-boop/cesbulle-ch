@@ -3471,6 +3471,52 @@ table.admin-table tr:hover td {
     display: none !important;
 }
 
+/* Correção cirúrgica de contraste no Painel Admin (#view-admin) */
+#view-admin .panel-card {
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    color: #1E293B !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+#view-admin .panel-title {
+    color: #1E293B !important;
+}
+
+#view-admin .report-row {
+    color: #1E293B !important;
+    border-bottom-color: #E2E8F0 !important;
+}
+
+#view-admin .report-row span {
+    color: #64748B !important;
+}
+
+#view-admin .report-row b {
+    color: #1E293B !important;
+}
+
+#view-admin .progress-labels,
+#view-admin .progress-labels span {
+    color: #64748B !important;
+}
+
+#view-admin .progress-container-stacked {
+    background: #F8FAFC !important;
+    border-color: #E2E8F0 !important;
+}
+
+#view-admin #admin-dashboard-reposicoes,
+#view-admin #admin-dashboard-afastamentos-alertas,
+#view-admin #admin-dashboard-active-services {
+    color: #64748B !important;
+}
+
+/* Ocultar ícones e emojis no Painel Admin */
+#view-admin i {
+    display: none !important;
+}
+
 /* Header Redesign */
 #view-setor-select .selector-header {
     background: rgba(16, 64, 59, 0.45) !important;
