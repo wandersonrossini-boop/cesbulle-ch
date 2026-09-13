@@ -17,7 +17,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=3.13.1">
+    <link rel="stylesheet" href="css/style.css?v=3.14.0">
     
     <!-- Firebase SDK (v8 Compat) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -560,79 +560,73 @@
                                 <!-- Dynamic stats cards generated from sectorsData -->
                             </div>
                             
-                            <!-- Synthetic Central Administrativa Status Hero Card -->
-                            <div class="panel-card" id="central-summary-hero-card" style="margin-bottom: 25px; box-shadow: var(--shadow-sm); border-radius: 12px; border: 1px solid var(--border-color); background: #FFFFFF; padding: 20px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                            <!-- Compact Summary Cards Grid (Side-by-Side) -->
+                            <div class="dashboard-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-bottom: 25px;">
+                                
+                                <!-- Card 1: Central Administrativa / Status -->
+                                <div class="panel-card" style="display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0;">
                                     <div>
-                                        <div style="font-size: 0.75rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Status do Diaconato</div>
-                                        <h3 id="hero-central-status-title" style="font-size: 1.15rem; font-weight: 700; color: #1E293B; margin: 0 0 6px 0;">Central Administrativa</h3>
-                                        <p id="hero-central-status-desc" style="font-size: 0.88rem; color: #64748B; margin: 0;">Carregando resumo de ações...</p>
+                                        <div class="panel-header" style="border-bottom: 1px solid #F1F5F9; padding-bottom: 8px; margin-bottom: 12px;">
+                                            <div class="panel-title" style="font-size: 0.95rem;"><i class="fa-solid fa-clipboard-check" style="margin-right: 6px; color: #0284C7;"></i> Status do Diaconato</div>
+                                        </div>
+                                        <h4 id="hero-central-status-title" style="font-size: 1.1rem; font-weight: 700; color: #1E293B; margin: 0 0 4px 0;">Central Administrativa</h4>
+                                        <p id="hero-central-status-desc" style="font-size: 0.82rem; color: #64748B; margin: 0;">Carregando ações...</p>
                                     </div>
-                                    <div>
-                                        <button onclick="App.switchAdminTab('central')" style="padding: 10px 18px; background: #1E293B; color: #FFFFFF; border: none; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
-                                            <span>Ver Central Administrativa</span>
+                                    <div style="margin-top: 15px;">
+                                        <button onclick="App.switchAdminTab('central')" style="width: 100%; padding: 8px 12px; background: #1E293B; color: #FFFFFF; border: none; border-radius: 6px; font-weight: 600; font-size: 0.8rem; cursor: pointer;">
+                                            Ver Central
                                         </button>
                                     </div>
                                 </div>
-                            </div>
-                            
-                            <!-- Columns layout -->
-                            <div class="dashboard-columns">
-                                <div>
-                                    <div class="panel-card">
-                                        <div class="panel-header">
-                                            <div class="panel-title"><i class="fa-solid fa-bolt" style="margin-right: 5px; color: #EAB308;"></i> Serviços em Andamento</div>
-                                            <span class="badge badge-active" style="background: rgba(16, 185, 129, 0.1); color: #10B981;" id="active-services-count">0 Ativo(s)</span>
+
+                                <!-- Card 2: Serviços em Andamento -->
+                                <div class="panel-card" style="display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0;">
+                                    <div>
+                                        <div class="panel-header" style="border-bottom: 1px solid #F1F5F9; padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                                            <div class="panel-title" style="font-size: 0.95rem;"><i class="fa-solid fa-bolt" style="margin-right: 6px; color: #EAB308;"></i> Serviços em Andamento</div>
+                                            <span class="badge badge-active" style="background: rgba(16, 185, 129, 0.1); color: #10B981; font-size: 0.72rem; font-weight: 700;" id="active-services-count">0 Ativo(s)</span>
                                         </div>
-                                        <div id="admin-dashboard-active-services">
-                                            <!-- Dynamic items -->
-                                            <div style="text-align: center; color: var(--slate-gray); padding: 20px;">Não há serviços em andamento no momento.</div>
+                                        <div id="admin-dashboard-active-services" style="font-size: 0.82rem; color: #64748B;">
+                                            <div style="text-align: center; padding: 10px;">Sem serviços ativos.</div>
                                         </div>
                                     </div>
                                 </div>
-                                
-                                <div>
-                                    <div class="panel-card">
-                                        <div class="panel-header">
-                                            <div class="panel-title"><i class="fa-solid fa-calendar-week" style="margin-right: 5px;"></i> Escalas da Semana</div>
+
+                                <!-- Card 3: Escalas da Semana -->
+                                <div class="panel-card" style="display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0;">
+                                    <div>
+                                        <div class="panel-header" style="border-bottom: 1px solid #F1F5F9; padding-bottom: 8px; margin-bottom: 12px;">
+                                            <div class="panel-title" style="font-size: 0.95rem;"><i class="fa-solid fa-calendar-week" style="margin-right: 6px; color: #10B981;"></i> Escalas da Semana</div>
                                         </div>
-                                        
-                                        <!-- Stacked progress bar -->
-                                        <div class="progress-container-stacked" style="margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 16px; border: 1px solid #f1f5f9;">
-                                            <div class="progress-bar-stacked" id="dashboard-scales-progress-bar" style="display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: #e2e8f0; margin-bottom: 10px;">
+                                        <div class="progress-container-stacked" style="margin-bottom: 10px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #f1f5f9;">
+                                            <div class="progress-bar-stacked" id="dashboard-scales-progress-bar" style="display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: #e2e8f0; margin-bottom: 6px;">
                                                 <div class="progress-segment confirmed" style="width: 0%; background: #10B981; transition: width 0.5s ease;" title="Confirmadas"></div>
                                                 <div class="progress-segment pending" style="width: 0%; background: #F59E0B; transition: width 0.5s ease;" title="Pendentes"></div>
                                                 <div class="progress-segment other" style="width: 0%; background: #6B7280; transition: width 0.5s ease;" title="Finalizadas/Outras"></div>
                                             </div>
-                                            <div class="progress-labels" style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 500;">
-                                                <span class="label confirmed" style="color: #10B981;"><span class="dot" style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #10B981; margin-right: 4px; vertical-align: middle;"></span>Confirmadas (<span id="dash-progress-pct-confirmed">0%</span>)</span>
-                                                <span class="label pending" style="color: #F59E0B;"><span class="dot" style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #F59E0B; margin-right: 4px; vertical-align: middle;"></span>Pendentes (<span id="dash-progress-pct-pending">0%</span>)</span>
+                                            <div class="progress-labels" style="display: flex; justify-content: space-between; font-size: 0.72rem; font-weight: 500;">
+                                                <span class="label confirmed" style="color: #10B981;">Confirmadas (<span id="dash-progress-pct-confirmed">0%</span>)</span>
+                                                <span class="label pending" style="color: #F59E0B;">Pendentes (<span id="dash-progress-pct-pending">0%</span>)</span>
                                             </div>
                                         </div>
-                                        
-                                        <div id="admin-dashboard-scales-summary" style="display: flex; flex-direction: column; gap: 10px;">
+                                        <div id="admin-dashboard-scales-summary" style="display: flex; flex-direction: column; gap: 4px; font-size: 0.8rem;">
                                             <!-- Summary numbers -->
                                         </div>
                                     </div>
-                                    
-                                    <div class="panel-card" style="margin-top: 20px;">
-                                        <div class="panel-header">
-                                            <div class="panel-title"><i class="fa-solid fa-rotate" style="margin-right: 5px;"></i> Reposições Pendentes</div>
+                                </div>
+
+                                <!-- Card 4: Afastamentos e Indisponibilidades -->
+                                <div class="panel-card" style="display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0;">
+                                    <div>
+                                        <div class="panel-header" style="border-bottom: 1px solid #F1F5F9; padding-bottom: 8px; margin-bottom: 12px;">
+                                            <div class="panel-title" style="font-size: 0.95rem;"><i class="fa-solid fa-plane-departure" style="margin-right: 6px; color: #6366F1;"></i> Afastamentos</div>
                                         </div>
-                                        <div id="admin-dashboard-reposicoes" style="text-align: center; padding: 10px; color: var(--slate-gray);">
-                                            Nenhuma solicitação pendente.
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="panel-card" style="margin-top: 20px;">
-                                        <div class="panel-header">
-                                            <div class="panel-title"><i class="fa-solid fa-plane-departure" style="margin-right: 5px;"></i> Afastamentos e Indisponibilidades</div>
-                                        </div>
-                                        <div id="admin-dashboard-afastamentos-alertas" style="padding: 10px; font-size: 0.85rem; color: var(--slate-gray);">
-                                            Todos os membros estão disponíveis.
+                                        <div id="admin-dashboard-afastamentos-alertas" style="font-size: 0.82rem; color: #64748B;">
+                                            Todos os membros disponíveis.
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
 
@@ -793,17 +787,6 @@
                         <!-- TAB: Escalas -->
                         <div id="admin-sub-escalas" class="admin-tabview" style="display: none;">
                             <p class="tab-subtitle" style="color: var(--slate-gray); margin-top: -15px; margin-bottom: 25px; font-size: 0.95rem;">Gerencie escalas por culto e por setor</p>
-                            
-                            <!-- Supervisor Alerts/Notifications Panel -->
-                            <div id="admin-supervisor-alerts-container" class="panel-card" style="display: none; border: 1px solid #fee2e2; background: #fff5f5; margin-bottom: 25px; border-radius: 16px; padding: 18px; box-shadow: var(--shadow-sm);">
-                                <div class="panel-title" style="color: #991b1b; font-weight: 700; font-size: 1.05rem; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #fecaca; padding-bottom: 10px;">
-                                    <span><i class="fa-solid fa-bell" style="margin-right: 8px; color: #dc2626;"></i> Notificações e Solicitações da Supervisão</span>
-                                    <span class="badge" id="admin-supervisor-alerts-badge" style="background: #dc2626; color: white; padding: 3px 9px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">0</span>
-                                </div>
-                                <div id="admin-supervisor-alerts-list" style="display: flex; flex-direction: column; gap: 12px;">
-                                    <!-- Alerts populated dynamically -->
-                                </div>
-                            </div>
                             
                             <div class="escalas-subtabs" style="display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid #E2E8F0; padding-bottom: 15px;">
                                 <button class="btn-primary" id="btn-tab-cultos" onclick="App.switchEscalasSubTab('cultos')" style="background: var(--teal-primary); width: auto; padding: 8px 16px; border-radius: 6px; box-shadow: none;">Cultos e Eventos</button>

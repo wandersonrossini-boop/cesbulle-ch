@@ -5182,17 +5182,22 @@ const App = {
                 let html = '';
 
                 mensagens.forEach(m => {
-                    const dataFmt = m.dataCriacao ? new Date(m.dataCriacao.seconds ? m.dataCriacao.seconds * 1000 : m.dataCriacao).toLocaleDateString('pt-BR') : '';
+                    const dateObj = m.dataCriacao ? new Date(m.dataCriacao.seconds ? m.dataCriacao.seconds * 1000 : m.dataCriacao) : null;
+                    const dataFmt = dateObj ? `${dateObj.toLocaleDateString('pt-BR')} às ${dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}` : '';
+                    const tipoLabel = m.tipo || 'Mensagem para Supervisão';
+                    const textoConteudo = m.mensagem || m.texto || m.conteudo || 'Solicitação enviada sem texto.';
+
                     html += `
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 14px 16px; background: #F0F9FF; border: 1px solid #BAE6FD; border-radius: 8px; flex-wrap: wrap; gap: 10px;">
                             <div style="flex: 1; min-width: 240px;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                                    <strong style="color: #0369A1; font-size: 0.9rem;">${m.remetenteNome || 'Obreiro'}</strong>
-                                    <span style="font-size: 0.75rem; color: #0369A1;">${dataFmt}</span>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
+                                    <strong style="color: #0369A1; font-size: 0.92rem;">${m.remetenteNome || 'Obreiro'}</strong>
+                                    <span style="font-size: 0.72rem; color: #0284C7; background: #E0F2FE; padding: 2px 8px; border-radius: 12px; font-weight: 600;">${tipoLabel}</span>
                                 </div>
-                                <p style="font-size: 0.85rem; color: #1E293B; margin: 0;">${m.mensagem || m.texto || 'Solicitação enviada'}</p>
+                                <p style="font-size: 0.85rem; color: #1E293B; margin: 0 0 6px 0; font-style: italic; background: #FFFFFF; padding: 8px 12px; border-radius: 6px; border: 1px solid #E0F2FE;">"${textoConteudo}"</p>
+                                <span style="font-size: 0.72rem; color: #64748B;">Enviado em: ${dataFmt}</span>
                             </div>
-                            <button onclick="App.marcarMensagemSupervisaoLida('${m.id}')" style="padding: 6px 12px; background: #0284C7; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+                            <button onclick="App.marcarMensagemSupervisaoLida('${m.id}')" style="padding: 6px 12px; background: #0284C7; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; align-self: center;">
                                 Marcar Lida
                             </button>
                         </div>
