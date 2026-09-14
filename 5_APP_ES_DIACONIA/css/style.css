@@ -3512,9 +3512,29 @@ table.admin-table tr:hover td {
     color: #64748B !important;
 }
 
-/* Ocultar ícones e emojis no Painel Admin */
+/* Exibir ícones no Painel Admin com alto contraste */
 #view-admin i {
-    display: none !important;
+    display: inline-block !important;
+}
+
+#view-admin .sector-icon-circle i {
+    color: inherit !important;
+    display: inline-block !important;
+}
+
+#view-admin .btn-table-action i {
+    color: #475569 !important;
+    display: inline-block !important;
+}
+
+#view-admin .btn-table-action.delete i {
+    color: #EF4444 !important;
+    display: inline-block !important;
+}
+
+#view-admin .btn-table-action.add i {
+    color: #0284C7 !important;
+    display: inline-block !important;
 }
 
 /* Header Redesign */
