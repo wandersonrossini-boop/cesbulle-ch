@@ -46,248 +46,335 @@
     <style>
         :root {
             --gold: #C9A050;
-            --gold-dim: rgba(201, 160, 80, 0.08);
-            --border: rgba(201, 160, 80, 0.15);
-            --font: 'Outfit', sans-serif;
+            --gold-light: #E0B45C;
+            --gold-dim: rgba(201, 160, 80, 0.12);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-gold: rgba(201, 160, 80, 0.3);
+            --bg-dark: #09090A;
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-heading: 'Outfit', 'Inter', sans-serif;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         html, body { 
             width: 100%; height: 100%; overflow: hidden;
-            background: #080809; color: #ffffff; font-family: var(--font);
+            background: var(--bg-dark); color: #ffffff; font-family: var(--font-main);
+            -webkit-font-smoothing: antialiased;
         }
 
         #view-login {
             position: absolute; inset: 0; z-index: 100;
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-            background: #080809;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: #09090A;
             background-image: 
-                radial-gradient(circle at 50% 20%, rgba(201, 160, 80, 0.08) 0%, transparent 60%),
-                linear-gradient(135deg, rgba(201, 160, 80, 0.02) 0%, transparent 50%);
-            padding: 20px 20px 40px 20px;
+                radial-gradient(circle at 50% 0%, rgba(201, 160, 80, 0.06) 0%, transparent 45%),
+                linear-gradient(180deg, #0c0d0f 0%, #060607 100%);
+            padding: 20px 30px;
             overflow-y: auto;
             scrollbar-width: none;
         }
         #view-login::-webkit-scrollbar { display: none; }
 
-        /* Portal Header (Bell & Avatar) */
-        .portal-header {
+        /* Top Bar Branding */
+        .portal-top-bar {
+            width: 100%;
+            max-width: 1440px;
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
             align-items: center;
-            gap: 15px;
-            padding: 20px 30px;
-            position: absolute;
-            top: 0; right: 0; width: 100%;
-            box-sizing: border-box;
-            z-index: 10;
+            margin-bottom: 16px;
+            padding: 0 4px;
         }
-        .notification-bell {
-            width: 40px; height: 40px; border-radius: 50%;
-            border: 1px solid rgba(201, 160, 80, 0.2);
-            background: rgba(22, 21, 22, 0.45);
-            display: flex; align-items: center; justify-content: center;
-            color: var(--gold); font-size: 1rem; position: relative;
-            cursor: pointer; transition: 0.3s;
+        .portal-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-        .notification-bell:hover {
-            border-color: var(--gold);
-            box-shadow: 0 0 10px rgba(201, 160, 80, 0.2);
+        .portal-brand img {
+            height: 38px;
+            width: auto;
+            filter: drop-shadow(0 2px 6px rgba(201, 160, 80, 0.25));
         }
-        .bell-badge {
-            position: absolute; top: 12px; right: 13px;
-            width: 7px; height: 7px; background: var(--gold);
-            border-radius: 50%;
+        .portal-brand-text {
+            font-family: var(--font-heading);
+            font-size: 0.95rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #F1F5F9;
         }
         .avatar-circle {
-            width: 40px; height: 40px; border-radius: 50%;
-            border: 1.5px solid var(--gold); overflow: hidden;
-            box-shadow: 0 0 10px rgba(201, 160, 80, 0.2);
+            width: 38px; height: 38px; border-radius: 50%;
+            border: 1px solid var(--gold); overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
             background: #111;
         }
         .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
 
-        .logo-box { width: 180px; height: 180px; margin-bottom: 20px; filter: drop-shadow(0 0 15px rgba(201, 160, 80, 0.25)); }
-        .logo-box img { width: 100%; height: 100%; object-fit: contain; }
+        /* Hero Header */
+        .portal-hero {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 24px auto;
+        }
+        .portal-title {
+            font-family: var(--font-heading);
+            font-size: 1.85rem;
+            font-weight: 800;
+            color: #FFFFFF;
+            letter-spacing: -0.3px;
+            margin-bottom: 4px;
+        }
+        .portal-subtitle {
+            font-size: 0.92rem;
+            color: #94A3B8;
+            font-weight: 400;
+        }
 
-        /* Portal Grid & Cards */
-        .portal-grid {
+        /* Layout Container Ampliado */
+        .portal-layout {
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+        .section-title {
+            font-family: var(--font-heading);
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #94A3B8;
+        }
+        .section-title span {
+            color: var(--gold);
+        }
+
+        /* OPERATIONAL SECTION */
+        .operational-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 16px;
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto 40px auto;
+            gap: 18px;
         }
-        @media(min-width: 600px) {
-            .portal-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 20px;
-            }
-            .portal-card.prominent {
-                grid-column: span 2;
+        @media(min-width: 850px) {
+            .operational-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 24px;
             }
         }
 
-        .portal-card {
-            background: rgba(22, 21, 22, 0.45);
-            border: 1px solid rgba(201, 160, 80, 0.15);
-            border-radius: 20px;
-            padding: 20px 25px;
+        .op-card {
+            position: relative;
+            height: 220px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 22px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+        }
+        @media(min-width: 850px) {
+            .op-card {
+                height: 300px;
+                padding: 26px;
+            }
+        }
+        .op-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(9, 9, 10, 0.05) 0%, rgba(9, 9, 10, 0.65) 50%, rgba(9, 9, 10, 0.95) 100%);
+            transition: opacity 0.3s ease;
+        }
+        .op-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-3px);
+            box-shadow: 0 16px 45px rgba(201, 160, 80, 0.22);
+        }
+        .op-card:hover::before {
+            background: linear-gradient(180deg, rgba(9, 9, 10, 0.02) 0%, rgba(9, 9, 10, 0.55) 45%, rgba(9, 9, 10, 0.92) 100%);
+        }
+
+        .op-card-content {
+            position: relative;
+            z-index: 2;
+        }
+        .op-title {
+            font-family: var(--font-heading);
+            font-size: 1.45rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #FFFFFF;
+            margin-bottom: 4px;
+        }
+        .op-action {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .op-action-text {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #FFFFFF;
+        }
+        .op-action-icon {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            background: var(--gold);
+            color: #080809;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+        .op-card:hover .op-action-icon {
+            transform: translateX(4px);
+            background: #FFFFFF;
+        }
+
+        /* ADMINISTRATIVE SECTION */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+        @media(min-width: 768px) {
+            .admin-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+            }
+        }
+
+        .admin-card {
+            background: rgba(18, 20, 24, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 16px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            color: #ffffff;
-            position: relative;
-            overflow: hidden;
+            transition: all 0.25s ease;
         }
-        .portal-card:hover {
-            border-color: var(--gold);
-            background: rgba(201, 160, 80, 0.05);
-            box-shadow: 0 0 25px rgba(201, 160, 80, 0.12);
+        .admin-card:hover {
+            background: rgba(30, 34, 42, 0.85);
+            border-color: rgba(201, 160, 80, 0.4);
             transform: translateY(-2px);
         }
-        .portal-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(201, 160, 80, 0.05), transparent);
-            transition: 0.5s;
+        .admin-card-info h4 {
+            font-family: var(--font-heading);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #F1F5F9;
+            margin-bottom: 2px;
+            letter-spacing: 0.5px;
         }
-        .portal-card:hover::before { left: 100%; }
-
-        .portal-card.prominent {
-            padding: 24px 30px;
-            border-color: rgba(201, 160, 80, 0.28);
-            background: rgba(201, 160, 80, 0.03);
+        .admin-card-info p {
+            font-size: 0.78rem;
+            color: #64748B;
+            line-height: 1.3;
+        }
+        .admin-card-arrow {
+            color: #475569;
+            font-size: 0.85rem;
+            transition: color 0.25s ease, transform 0.25s ease;
+        }
+        .admin-card:hover .admin-card-arrow {
+            color: var(--gold);
+            transform: translateX(3px);
         }
 
-        .portal-icon-container {
-            background: rgba(201, 160, 80, 0.1);
-            border: 1px solid rgba(201, 160, 80, 0.2);
-            width: 48px; height: 48px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            margin-right: 18px; flex-shrink: 0;
-            color: var(--gold); font-size: 1.25rem;
-            transition: all 0.3s ease;
-        }
-        .portal-card:hover .portal-icon-container {
-            background: var(--gold);
-            color: #080809;
-            box-shadow: 0 0 15px rgba(201, 160, 80, 0.35);
-            border-color: var(--gold);
-        }
-        .portal-card.prominent .portal-icon-container { width: 56px; height: 56px; font-size: 1.45rem; }
-
-        .portal-text { flex-grow: 1; text-align: left; }
-        .portal-card-title {
-            font-size: 1.05rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 1px;
-            margin: 0 0 4px 0; color: #ffffff;
-            font-family: var(--font);
-        }
-        .portal-card.prominent .portal-card-title { font-size: 1.2rem; }
-        .portal-card-desc { font-size: 0.8rem; color: #a8a29e; margin: 0; font-weight: 400; line-height: 1.4; }
-        .portal-card.prominent .portal-card-desc { font-size: 0.88rem; }
-
-        .portal-arrow { color: rgba(201, 160, 80, 0.3); font-size: 1rem; transition: all 0.3s ease; margin-left: 15px; }
-        .portal-card:hover .portal-arrow { color: var(--gold); transform: translateX(3px); }
-
-        /* Bottom widgets */
-        .portal-bottom-bar {
+        /* Bottom Status Footer */
+        .portal-footer {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 22px;
+            gap: 16px;
             width: 100%;
-            max-width: 800px;
+            max-width: 1440px;
             margin: 20px auto 0 auto;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 16px;
         }
         @media(min-width: 768px) {
-            .portal-bottom-bar {
+            .portal-footer {
                 flex-direction: row;
                 justify-content: space-between;
-                align-items: center;
-                gap: 15px;
             }
         }
-        .portal-status-box {
-            background: rgba(22, 21, 22, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 12px 20px;
-            display: flex; align-items: center; gap: 12px;
-            font-size: 0.8rem; color: #a8a29e;
+        .portal-status {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 0.78rem; color: #64748B;
         }
         .status-dot {
             width: 8px; height: 8px; background: #22c55e; border-radius: 50%;
-            box-shadow: 0 0 10px #22c55e; animation: pulse 2s infinite;
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
         }
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.3); opacity: 0.5; }
-            100% { transform: scale(1); opacity: 1; }
+        .portal-help {
+            font-size: 0.78rem; color: #64748B; cursor: pointer;
+            transition: color 0.2s ease;
+            display: flex; align-items: center; gap: 6px;
         }
-        .portal-quote {
-            text-align: center; font-size: 0.92rem; color: var(--gold);
-            font-family: 'Playfair Display', serif; font-style: italic;
-        }
-        .portal-help-box {
-            background: rgba(22, 21, 22, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 12px 20px;
-            display: flex; align-items: center; gap: 12px;
-            font-size: 0.8rem; color: #a8a29e; cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .portal-help-box:hover { border-color: var(--gold); color: #ffffff; }
+        .portal-help:hover { color: var(--gold); }
 
-        /* PIN SCREEN */
+        /* PIN / LOGIN MODAL */
         #pin-screen { display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; margin: 40px 0; }
         .pin-container {
-            background: rgba(22, 21, 22, 0.45);
-            border: 1px solid var(--border);
-            border-radius: 30px;
-            padding: 50px 35px;
+            background: rgba(18, 20, 24, 0.95);
+            border: 1px solid var(--border-gold);
+            border-radius: 14px;
+            padding: 36px 28px;
             width: 100%;
             max-width: 360px;
             text-align: center;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(20px);
         }
         .pin-input {
-            width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border);
-            border-radius: 16px; padding: 18px; font-size: 2.2rem; text-align: center;
-            letter-spacing: 12px; margin-bottom: 25px; outline: none; color: #fff;
+            width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border-gold);
+            border-radius: 8px; padding: 14px; font-size: 2rem; text-align: center;
+            letter-spacing: 10px; margin-bottom: 20px; outline: none; color: #fff;
             transition: 0.3s;
         }
-        .pin-input:focus { border-color: var(--gold); box-shadow: 0 0 15px rgba(201,160,80,0.15); }
+        .pin-input:focus { border-color: var(--gold); box-shadow: 0 0 12px rgba(201,160,80,0.25); }
         .btn-confirm {
-            width: 100%; background: var(--gold); color: #000; border: none;
-            padding: 20px; border-radius: 16px; font-weight: 800; font-size: 1.1rem;
-            cursor: pointer; text-transform: uppercase; letter-spacing: 2px;
-            transition: 0.3s;
+            width: 100%; background: var(--gold); color: #080809; border: none;
+            padding: 15px; border-radius: 8px; font-weight: 800; font-size: 0.92rem;
+            cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px;
+            transition: 0.25s;
         }
-        .btn-confirm:hover { background: #e0b45c; transform: translateY(-1px); }
+        .btn-confirm:hover { background: var(--gold-light); transform: translateY(-1px); }
 
-        /* APP HEADER */
+        /* APP HEADER & SHELL */
         .app-header {
-            position: fixed; top: 0; left: 0; width: 100%; height: 70px;
-            background: #000; border-bottom: 1.5px solid var(--gold);
+            position: fixed; top: 0; left: 0; width: 100%; height: 60px;
+            background: #0B0B0C; border-bottom: 1px solid var(--border-gold);
             display: none; align-items: center; justify-content: space-between;
-            padding: 0 25px; z-index: 1000;
+            padding: 0 20px; z-index: 1000;
         }
-        .app-container { position: absolute; top: 70px; left: 0; width: 100%; height: calc(100% - 70px); display: none; }
+        .app-container { position: absolute; top: 60px; left: 0; width: 100%; height: calc(100% - 60px); display: none; }
         .app-view { display: none; width: 100%; height: 100%; }
         .app-view.active { display: block; }
         iframe { width: 100%; height: 100%; border: none; }
@@ -296,134 +383,146 @@
 <body>
     <div id="view-login">
         
-        <!-- Portal Header Icons -->
-        <div class="portal-header">
-            <!-- Notificacao Removida conforme pedido -->
+        <!-- Top Bar Branding -->
+        <div class="portal-top-bar">
+            <div class="portal-brand">
+                <img src="assets/logo_3.png?v=70.3.85" alt="CME Lausanne Logo">
+                <span class="portal-brand-text">CME Lausanne</span>
+            </div>
             <div class="avatar-circle">
                 <img src="assets/logo_3.png?v=70.3.85" alt="Logo avatar">
             </div>
         </div>
 
-        <!-- ROLE SELECTION VIEW -->
-        <div id="role-selection" style="width: 100%; max-width: 800px; margin: 0 auto; text-align: center;">
-            <div class="logo-box" style="margin: 0 auto 5px auto;">
-                <img src="assets/logo_3.png?v=70.3.85" alt="CES Logo">
-            </div>
+        <!-- MAIN SYSTEM HOME VIEW -->
+        <div id="role-selection" style="width: 100%;">
             
-            <h1 style="font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 700; color: #ffffff; margin-bottom: 8px; letter-spacing: -0.5px;">
-                Bem-vindo ao sistema <span style="color: var(--gold);">Lausanne</span>
-            </h1>
-            <p style="font-size: 0.95rem; color: #a8a29e; max-width: 500px; margin: 0 auto 40px auto; line-height: 1.5; font-weight: 400; font-family:'Inter';">
-                Acesse as equipes, acompanhe atividades e gerencie cada detalhe com excelência.
-            </p>
-
-            <div class="portal-grid">
-                <!-- LIVE (ALTAR) -->
-                <div class="portal-card prominent" onclick="selectRole('altar')">
-                    <div style="display: flex; align-items: center; flex-grow: 1;">
-                        <div class="portal-text" style="width: 100%; text-align: center;">
-                            <h3 class="portal-card-title">LIVE (ALTAR)</h3>
-                            <p class="portal-card-desc">Gerencie transmissões e conteúdos ao vivo.</p>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right portal-arrow"></i>
-                </div>
-                
-                <!-- GABINETE PASTORAL -->
-                <div class="portal-card prominent" onclick="selectRole('gabinete')" style="background: linear-gradient(135deg, rgba(201, 160, 80, 0.08) 0%, rgba(22, 21, 22, 0.45) 100%);">
-                    <div style="display: flex; align-items: center; flex-grow: 1;">
-                        <div class="portal-text" style="width: 100%; text-align: center;">
-                            <h3 class="portal-card-title">GABINETE PASTORAL</h3>
-                            <p class="portal-card-desc">Acesso exclusivo da liderança pastoral.</p>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right portal-arrow"></i>
-                </div>
-
-                <!-- RECEPÇÃO -->
-                <div class="portal-card" onclick="selectRole('reception')">
-                    <div style="display: flex; align-items: center; flex-grow: 1;">
-                        <div class="portal-text" style="width: 100%; text-align: center;">
-                            <h3 class="portal-card-title">Recepção</h3>
-                            <p class="portal-card-desc">Atendimento e cadastro de visitantes.</p>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right portal-arrow"></i>
-                </div>
-
-                <!-- INTEGRAÇÃO -->
-                <div class="portal-card" onclick="selectRole('integracao')">
-                    <div style="display: flex; align-items: center; flex-grow: 1;">
-                        <div class="portal-text" style="width: 100%; text-align: center;">
-                            <h3 class="portal-card-title">Integração</h3>
-                            <p class="portal-card-desc">Conectando pessoas à família Lausanne.</p>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right portal-arrow"></i>
-                </div>
-
-                <!-- CRIANÇAS -->
-                <div class="portal-card" onclick="selectRole('kids')">
-                    <div style="display: flex; align-items: center; flex-grow: 1;">
-                        <div class="portal-text" style="width: 100%; text-align: center;">
-                            <h3 class="portal-card-title">Crianças</h3>
-                            <p class="portal-card-desc">Ministério infantil com amor e excelência.</p>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right portal-arrow"></i>
-                </div>
-
-                <!-- SECRETARIA -->
-                <div class="portal-card" onclick="selectRole('admin')">
-                    <div style="display: flex; align-items: center; flex-grow: 1;">
-                        <div class="portal-text" style="width: 100%; text-align: center;">
-                            <h3 class="portal-card-title">Secretaria</h3>
-                            <p class="portal-card-desc">Documentos, solicitações e comunicações oficiais.</p>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right portal-arrow"></i>
-                </div>
+            <div class="portal-hero">
+                <h1 class="portal-title">Bem-vindo</h1>
+                <p class="portal-subtitle">Escolha uma área para começar.</p>
             </div>
 
-            <!-- Bottom Row widgets -->
-            <div class="portal-bottom-bar">
-                <div class="portal-status-box">
+            <div class="portal-layout">
+                
+                <!-- SECTION 1: OPERAÇÃO DO CULTO (HIGH PRIORITY) -->
+                <div>
+                    <div class="section-header">
+                        <div class="section-title"><span>OPERAÇÃO</span> DO CULTO</div>
+                    </div>
+                    
+                    <div class="operational-grid">
+                        
+                        <!-- ALTAR -->
+                        <div class="op-card" style="background-image: url('assets/card_altar.jpg');" onclick="selectRole('altar')">
+                            <div class="op-card-content">
+                                <h3 class="op-title">ALTAR</h3>
+                                <div class="op-action">
+                                    <span class="op-action-text">Acessar</span>
+                                    <div class="op-action-icon"><i class="fas fa-arrow-right"></i></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RECEPÇÃO -->
+                        <div class="op-card" style="background-image: url('assets/card_recepcao.png');" onclick="selectRole('reception')">
+                            <div class="op-card-content">
+                                <h3 class="op-title">RECEPÇÃO</h3>
+                                <div class="op-action">
+                                    <span class="op-action-text">Acessar</span>
+                                    <div class="op-action-icon"><i class="fas fa-arrow-right"></i></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CRIANÇAS -->
+                        <div class="op-card" style="background-image: url('assets/card_kids.png');" onclick="selectRole('kids')">
+                            <div class="op-card-content">
+                                <h3 class="op-title">CRIANÇAS</h3>
+                                <div class="op-action">
+                                    <span class="op-action-text">Acessar</span>
+                                    <div class="op-action-icon"><i class="fas fa-arrow-right"></i></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- SECTION 2: ÁREAS ADMINISTRATIVAS (SECONDARY PRIORITY) -->
+                <div>
+                    <div class="section-header">
+                        <div class="section-title"><span>ÁREAS</span> ADMINISTRATIVAS</div>
+                    </div>
+
+                    <div class="admin-grid">
+                        
+                        <!-- GABINETE PASTORAL -->
+                        <div class="admin-card" onclick="selectRole('gabinete')">
+                            <div class="admin-card-info">
+                                <h4>Gabinete Pastoral</h4>
+                                <p>Atendimento e liderança.</p>
+                            </div>
+                            <i class="fas fa-chevron-right admin-card-arrow"></i>
+                        </div>
+
+                        <!-- INTEGRAÇÃO -->
+                        <div class="admin-card" onclick="selectRole('integracao')">
+                            <div class="admin-card-info">
+                                <h4>Integração</h4>
+                                <p>Acompanhamento de novos convertidos.</p>
+                            </div>
+                            <i class="fas fa-chevron-right admin-card-arrow"></i>
+                        </div>
+
+                        <!-- SECRETARIA -->
+                        <div class="admin-card" onclick="selectRole('admin')">
+                            <div class="admin-card-info">
+                                <h4>Secretaria</h4>
+                                <p>Triagem, documentos e registros.</p>
+                            </div>
+                            <i class="fas fa-chevron-right admin-card-arrow"></i>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer Bar -->
+            <div class="portal-footer">
+                <div class="portal-status">
                     <div class="status-dot"></div>
-                    <span>Sistema online. Todos os serviços funcionando.</span>
+                    <span>Sistema operacional ativo • CME Lausanne</span>
                 </div>
-                
-                <div class="portal-quote">
-                    "Tudo seja feito com amor." <span style="font-weight: 700; display: block; font-size: 0.8rem; margin-top: 4px; font-family:'Inter'; font-style:normal;">1 Coríntios 16:14</span>
-                </div>
-                
-                <div class="portal-help-box" onclick="alert('Entre em contato com a secretaria no telefone da Catedral para obter suporte ou alterar suas permissões.')">
-                    <i class="fas fa-circle-question" style="color: var(--gold); font-size: 1.1rem;"></i>
-                    <span>Precisa de ajuda? Fale com a secretaria.</span>
+                <div class="portal-help" onclick="alert('Entre em contato com a secretaria da Catedral para suporte ou liberação de acessos.')">
+                    <i class="fas fa-circle-question" style="color: var(--gold);"></i>
+                    <span>Suporte da Secretaria</span>
                 </div>
             </div>
+        </div> </div>
         </div>
 
-        <!-- PIN ENTER VIEW -->
+        <!-- PIN / LOGIN SCREEN -->
         <div id="pin-screen">
             <div class="pin-container">
-                <h2 style="font-weight: 800; margin-bottom: 30px; letter-spacing: 3px; color: #fff;">ACESSO</h2>
+                <h2 style="font-family: var(--font-heading); font-weight: 800; margin-bottom: 24px; letter-spacing: 2px; color: #fff; font-size: 1.2rem; text-transform: uppercase;">ACESSO AO MÓDULO</h2>
                 
                 <div id="pin-input-wrapper">
                     <input type="password" id="pin-input" class="pin-input" placeholder="••••">
                 </div>
 
-                <div id="email-password-wrapper" style="display: none; flex-direction: column; gap: 15px; margin-bottom: 25px;">
-                    <input type="email" id="email-input" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 16px; padding: 18px; font-size: 1.1rem; color: #fff; outline: none; transition: 0.3s;" placeholder="E-mail">
-                    <input type="password" id="password-input" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 16px; padding: 18px; font-size: 1.1rem; color: #fff; outline: none; transition: 0.3s;" placeholder="Senha">
-                    <p id="toggle-login-method" style="color: var(--gold); font-size: 0.85rem; cursor: pointer; text-decoration: underline;" onclick="toggleLoginMethod()">Entrar com PIN de Equipe</p>
+                <div id="email-password-wrapper" style="display: none; flex-direction: column; gap: 14px; margin-bottom: 20px;">
+                    <input type="email" id="email-input" style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border-gold); border-radius: 10px; padding: 14px; font-size: 0.95rem; color: #fff; outline: none;" placeholder="E-mail (@catedral.ch)">
+                    <input type="password" id="password-input" style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border-gold); border-radius: 10px; padding: 14px; font-size: 0.95rem; color: #fff; outline: none;" placeholder="Senha">
+                    <p id="toggle-login-method" style="color: var(--gold); font-size: 0.8rem; cursor: pointer; text-decoration: underline;" onclick="toggleLoginMethod()">Entrar com PIN de Equipe</p>
                 </div>
 
-                <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px; justify-content:center; cursor:pointer;" onclick="toggleRemember()">
-                    <input type="checkbox" id="remember-me" style="width:24px; height:24px; cursor:pointer; accent-color: var(--gold);">
-                    <span style="font-size:1rem; font-weight:600; color:#e8dcc8; letter-spacing:1px;">Manter Conectado</span>
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:24px; justify-content:center; cursor:pointer;" onclick="toggleRemember()">
+                    <input type="checkbox" id="remember-me" style="width:18px; height:18px; cursor:pointer; accent-color: var(--gold);">
+                    <span style="font-size:0.85rem; font-weight:500; color:#CBD5E1;">Manter conectado</span>
                 </div>
-                <button class="btn-confirm" onclick="validatePin()">ENTRAR</button>
-                <p onclick="showRoles()" style="margin-top:30px; color:var(--gold); font-size:0.85rem; cursor:pointer; font-weight:800; text-transform: uppercase; letter-spacing: 2px;">Voltar</p>
+                <button class="btn-confirm" onclick="validatePin()">Confirmar Acesso</button>
+                <p onclick="showRoles()" style="margin-top:20px; color:#94A3B8; font-size:0.8rem; cursor:pointer; font-weight:700; text-transform: uppercase; letter-spacing: 1.5px;">← Voltar ao Menu</p>
             </div>
         </div>
 
@@ -431,10 +530,11 @@
 
     <!-- APP NAVIGATION SHELL -->
     <header class="app-header" id="app-header">
-        <div style="display:flex; align-items:center; gap:15px;">
-            <img src="assets/logo_3.png?v=70.3.85" style="height:40px; width:auto;">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <img src="assets/logo_3.png?v=70.3.85" style="height:34px; width:auto;">
+            <span style="font-family: var(--font-heading); font-size: 0.85rem; font-weight: 700; color: #E2E8F0; letter-spacing: 1.5px;">ES LAUSANNE</span>
         </div>
-        <i class="fas fa-power-off" style="color:#FF4444; font-size: 1.4rem; cursor:pointer;" onclick="logout()"></i>
+        <i class="fas fa-power-off" style="color:#EF4444; font-size: 1.2rem; cursor:pointer;" onclick="logout()"></i>
     </header>
 
     <div class="app-container" id="app-container">
