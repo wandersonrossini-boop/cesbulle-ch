@@ -4308,31 +4308,31 @@ table.admin-table tr:hover td {
 }
 
 .member-header {
-    background: rgba(16, 64, 59, 0.95) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border-bottom: 1px solid rgba(138, 166, 163, 0.25) !important;
-    color: #F8FAFC !important;
-    box-shadow: none !important;
+    background: #127369 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-bottom: 1px solid #0E5C54 !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }
 .member-header .btn-icon {
-    background: rgba(255, 255, 255, 0.12) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
     color: #FFFFFF !important;
 }
 .member-header .btn-icon i {
     color: inherit;
 }
 .member-header .btn-icon i.fa-power-off {
-    color: #FCA5A5 !important;
+    color: #FECACA !important;
 }
 .member-header-title {
-    color: #F8FAFC !important;
+    color: #FFFFFF !important;
 }
 .member-header-subtitle {
     color: #E2E8F0 !important;
 }
 .member-app-shell {
-    background: transparent !important;
+    background: #F8FAFC !important;
 }
 
 /* Minimalist Segment Bar for Scale Period */
@@ -4497,7 +4497,6 @@ table.admin-table tr:hover td {
     box-shadow: none !important;
 }
 
-/* Ocultar ícones / emojis em #member-sub-area-detail exceto botoes do cabeçalho */
 #member-sub-area-detail i,
 #member-sub-area-detail .org-area-icon-wrap-premium i,
 #member-sub-area-detail .org-area-pattern-overlay {

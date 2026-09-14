@@ -2512,63 +2512,6 @@ const App = {
             areaCardsHtml = `${recepcaoCardHtml}${temploCardHtml}${acolhimentoCardHtml}`;
         }
 
-        // Next service calculation for bottom summary card
-        let nextServiceLabel = 'Nenhum serviço';
-        let nextServiceDetail = 'Sem escalas agendadas';
-        const hojeStr2 = this.formatLocalISOString(new Date()).split('T')[0];
-        const userScales = escalas.filter(e => e.membroId === this.currentUser.id && e.data >= hojeStr2 && e.statusServico !== 'Finalizado' && e.statusPresenca !== 'Recusada');
-        userScales.sort((a, b) => a.data.localeCompare(b.data) || a.horarioInicio.localeCompare(b.horarioInicio));
-        if (userScales.length > 0) {
-            const next = userScales[0];
-            const [y, m, d] = next.data.split('-');
-            nextServiceLabel = `${d}/${m} - ${next.horarioInicio}`;
-            nextServiceDetail = `${next.funcao}`;
-        }
-
-        // Unread notices count
-        let unreadCount = 0;
-        try {
-            const readAvisosStr = localStorage.getItem('diaconia_read_avisos');
-            const readIds = readAvisosStr ? JSON.parse(readAvisosStr) : [];
-            const avisos = this.cachedAvisosList || [];
-            unreadCount = avisos.filter(a => !readIds.includes(a.id)).length;
-        } catch (err) {}        const unreadLabelHtml = unreadCount > 0 ? `<span class="summary-bell-badge" style="display: flex; position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; border-radius: 50%; width: 18px; height: 18px; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700;">${unreadCount}</span>` : '';
-        const unreadText = unreadCount === 1 ? 'Você tem 1 aviso' : `Você tem ${unreadCount} avisos`;
-
-        let nextServiceOnClick = "";
-        let nextServiceCursor = "";
-        if (userScales.length > 0) {
-            nextServiceOnClick = `onclick="App.openMinhasEscalasModal()"`;
-            nextServiceCursor = "cursor: pointer;";
-        }
-
-        const summaryBlockHtml = `
-            <div class="selection-summary-container" style="margin-top: 15px; display: flex; align-items: center; gap: 10px; width: 100%;">
-                <div class="summary-col" style="flex: 1; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); padding: 12px; border-radius: 16px; ${nextServiceCursor}" ${nextServiceOnClick}>
-                    <div class="summary-icon-wrap" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(18, 115, 105, 0.1); border: 1px solid rgba(18, 115, 105, 0.2); color: #127369; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">
-                        <i class="fa-regular fa-calendar-check"></i>
-                    </div>
-                    <div class="summary-text-wrap" style="text-align: left;">
-                        <span class="summary-label" style="display: block; font-size: 0.68rem; color: #8AA6A3; font-weight: 600; text-transform: uppercase;">Meus Serviços</span>
-                        <span class="summary-val-main" style="display: block; font-size: 0.8rem; font-weight: 700; color: #fff; margin-top: 1px;">${nextServiceLabel}</span>
-                        <span class="summary-val-sub" style="display: block; font-size: 0.68rem; color: #BFBFBF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px;">Clique para gerenciar</span>
-                    </div>
-                </div>
-                
-                <div class="summary-col" style="flex: 1; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); padding: 12px; border-radius: 16px; cursor: pointer;" onclick="App.switchMemberTab('avisos')">
-                    <div class="summary-icon-wrap" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(18, 115, 105, 0.1); border: 1px solid rgba(18, 115, 105, 0.2); color: #127369; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; position: relative;">
-                        <i class="fa-regular fa-bell"></i>
-                        ${unreadLabelHtml}
-                    </div>
-                    <div class="summary-text-wrap" style="text-align: left;">
-                        <span class="summary-label" style="display: block; font-size: 0.68rem; color: #8AA6A3; font-weight: 600; text-transform: uppercase;">Avisos</span>
-                        <span class="summary-val-main" style="display: block; font-size: 0.8rem; font-weight: 700; color: #fff; margin-top: 1px;">Avisos não lidos</span>
-                        <span class="summary-val-sub" style="display: block; font-size: 0.68rem; color: #BFBFBF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px;">${unreadText}</span>
-                    </div>
-                </div>
-            </div>
-        `;
-
         // --- NOVO: Renderizar Escalas Pendentes (Confirmação) ---
         const userPendingScales = escalas.filter(e => e.membroId === this.currentUser.id && e.statusPresenca === 'Pendente' && e.data >= hojeStr && !this.isOperationalSector(e.setorId));
         let pendingAlertHtml = '';
@@ -3258,53 +3201,48 @@ const App = {
 
                 detailContainer.innerHTML = `
                     <header class="detail-header">
-                        <button onclick="App.closeAreaDetail()" class="btn-icon" style="background: none; border: none; color: #fff; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;">
+                        <button onclick="App.closeAreaDetail()" class="btn-icon" style="background: none; border: none; color: #1E293B; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;">
                             <i class="fa-solid fa-arrow-left"></i>
                         </button>
-                        <span class="detail-header-title">${areaTitle}</span>
-                        <button class="btn-icon" style="background: none; border: none; color: #fff; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;">
-                            <i class="fa-solid fa-ellipsis"></i>
-                        </button>
+                        <div style="text-align: center;">
+                            <span class="detail-header-title" style="display: block; font-weight: 700; font-size: 1rem; color: #1E293B;">${areaTitle}</span>
+                            <span style="display: block; font-size: 0.72rem; color: #64748B; font-weight: 500;">Minha Escala</span>
+                        </div>
+                        <div style="width: 32px; height: 32px;"></div>
                     </header>
 
-                    <div class="detail-area-banner card-${nodeId}">
-                        <div class="org-area-pattern-overlay"></div>
-                        <div style="display: flex; align-items: center; gap: 15px; z-index: 1; position: relative;">
-                            <div class="org-area-icon-wrap-premium" style="width: 50px; height: 50px; font-size: 1.4rem;">
-                                <i class="${iconClass}"></i>
-                            </div>
-                            <div style="text-align: left;">
-                                <h2 style="font-size: 1.3rem; font-weight: 800; color: #fff; margin: 0; text-transform: uppercase; letter-spacing: -0.2px;">${areaTitle}</h2>
-                                <p style="font-size: 0.8rem; color: #BFBFBF; margin-top: 2px; font-weight: 500;">${cultoNome}</p>
-                                <p style="font-size: 0.75rem; color: #8AA6A3; margin-top: 1px; font-weight: 500;"><i class="fa-regular fa-clock" style="margin-right: 4px;"></i> ${horarioInicio} às ${horarioFim}</p>
-                            </div>
+                    <div class="panel-card" style="margin-bottom: 12px; text-align: left; padding: 15px;">
+                        <div style="font-size: 0.8rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">${cultoNome}</div>
+                        <div style="font-size: 1.1rem; font-weight: 800; color: #1E293B; margin-bottom: 8px;">${horarioInicio} — ${horarioFim}</div>
+                        <div class="status-box ${statusClassBox}" style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 8px 12px; background: #F8FAFC !important; border: 1px solid #E2E8F0 !important;">
+                            <span style="width: 8px; height: 8px; border-radius: 50%; background: ${statusDotColor}; display: inline-block;"></span>
+                            <span style="font-weight: 700; font-size: 0.8rem; color: #1E293B;">${statusTitle}</span>
                         </div>
-                    </div>
-
-                    <div class="status-box ${statusClassBox}">
-                        <span style="width: 8px; height: 8px; border-radius: 50%; background: ${statusDotColor}; display: inline-block; box-shadow: 0 0 8px ${statusDotColor};"></span>
-                        <div style="text-align: left;">
-                            <div style="font-weight: 700; color: #fff;">${statusTitle}</div>
-                            <div style="font-size: 0.72rem; color: #BFBFBF; font-weight: 500; margin-top: 1px;">${statusDesc}</div>
-                        </div>
+                        ${confirmButtonHtml}
                     </div>
 
                     <div class="panel-card" style="margin-bottom: 12px; text-align: left; padding: 15px;">
-                        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
-                            <div style="flex: 1;">
-                                <div style="font-size: 0.85rem; font-weight: 700; color: #fff; margin-bottom: 4px;">Objetivo da área</div>
-                                <div style="font-size: 0.75rem; color: #BFBFBF; line-height: 1.4;">${staticData.objetivo}</div>
+                        <div style="font-size: 0.85rem; font-weight: 700; color: #1E293B; margin-bottom: 10px;">Informações da escala</div>
+                        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.78rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E2E8F0; padding-bottom: 8px;">
+                                <span style="color: #64748B; display: flex; align-items: center; gap: 8px;">Local</span>
+                                <span style="color: #1E293B; font-weight: 600;">${staticData.local}</span>
                             </div>
-                            <div style="font-size: 1rem; color: var(--theme-color); opacity: 0.8;">
-                                <i class="fa-solid fa-bullseye"></i>
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E2E8F0; padding-bottom: 8px;">
+                                <span style="color: #64748B; display: flex; align-items: center; gap: 8px;">Supervisor</span>
+                                <span style="color: #1E293B; font-weight: 600;">${staticData.supervisor}</span>
                             </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; ${staticData.traje ? 'border-bottom: 1px solid #E2E8F0; padding-bottom: 8px;' : 'padding-bottom: 2px;'}">
+                                <span style="color: #64748B; display: flex; align-items: center; gap: 8px;">Chegada</span>
+                                <span style="color: #1E293B; font-weight: 600;">${arrivalTime}</span>
+                            </div>
+                            ${trajeHtml}
                         </div>
                     </div>
 
                     <div class="panel-card" style="margin-bottom: 12px; text-align: left; padding: 15px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <span style="font-size: 0.85rem; font-weight: 700; color: #fff;">Equipe escalada</span>
-                            <span style="font-size: 0.72rem; color: var(--theme-color); font-weight: 700; cursor: pointer;">Ver todos</span>
+                            <span style="font-size: 0.85rem; font-weight: 700; color: #1E293B;">Equipe escalada</span>
                         </div>
                         <div class="detail-team-list">
                             ${teamListHtml}
@@ -3313,40 +3251,19 @@ const App = {
 
                     ${standbysHtml}
 
-                    ${confirmButtonHtml}
-
-                    <div class="panel-card" style="margin-bottom: 12px; text-align: left; padding: 15px;">
-                        <div style="font-size: 0.85rem; font-weight: 700; color: #fff; margin-bottom: 10px;">Informações importantes</div>
-                        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.78rem;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
-                                <span style="color: #8AA6A3; display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-location-dot" style="width: 14px;"></i> Local</span>
-                                <span style="color: #fff; font-weight: 600;">${staticData.local}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
-                                <span style="color: #8AA6A3; display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-user-tie" style="width: 14px;"></i> Supervisor</span>
-                                <span style="color: #fff; font-weight: 600;">${staticData.supervisor}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; ${staticData.traje ? 'border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;' : 'padding-bottom: 2px;'}">
-                                <span style="color: #8AA6A3; display: flex; align-items: center; gap: 8px;"><i class="fa-regular fa-clock" style="width: 14px;"></i> Chegada</span>
-                                <span style="color: #fff; font-weight: 600;">${arrivalTime}</span>
-                            </div>
-                            ${trajeHtml}
-                        </div>
-                    </div>
-
                     <div class="panel-card" style="margin-bottom: 15px; text-align: left; padding: 15px;">
-                        <div style="font-size: 0.85rem; font-weight: 700; color: #fff; margin-bottom: 10px;">Checklist da área</div>
+                        <div style="font-size: 0.85rem; font-weight: 700; color: #1E293B; margin-bottom: 10px;">Checklist da área</div>
                         <div style="display: flex; flex-direction: column; gap: 6px;">
                             ${checklistHtml}
                         </div>
                     </div>
 
                     <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                        <button class="btn-secondary" onclick="App.showAreaInstructions('${nodeId}')" style="flex: 1; height: 44px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); color: #fff; font-size: 0.78rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
-                            <i class="fa-regular fa-file-lines"></i> Ver instruções
+                        <button class="btn-secondary" onclick="App.showAreaInstructions('${nodeId}')" style="flex: 1; height: 44px; border-radius: 8px; border: 1px solid #CBD5E1; background: #F1F5F9; color: #1E293B; font-size: 0.78rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
+                            Ver instruções
                         </button>
-                        <button class="btn-secondary" onclick="App.requestAreaHelp('${nodeId}')" style="flex: 1; height: 44px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); color: #fff; font-size: 0.78rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
-                            <i class="fa-solid fa-headset"></i> Solicitar ajuda
+                        <button class="btn-secondary" onclick="App.requestAreaHelp('${nodeId}')" style="flex: 1; height: 44px; border-radius: 8px; border: 1px solid #CBD5E1; background: #F1F5F9; color: #1E293B; font-size: 0.78rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
+                            Solicitar ajuda
                         </button>
                     </div>
                 `;
