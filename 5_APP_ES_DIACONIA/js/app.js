@@ -2618,8 +2618,6 @@ const App = {
                 <div class="org-areas-grid">
                     ${areaCardsHtml}
                 </div>
-                
-                ${summaryBlockHtml}
             </div>
         `;
 

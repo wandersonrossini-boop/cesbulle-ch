@@ -4497,11 +4497,16 @@ table.admin-table tr:hover td {
     box-shadow: none !important;
 }
 
-/* Ocultar ícones / emojis em #member-sub-area-detail */
+/* Ocultar ícones / emojis em #member-sub-area-detail exceto botoes do cabeçalho */
 #member-sub-area-detail i,
 #member-sub-area-detail .org-area-icon-wrap-premium i,
 #member-sub-area-detail .org-area-pattern-overlay {
     display: none !important;
+}
+
+#member-sub-area-detail .detail-header button i {
+    display: inline-block !important;
+    color: #1E293B !important;
 }
 
 .status-box.status-ready {
