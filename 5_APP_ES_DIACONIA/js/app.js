@@ -3084,6 +3084,7 @@ const App = {
                 let ownBadgeColor = '#065F46';
                 let userFuncaoText = 'Apoio no Templo';
                 let userLadoText = '';
+                let userAtividadeText = '';
 
                 if (ownScale) {
                     if (ownScale.statusPresenca === 'Pendente') {
@@ -3092,59 +3093,74 @@ const App = {
                         ownBadgeColor = '#B45309';
                     }
                     userFuncaoText = ownScale.funcao || 'Apoio no Templo';
-                    if (ownScale.observacoes) {
+                    
+                    // Extrair Lado e Atividade se houver em observacoes ou funcao
+                    const obsLower = (ownScale.observacoes || '').toLowerCase();
+                    const funcLower = (ownScale.funcao || '').toLowerCase();
+
+                    if (obsLower.includes('direito') || funcLower.includes('direito') || obsLower.includes('dir')) {
+                        userLadoText = 'Lado Direito';
+                    } else if (obsLower.includes('esquerdo') || funcLower.includes('esquerdo') || obsLower.includes('esq')) {
+                        userLadoText = 'Lado Esquerdo';
+                    } else if (ownScale.observacoes) {
                         userLadoText = ownScale.observacoes;
+                    }
+
+                    if (funcLower.includes('ronda') || obsLower.includes('ronda')) {
+                        userAtividadeText = 'Ronda';
                     }
                 }
 
-                let userDetalheLinha = userFuncaoText;
-                if (userLadoText) {
-                    userDetalheLinha += ` · ${userLadoText}`;
-                }
+                // Construir linha secundária exata: Lado Direito · Ronda (ou observações)
+                let subLinhaPartes = [];
+                if (userLadoText) subLinhaPartes.push(userLadoText);
+                if (userAtividadeText && !userFuncaoText.toLowerCase().includes('ronda')) subLinhaPartes.push(userAtividadeText);
+                let userDetalheLinha = subLinhaPartes.join(' · ');
 
                 // Photo HTML (large, integrated photo cut out naturally over green background)
                 let heroPhotoHtml = '';
                 if (directPhoto) {
-                    heroPhotoHtml = `<img src="${directPhoto}" alt="${this.currentUser.nome}" style="max-height: 180px; object-fit: cover; object-position: top; border-radius: 12px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));">`;
+                    heroPhotoHtml = `<img src="${directPhoto}" alt="${this.currentUser.nome}" style="max-height: 160px; object-fit: cover; object-position: top; border-radius: 10px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));">`;
                 } else {
                     const initials = this.currentUser.nome.split(' ').filter(n => n.length > 0).map(n => n[0]).slice(0, 2).join('').toUpperCase();
-                    heroPhotoHtml = `<div style="width: 110px; height: 130px; border-radius: 12px; background: #0E5C54; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; font-weight: 800; border: 2px solid rgba(255,255,255,0.2);">${initials}</div>`;
+                    heroPhotoHtml = `<div style="width: 100px; height: 120px; border-radius: 10px; background: #0E5C54; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; border: 2px solid rgba(255,255,255,0.2);">${initials}</div>`;
                 }
 
                 detailContainer.innerHTML = `
                     <!-- Top Hero Background (35-45% height with green gradient) -->
-                    <div style="background: linear-gradient(165deg, #0A433D 0%, #127369 55%, rgba(18, 115, 105, 0.85) 80%, rgba(248, 250, 252, 0) 100%); margin: -16px -16px 0 -16px; padding: 16px 16px 45px 16px; color: #FFFFFF;">
+                    <div style="background: linear-gradient(165deg, #0A433D 0%, #127369 55%, rgba(18, 115, 105, 0.85) 80%, rgba(248, 250, 252, 0) 100%); margin: -16px -16px 0 -16px; padding: 14px 16px 40px 16px; color: #FFFFFF;">
                         
-                        <header style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                            <button onclick="App.closeAreaDetail()" class="btn-icon" style="background: none; border: none; color: #FFFFFF; font-size: 1rem; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600;">
-                                <i class="fa-solid fa-arrow-left"></i> Voltar
+                        <!-- High Contrast Header (White/Light Icons and Text) -->
+                        <header style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                            <button onclick="App.closeAreaDetail()" class="btn-icon" style="background: none; border: none; color: #FFFFFF !important; font-size: 1rem; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 700;">
+                                <i class="fa-solid fa-arrow-left" style="color: #FFFFFF !important;"></i> <span style="color: #FFFFFF !important;">Voltar</span>
                             </button>
                             <div style="text-align: center;">
-                                <span style="font-weight: 800; font-size: 1.15rem; color: #FFFFFF; display: block;">Minha Escala</span>
-                                <span style="font-size: 0.75rem; opacity: 0.9; font-weight: 500;">${areaTitle}</span>
+                                <span style="font-weight: 800; font-size: 1.1rem; color: #FFFFFF !important; display: block;">Minha Escala</span>
+                                <span style="font-size: 0.75rem; color: #F1F5F9 !important; font-weight: 600;">${areaTitle}</span>
                             </div>
-                            <div style="text-align: right; color: #FFFFFF; font-size: 0.7rem; line-height: 1.2;">
-                                <div style="font-weight: 700;">CME Lausanne</div>
-                                <div style="opacity: 0.8;">Juntos no serviço de Cristo</div>
+                            <div style="text-align: right; color: #FFFFFF !important; font-size: 0.7rem; line-height: 1.2;">
+                                <div style="font-weight: 700; color: #FFFFFF !important;">CME Lausanne</div>
+                                <div style="color: #F1F5F9 !important; font-weight: 500;">Juntos no serviço</div>
                             </div>
                         </header>
 
-                        <!-- Hero Member Identity Section -->
-                        <div style="display: flex; align-items: flex-end; gap: 16px; padding-top: 10px;">
+                        <!-- Hero Member Identity Section (Closer Spacing) -->
+                        <div style="display: flex; align-items: flex-end; gap: 14px; padding-top: 4px;">
                             <div style="flex-shrink: 0;">
                                 ${heroPhotoHtml}
                             </div>
-                            <div style="text-align: left; margin-bottom: 8px;">
-                                <h1 style="font-size: 1.8rem; font-weight: 900; color: #FFFFFF; margin: 0; line-height: 1.1; letter-spacing: -0.5px;">${this.currentUser.nome}</h1>
-                                <div style="font-size: 1rem; font-weight: 700; color: #E2E8F0; margin-top: 4px;">${userFuncaoText}</div>
-                                <div style="font-size: 0.82rem; color: #94A3B8; font-weight: 500; margin-top: 2px;">${areaTitle}${userLadoText ? ` · ${userLadoText}` : ''}</div>
+                            <div style="text-align: left; margin-bottom: 4px;">
+                                <h1 style="font-size: 1.7rem; font-weight: 900; color: #FFFFFF !important; margin: 0; line-height: 1.1; letter-spacing: -0.5px;">${this.currentUser.nome}</h1>
+                                <div style="font-size: 0.98rem; font-weight: 700; color: #F8FAFC !important; margin-top: 4px;">${userFuncaoText}</div>
+                                ${userDetalheLinha ? `<div style="font-size: 0.85rem; color: #E2E8F0 !important; font-weight: 600; margin-top: 2px;">${userDetalheLinha}</div>` : ''}
                             </div>
                         </div>
 
                     </div>
 
-                    <!-- Overlapping Cult Highlight Card -->
-                    <div class="panel-card" style="margin: -25px 0 16px 0; position: relative; z-index: 2; text-align: left; padding: 18px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);">
+                    <!-- Overlapping Cult Highlight Card (Real Data) -->
+                    <div class="panel-card" style="margin: -22px 0 16px 0; position: relative; z-index: 2; text-align: left; padding: 18px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
                             <div>
                                 <div style="font-size: 0.72rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px;">${dateStr.split('-').reverse().join('/')}</div>
