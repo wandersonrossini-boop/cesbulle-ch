@@ -2362,7 +2362,34 @@ const App = {
             }
         }
 
-        // Formatar datas para o banner de resumo do culto
+        // Formatar datas e cabeçalho do topo da tela de escalas
+        let heroHeaderHtml = '';
+        let userAreaName = 'Templo';
+        const userScale = evtActive ? evtActive.escalas.find(e => e.membroId === this.currentUser.id && e.statusPresenca !== 'Recusada') : null;
+        if (userScale) {
+            if (userScale.setorId === 'recepcao' || userScale.setorId === 'entrada' || userScale.setorId === 'check_in') {
+                userAreaName = 'Recepção';
+            } else if (userScale.setorId === 'acolhimento') {
+                userAreaName = 'Acolhimento';
+            }
+        }
+
+        heroHeaderHtml = `
+            <div style="background: linear-gradient(165deg, #061713 0%, #0A2B24 45%, rgba(14, 92, 84, 0.75) 75%, rgba(248, 250, 252, 0) 100%); margin: -16px -16px 0 -16px; padding: 14px 16px 36px 16px; color: #FFFFFF; text-align: left;">
+                <header style="display: flex; align-items: flex-start; justify-content: space-between;">
+                    <div>
+                        <div style="font-size: 0.72rem; font-weight: 800; color: #E2E8F0; text-transform: uppercase; letter-spacing: 1px;">MINHA ESCALA</div>
+                        <h1 style="font-size: 1.7rem; font-weight: 900; color: #FFFFFF !important; margin: 2px 0 0 0; line-height: 1.1;">${userAreaName}</h1>
+                        <div style="font-size: 0.82rem; color: #E2E8F0 !important; font-weight: 500; margin-top: 3px;">Servir é uma honra</div>
+                    </div>
+                    <div style="text-align: right; color: #FFFFFF !important; font-size: 0.7rem; line-height: 1.2;">
+                        <div style="font-weight: 800; color: #FFFFFF !important; letter-spacing: 0.5px;">CME LAUSANNE</div>
+                        <div style="color: #F1F5F9 !important; font-weight: 500;">Juntos no serviço de Cristo</div>
+                    </div>
+                </header>
+            </div>
+        `;
+
         let summaryCardHtml = "";
         if (evtActive) {
             const dateParts = evtActive.data.split('-');
@@ -2370,54 +2397,51 @@ const App = {
             const diaSemanaShort = d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '').toUpperCase();
             const dataFmt = `${dateParts[2]}/${dateParts[1]}`;
 
-            // Verificar se o usuário atual está escalado neste evento
-            const userEventScale = evtActive.escalas.find(e => e.membroId === this.currentUser.id && e.statusPresenca !== 'Recusada');
-            let userScaleInfoHtml = '';
-
-            if (userEventScale) {
-                const isPending = userEventScale.statusPresenca === 'Pendente';
+            if (userScale) {
+                const isPending = userScale.statusPresenca === 'Pendente';
                 const statusBadgeBg = isPending ? '#FEF3C7' : '#D1FAE5';
                 const statusBadgeColor = isPending ? '#B45309' : '#065F46';
                 const statusBadgeText = isPending ? 'PENDENTE' : 'CONFIRMADO';
 
-                // Resolver setor, função e lado/observação
-                let setorNome = 'Templo';
-                if (userEventScale.setorId === 'recepcao' || userEventScale.setorId === 'entrada' || userEventScale.setorId === 'check_in') {
-                    setorNome = 'Recepção';
-                } else if (userEventScale.setorId === 'acolhimento') {
-                    setorNome = 'Acolhimento';
+                let detalheFuncao = userScale.funcao || 'Apoio no Templo';
+                let obsLower = (userScale.observacoes || '').toLowerCase();
+                let funcLower = (userScale.funcao || '').toLowerCase();
+                let ladoText = '';
+                if (obsLower.includes('direito') || funcLower.includes('direito') || obsLower.includes('dir')) {
+                    ladoText = 'Lado Direito';
+                } else if (obsLower.includes('esquerdo') || funcLower.includes('esquerdo') || obsLower.includes('esq')) {
+                    ladoText = 'Lado Esquerdo';
                 }
+                let atividadeText = funcLower.includes('ronda') || obsLower.includes('ronda') ? 'Ronda' : '';
 
-                let detalheEscala = userEventScale.funcao || 'Voluntário';
-                if (userEventScale.observacoes) {
-                    detalheEscala += ` · ${userEventScale.observacoes}`;
-                }
-
-                userScaleInfoHtml = `
-                    <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #E2E8F0; font-size: 0.85rem; color: #1E293B; font-weight: 600;">
-                        ${setorNome} · ${detalheEscala}
-                    </div>
-                `;
+                let linha1 = `${userAreaName} · ${detalheFuncao}`;
+                let linha2Partes = [];
+                if (ladoText) linha2Partes.push(ladoText);
+                if (atividadeText) linha2Partes.push(atividadeText);
+                let linha2 = linha2Partes.join(' · ');
 
                 summaryCardHtml = `
-                    <div class="panel-card" style="margin-bottom: 16px; padding: 16px; background: #FFFFFF !important; border: 1px solid #E2E8F0 !important; border-radius: 10px;">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                    <div class="panel-card" style="margin: -24px 0 16px 0; position: relative; z-index: 2; text-align: left; padding: 18px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
                             <div>
-                                <span style="font-size: 0.75rem; font-weight: 700; color: #64748B; text-transform: uppercase;">${diaSemanaShort}, ${dataFmt}</span>
-                                <h3 style="font-size: 1.1rem; font-weight: 800; color: #1E293B; margin: 2px 0 0 0;">${evtActive.cultoNome}</h3>
+                                <div style="font-size: 0.7rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px;">${diaSemanaShort}, ${dataFmt}</div>
+                                <h2 style="font-size: 1.25rem; font-weight: 900; color: #0F172A; margin: 2px 0 0 0; line-height: 1.2;">${evtActive.cultoNome}</h2>
                             </div>
-                            <span style="font-size: 0.72rem; font-weight: 700; background: ${statusBadgeBg}; color: ${statusBadgeColor}; padding: 4px 10px; border-radius: 12px; letter-spacing: 0.5px;">${statusBadgeText}</span>
+                            <span style="font-size: 0.72rem; font-weight: 800; background: ${statusBadgeBg}; color: ${statusBadgeColor}; padding: 4px 12px; border-radius: 12px; letter-spacing: 0.5px; flex-shrink: 0; margin-left: 8px;">${statusBadgeText}</span>
                         </div>
-                        <div style="font-size: 0.9rem; font-weight: 600; color: #64748B;">${evtActive.horarioInicio} — ${evtActive.horarioFim}</div>
-                        ${userScaleInfoHtml}
+                        <div style="font-size: 1.05rem; font-weight: 800; color: #1E293B; margin-bottom: 12px;">${evtActive.horarioInicio} — ${evtActive.horarioFim}</div>
+                        <div style="padding-top: 10px; border-top: 1px solid #F1F5F9;">
+                            <div style="font-size: 0.92rem; font-weight: 800; color: #0F172A;">${linha1}</div>
+                            ${linha2 ? `<div style="font-size: 0.82rem; font-weight: 600; color: #64748B; margin-top: 2px;">${linha2}</div>` : ''}
+                        </div>
                     </div>
                 `;
             } else {
                 summaryCardHtml = `
-                    <div class="panel-card" style="margin-bottom: 16px; padding: 16px; background: #FFFFFF !important; border: 1px solid #E2E8F0 !important; border-radius: 10px;">
-                        <div style="font-size: 0.75rem; font-weight: 700; color: #64748B; text-transform: uppercase;">${diaSemanaShort}, ${dataFmt}</div>
-                        <h3 style="font-size: 1.1rem; font-weight: 800; color: #1E293B; margin: 2px 0 0 0;">${evtActive.cultoNome}</h3>
-                        <div style="font-size: 0.9rem; font-weight: 600; color: #64748B; margin-top: 4px;">${evtActive.horarioInicio} — ${evtActive.horarioFim}</div>
+                    <div class="panel-card" style="margin: -24px 0 16px 0; position: relative; z-index: 2; text-align: left; padding: 18px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);">
+                        <div style="font-size: 0.7rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px;">${diaSemanaShort}, ${dataFmt}</div>
+                        <h2 style="font-size: 1.25rem; font-weight: 900; color: #0F172A; margin: 2px 0 0 0; line-height: 1.2;">${evtActive.cultoNome}</h2>
+                        <div style="font-size: 1.05rem; font-weight: 800; color: #1E293B; margin-top: 4px;">${evtActive.horarioInicio} — ${evtActive.horarioFim}</div>
                     </div>
                 `;
             }
@@ -2425,7 +2449,8 @@ const App = {
 
         if (!evtActive) {
             container.innerHTML = `
-                <div style="text-align: center; padding: 40px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; margin-top: 15px;">
+                ${heroHeaderHtml}
+                <div style="text-align: center; padding: 40px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; margin-top: -20px;">
                     <p style="color: #64748B; font-size: 0.95rem;">Nenhuma escala agendada para este período.</p>
                 </div>
             `;
@@ -2503,18 +2528,30 @@ const App = {
         const cultoAtivo = this.cultosData.find(c => c.id === evtActive.cultoId);
         const isEscalaLivre = cultoAtivo && cultoAtivo.modeloEscala === 'Escala Livre';
 
-        // Gerar cards do organograma
+        // Gerar cards das Áreas de Serviço
         let areaCardsHtml = '';
         if (isEscalaLivre) {
             areaCardsHtml = this.renderAreaCard(escalaLivreScales, 'Escala Livre', 'fa-solid fa-users', 'escala_livre', '', '#6B7280', membrosMap, true);
         } else {
-            const recepcaoCardHtml = this.renderAreaCard([...portariaScales, ...checkinScales], 'Recepção', 'fa-solid fa-id-card', 'recepcao', '', '#3B82F6', membrosMap);
             const temploCardHtml = this.renderAreaCard([...apoioDireitoScales, ...apoioEsquerdoScales, ...rondaDireitoScales, ...rondaEsquerdoScales], 'Templo', 'fa-solid fa-place-of-worship', 'templo', '', '#14B8A6', membrosMap);
+            const recepcaoCardHtml = this.renderAreaCard([...portariaScales, ...checkinScales], 'Recepção', 'fa-solid fa-id-card', 'recepcao', '', '#3B82F6', membrosMap);
             const acolhimentoCardHtml = this.renderAreaCard(acolhimentoScales, 'Acolhimento', 'fa-solid fa-hands-holding-child', 'acolhimento', '', '#EC4899', membrosMap);
-            areaCardsHtml = `${recepcaoCardHtml}${temploCardHtml}${acolhimentoCardHtml}`;
+            
+            // Posicionar a área do próprio obreiro em primeiro lugar com o destaque "SUA ÁREA"
+            const userInTemplo = [...apoioDireitoScales, ...apoioEsquerdoScales, ...rondaDireitoScales, ...rondaEsquerdoScales].some(e => e.membroId === this.currentUser.id);
+            const userInRecepcao = [...portariaScales, ...checkinScales].some(e => e.membroId === this.currentUser.id);
+            const userInAcolhimento = acolhimentoScales.some(e => e.membroId === this.currentUser.id);
+
+            if (userInRecepcao) {
+                areaCardsHtml = `${recepcaoCardHtml}${temploCardHtml}${acolhimentoCardHtml}`;
+            } else if (userInAcolhimento) {
+                areaCardsHtml = `${acolhimentoCardHtml}${temploCardHtml}${recepcaoCardHtml}`;
+            } else {
+                areaCardsHtml = `${temploCardHtml}${recepcaoCardHtml}${acolhimentoCardHtml}`;
+            }
         }
 
-        // --- NOVO: Renderizar Escalas Pendentes (Confirmação) ---
+        // --- Renderizar Escalas Pendentes (Confirmação) ---
         const userPendingScales = escalas.filter(e => e.membroId === this.currentUser.id && e.statusPresenca === 'Pendente' && e.data >= hojeStr && !this.isOperationalSector(e.setorId));
         let pendingAlertHtml = '';
         if (userPendingScales.length > 0) {
@@ -2523,7 +2560,7 @@ const App = {
                 const d = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
                 const diaFormatado = d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' });
                 return `
-                    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px; margin-bottom: 10px;">
+                    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px; margin-bottom: 10px; text-align: left;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                             <span style="font-weight: 700; color: #1E293B;">${e.cultoNome || 'Escala'}</span>
                             <span style="font-size: 0.75rem; background: #FEF3C7; color: #B45309; padding: 2px 6px; border-radius: 4px; font-weight: 600;">Pendente</span>
@@ -2545,7 +2582,7 @@ const App = {
             }).join('');
             
             pendingAlertHtml = `
-                <div style="margin-bottom: 20px; padding: 15px; background: #FFFBEB; border: 1px solid #FCD34D; border-radius: 8px;">
+                <div style="margin-bottom: 20px; padding: 15px; background: #FFFBEB; border: 1px solid #FCD34D; border-radius: 8px; text-align: left;">
                     <h3 style="color: #B45309; font-size: 0.95rem; font-weight: 700; margin-bottom: 12px; text-transform: uppercase;">
                         Suas Escalas Pendentes
                     </h3>
@@ -2555,11 +2592,16 @@ const App = {
         }
 
         container.innerHTML = `
+            ${heroHeaderHtml}
             ${pendingAlertHtml}
             ${summaryCardHtml}
             
+            <div style="text-align: left; margin: 18px 0 10px 0;">
+                <div style="font-size: 0.75rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 1px;">ÁREAS DE SERVIÇO</div>
+            </div>
+
             <div class="org-daily-container" id="org-daily-swipe-area">
-                <div class="org-areas-grid">
+                <div style="display: flex; flex-direction: column;">
                     ${areaCardsHtml}
                 </div>
             </div>
@@ -2576,7 +2618,6 @@ const App = {
     },
 
     renderAreaCard(scales, title, iconClass, nodeId, bgImageUrl, accentColor, membrosMap = {}, isFullWidth = false) {
-        // Deduplicate scales by member
         const uniqueScales = [];
         const seenMembers = new Set();
         scales.forEach(escala => {
@@ -2587,61 +2628,55 @@ const App = {
             }
         });
 
-        const count = uniqueScales.length;
-        const countText = count === 1 ? '1 escalado' : `${count} voluntários`;
-
-        const cardSpanClass = isFullWidth ? 'grid-column: span 2;' : '';
-        
-        // Static descriptions matching sectors
         const descMap = {
-            'portaria': 'Controle de entrada e segurança',
-            'checkin': 'Cadastro e identificação',
-            'apoio-direito': 'Organização do lado direito',
-            'apoio-esquerdo': 'Organização do lado esquerdo',
-            'acolhimento': 'Receber e acolher com amor e excelência',
-            
-            // Unified mappings (v3.6.22)
-            'recepcao': 'Controle de portaria e check-in de membros',
+            'recepcao': 'Portaria e check-in de membros',
             'templo': 'Suporte, organização e acomodação no templo',
             'ronda': 'Ronda periódica e segurança externa/interna',
+            'acolhimento': 'Receber e acolher com excelência',
             'escala_livre': 'Atuar onde houver necessidade seguindo a supervisão'
         };
         const desc = descMap[nodeId] || '';
 
-        // Check if the current user is scheduled in this specific area card
-        const isUserAssigned = uniqueScales.some(escala => escala.membroId === this.currentUser.id);
-        const cardClass = `org-area-card card-${nodeId} ${isUserAssigned ? 'user-assigned-card' : ''}`;
+        // Check if current user is scheduled in this area
+        const ownScale = uniqueScales.find(escala => escala.membroId === this.currentUser.id);
+        const isUserAssigned = !!ownScale;
 
-        if (isFullWidth) {
+        if (isUserAssigned) {
+            let funcaoText = ownScale.funcao || 'Apoio no Templo';
+            let obsLower = (ownScale.observacoes || '').toLowerCase();
+            let funcLower = (ownScale.funcao || '').toLowerCase();
+            let ladoText = '';
+            if (obsLower.includes('direito') || funcLower.includes('direito') || obsLower.includes('dir')) {
+                ladoText = 'Lado Direito';
+            } else if (obsLower.includes('esquerdo') || funcLower.includes('esquerdo') || obsLower.includes('esq')) {
+                ladoText = 'Lado Esquerdo';
+            }
+            let atividadeText = funcLower.includes('ronda') || obsLower.includes('ronda') ? 'Ronda' : '';
+            let detalheLinha = [ladoText, atividadeText].filter(Boolean).join(' · ');
+
             return `
-                <div class="org-area-card-wrapper" style="${cardSpanClass}">
-                    <div class="${cardClass} card-horizontal" onclick="App.openAreaDetail('${nodeId}')">
-                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; z-index: 1; width: 100%;">
-                            <h4 class="org-area-title" style="margin: 0; color: #1E293B; font-weight: 800; font-size: 1.1rem;">${title}</h4>
-                            ${isUserAssigned ? `<span class="user-assigned-badge" style="background: #D1FAE5; color: #065F46; font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem;">VOCÊ</span>` : ''}
+                <div style="margin-bottom: 12px;">
+                    <div onclick="App.openAreaDetail('${nodeId}')" style="background: #E6F4F1; border: 1px solid #B2DFDB; border-radius: 14px; padding: 18px; text-align: left; cursor: pointer; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                            <h4 style="margin: 0; font-size: 1.25rem; font-weight: 900; color: #064E3B;">${title}</h4>
+                            <span style="font-size: 0.72rem; font-weight: 800; background: #A7F3D0; color: #065F46; padding: 3px 10px; border-radius: 12px; letter-spacing: 0.5px;">SUA ÁREA</span>
                         </div>
-                        <p class="org-area-desc" style="z-index: 1; margin-top: 6px; text-align: left; color: #64748B; font-size: 0.8rem;">${desc}</p>
-                        <div style="margin-top: 10px; font-size: 0.8rem; font-weight: 600; color: #127369; display: flex; align-items: center; gap: 4px;">
-                            Ver minha escala &rsaquo;
-                        </div>
+                        <div style="font-size: 0.95rem; font-weight: 700; color: #065F46; margin-top: 4px;">${funcaoText}</div>
+                        ${detalheLinha ? `<div style="font-size: 0.82rem; color: #047857; font-weight: 500; margin-top: 2px; margin-bottom: 14px;">${detalheLinha}</div>` : `<div style="margin-bottom: 14px;"></div>`}
+                        <button style="width: 100%; height: 42px; background: #0E5C54; color: #FFFFFF; border: none; border-radius: 8px; font-weight: 700; font-size: 0.88rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
+                            Ver minha escala <i class="fa-solid fa-chevron-right" style="font-size: 0.8rem;"></i>
+                        </button>
                     </div>
                 </div>
             `;
         } else {
             return `
-                <div class="org-area-card-wrapper" style="${cardSpanClass}">
-                    <div class="${cardClass}" onclick="App.openAreaDetail('${nodeId}')" style="background: #FFFFFF; border: 1px solid ${isUserAssigned ? '#10B981' : '#E2E8F0'}; border-radius: 10px; padding: 14px;">
-                        <div style="display: flex; justify-content: space-between; width: 100%; align-items: flex-start; z-index: 1;">
-                            <h4 class="org-area-title" style="margin: 0; color: #1E293B; font-weight: 800; font-size: 1.1rem;">${title}</h4>
-                            ${isUserAssigned ? `<span class="user-assigned-badge" style="background: #D1FAE5; color: #065F46; font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem;">VOCÊ</span>` : ''}
-                        </div>
-                        <div class="org-area-text-section" style="margin-top: 8px; text-align: left; z-index: 1; width: 100%;">
-                            <p class="org-area-desc" style="margin: 0; line-height: 1.3; color: #64748B; font-size: 0.8rem;">${desc}</p>
-                        </div>
-                        <div style="margin-top: 12px; font-size: 0.8rem; font-weight: 600; color: #127369; display: flex; align-items: center; gap: 4px;">
-                            Ver minha escala &rsaquo;
-                        </div>
+                <div onclick="App.openAreaDetail('${nodeId}')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; text-align: left; transition: background 0.15s ease;">
+                    <div>
+                        <div style="font-size: 1.05rem; font-weight: 800; color: #0F172A;">${title}</div>
+                        <div style="font-size: 0.82rem; color: #64748B; margin-top: 2px;">${desc}</div>
                     </div>
+                    <i class="fa-solid fa-chevron-right" style="color: #94A3B8; font-size: 0.85rem;"></i>
                 </div>
             `;
         }
@@ -2710,13 +2745,14 @@ const App = {
         },
         'ronda-direito': {
             objetivo: 'Realizar rondas periódicas de segurança na área externa da entrada, sala pastoral e sala multiuso.',
-            local: 'Estacionamento Lado Direito',
+            local: 'Templo Lado Direito',
             supervisor: 'Supervisor Wan',
             chegada: '17:30',
             traje: 'Esporte Fino',
             checklist: [
-                'Rondar as vias laterais e estacionamento',
+                'Rondar as vias laterais',
                 'Verificar fechamento de portões auxiliares',
+                'Garantir fechamento de portas de segurança',
                 'Relatar qualquer movimentação atípica'
             ],
             instrucoes: 'Permaneça em movimento constante. Não se isole em locais escuros.'
@@ -2780,12 +2816,12 @@ const App = {
         },
         'ronda': {
             objetivo: 'Realizar rondas periódicas de segurança nas áreas externas, estacionamentos, laterais, banheiros e salas de apoio.',
-            local: 'Estacionamentos e Vias Laterais',
+            local: 'Templo',
             supervisor: 'Supervisor Wan',
             chegada: '17:30',
             traje: 'Esporte Fino',
             checklist: [
-                'Rondar as vias laterais e estacionamentos',
+                'Rondar as vias laterais',
                 'Verificar fechamento de portões auxiliares',
                 'Garantir fechamento de portas de segurança',
                 'Relatar qualquer movimentação atípica'
@@ -3117,78 +3153,98 @@ const App = {
                 if (userAtividadeText && !userFuncaoText.toLowerCase().includes('ronda')) subLinhaPartes.push(userAtividadeText);
                 let userDetalheLinha = subLinhaPartes.join(' · ');
 
-                // Photo HTML (large, integrated photo cut out naturally over green background)
+                // Format date string (e.g., DOMINGO, 20 DE SETEMBRO DE 2026)
+                let fullDateFormatted = dateStr ? dateStr.split('-').reverse().join('/') : '';
+                if (dateStr && dateStr.includes('-')) {
+                    const parts = dateStr.split('-');
+                    if (parts.length === 3) {
+                        const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                        const days = ['DOMINGO', 'SEGUNDA-FEIRA', 'TERÇA-FEIRA', 'QUARTA-FEIRA', 'QUINTA-FEIRA', 'SEXTA-FEIRA', 'SÁBADO'];
+                        const months = ['JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO', 'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'];
+                        const dayName = days[d.getDay()];
+                        const dayNum = parseInt(parts[2]);
+                        const monthName = months[parseInt(parts[1]) - 1];
+                        fullDateFormatted = `${dayName}, ${dayNum} DE ${monthName} DE ${parts[0]}`;
+                    }
+                }
+
+                // Display local
+                let displayLocal = staticData.local;
+                if (nodeId === 'templo' || (userFuncaoText && userFuncaoText.toLowerCase().includes('templo'))) {
+                    displayLocal = 'Templo';
+                }
+
+                // Photo HTML (large, integrated photo cut out naturally over green background, positioned high near Voltar)
                 let heroPhotoHtml = '';
                 if (directPhoto) {
-                    heroPhotoHtml = `<img src="${directPhoto}" alt="${this.currentUser.nome}" style="max-height: 160px; object-fit: cover; object-position: top; border-radius: 10px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));">`;
+                    heroPhotoHtml = `<img src="${directPhoto}" alt="${this.currentUser.nome}" style="max-height: 145px; object-fit: cover; object-position: top; border-radius: 8px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25)); display: block; margin-top: -12px;">`;
                 } else {
                     const initials = this.currentUser.nome.split(' ').filter(n => n.length > 0).map(n => n[0]).slice(0, 2).join('').toUpperCase();
-                    heroPhotoHtml = `<div style="width: 100px; height: 120px; border-radius: 10px; background: #0E5C54; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; border: 2px solid rgba(255,255,255,0.2);">${initials}</div>`;
+                    heroPhotoHtml = `<div style="width: 85px; height: 105px; border-radius: 8px; background: #0E5C54; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; border: 1px solid rgba(255,255,255,0.2); margin-top: -12px;">${initials}</div>`;
                 }
 
                 detailContainer.innerHTML = `
-                    <!-- Top Hero Background (35-45% height with green gradient) -->
-                    <div style="background: linear-gradient(165deg, #0A433D 0%, #127369 55%, rgba(18, 115, 105, 0.85) 80%, rgba(248, 250, 252, 0) 100%); margin: -16px -16px 0 -16px; padding: 14px 16px 40px 16px; color: #FFFFFF;">
+                    <!-- Top Hero Background (Compact green gradient fading early to white/transparent) -->
+                    <div style="background: linear-gradient(165deg, #061713 0%, #0A2B24 45%, rgba(14, 92, 84, 0.75) 75%, rgba(248, 250, 252, 0) 100%); margin: -16px -16px 0 -16px; padding: 12px 16px 32px 16px; color: #FFFFFF;">
                         
-                        <!-- High Contrast Header (White/Light Icons and Text) -->
-                        <header style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                            <button onclick="App.closeAreaDetail()" class="btn-icon" style="background: none; border: none; color: #FFFFFF !important; font-size: 1rem; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 700;">
-                                <i class="fa-solid fa-arrow-left" style="color: #FFFFFF !important;"></i> <span style="color: #FFFFFF !important;">Voltar</span>
+                        <!-- High Contrast Header Bar -->
+                        <header style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                            <button onclick="App.closeAreaDetail()" class="btn-icon" style="background: none; border: none; color: #FFFFFF !important; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 700;">
+                                <i class="fa-solid fa-chevron-left" style="color: #FFFFFF !important;"></i> <span style="color: #FFFFFF !important;">Voltar</span>
                             </button>
                             <div style="text-align: center;">
-                                <span style="font-weight: 800; font-size: 1.1rem; color: #FFFFFF !important; display: block;">Minha Escala</span>
-                                <span style="font-size: 0.75rem; color: #F1F5F9 !important; font-weight: 600;">${areaTitle}</span>
+                                <span style="font-weight: 800; font-size: 1.05rem; color: #FFFFFF !important; display: block;">Minha Escala</span>
                             </div>
                             <div style="text-align: right; color: #FFFFFF !important; font-size: 0.7rem; line-height: 1.2;">
                                 <div style="font-weight: 700; color: #FFFFFF !important;">CME Lausanne</div>
-                                <div style="color: #F1F5F9 !important; font-weight: 500;">Juntos no serviço</div>
+                                <div style="color: #F1F5F9 !important; font-weight: 500;">Juntos no serviço de Cristo</div>
                             </div>
                         </header>
 
-                        <!-- Hero Member Identity Section (Closer Spacing) -->
-                        <div style="display: flex; align-items: flex-end; gap: 14px; padding-top: 4px;">
+                        <!-- Hero Member Identity Section (Positioned high closer to Voltar) -->
+                        <div style="display: flex; align-items: flex-end; gap: 14px; padding-top: 0px;">
                             <div style="flex-shrink: 0;">
                                 ${heroPhotoHtml}
                             </div>
-                            <div style="text-align: left; margin-bottom: 4px;">
-                                <h1 style="font-size: 1.7rem; font-weight: 900; color: #FFFFFF !important; margin: 0; line-height: 1.1; letter-spacing: -0.5px;">${this.currentUser.nome}</h1>
-                                <div style="font-size: 0.98rem; font-weight: 700; color: #F8FAFC !important; margin-top: 4px;">${userFuncaoText}</div>
-                                ${userDetalheLinha ? `<div style="font-size: 0.85rem; color: #E2E8F0 !important; font-weight: 600; margin-top: 2px;">${userDetalheLinha}</div>` : ''}
+                            <div style="text-align: left; margin-bottom: 2px;">
+                                <h1 style="font-size: 1.65rem; font-weight: 900; color: #FFFFFF !important; margin: 0; line-height: 1.1; letter-spacing: -0.5px;">${this.currentUser.nome}</h1>
+                                <div style="font-size: 0.95rem; font-weight: 700; color: #F8FAFC !important; margin-top: 3px;">${userFuncaoText}</div>
+                                ${userDetalheLinha ? `<div style="font-size: 0.82rem; color: #E2E8F0 !important; font-weight: 500; margin-top: 2px;">${userDetalheLinha}</div>` : ''}
                             </div>
                         </div>
 
                     </div>
 
-                    <!-- Overlapping Cult Highlight Card (Real Data) -->
-                    <div class="panel-card" style="margin: -22px 0 16px 0; position: relative; z-index: 2; text-align: left; padding: 18px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                    <!-- Overlapping Celebration Highlight Card -->
+                    <div class="panel-card" style="margin: -24px 0 14px 0; position: relative; z-index: 2; text-align: left; padding: 18px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
                             <div>
-                                <div style="font-size: 0.72rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px;">${dateStr.split('-').reverse().join('/')}</div>
-                                <h2 style="font-size: 1.2rem; font-weight: 900; color: #1E293B; margin: 2px 0 0 0;">${cultoNome}</h2>
+                                <div style="font-size: 0.7rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px;">${fullDateFormatted}</div>
+                                <h2 style="font-size: 1.25rem; font-weight: 900; color: #0F172A; margin: 2px 0 0 0; line-height: 1.2;">${cultoNome}</h2>
                             </div>
-                            <span style="font-size: 0.72rem; font-weight: 800; background: ${ownBadgeBg}; color: ${ownBadgeColor}; padding: 4px 12px; border-radius: 12px; letter-spacing: 0.5px;">${ownStatusLabel}</span>
+                            <span style="font-size: 0.72rem; font-weight: 800; background: ${ownBadgeBg}; color: ${ownBadgeColor}; padding: 4px 12px; border-radius: 12px; letter-spacing: 0.5px; flex-shrink: 0; margin-left: 8px;">${ownStatusLabel}</span>
                         </div>
 
                         <div style="font-size: 1.05rem; font-weight: 800; color: #1E293B; margin-bottom: 14px;">${horarioInicio} — ${horarioFim}</div>
 
                         <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid #F1F5F9; font-size: 0.8rem; color: #64748B;">
-                            <div>
+                            <div style="flex: 1;">
                                 <span style="display: block; font-size: 0.68rem; color: #94A3B8; font-weight: 600;">Local</span>
-                                <span style="font-weight: 700; color: #1E293B;">${staticData.local}</span>
+                                <span style="font-weight: 800; color: #0F172A; font-size: 0.9rem;">${displayLocal}</span>
                             </div>
-                            <div style="border-left: 1px solid #F1F5F9; padding-left: 12px;">
+                            <div style="border-left: 1px solid #F1F5F9; padding-left: 12px; flex: 1;">
                                 <span style="display: block; font-size: 0.68rem; color: #94A3B8; font-weight: 600;">Supervisor</span>
-                                <span style="font-weight: 700; color: #1E293B;">${staticData.supervisor}</span>
+                                <span style="font-weight: 800; color: #0F172A; font-size: 0.9rem;">${staticData.supervisor}</span>
                             </div>
-                            <div style="border-left: 1px solid #F1F5F9; padding-left: 12px;">
+                            <div style="border-left: 1px solid #F1F5F9; padding-left: 12px; flex: 1;">
                                 <span style="display: block; font-size: 0.68rem; color: #94A3B8; font-weight: 600;">Chegada</span>
-                                <span style="font-weight: 700; color: #1E293B;">${arrivalTime}</span>
+                                <span style="font-weight: 800; color: #0F172A; font-size: 0.9rem;">${arrivalTime}</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Equipe Escalada -->
-                    <div class="panel-card" style="margin-bottom: 16px; text-align: left; padding: 16px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px;">
+                    <div class="panel-card" style="margin-bottom: 14px; text-align: left; padding: 16px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                             <span style="font-size: 0.95rem; font-weight: 800; color: #1E293B;">Equipe escalada</span>
                             <span style="font-size: 0.75rem; color: #64748B; font-weight: 500;">Outros servos nesta escala</span>
@@ -3213,7 +3269,7 @@ const App = {
                         <button class="btn-secondary" onclick="App.showAreaInstructions('${nodeId}')" style="flex: 1; height: 46px; border-radius: 8px; border: 1px solid #CBD5E1; background: #F1F5F9; color: #1E293B; font-size: 0.85rem; font-weight: 700; cursor: pointer;">
                             Ver instruções
                         </button>
-                        <button class="btn-secondary" onclick="App.requestAreaHelp('${nodeId}')" style="flex: 1; height: 46px; border-radius: 8px; border: none; background: #127369; color: #FFFFFF; font-size: 0.85rem; font-weight: 700; cursor: pointer;">
+                        <button class="btn-secondary" onclick="App.requestAreaHelp('${nodeId}')" style="flex: 1; height: 46px; border-radius: 8px; border: none; background: #0E5C54; color: #FFFFFF; font-size: 0.85rem; font-weight: 700; cursor: pointer;">
                             Solicitar ajuda
                         </button>
                     </div>
