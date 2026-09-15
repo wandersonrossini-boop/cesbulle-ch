@@ -1,4 +1,4 @@
-// CES Diaconia - Service Worker de Notificações (v3.16.0-PWA)
+// CES Diaconia - Service Worker de Notificações (v3.17.0-PWA)
 // Controla recebimento e exibição de push notifications via FCM e Cache Offline PWA
 
 importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js');

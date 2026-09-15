@@ -2362,68 +2362,71 @@ const App = {
             }
         }
 
-        // Formatar datas para o banner
-        let bannerLabel = "";
-        let bannerSub = "";
+        // Formatar datas para o banner de resumo do culto
+        let summaryCardHtml = "";
         if (evtActive) {
             const dateParts = evtActive.data.split('-');
             const d = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
-            const diaSemanaFull = d.toLocaleDateString('pt-BR', { weekday: 'long' });
             const diaSemanaShort = d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '').toUpperCase();
             const dataFmt = `${dateParts[2]}/${dateParts[1]}`;
-            bannerLabel = `${diaSemanaShort}, ${dataFmt} • ${evtActive.cultoNome}`;
-            bannerSub = `${evtActive.horarioInicio} – ${evtActive.horarioFim}`;
-        } else {
-            const monthName = this.memberCurrentDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-            bannerLabel = `${monthName.toUpperCase()}`;
-            bannerSub = '';
+
+            // Verificar se o usuário atual está escalado neste evento
+            const userEventScale = evtActive.escalas.find(e => e.membroId === this.currentUser.id && e.statusPresenca !== 'Recusada');
+            let userScaleInfoHtml = '';
+
+            if (userEventScale) {
+                const isPending = userEventScale.statusPresenca === 'Pendente';
+                const statusBadgeBg = isPending ? '#FEF3C7' : '#D1FAE5';
+                const statusBadgeColor = isPending ? '#B45309' : '#065F46';
+                const statusBadgeText = isPending ? 'PENDENTE' : 'CONFIRMADO';
+
+                // Resolver setor, função e lado/observação
+                let setorNome = 'Templo';
+                if (userEventScale.setorId === 'recepcao' || userEventScale.setorId === 'entrada' || userEventScale.setorId === 'check_in') {
+                    setorNome = 'Recepção';
+                } else if (userEventScale.setorId === 'acolhimento') {
+                    setorNome = 'Acolhimento';
+                }
+
+                let detalheEscala = userEventScale.funcao || 'Voluntário';
+                if (userEventScale.observacoes) {
+                    detalheEscala += ` · ${userEventScale.observacoes}`;
+                }
+
+                userScaleInfoHtml = `
+                    <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #E2E8F0; font-size: 0.85rem; color: #1E293B; font-weight: 600;">
+                        ${setorNome} · ${detalheEscala}
+                    </div>
+                `;
+
+                summaryCardHtml = `
+                    <div class="panel-card" style="margin-bottom: 16px; padding: 16px; background: #FFFFFF !important; border: 1px solid #E2E8F0 !important; border-radius: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                            <div>
+                                <span style="font-size: 0.75rem; font-weight: 700; color: #64748B; text-transform: uppercase;">${diaSemanaShort}, ${dataFmt}</span>
+                                <h3 style="font-size: 1.1rem; font-weight: 800; color: #1E293B; margin: 2px 0 0 0;">${evtActive.cultoNome}</h3>
+                            </div>
+                            <span style="font-size: 0.72rem; font-weight: 700; background: ${statusBadgeBg}; color: ${statusBadgeColor}; padding: 4px 10px; border-radius: 12px; letter-spacing: 0.5px;">${statusBadgeText}</span>
+                        </div>
+                        <div style="font-size: 0.9rem; font-weight: 600; color: #64748B;">${evtActive.horarioInicio} — ${evtActive.horarioFim}</div>
+                        ${userScaleInfoHtml}
+                    </div>
+                `;
+            } else {
+                summaryCardHtml = `
+                    <div class="panel-card" style="margin-bottom: 16px; padding: 16px; background: #FFFFFF !important; border: 1px solid #E2E8F0 !important; border-radius: 10px;">
+                        <div style="font-size: 0.75rem; font-weight: 700; color: #64748B; text-transform: uppercase;">${diaSemanaShort}, ${dataFmt}</div>
+                        <h3 style="font-size: 1.1rem; font-weight: 800; color: #1E293B; margin: 2px 0 0 0;">${evtActive.cultoNome}</h3>
+                        <div style="font-size: 0.9rem; font-weight: 600; color: #64748B; margin-top: 4px;">${evtActive.horarioInicio} — ${evtActive.horarioFim}</div>
+                    </div>
+                `;
+            }
         }
-
-        // Check if current user is scheduled for this event (for banner indicator)
-        const userInEvent = evtActive ? evtActive.escalas.some(e => e.membroId === this.currentUser.id && e.statusPresenca !== 'Recusada') : false;
-        const userEventScale = userInEvent ? evtActive.escalas.find(e => e.membroId === this.currentUser.id && e.statusPresenca !== 'Recusada') : null;
-
-        // Event index for navigation
-        const currentEventIdx = eventsList.findIndex(e => e.key === (evtActive ? evtActive.key : null));
-        const hasPrev = currentEventIdx > 0;
-        const hasNext = currentEventIdx < eventsList.length - 1;
-
-        // Interactive Date Header with left/right navigation
-        let userBadgeHtml = '';
-        if (userInEvent && userEventScale) {
-            const isPending = userEventScale.statusPresenca === 'Pendente';
-            const badgeColor = isPending ? '#D9A752' : '#10b981';
-            const badgeIcon = isPending ? 'fa-solid fa-clock' : 'fa-solid fa-circle-check';
-            const badgeText = isPending ? 'CONFIRMAR' : 'CONFIRMADO';
-            userBadgeHtml = `
-                <span class="org-user-event-badge" style="background: rgba(${isPending ? '217,167,82' : '16,185,129'},0.15); border: 1px solid rgba(${isPending ? '217,167,82' : '16,185,129'},0.35); color: ${badgeColor};">
-                    <i class="${badgeIcon}"></i> ${badgeText}
-                </span>
-            `;
-        }
-
-        let staticHeaderHtml = `
-            <div class="org-date-nav-banner">
-                <button class="org-date-nav-arrow" onclick="App.navigateOrgEvent(-1)" style="opacity: ${hasPrev ? '1' : '0.2'}; pointer-events: ${hasPrev ? 'auto' : 'none'}" title="Evento anterior">
-                    <i class="fa-solid fa-chevron-left"></i>
-                </button>
-                <div class="org-date-nav-center">
-                    <div class="org-date-nav-label">${bannerLabel}</div>
-                    ${bannerSub ? `<div class="org-date-nav-sub">${bannerSub}</div>` : ''}
-                    ${userBadgeHtml}
-                </div>
-                <button class="org-date-nav-arrow" onclick="App.navigateOrgEvent(1)" style="opacity: ${hasNext ? '1' : '0.2'}; pointer-events: ${hasNext ? 'auto' : 'none'}" title="Próximo evento">
-                    <i class="fa-solid fa-chevron-right"></i>
-                </button>
-            </div>
-        `;
 
         if (!evtActive) {
             container.innerHTML = `
-                ${staticHeaderHtml}
-                <div style="text-align: center; padding: 40px var(--white); background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; margin-top: 15px;">
-                    <i class="fa-solid fa-calendar-xmark" style="font-size: 2.5rem; color: #8AA6A3; opacity: 0.4; margin-bottom: 12px;"></i>
-                    <p style="color: #8AA6A3; font-size: 0.95rem;">Nenhuma escala agendada para este período.</p>
+                <div style="text-align: center; padding: 40px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; margin-top: 15px;">
+                    <p style="color: #64748B; font-size: 0.95rem;">Nenhuma escala agendada para este período.</p>
                 </div>
             `;
             return;
@@ -2503,12 +2506,11 @@ const App = {
         // Gerar cards do organograma
         let areaCardsHtml = '';
         if (isEscalaLivre) {
-            // Exibir apenas o cartão único de Escala Livre em largura total
-            areaCardsHtml = this.renderAreaCard(escalaLivreScales, 'Escala Livre', 'fa-solid fa-users', 'escala_livre', 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80', '#6B7280', membrosMap, true);
+            areaCardsHtml = this.renderAreaCard(escalaLivreScales, 'Escala Livre', 'fa-solid fa-users', 'escala_livre', '', '#6B7280', membrosMap, true);
         } else {
-            const recepcaoCardHtml = this.renderAreaCard([...portariaScales, ...checkinScales], 'Recepção', 'fa-solid fa-id-card', 'recepcao', 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=400&q=80', '#3B82F6', membrosMap);
-            const temploCardHtml = this.renderAreaCard([...apoioDireitoScales, ...apoioEsquerdoScales, ...rondaDireitoScales, ...rondaEsquerdoScales], 'Templo', 'fa-solid fa-place-of-worship', 'templo', 'https://images.unsplash.com/photo-1545232979-8bf34eb9757b?auto=format&fit=crop&w=400&q=80', '#14B8A6', membrosMap);
-            const acolhimentoCardHtml = this.renderAreaCard(acolhimentoScales, 'Acolhimento', 'fa-solid fa-hands-holding-child', 'acolhimento', 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80', '#EC4899', membrosMap);
+            const recepcaoCardHtml = this.renderAreaCard([...portariaScales, ...checkinScales], 'Recepção', 'fa-solid fa-id-card', 'recepcao', '', '#3B82F6', membrosMap);
+            const temploCardHtml = this.renderAreaCard([...apoioDireitoScales, ...apoioEsquerdoScales, ...rondaDireitoScales, ...rondaEsquerdoScales], 'Templo', 'fa-solid fa-place-of-worship', 'templo', '', '#14B8A6', membrosMap);
+            const acolhimentoCardHtml = this.renderAreaCard(acolhimentoScales, 'Acolhimento', 'fa-solid fa-hands-holding-child', 'acolhimento', '', '#EC4899', membrosMap);
             areaCardsHtml = `${recepcaoCardHtml}${temploCardHtml}${acolhimentoCardHtml}`;
         }
 
@@ -2521,21 +2523,21 @@ const App = {
                 const d = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
                 const diaFormatado = d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' });
                 return `
-                    <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 12px; margin-bottom: 10px;">
+                    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px; margin-bottom: 10px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <span style="font-weight: 700; color: #fff;">${e.cultoNome || 'Escala'}</span>
-                            <span style="font-size: 0.75rem; background: #D9A752; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 600;">Pendente</span>
+                            <span style="font-weight: 700; color: #1E293B;">${e.cultoNome || 'Escala'}</span>
+                            <span style="font-size: 0.75rem; background: #FEF3C7; color: #B45309; padding: 2px 6px; border-radius: 4px; font-weight: 600;">Pendente</span>
                         </div>
-                        <div style="font-size: 0.85rem; color: #BFBFBF; margin-bottom: 12px;">
-                            <i class="fa-regular fa-calendar" style="margin-right: 4px;"></i> ${diaFormatado.toUpperCase()} • ${e.horarioInicio} - ${e.horarioFim}<br>
-                            <i class="fa-solid fa-user-tag" style="margin-right: 4px; margin-top: 6px;"></i> ${e.funcao}
+                        <div style="font-size: 0.85rem; color: #64748B; margin-bottom: 12px;">
+                            ${diaFormatado.toUpperCase()} • ${e.horarioInicio} - ${e.horarioFim}<br>
+                            ${e.funcao}
                         </div>
                         <div style="display: flex; gap: 8px;">
                             <button class="btn-scale-action btn-recusar-presenca" onclick="App.handleConfirmPresenca('${e.id}', 'Recusada')" style="flex: 1; padding: 8px; border-radius: 6px;">
-                                <i class="fa-solid fa-xmark"></i> Recusar
+                                Recusar
                             </button>
                             <button class="btn-scale-action btn-confirm-presenca" onclick="App.handleConfirmPresenca('${e.id}', 'Confirmada')" style="flex: 1; padding: 8px; border-radius: 6px; background: #10B981; color: white;">
-                                <i class="fa-solid fa-check"></i> Aceitar
+                                Aceitar
                             </button>
                         </div>
                     </div>
@@ -2543,19 +2545,18 @@ const App = {
             }).join('');
             
             pendingAlertHtml = `
-                <div style="margin-bottom: 20px; padding: 15px; background: linear-gradient(135deg, rgba(217, 167, 82, 0.15), rgba(217, 167, 82, 0.05)); border: 1px solid rgba(217, 167, 82, 0.3); border-radius: 12px;">
-                    <h3 style="color: #D9A752; font-size: 0.95rem; font-weight: 700; margin-bottom: 12px; text-transform: uppercase;">
-                        <i class="fa-solid fa-bell" style="margin-right: 6px;"></i> Suas Escalas Pendentes
+                <div style="margin-bottom: 20px; padding: 15px; background: #FFFBEB; border: 1px solid #FCD34D; border-radius: 8px;">
+                    <h3 style="color: #B45309; font-size: 0.95rem; font-weight: 700; margin-bottom: 12px; text-transform: uppercase;">
+                        Suas Escalas Pendentes
                     </h3>
                     ${cardsHtml}
                 </div>
             `;
         }
-        // ---------------------------------------------------------
 
         container.innerHTML = `
             ${pendingAlertHtml}
-            ${staticHeaderHtml}
+            ${summaryCardHtml}
             
             <div class="org-daily-container" id="org-daily-swipe-area">
                 <div class="org-areas-grid">
@@ -2615,19 +2616,13 @@ const App = {
             return `
                 <div class="org-area-card-wrapper" style="${cardSpanClass}">
                     <div class="${cardClass} card-horizontal" onclick="App.openAreaDetail('${nodeId}')">
-                        <div class="org-area-pattern-overlay"></div>
                         <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; z-index: 1; width: 100%;">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <span class="org-area-icon-wrap-premium"><i class="${iconClass}"></i></span>
-                                <h4 class="org-area-title" style="margin: 0;">${title}</h4>
-                            </div>
-                            ${isUserAssigned ? `<span class="user-assigned-badge"><i class="fa-solid fa-star"></i> SUA ESCALA</span>` : ''}
+                            <h4 class="org-area-title" style="margin: 0; color: #1E293B; font-weight: 800; font-size: 1.1rem;">${title}</h4>
+                            ${isUserAssigned ? `<span class="user-assigned-badge" style="background: #D1FAE5; color: #065F46; font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem;">VOCÊ</span>` : ''}
                         </div>
-                        <p class="org-area-desc" style="z-index: 1; margin-top: 4px; text-align: left;">${desc}</p>
-                        <div class="org-area-action">
-                            <button class="org-area-chevron-circle-premium">
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </button>
+                        <p class="org-area-desc" style="z-index: 1; margin-top: 6px; text-align: left; color: #64748B; font-size: 0.8rem;">${desc}</p>
+                        <div style="margin-top: 10px; font-size: 0.8rem; font-weight: 600; color: #127369; display: flex; align-items: center; gap: 4px;">
+                            Ver minha escala &rsaquo;
                         </div>
                     </div>
                 </div>
@@ -2635,20 +2630,16 @@ const App = {
         } else {
             return `
                 <div class="org-area-card-wrapper" style="${cardSpanClass}">
-                    <div class="${cardClass}" onclick="App.openAreaDetail('${nodeId}')">
-                        <div class="org-area-pattern-overlay"></div>
+                    <div class="${cardClass}" onclick="App.openAreaDetail('${nodeId}')" style="background: #FFFFFF; border: 1px solid ${isUserAssigned ? '#10B981' : '#E2E8F0'}; border-radius: 10px; padding: 14px;">
                         <div style="display: flex; justify-content: space-between; width: 100%; align-items: flex-start; z-index: 1;">
-                            <span class="org-area-icon-wrap-premium"><i class="${iconClass}"></i></span>
-                            ${isUserAssigned ? `<span class="user-assigned-badge"><i class="fa-solid fa-star"></i> VOCÊ</span>` : ''}
+                            <h4 class="org-area-title" style="margin: 0; color: #1E293B; font-weight: 800; font-size: 1.1rem;">${title}</h4>
+                            ${isUserAssigned ? `<span class="user-assigned-badge" style="background: #D1FAE5; color: #065F46; font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem;">VOCÊ</span>` : ''}
                         </div>
-                        <div class="org-area-text-section" style="margin-top: 10px; text-align: left; z-index: 1; width: 100%;">
-                            <h4 class="org-area-title">${title}</h4>
-                            <p class="org-area-desc" style="margin-top: 2px; line-height: 1.25;">${desc}</p>
+                        <div class="org-area-text-section" style="margin-top: 8px; text-align: left; z-index: 1; width: 100%;">
+                            <p class="org-area-desc" style="margin: 0; line-height: 1.3; color: #64748B; font-size: 0.8rem;">${desc}</p>
                         </div>
-                        <div class="org-area-action">
-                            <button class="org-area-chevron-circle-premium">
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </button>
+                        <div style="margin-top: 12px; font-size: 0.8rem; font-weight: 600; color: #127369; display: flex; align-items: center; gap: 4px;">
+                            Ver minha escala &rsaquo;
                         </div>
                     </div>
                 </div>
@@ -3005,63 +2996,49 @@ const App = {
 
                 // Area status calculations
                 let statusTitle = 'Área pronta';
-                let statusDesc = 'Todos os membros confirmados';
-                let statusDotColor = '#127369';
-                let statusClassBox = 'status-ready';
-
-                if (uniqueScales.length === 0) {
-                    statusTitle = 'Aguardando escala';
-                    statusDesc = 'Nenhum voluntário escalado';
-                    statusDotColor = '#D9A752';
-                    statusClassBox = 'status-waiting';
-                } else {
-                    const hasPending = uniqueScales.some(e => e.statusPresenca === 'Pendente');
-                    if (hasPending) {
-                        statusTitle = 'Aguardando confirmações';
-                        statusDesc = 'Alguns membros ainda não confirmaram a presença';
-                        statusDotColor = '#D9A752';
-                        statusClassBox = 'status-waiting';
-                    }
-                }
-
-                // Render Team List
+                // Filter out current user from team list (Outros servos nesta escala)
+                const teamScalesOther = uniqueScales.filter(e => e.membroId !== this.currentUser.id);
                 let teamListHtml = '';
-                uniqueScales.forEach(escala => {
-                    const isOwn = escala.membroId === this.currentUser.id;
+                teamScalesOther.forEach(escala => {
                     let statusClass = 'status-pendente';
-                    let statusLabel = 'Pendente';
+                    let statusLabel = 'PENDENTE';
+                    let badgeBg = '#FEF3C7';
+                    let badgeColor = '#B45309';
                     if (escala.statusPresenca === 'Confirmada') {
-                        statusClass = 'status-confirmado';
-                        statusLabel = 'Confirmado';
+                        badgeBg = '#D1FAE5';
+                        badgeColor = '#065F46';
+                        statusLabel = 'CONFIRMADO';
                     } else if (escala.statusPresenca === 'Recusada') {
-                        statusClass = 'status-recusado';
-                        statusLabel = 'Recusado';
+                        badgeBg = '#FEE2E2';
+                        badgeColor = '#991B1B';
+                        statusLabel = 'RECUSADO';
                     }
 
                     const membroInfo = membrosMap[escala.membroId];
                     const fotoUrl = membroInfo ? membroInfo.fotoUrl : null;
                     const avatarHtml = this.getCardAvatarHtml(escala.membroNome, fotoUrl, 1);
                     
-                    const isRonda = (escala.funcao || '').toLowerCase().includes('ronda');
-                    const rondaBadge = isRonda ? `<span style="background: rgba(245, 158, 11, 0.2); border: 1px solid #F59E0B; color: #F59E0B; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase;"><i class="fa-solid fa-shield-halved"></i> Ronda</span>` : '';
+                    let detalheOutro = escala.funcao || 'Apoio';
+                    if (escala.observacoes) {
+                        detalheOutro += ` · ${escala.observacoes}`;
+                    }
 
                     teamListHtml += `
-                        <div style="display: flex; align-items: center; gap: 12px; background: rgba(255, 255, 255, 0.02); padding: 8px 12px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05);">
-                            ${avatarHtml}
-                            <div style="flex: 1; text-align: left;">
-                                <div style="font-size: 0.85rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px;">${escala.membroNome} ${isOwn ? '<span style="color:#8AA6A3; font-weight:500;">(Você)</span>' : ''} ${rondaBadge}</div>
-                                <div style="font-size: 0.7rem; color: #8AA6A3; margin-top: 1px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
-                                    <span style="font-weight: 700; color: var(--theme-color);"><i class="fa-solid fa-user-tag" style="font-size: 0.65rem; margin-right: 2px;"></i>${escala.funcao || 'Membro'}</span>
-                                    ${escala.observacoes ? `<span style="color: #8AA6A3;">•</span> <span style="color: #D9A752; font-weight: 600;"><i class="fa-solid fa-map-pin" style="font-size: 0.65rem; margin-right: 2px;"></i>${escala.observacoes}</span>` : ''}
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #F1F5F9;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                ${avatarHtml}
+                                <div style="text-align: left;">
+                                    <div style="font-size: 0.9rem; font-weight: 700; color: #1E293B;">${escala.membroNome}</div>
+                                    <div style="font-size: 0.75rem; color: #64748B; font-weight: 500;">${detalheOutro}</div>
                                 </div>
                             </div>
-                            <span class="card-scale-status ${statusClass}" style="font-size: 0.68rem; padding: 3px 8px; border-radius: 6px;">${statusLabel}</span>
+                            <span style="font-size: 0.68rem; font-weight: 700; background: ${badgeBg}; color: ${badgeColor}; padding: 3px 8px; border-radius: 10px;">${statusLabel}</span>
                         </div>
                     `;
                 });
 
-                if (uniqueScales.length === 0) {
-                    teamListHtml = '<div style="font-size: 0.8rem; color: #8AA6A3; padding: 10px; text-align: center;">Nenhum obreiro escalado ainda.</div>';
+                if (teamScalesOther.length === 0) {
+                    teamListHtml = '<div style="font-size: 0.8rem; color: #64748B; padding: 10px 0; text-align: center;">Nenhum outro obreiro escalado nesta área.</div>';
                 }
 
                 // Checkboxes setup
@@ -3072,177 +3049,112 @@ const App = {
                 staticData.checklist.forEach((item, index) => {
                     const isChecked = savedChecklist[index] === true;
                     checklistHtml += `
-                        <label style="display: flex; align-items: center; gap: 10px; color: #BFBFBF; cursor: pointer; user-select: none; margin-bottom: 4px;">
-                            <input type="checkbox" class="checklist-item-checkbox" data-index="${index}" ${isChecked ? 'checked' : ''} onchange="App.handleChecklistItemChange('${nodeId}', ${index}, this)">
-                            <span style="font-size: 0.8rem; text-align: left;">${item}</span>
+                        <label style="display: flex; align-items: center; gap: 10px; color: #334155; cursor: pointer; user-select: none; margin-bottom: 6px; font-weight: 500;">
+                            <input type="checkbox" class="checklist-item-checkbox" data-index="${index}" ${isChecked ? 'checked' : ''} onchange="App.handleChecklistItemChange('${nodeId}', ${index}, this)" style="width: 18px; height: 18px; accent-color: #127369;">
+                            <span style="font-size: 0.85rem; text-align: left;">${item}</span>
                         </label>
                     `;
                 });
 
-                // Determine confirm button presence or standby volunteer button
-                let confirmButtonHtml = '';
+                // User details block
+                const currentUserInfo = membrosMap[this.currentUser.id] || {};
+                const userPhotoUrl = currentUserInfo.fotoUrl || null;
+                const userAvatarHtml = this.getCardAvatarHtml(this.currentUser.nome, userPhotoUrl, 1);
+                
                 const ownScale = uniqueScales.find(e => e.membroId === this.currentUser.id);
+                let ownStatusLabel = 'CONFIRMADO';
+                let ownBadgeBg = '#D1FAE5';
+                let ownBadgeColor = '#065F46';
+                let userFuncaoText = 'Apoio';
+                let userLadoText = '';
+
                 if (ownScale) {
                     if (ownScale.statusPresenca === 'Pendente') {
-                        confirmButtonHtml = `
-                            <div style="width: 100%; display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
-                                <button class="btn-primary confirm-pulse-btn" onclick="App.handleConfirmPresencaFromDetail('${ownScale.id}', 'Confirmada')" style="width: 100%; height: 50px; border-radius: 14px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; font-weight: 800; font-size: 0.98rem; border: none; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;">
-                                    <i class="fa-solid fa-circle-check" style="font-size: 1.1rem;"></i> Confirmar Presença Agora
-                                </button>
-                                <button class="btn-secondary" onclick="App.handleConfirmPresencaFromDetail('${ownScale.id}', 'Recusada')" style="width: 100%; height: 38px; border-radius: 10px; border: 1px solid rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); color: #ef4444; font-size: 0.8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                                    <i class="fa-solid fa-circle-xmark"></i> Não poderei comparecer
-                                </button>
-                            </div>
-                        `;
-                    } else if (ownScale.statusPresenca === 'Confirmada') {
-                        confirmButtonHtml = `
-                            <div style="width: 100%; display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
-                                <div style="width: 100%; height: 46px; border-radius: 14px; border: 1.5px solid rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.08); color: #10b981; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.5px; text-transform: uppercase;">
-                                    <i class="fa-solid fa-check-double" style="font-size: 1rem;"></i> PRESENÇA CONFIRMADA
-                                </div>
-                                <button class="btn-secondary" onclick="App.handleConfirmPresencaFromDetail('${ownScale.id}', 'Recusada')" style="width: 100%; height: 38px; border-radius: 10px; border: 1px solid rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); color: #ef4444; font-size: 0.8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                                    <i class="fa-solid fa-circle-xmark"></i> Não poderei comparecer
-                                </button>
-                            </div>
-                        `;
+                        ownStatusLabel = 'PENDENTE';
+                        ownBadgeBg = '#FEF3C7';
+                        ownBadgeColor = '#B45309';
                     }
-                } else {
-                    const ownStandby = areaStandbys.find(s => s.membroId === this.currentUser.id);
-                    if (ownStandby) {
-                        confirmButtonHtml = `
-                            <div style="width: 100%; display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
-                                <div style="width: 100%; height: 46px; border-radius: 14px; border: 1.5px dashed rgba(18, 115, 105, 0.4); background: rgba(18, 115, 105, 0.05); color: var(--theme-color); font-weight: 800; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.5px; text-transform: uppercase;">
-                                    <i class="fa-solid fa-hand-holding-hand" style="font-size: 1rem;"></i> VOCÊ ESTÁ DISPONÍVEL COMO VOLUNTÁRIO
-                                </div>
-                                <button class="btn-secondary" onclick="App.handleCancelStandby('${ownStandby.id}', '${nodeId}')" style="width: 100%; height: 38px; border-radius: 10px; border: 1px solid rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); color: #ef4444; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
-                                    <i class="fa-solid fa-trash-can"></i> Cancelar Disponibilidade
+                    userFuncaoText = ownScale.funcao || 'Apoio';
+                    if (ownScale.observacoes) {
+                        userLadoText = ownScale.observacoes;
+                    }
+                }
+
+                let userDetalheLinha = userFuncaoText;
+                if (userLadoText) {
+                    userDetalheLinha += ` · ${userLadoText}`;
+                }
+
+                // Action buttons inside main card
+                let mainCardActionsHtml = '';
+                if (ownScale) {
+                    if (ownScale.statusPresenca === 'Pendente') {
+                        mainCardActionsHtml = `
+                            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
+                                <button onclick="App.handleConfirmPresencaFromDetail('${ownScale.id}', 'Confirmada')" style="width: 100%; height: 44px; border-radius: 8px; background: #127369; color: #FFFFFF; font-weight: 700; font-size: 0.9rem; border: none; cursor: pointer;">
+                                    Confirmar presença
+                                </button>
+                                <button onclick="App.handleConfirmPresencaFromDetail('${ownScale.id}', 'Recusada')" style="width: 100%; height: 44px; border-radius: 8px; background: #F1F5F9; color: #1E293B; font-weight: 600; font-size: 0.85rem; border: 1px solid #CBD5E1; cursor: pointer;">
+                                    Não poderei comparecer
                                 </button>
                             </div>
                         `;
                     } else {
-                        const isUserScaledInThisCulto = escalas.some(escala => escala.cultoId === cultoId && escala.membroId === this.currentUser.id && escala.statusPresenca !== 'Recusada');
-                        if (!isUserScaledInThisCulto) {
-                            let roleSelectorHtml = '';
-                            if (nodeId === 'recepcao') {
-                                roleSelectorHtml = `
-                                    <div style="margin-bottom: 12px; text-align: left; width: 100%;">
-                                        <label style="font-size: 0.72rem; color: #8aa6a3; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 5px;"><i class="fa-solid fa-list-check" style="margin-right: 4px;"></i>Escolha a Função (Opcional):</label>
-                                        <select id="standby-role-select" style="width: 100%; height: 38px; border-radius: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 0 10px; font-size: 0.82rem; outline: none; cursor: pointer;">
-                                            <option value="Recepção">Qualquer uma / Em aberto</option>
-                                            <option value="Portaria">Portaria</option>
-                                            <option value="Check-in">Check-in</option>
-                                        </select>
-                                    </div>
-                                `;
-                            } else if (nodeId === 'templo') {
-                                roleSelectorHtml = `
-                                    <div style="margin-bottom: 12px; text-align: left; width: 100%;">
-                                        <label style="font-size: 0.72rem; color: #8aa6a3; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 5px;"><i class="fa-solid fa-map-pin" style="margin-right: 4px;"></i>Escolha o Lado (Opcional):</label>
-                                        <select id="standby-role-select" style="width: 100%; height: 38px; border-radius: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 0 10px; font-size: 0.82rem; outline: none; cursor: pointer;">
-                                            <option value="Apoio Interno">Qualquer um / Em aberto</option>
-                                            <option value="Apoio Interno (L. Dir.)">Lado Direito</option>
-                                            <option value="Apoio Interno (L. Esq.)">Lado Esquerdo</option>
-                                        </select>
-                                    </div>
-                                `;
-                            } else if (nodeId === 'ronda') {
-                                roleSelectorHtml = `
-                                    <div style="margin-bottom: 12px; text-align: left; width: 100%;">
-                                        <label style="font-size: 0.72rem; color: #8aa6a3; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 5px;"><i class="fa-solid fa-shield-halved" style="margin-right: 4px;"></i>Escolha o Lado (Opcional):</label>
-                                        <select id="standby-role-select" style="width: 100%; height: 38px; border-radius: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 0 10px; font-size: 0.82rem; outline: none; cursor: pointer;">
-                                            <option value="Ronda">Qualquer um / Em aberto</option>
-                                            <option value="Ronda (L. Dir.)">Lado Direito</option>
-                                            <option value="Ronda (L. Esq.)">Lado Esquerdo</option>
-                                        </select>
-                                    </div>
-                                `;
-                            }
-
-                            confirmButtonHtml = `
-                                ${roleSelectorHtml}
-                                <button class="btn-primary" onclick="App.handleRegisterStandby('${cultoId}', '${cultoNome.replace(/'/g, "\\'")}', '${dateStr}', '${horarioInicio} - ${horarioFim}', '${nodeId}')" style="width: 100%; height: 50px; border-radius: 14px; background: linear-gradient(135deg, var(--theme-color) 0%, #0d5e56 100%); color: #fff; font-weight: 800; font-size: 0.95rem; border: none; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; text-transform: uppercase;">
-                                    <i class="fa-solid fa-hand-holding-hand" style="font-size: 1.1rem;"></i> Estou Disponível (Voluntário)
+                        mainCardActionsHtml = `
+                            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
+                                <button onclick="App.handleConfirmPresencaFromDetail('${ownScale.id}', 'Recusada')" style="width: 100%; height: 44px; border-radius: 8px; background: #F1F5F9; color: #1E293B; font-weight: 600; font-size: 0.85rem; border: 1px solid #CBD5E1; cursor: pointer;">
+                                    Não poderei comparecer
                                 </button>
-                            `;
-                        } else {
-                            confirmButtonHtml = `
-                                <div style="width: 100%; height: 46px; border-radius: 14px; border: 1.5px solid rgba(138, 166, 163, 0.3); background: rgba(255,255,255,0.02); color: #8AA6A3; font-weight: 700; font-size: 0.82rem; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; text-transform: uppercase;">
-                                    <i class="fa-solid fa-user-check"></i> Já escalado em outro setor/função
-                                </div>
-                            `;
-                        }
+                            </div>
+                        `;
                     }
                 }
 
-                // Calculate arrival time dynamically
-                let arrivalTime = staticData.chegada;
-                if (horarioInicio) {
-                    try {
-                        const [h, m] = horarioInicio.split(':').map(Number);
-                        const offsetMinutes = staticData.chegada === '17:45' ? 15 : 30; // 15 mins before or 30 mins before
-                        const date = new Date();
-                        date.setHours(h);
-                        date.setMinutes(m - offsetMinutes);
-                        const arrivalH = String(date.getHours()).padStart(2, '0');
-                        const arrivalM = String(date.getMinutes()).padStart(2, '0');
-                        arrivalTime = `${arrivalH}:${arrivalM}`;
-                    } catch (err) {}
-                }
-
-                let trajeHtml = '';
-                if (staticData.traje) {
-                    trajeHtml = `
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 2px;">
-                            <span style="color: #8AA6A3; display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-shirt" style="width: 14px;"></i> Traje</span>
-                            <span style="color: #fff; font-weight: 600;">${staticData.traje}</span>
-                        </div>
-                    `;
-                }
-
                 detailContainer.innerHTML = `
-                    <header class="detail-header">
-                        <button onclick="App.closeAreaDetail()" class="btn-icon" style="background: none; border: none; color: #1E293B; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;">
-                            <i class="fa-solid fa-arrow-left"></i>
+                    <header class="detail-header" style="background: #127369; padding: 12px 16px; margin: -16px -16px 16px -16px; display: flex; align-items: center; justify-content: space-between;">
+                        <button onclick="App.closeAreaDetail()" class="btn-icon" style="background: none; border: none; color: #FFFFFF; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                            <i class="fa-solid fa-arrow-left"></i> Voltar
                         </button>
-                        <div style="text-align: center;">
-                            <span class="detail-header-title" style="display: block; font-weight: 700; font-size: 1rem; color: #1E293B;">${areaTitle}</span>
-                            <span style="display: block; font-size: 0.72rem; color: #64748B; font-weight: 500;">Minha Escala</span>
+                        <span class="detail-header-title" style="font-weight: 700; font-size: 1rem; color: #FFFFFF;">Minha Escala</span>
+                        <div style="text-align: right; color: #FFFFFF; font-size: 0.72rem; line-height: 1.2;">
+                            <div style="font-weight: 700;">CME Lausanne</div>
+                            <div style="opacity: 0.8;">Juntos no serviço de Cristo</div>
                         </div>
-                        <div style="width: 32px; height: 32px;"></div>
                     </header>
 
-                    <div class="panel-card" style="margin-bottom: 12px; text-align: left; padding: 15px;">
-                        <div style="font-size: 0.8rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">${cultoNome}</div>
-                        <div style="font-size: 1.1rem; font-weight: 800; color: #1E293B; margin-bottom: 8px;">${horarioInicio} — ${horarioFim}</div>
-                        <div class="status-box ${statusClassBox}" style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 8px 12px; background: #F8FAFC !important; border: 1px solid #E2E8F0 !important;">
-                            <span style="width: 8px; height: 8px; border-radius: 50%; background: ${statusDotColor}; display: inline-block;"></span>
-                            <span style="font-weight: 700; font-size: 0.8rem; color: #1E293B;">${statusTitle}</span>
+                    <!-- Main Highlight Card -->
+                    <div class="panel-card" style="margin-bottom: 16px; text-align: left; padding: 16px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                            <div>
+                                <div style="font-size: 0.75rem; font-weight: 700; color: #64748B; text-transform: uppercase;">${dateStr.split('-').reverse().join('/')}</div>
+                                <h2 style="font-size: 1.15rem; font-weight: 800; color: #1E293B; margin: 2px 0 0 0;">${cultoNome}</h2>
+                            </div>
+                            <span style="font-size: 0.72rem; font-weight: 700; background: ${ownBadgeBg}; color: ${ownBadgeColor}; padding: 4px 10px; border-radius: 12px;">${ownStatusLabel}</span>
                         </div>
-                        ${confirmButtonHtml}
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #F1F5F9;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                ${userAvatarHtml}
+                                <div>
+                                    <div style="font-size: 1.1rem; font-weight: 800; color: #1E293B;">${this.currentUser.nome}</div>
+                                    <div style="font-size: 0.82rem; color: #64748B; font-weight: 500;">${userDetalheLinha}</div>
+                                </div>
+                            </div>
+                            <div style="border-left: 1px solid #E2E8F0; padding-left: 15px; text-align: left;">
+                                <div style="font-size: 0.72rem; color: #64748B; font-weight: 600;">Área</div>
+                                <div style="font-size: 1rem; font-weight: 800; color: #1E293B;">${areaTitle}</div>
+                                <div style="font-size: 0.7rem; color: #64748B; max-width: 130px; line-height: 1.2; margin-top: 2px;">Serviços de apoio incluídos</div>
+                            </div>
+                        </div>
+
+                        ${mainCardActionsHtml}
                     </div>
 
-                    <div class="panel-card" style="margin-bottom: 12px; text-align: left; padding: 15px;">
-                        <div style="font-size: 0.85rem; font-weight: 700; color: #1E293B; margin-bottom: 10px;">Informações da escala</div>
-                        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.78rem;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E2E8F0; padding-bottom: 8px;">
-                                <span style="color: #64748B; display: flex; align-items: center; gap: 8px;">Local</span>
-                                <span style="color: #1E293B; font-weight: 600;">${staticData.local}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E2E8F0; padding-bottom: 8px;">
-                                <span style="color: #64748B; display: flex; align-items: center; gap: 8px;">Supervisor</span>
-                                <span style="color: #1E293B; font-weight: 600;">${staticData.supervisor}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; ${staticData.traje ? 'border-bottom: 1px solid #E2E8F0; padding-bottom: 8px;' : 'padding-bottom: 2px;'}">
-                                <span style="color: #64748B; display: flex; align-items: center; gap: 8px;">Chegada</span>
-                                <span style="color: #1E293B; font-weight: 600;">${arrivalTime}</span>
-                            </div>
-                            ${trajeHtml}
-                        </div>
-                    </div>
-
-                    <div class="panel-card" style="margin-bottom: 12px; text-align: left; padding: 15px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <span style="font-size: 0.85rem; font-weight: 700; color: #1E293B;">Equipe escalada</span>
+                    <!-- Equipe Escalada -->
+                    <div class="panel-card" style="margin-bottom: 16px; text-align: left; padding: 16px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-size: 0.95rem; font-weight: 800; color: #1E293B;">Equipe escalada</span>
+                            <span style="font-size: 0.75rem; color: #64748B; font-weight: 500;">Outros servos nesta escala</span>
                         </div>
                         <div class="detail-team-list">
                             ${teamListHtml}
@@ -3251,18 +3163,20 @@ const App = {
 
                     ${standbysHtml}
 
-                    <div class="panel-card" style="margin-bottom: 15px; text-align: left; padding: 15px;">
-                        <div style="font-size: 0.85rem; font-weight: 700; color: #1E293B; margin-bottom: 10px;">Checklist da área</div>
-                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <!-- Checklist da Área -->
+                    <div class="panel-card" style="margin-bottom: 16px; text-align: left; padding: 16px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px;">
+                        <div style="font-size: 0.95rem; font-weight: 800; color: #1E293B; margin-bottom: 12px;">Checklist da área</div>
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
                             ${checklistHtml}
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                        <button class="btn-secondary" onclick="App.showAreaInstructions('${nodeId}')" style="flex: 1; height: 44px; border-radius: 8px; border: 1px solid #CBD5E1; background: #F1F5F9; color: #1E293B; font-size: 0.78rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
+                    <!-- Botões de Ação -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 24px;">
+                        <button class="btn-secondary" onclick="App.showAreaInstructions('${nodeId}')" style="flex: 1; height: 46px; border-radius: 8px; border: 1px solid #CBD5E1; background: #F1F5F9; color: #1E293B; font-size: 0.85rem; font-weight: 700; cursor: pointer;">
                             Ver instruções
                         </button>
-                        <button class="btn-secondary" onclick="App.requestAreaHelp('${nodeId}')" style="flex: 1; height: 44px; border-radius: 8px; border: 1px solid #CBD5E1; background: #F1F5F9; color: #1E293B; font-size: 0.78rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
+                        <button class="btn-secondary" onclick="App.requestAreaHelp('${nodeId}')" style="flex: 1; height: 46px; border-radius: 8px; border: none; background: #127369; color: #FFFFFF; font-size: 0.85rem; font-weight: 700; cursor: pointer;">
                             Solicitar ajuda
                         </button>
                     </div>
