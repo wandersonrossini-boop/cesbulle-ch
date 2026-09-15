@@ -2994,16 +2994,28 @@ const App = {
                     `;
                 }
 
-                // Area status calculations
-                let statusTitle = 'Área pronta';
+                // Calculate arrival time dynamically
+                let arrivalTime = staticData.chegada;
+                if (horarioInicio) {
+                    try {
+                        const [h, m] = horarioInicio.split(':').map(Number);
+                        const offsetMinutes = staticData.chegada === '17:45' ? 15 : 30;
+                        const date = new Date();
+                        date.setHours(h);
+                        date.setMinutes(m - offsetMinutes);
+                        const arrivalH = String(date.getHours()).padStart(2, '0');
+                        const arrivalM = String(date.getMinutes()).padStart(2, '0');
+                        arrivalTime = `${arrivalH}:${arrivalM}`;
+                    } catch (err) {}
+                }
+
                 // Filter out current user from team list (Outros servos nesta escala)
                 const teamScalesOther = uniqueScales.filter(e => e.membroId !== this.currentUser.id);
                 let teamListHtml = '';
                 teamScalesOther.forEach(escala => {
-                    let statusClass = 'status-pendente';
-                    let statusLabel = 'PENDENTE';
                     let badgeBg = '#FEF3C7';
                     let badgeColor = '#B45309';
+                    let statusLabel = 'PENDENTE';
                     if (escala.statusPresenca === 'Confirmada') {
                         badgeBg = '#D1FAE5';
                         badgeColor = '#065F46';
@@ -3038,7 +3050,12 @@ const App = {
                 });
 
                 if (teamScalesOther.length === 0) {
-                    teamListHtml = '<div style="font-size: 0.8rem; color: #64748B; padding: 10px 0; text-align: center;">Nenhum outro obreiro escalado nesta área.</div>';
+                    teamListHtml = `
+                        <div style="font-size: 0.82rem; color: #64748B; padding: 16px 0; text-align: center;">
+                            <div style="font-weight: 600; color: #475569;">Nenhum outro obreiro escalado nesta área.</div>
+                            <div style="font-size: 0.75rem; color: #94A3B8; margin-top: 2px;">Você é o único escalado para esta função.</div>
+                        </div>
+                    `;
                 }
 
                 // Checkboxes setup
@@ -3049,7 +3066,7 @@ const App = {
                 staticData.checklist.forEach((item, index) => {
                     const isChecked = savedChecklist[index] === true;
                     checklistHtml += `
-                        <label style="display: flex; align-items: center; gap: 10px; color: #334155; cursor: pointer; user-select: none; margin-bottom: 6px; font-weight: 500;">
+                        <label style="display: flex; align-items: center; gap: 10px; color: #334155; cursor: pointer; user-select: none; margin-bottom: 8px; font-weight: 500;">
                             <input type="checkbox" class="checklist-item-checkbox" data-index="${index}" ${isChecked ? 'checked' : ''} onchange="App.handleChecklistItemChange('${nodeId}', ${index}, this)" style="width: 18px; height: 18px; accent-color: #127369;">
                             <span style="font-size: 0.85rem; text-align: left;">${item}</span>
                         </label>
@@ -3059,13 +3076,13 @@ const App = {
                 // User details block
                 const currentUserInfo = membrosMap[this.currentUser.id] || {};
                 const userPhotoUrl = currentUserInfo.fotoUrl || null;
-                const userAvatarHtml = this.getCardAvatarHtml(this.currentUser.nome, userPhotoUrl, 1);
+                const directPhoto = this.getDirectPhotoUrl(userPhotoUrl);
                 
                 const ownScale = uniqueScales.find(e => e.membroId === this.currentUser.id);
                 let ownStatusLabel = 'CONFIRMADO';
                 let ownBadgeBg = '#D1FAE5';
                 let ownBadgeColor = '#065F46';
-                let userFuncaoText = 'Apoio';
+                let userFuncaoText = 'Apoio no Templo';
                 let userLadoText = '';
 
                 if (ownScale) {
@@ -3074,7 +3091,7 @@ const App = {
                         ownBadgeBg = '#FEF3C7';
                         ownBadgeColor = '#B45309';
                     }
-                    userFuncaoText = ownScale.funcao || 'Apoio';
+                    userFuncaoText = ownScale.funcao || 'Apoio no Templo';
                     if (ownScale.observacoes) {
                         userLadoText = ownScale.observacoes;
                     }
@@ -3085,69 +3102,73 @@ const App = {
                     userDetalheLinha += ` · ${userLadoText}`;
                 }
 
-                // Action buttons inside main card
-                let mainCardActionsHtml = '';
-                if (ownScale) {
-                    if (ownScale.statusPresenca === 'Pendente') {
-                        mainCardActionsHtml = `
-                            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
-                                <button onclick="App.handleConfirmPresencaFromDetail('${ownScale.id}', 'Confirmada')" style="width: 100%; height: 44px; border-radius: 8px; background: #127369; color: #FFFFFF; font-weight: 700; font-size: 0.9rem; border: none; cursor: pointer;">
-                                    Confirmar presença
-                                </button>
-                                <button onclick="App.handleConfirmPresencaFromDetail('${ownScale.id}', 'Recusada')" style="width: 100%; height: 44px; border-radius: 8px; background: #F1F5F9; color: #1E293B; font-weight: 600; font-size: 0.85rem; border: 1px solid #CBD5E1; cursor: pointer;">
-                                    Não poderei comparecer
-                                </button>
-                            </div>
-                        `;
-                    } else {
-                        mainCardActionsHtml = `
-                            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
-                                <button onclick="App.handleConfirmPresencaFromDetail('${ownScale.id}', 'Recusada')" style="width: 100%; height: 44px; border-radius: 8px; background: #F1F5F9; color: #1E293B; font-weight: 600; font-size: 0.85rem; border: 1px solid #CBD5E1; cursor: pointer;">
-                                    Não poderei comparecer
-                                </button>
-                            </div>
-                        `;
-                    }
+                // Photo HTML (large, integrated photo cut out naturally over green background)
+                let heroPhotoHtml = '';
+                if (directPhoto) {
+                    heroPhotoHtml = `<img src="${directPhoto}" alt="${this.currentUser.nome}" style="max-height: 180px; object-fit: cover; object-position: top; border-radius: 12px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));">`;
+                } else {
+                    const initials = this.currentUser.nome.split(' ').filter(n => n.length > 0).map(n => n[0]).slice(0, 2).join('').toUpperCase();
+                    heroPhotoHtml = `<div style="width: 110px; height: 130px; border-radius: 12px; background: #0E5C54; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; font-weight: 800; border: 2px solid rgba(255,255,255,0.2);">${initials}</div>`;
                 }
 
                 detailContainer.innerHTML = `
-                    <header class="detail-header" style="background: #127369; padding: 12px 16px; margin: -16px -16px 16px -16px; display: flex; align-items: center; justify-content: space-between;">
-                        <button onclick="App.closeAreaDetail()" class="btn-icon" style="background: none; border: none; color: #FFFFFF; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                            <i class="fa-solid fa-arrow-left"></i> Voltar
-                        </button>
-                        <span class="detail-header-title" style="font-weight: 700; font-size: 1rem; color: #FFFFFF;">Minha Escala</span>
-                        <div style="text-align: right; color: #FFFFFF; font-size: 0.72rem; line-height: 1.2;">
-                            <div style="font-weight: 700;">CME Lausanne</div>
-                            <div style="opacity: 0.8;">Juntos no serviço de Cristo</div>
-                        </div>
-                    </header>
+                    <!-- Top Hero Background (35-45% height with green gradient) -->
+                    <div style="background: linear-gradient(165deg, #0A433D 0%, #127369 55%, rgba(18, 115, 105, 0.85) 80%, rgba(248, 250, 252, 0) 100%); margin: -16px -16px 0 -16px; padding: 16px 16px 45px 16px; color: #FFFFFF;">
+                        
+                        <header style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                            <button onclick="App.closeAreaDetail()" class="btn-icon" style="background: none; border: none; color: #FFFFFF; font-size: 1rem; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600;">
+                                <i class="fa-solid fa-arrow-left"></i> Voltar
+                            </button>
+                            <div style="text-align: center;">
+                                <span style="font-weight: 800; font-size: 1.15rem; color: #FFFFFF; display: block;">Minha Escala</span>
+                                <span style="font-size: 0.75rem; opacity: 0.9; font-weight: 500;">${areaTitle}</span>
+                            </div>
+                            <div style="text-align: right; color: #FFFFFF; font-size: 0.7rem; line-height: 1.2;">
+                                <div style="font-weight: 700;">CME Lausanne</div>
+                                <div style="opacity: 0.8;">Juntos no serviço de Cristo</div>
+                            </div>
+                        </header>
 
-                    <!-- Main Highlight Card -->
-                    <div class="panel-card" style="margin-bottom: 16px; text-align: left; padding: 16px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px;">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <!-- Hero Member Identity Section -->
+                        <div style="display: flex; align-items: flex-end; gap: 16px; padding-top: 10px;">
+                            <div style="flex-shrink: 0;">
+                                ${heroPhotoHtml}
+                            </div>
+                            <div style="text-align: left; margin-bottom: 8px;">
+                                <h1 style="font-size: 1.8rem; font-weight: 900; color: #FFFFFF; margin: 0; line-height: 1.1; letter-spacing: -0.5px;">${this.currentUser.nome}</h1>
+                                <div style="font-size: 1rem; font-weight: 700; color: #E2E8F0; margin-top: 4px;">${userFuncaoText}</div>
+                                <div style="font-size: 0.82rem; color: #94A3B8; font-weight: 500; margin-top: 2px;">${areaTitle}${userLadoText ? ` · ${userLadoText}` : ''}</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Overlapping Cult Highlight Card -->
+                    <div class="panel-card" style="margin: -25px 0 16px 0; position: relative; z-index: 2; text-align: left; padding: 18px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
                             <div>
-                                <div style="font-size: 0.75rem; font-weight: 700; color: #64748B; text-transform: uppercase;">${dateStr.split('-').reverse().join('/')}</div>
-                                <h2 style="font-size: 1.15rem; font-weight: 800; color: #1E293B; margin: 2px 0 0 0;">${cultoNome}</h2>
+                                <div style="font-size: 0.72rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px;">${dateStr.split('-').reverse().join('/')}</div>
+                                <h2 style="font-size: 1.2rem; font-weight: 900; color: #1E293B; margin: 2px 0 0 0;">${cultoNome}</h2>
                             </div>
-                            <span style="font-size: 0.72rem; font-weight: 700; background: ${ownBadgeBg}; color: ${ownBadgeColor}; padding: 4px 10px; border-radius: 12px;">${ownStatusLabel}</span>
+                            <span style="font-size: 0.72rem; font-weight: 800; background: ${ownBadgeBg}; color: ${ownBadgeColor}; padding: 4px 12px; border-radius: 12px; letter-spacing: 0.5px;">${ownStatusLabel}</span>
                         </div>
 
-                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #F1F5F9;">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                ${userAvatarHtml}
-                                <div>
-                                    <div style="font-size: 1.1rem; font-weight: 800; color: #1E293B;">${this.currentUser.nome}</div>
-                                    <div style="font-size: 0.82rem; color: #64748B; font-weight: 500;">${userDetalheLinha}</div>
-                                </div>
+                        <div style="font-size: 1.05rem; font-weight: 800; color: #1E293B; margin-bottom: 14px;">${horarioInicio} — ${horarioFim}</div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid #F1F5F9; font-size: 0.8rem; color: #64748B;">
+                            <div>
+                                <span style="display: block; font-size: 0.68rem; color: #94A3B8; font-weight: 600;">Local</span>
+                                <span style="font-weight: 700; color: #1E293B;">${staticData.local}</span>
                             </div>
-                            <div style="border-left: 1px solid #E2E8F0; padding-left: 15px; text-align: left;">
-                                <div style="font-size: 0.72rem; color: #64748B; font-weight: 600;">Área</div>
-                                <div style="font-size: 1rem; font-weight: 800; color: #1E293B;">${areaTitle}</div>
-                                <div style="font-size: 0.7rem; color: #64748B; max-width: 130px; line-height: 1.2; margin-top: 2px;">Serviços de apoio incluídos</div>
+                            <div style="border-left: 1px solid #F1F5F9; padding-left: 12px;">
+                                <span style="display: block; font-size: 0.68rem; color: #94A3B8; font-weight: 600;">Supervisor</span>
+                                <span style="font-weight: 700; color: #1E293B;">${staticData.supervisor}</span>
+                            </div>
+                            <div style="border-left: 1px solid #F1F5F9; padding-left: 12px;">
+                                <span style="display: block; font-size: 0.68rem; color: #94A3B8; font-weight: 600;">Chegada</span>
+                                <span style="font-weight: 700; color: #1E293B;">${arrivalTime}</span>
                             </div>
                         </div>
-
-                        ${mainCardActionsHtml}
                     </div>
 
                     <!-- Equipe Escalada -->

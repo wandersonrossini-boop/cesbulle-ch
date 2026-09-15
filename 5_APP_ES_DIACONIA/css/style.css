@@ -4403,7 +4403,7 @@ table.admin-table tr:hover td {
 }
 
 /* ==========================================================================
-   TELA DE DETALHE DA ÁREA (PORTAL DO MEMBRO - CONTRASTE INSTITUCIONAL PLANO)
+   TELA DE DETALHE DA ÁREA (PORTAL DO MEMBRO - VISUAL HERO COM TRANSIÇÃO)
    ========================================================================== */
 #member-sub-area-detail {
     display: none;
@@ -4412,6 +4412,7 @@ table.admin-table tr:hover td {
     animation: fadeIn 0.4s ease;
     background: #F8FAFC !important;
     color: #1E293B !important;
+    position: relative;
 }
 
 #member-sub-area-detail .detail-header {
