@@ -1856,22 +1856,7 @@ const App = {
 
             if (isDiaconiaOrAcolhimento) {
                 await this.renderDiaconiaOrganograma(escalas, container);
-                
-                // Detect next service for highlight
-                escalas.forEach(escala => {
-                    const isOwnScale = escala.membroId === this.currentUser.id;
-                    if (isOwnScale && escala.data >= hojeStr && escala.statusServico !== 'Finalizado' && escala.statusPresenca !== 'Recusada') {
-                        if (!nextService || escala.data < nextService.data) {
-                            nextService = escala;
-                        }
-                    }
-                });
-
-                // Check if calendar view is scheduled to be shown after reload
-                if (this.showCalendarAfterLoading) {
-                    this.showCalendarAfterLoading = false;
-                    this.showMonthlyCalendar();
-                }
+                return;
             } else {
                 container.innerHTML = '';
                 if (escalas.length === 0) {
@@ -2362,31 +2347,86 @@ const App = {
             }
         }
 
-        // Formatar datas e cabeçalho do topo da tela de escalas
-        let heroHeaderHtml = '';
+        // Hide competing default header and extra highlight card to guarantee a single unified header
+        const defaultMemberHeader = document.querySelector('.member-header');
+        if (defaultMemberHeader) defaultMemberHeader.style.display = 'none';
+
+        const highlightContainer = document.getElementById('next-service-highlight');
+        if (highlightContainer) highlightContainer.style.display = 'none';
+
+        // Extract user photo & scale details for top hero header
+        const currentUserInfo = membrosMap[this.currentUser.id] || {};
+        const userPhotoUrl = currentUserInfo.fotoUrl || null;
+        const directPhoto = this.getDirectPhotoUrl(userPhotoUrl);
+
         let userAreaName = 'Templo';
         const userScale = evtActive ? evtActive.escalas.find(e => e.membroId === this.currentUser.id && e.statusPresenca !== 'Recusada') : null;
+        let userFuncaoText = 'Apoio no Templo';
+        let userLadoText = '';
+        let userAtividadeText = '';
+
         if (userScale) {
             if (userScale.setorId === 'recepcao' || userScale.setorId === 'entrada' || userScale.setorId === 'check_in') {
                 userAreaName = 'Recepção';
             } else if (userScale.setorId === 'acolhimento') {
                 userAreaName = 'Acolhimento';
             }
+            userFuncaoText = userScale.funcao || 'Apoio no Templo';
+            const obsLower = (userScale.observacoes || '').toLowerCase();
+            const funcLower = (userScale.funcao || '').toLowerCase();
+
+            if (obsLower.includes('direito') || funcLower.includes('direito') || obsLower.includes('dir')) {
+                userLadoText = 'Lado Direito';
+            } else if (obsLower.includes('esquerdo') || funcLower.includes('esquerdo') || obsLower.includes('esq')) {
+                userLadoText = 'Lado Esquerdo';
+            } else if (userScale.observacoes) {
+                userLadoText = userScale.observacoes;
+            }
+
+            if (funcLower.includes('ronda') || obsLower.includes('ronda')) {
+                userAtividadeText = 'Ronda';
+            }
+        }
+
+        let subLinhaPartes = [];
+        if (userLadoText) subLinhaPartes.push(userLadoText);
+        if (userAtividadeText && !userFuncaoText.toLowerCase().includes('ronda')) subLinhaPartes.push(userAtividadeText);
+        let userDetalheLinha = subLinhaPartes.join(' · ');
+
+        // Member photo HTML
+        let heroPhotoHtml = '';
+        if (directPhoto) {
+            heroPhotoHtml = `<img src="${directPhoto}" alt="${this.currentUser.nome}" style="max-height: 145px; object-fit: cover; object-position: top; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25)); display: block; margin-top: -8px;">`;
+        } else {
+            const initials = this.currentUser.nome.split(' ').filter(n => n.length > 0).map(n => n[0]).slice(0, 2).join('').toUpperCase();
+            heroPhotoHtml = `<div style="width: 85px; height: 105px; border-radius: 8px; background: #0E5C54; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; border: 1px solid rgba(255,255,255,0.2); margin-top: -8px;">${initials}</div>`;
         }
 
         heroHeaderHtml = `
             <div style="background: linear-gradient(165deg, #061713 0%, #0A2B24 45%, rgba(14, 92, 84, 0.75) 75%, rgba(248, 250, 252, 0) 100%); margin: -16px -16px 0 -16px; padding: 14px 16px 36px 16px; color: #FFFFFF; text-align: left;">
-                <header style="display: flex; align-items: flex-start; justify-content: space-between;">
-                    <div>
-                        <div style="font-size: 0.72rem; font-weight: 800; color: #E2E8F0; text-transform: uppercase; letter-spacing: 1px;">MINHA ESCALA</div>
-                        <h1 style="font-size: 1.7rem; font-weight: 900; color: #FFFFFF !important; margin: 2px 0 0 0; line-height: 1.1;">${userAreaName}</h1>
-                        <div style="font-size: 0.82rem; color: #E2E8F0 !important; font-weight: 500; margin-top: 3px;">Servir é uma honra</div>
+                <header style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <button onclick="App.navigateTo('view-setor-select')" class="btn-icon" style="background: none; border: none; color: #FFFFFF !important; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 700;">
+                        <i class="fa-solid fa-chevron-left" style="color: #FFFFFF !important;"></i> <span style="color: #FFFFFF !important;">Voltar</span>
+                    </button>
+                    <div style="text-align: center;">
+                        <span style="font-weight: 800; font-size: 1.05rem; color: #FFFFFF !important; display: block;">Minha Escala</span>
                     </div>
                     <div style="text-align: right; color: #FFFFFF !important; font-size: 0.7rem; line-height: 1.2;">
                         <div style="font-weight: 800; color: #FFFFFF !important; letter-spacing: 0.5px;">CME LAUSANNE</div>
                         <div style="color: #F1F5F9 !important; font-weight: 500;">Juntos no serviço de Cristo</div>
                     </div>
                 </header>
+
+                <div style="display: flex; align-items: flex-end; gap: 14px; padding-top: 0px;">
+                    <div style="flex-shrink: 0;">
+                        ${heroPhotoHtml}
+                    </div>
+                    <div style="text-align: left; margin-bottom: 2px;">
+                        <h1 style="font-size: 1.65rem; font-weight: 900; color: #FFFFFF !important; margin: 0; line-height: 1.1; letter-spacing: -0.5px;">${this.currentUser.nome}</h1>
+                        <div style="font-size: 0.95rem; font-weight: 700; color: #F8FAFC !important; margin-top: 3px;">${userFuncaoText}</div>
+                        ${userDetalheLinha ? `<div style="font-size: 0.82rem; color: #E2E8F0 !important; font-weight: 500; margin-top: 2px;">${userDetalheLinha}</div>` : ''}
+                    </div>
+                </div>
             </div>
         `;
 
@@ -2403,22 +2443,8 @@ const App = {
                 const statusBadgeColor = isPending ? '#B45309' : '#065F46';
                 const statusBadgeText = isPending ? 'PENDENTE' : 'CONFIRMADO';
 
-                let detalheFuncao = userScale.funcao || 'Apoio no Templo';
-                let obsLower = (userScale.observacoes || '').toLowerCase();
-                let funcLower = (userScale.funcao || '').toLowerCase();
-                let ladoText = '';
-                if (obsLower.includes('direito') || funcLower.includes('direito') || obsLower.includes('dir')) {
-                    ladoText = 'Lado Direito';
-                } else if (obsLower.includes('esquerdo') || funcLower.includes('esquerdo') || obsLower.includes('esq')) {
-                    ladoText = 'Lado Esquerdo';
-                }
-                let atividadeText = funcLower.includes('ronda') || obsLower.includes('ronda') ? 'Ronda' : '';
-
-                let linha1 = `${userAreaName} · ${detalheFuncao}`;
-                let linha2Partes = [];
-                if (ladoText) linha2Partes.push(ladoText);
-                if (atividadeText) linha2Partes.push(atividadeText);
-                let linha2 = linha2Partes.join(' · ');
+                let linha1 = `${userAreaName} · ${userFuncaoText}`;
+                let linha2 = userDetalheLinha;
 
                 summaryCardHtml = `
                     <div class="panel-card" style="margin: -24px 0 16px 0; position: relative; z-index: 2; text-align: left; padding: 18px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);">
@@ -3088,7 +3114,7 @@ const App = {
                 if (teamScalesOther.length === 0) {
                     teamListHtml = `
                         <div style="font-size: 0.82rem; color: #64748B; padding: 16px 0; text-align: center;">
-                            <div style="font-weight: 600; color: #475569;">Nenhum outro obreiro escalado nesta área.</div>
+                            <div style="font-weight: 600; color: #475569;">Não há outro obreiro escalado nesta área.</div>
                             <div style="font-size: 0.75rem; color: #94A3B8; margin-top: 2px;">Você é o único escalado para esta função.</div>
                         </div>
                     `;
@@ -3102,9 +3128,9 @@ const App = {
                 staticData.checklist.forEach((item, index) => {
                     const isChecked = savedChecklist[index] === true;
                     checklistHtml += `
-                        <label style="display: flex; align-items: center; gap: 10px; color: #334155; cursor: pointer; user-select: none; margin-bottom: 8px; font-weight: 500;">
-                            <input type="checkbox" class="checklist-item-checkbox" data-index="${index}" ${isChecked ? 'checked' : ''} onchange="App.handleChecklistItemChange('${nodeId}', ${index}, this)" style="width: 18px; height: 18px; accent-color: #127369;">
-                            <span style="font-size: 0.85rem; text-align: left;">${item}</span>
+                        <label style="display: flex; align-items: flex-start; gap: 10px; color: #334155; cursor: pointer; user-select: none; margin-bottom: 6px; font-weight: 500; line-height: 1.25;">
+                            <input type="checkbox" class="checklist-item-checkbox" data-index="${index}" ${isChecked ? 'checked' : ''} onchange="App.handleChecklistItemChange('${nodeId}', ${index}, this)" style="width: 17px; height: 17px; accent-color: #0E5C54; margin-top: 1px; flex-shrink: 0;">
+                            <span style="font-size: 0.83rem; text-align: left;">${item}</span>
                         </label>
                     `;
                 });
@@ -3177,10 +3203,10 @@ const App = {
                 // Photo HTML (large, integrated photo cut out naturally over green background, positioned high near Voltar)
                 let heroPhotoHtml = '';
                 if (directPhoto) {
-                    heroPhotoHtml = `<img src="${directPhoto}" alt="${this.currentUser.nome}" style="max-height: 145px; object-fit: cover; object-position: top; border-radius: 8px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25)); display: block; margin-top: -12px;">`;
+                    heroPhotoHtml = `<img src="${directPhoto}" alt="${this.currentUser.nome}" style="max-height: 155px; object-fit: cover; object-position: top; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3)); display: block; margin-top: -14px;">`;
                 } else {
                     const initials = this.currentUser.nome.split(' ').filter(n => n.length > 0).map(n => n[0]).slice(0, 2).join('').toUpperCase();
-                    heroPhotoHtml = `<div style="width: 85px; height: 105px; border-radius: 8px; background: #0E5C54; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; border: 1px solid rgba(255,255,255,0.2); margin-top: -12px;">${initials}</div>`;
+                    heroPhotoHtml = `<div style="width: 90px; height: 115px; border-radius: 8px; background: #0E5C54; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 1.9rem; font-weight: 800; border: 1px solid rgba(255,255,255,0.2); margin-top: -14px;">${initials}</div>`;
                 }
 
                 detailContainer.innerHTML = `
@@ -3257,9 +3283,9 @@ const App = {
                     ${standbysHtml}
 
                     <!-- Checklist da Área -->
-                    <div class="panel-card" style="margin-bottom: 16px; text-align: left; padding: 16px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px;">
-                        <div style="font-size: 0.95rem; font-weight: 800; color: #1E293B; margin-bottom: 12px;">Checklist da área</div>
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div class="panel-card" style="margin-bottom: 14px; text-align: left; padding: 14px 16px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px;">
+                        <div style="font-size: 0.92rem; font-weight: 800; color: #1E293B; margin-bottom: 8px;">Checklist da área</div>
+                        <div style="display: flex; flex-direction: column; gap: 2px;">
                             ${checklistHtml}
                         </div>
                     </div>
