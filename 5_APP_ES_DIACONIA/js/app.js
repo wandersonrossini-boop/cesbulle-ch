@@ -4651,7 +4651,9 @@ const App = {
 
             // 3. Scale Summary Stats & Progress Bar
             const summaryContainer = document.getElementById('admin-dashboard-scales-summary');
-            summaryContainer.innerHTML = '';
+            if (summaryContainer) {
+                summaryContainer.innerHTML = '';
+            }
             
             const escalasLiturgicas = escalas.filter(e => !this.isOperationalSector(e.setorId));
             const totalScales = escalasLiturgicas.length;
@@ -4677,30 +4679,34 @@ const App = {
             if (pctConfirmedEl) pctConfirmedEl.innerText = `${pctConfirmed}%`;
             if (pctPendingEl) pctPendingEl.innerText = `${pctPending}%`;
 
-            summaryContainer.innerHTML = `
-                <div class="report-row"><span>Total Planejado:</span> <b>${totalScales}</b></div>
-                <div class="report-row"><span>Presenças Confirmadas:</span> <b style="color: #10B981;">${confirmed}</b></div>
-                <div class="report-row"><span>Presenças Pendentes:</span> <b style="color: #F59E0B;">${pending}</b></div>
-                ${other > 0 ? `<div class="report-row"><span>Presenças Recusadas / Substituir:</span> <b style="color: #EF4444;">${other}</b></div>` : ''}
-                <div class="report-row" title="Obreiros que já concluíram o atendimento no check-out"><span>Serviços Finalizados (Check-outs):</span> <b style="color: var(--teal-primary);">${finished}</b></div>
-            `;
+            if (summaryContainer) {
+                summaryContainer.innerHTML = `
+                    <div class="report-row"><span>Total Planejado:</span> <b>${totalScales}</b></div>
+                    <div class="report-row"><span>Presenças Confirmadas:</span> <b style="color: #10B981;">${confirmed}</b></div>
+                    <div class="report-row"><span>Presenças Pendentes:</span> <b style="color: #F59E0B;">${pending}</b></div>
+                    ${other > 0 ? `<div class="report-row"><span>Presenças Recusadas / Substituir:</span> <b style="color: #EF4444;">${other}</b></div>` : ''}
+                    <div class="report-row" title="Obreiros que já concluíram o atendimento no check-out"><span>Serviços Finalizados (Check-outs):</span> <b style="color: var(--teal-primary);">${finished}</b></div>
+                `;
+            }
 
             // 4. Pending Replenishments summary
             const reposicoes = await DbService.getReposicoes();
             const pendingReps = reposicoes.filter(r => r.status === 'Pendente');
             const repContainer = document.getElementById('admin-dashboard-reposicoes');
 
-            if (pendingReps.length === 0) {
-                repContainer.innerHTML = `<div style="color:#059669; font-weight:600;"><i class="fa-solid fa-circle-check"></i> Tudo abastecido. Sem solicitações.</div>`;
-            } else {
-                repContainer.innerHTML = `
-                    <div style="color: #DC2626; font-weight:700; font-size:1.1rem; margin-bottom:5px;">
-                        ${pendingReps.length} Solicitações Pendentes
-                    </div>
-                    <button class="btn-primary" style="padding: 6px 12px; font-size: 0.8rem; width: auto; margin: 0 auto;" onclick="App.navigateToTabFromDashboard('reposicoes')">
-                        Ver e Atender
-                    </button>
-                `;
+            if (repContainer) {
+                if (pendingReps.length === 0) {
+                    repContainer.innerHTML = `<div style="color:#059669; font-weight:600;"><i class="fa-solid fa-circle-check"></i> Tudo abastecido. Sem solicitações.</div>`;
+                } else {
+                    repContainer.innerHTML = `
+                        <div style="color: #DC2626; font-weight:700; font-size:1.1rem; margin-bottom:5px;">
+                            ${pendingReps.length} Solicitações Pendentes
+                        </div>
+                        <button class="btn-primary" style="padding: 6px 12px; font-size: 0.8rem; width: auto; margin: 0 auto;" onclick="App.navigateToTabFromDashboard('reposicoes')">
+                            Ver e Atender
+                        </button>
+                    `;
+                }
             }
 
             // 6. Calculate absence alerts for dashboard
