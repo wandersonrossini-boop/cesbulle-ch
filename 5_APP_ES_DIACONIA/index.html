@@ -454,37 +454,45 @@
                     <div class="admin-sidebar-menu">
                         <div class="admin-nav-group-label" style="font-size: 0.65rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px 4px 12px;">Principal</div>
                         <a class="admin-menu-item active" onclick="App.switchAdminTab('dashboard', this)">
+                            <i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>
                             <span>Painel Geral</span>
                         </a>
 
                         <div class="admin-nav-group-label" style="font-size: 0.65rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 12px 4px 12px;">Operação & Escalas</div>
                         <a class="admin-menu-item" onclick="App.switchAdminTab('escalas', this)">
+                            <i class="fa-solid fa-calendar-days" style="margin-right: 10px; width: 16px; text-align: center;"></i>
                             <span>Escalas</span>
                         </a>
 
                         <div class="admin-nav-group-label" style="font-size: 0.65rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 12px 4px 12px;">Equipe & Ações</div>
                         <a class="admin-menu-item" onclick="App.switchAdminTab('membros', this)">
+                            <i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>
                             <span>Membros</span>
                         </a>
                         <a class="admin-menu-item" onclick="App.switchAdminTab('central', this)">
+                            <i class="fa-solid fa-clipboard-check" style="margin-right: 10px; width: 16px; text-align: center;"></i>
                             <span>Central Administrativa</span>
                         </a>
 
                         <div class="admin-nav-group-label" style="font-size: 0.65rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 12px 4px 12px;">Comunicação</div>
                         <a class="admin-menu-item" onclick="App.switchAdminTab('avisos', this)">
+                            <i class="fa-solid fa-bullhorn" style="margin-right: 10px; width: 16px; text-align: center;"></i>
                             <span>Informativos</span>
                         </a>
 
                         <div class="admin-nav-group-label" style="font-size: 0.65rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 12px 4px 12px;">Gestão Operacional</div>
                         <a class="admin-menu-item" onclick="App.switchAdminTab('reposicoes', this)">
+                            <i class="fa-solid fa-boxes-packing" style="margin-right: 10px; width: 16px; text-align: center;"></i>
                             <span>Reposição</span>
                         </a>
                         <a class="admin-menu-item" onclick="App.switchAdminTab('relatorios', this)">
+                            <i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>
                             <span>Relatórios</span>
                         </a>
                         
                         <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 15px;">
                             <a class="admin-menu-item" onclick="App.navigateTo('view-setor-select')" style="color: #0284c7 !important;">
+                                <i class="fa-solid fa-right-left" style="margin-right: 10px; width: 16px; text-align: center;"></i>
                                 <span>Mudar para Membro</span>
                             </a>
                         </div>
@@ -556,8 +564,23 @@
                                         <div class="panel-header" style="border-bottom: 1px solid #F1F5F9; padding-bottom: 8px; margin-bottom: 12px;">
                                             <div class="panel-title" style="font-size: 0.95rem; font-weight: 700; color: #0D5C5A;">Status do Diaconato</div>
                                         </div>
-                                        <h4 id="hero-central-status-title" style="font-size: 1.05rem; font-weight: 700; color: #1E293B; margin: 0 0 4px 0;">Central Administrativa</h4>
-                                        <p id="hero-central-status-desc" style="font-size: 0.82rem; color: #64748B; margin: 0;">Carregando ações...</p>
+                                        <h4 style="font-size: 1.05rem; font-weight: 700; color: #1E293B; margin: 0 0 2px 0;">Central Administrativa</h4>
+                                        <p id="hero-central-status-desc" style="font-size: 0.8rem; color: #64748B; margin: 0 0 12px 0;">3 ações pendentes</p>
+
+                                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                                            <div onclick="App.switchAdminTab('central')" style="display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; padding: 8px 10px; border-radius: 6px; border: 1px solid #F1F5F9; cursor: pointer;">
+                                                <span style="font-size: 0.82rem; color: #334155;"><strong id="dash-card-faltas-count" style="color: #DC2626; margin-right: 6px;">2</strong> faltas não justificadas</span>
+                                                <i class="fa-solid fa-chevron-right" style="font-size: 0.75rem; color: #94A3B8;"></i>
+                                            </div>
+                                            <div onclick="App.switchAdminTab('central')" style="display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; padding: 8px 10px; border-radius: 6px; border: 1px solid #F1F5F9; cursor: pointer;">
+                                                <span style="font-size: 0.82rem; color: #334155;"><strong id="dash-card-pedidos-count" style="color: #D97706; margin-right: 6px;">1</strong> pedido de alteração</span>
+                                                <i class="fa-solid fa-chevron-right" style="font-size: 0.75rem; color: #94A3B8;"></i>
+                                            </div>
+                                            <div onclick="App.switchAdminTab('central')" style="display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; padding: 8px 10px; border-radius: 6px; border: 1px solid #F1F5F9; cursor: pointer;">
+                                                <span style="font-size: 0.82rem; color: #334155;"><strong id="dash-card-mensagens-count" style="color: #64748B; margin-right: 6px;">0</strong> novas mensagens</span>
+                                                <i class="fa-solid fa-chevron-right" style="font-size: 0.75rem; color: #94A3B8;"></i>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div style="margin-top: 15px;">
                                         <button onclick="App.switchAdminTab('central')" style="width: 100%; padding: 8px 12px; background: #0D5C5A; color: #FFFFFF; border: none; border-radius: 6px; font-weight: 600; font-size: 0.8rem; cursor: pointer;">
@@ -614,6 +637,16 @@
                                     </div>
                                 </div>
 
+                            </div>
+
+                            <!-- Rodapé Institucional do Painel Geral -->
+                            <div class="admin-dashboard-footer" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center; color: #64748B; font-size: 0.8rem; flex-wrap: wrap; gap: 10px;">
+                                <div>
+                                    <strong style="color: #0D5C5A;">Diaconato CME Lausanne</strong> — Servindo com organização, comunhão e propósito.
+                                </div>
+                                <div style="font-style: italic; color: #94A3B8;">
+                                    Para a glória de Deus.
+                                </div>
                             </div>
                         </div>
 

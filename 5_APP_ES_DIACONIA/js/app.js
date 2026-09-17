@@ -4627,7 +4627,14 @@ const App = {
             document.getElementById('active-services-count').innerText = `${activeServices.length} ativos`;
 
             if (activeServices.length === 0) {
-                serviceContainer.innerHTML = `<div style="text-align: center; color: #64748B; padding: 20px; font-size:0.85rem;">Nenhum serviço em andamento no momento.</div>`;
+                serviceContainer.innerHTML = `
+                    <div style="text-align: center; padding: 15px 10px;">
+                        <div style="font-size: 2.2rem; font-weight: 800; color: #0D5C5A; line-height: 1;">0</div>
+                        <div style="font-size: 0.72rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px; margin-bottom: 20px;">ATIVOS</div>
+                        <div style="border-top: 1px solid #F1F5F9; padding-top: 15px; font-size: 0.82rem; color: #64748B; max-width: 200px; margin: 0 auto; line-height: 1.4;">
+                            Não há serviços em andamento no momento.
+                        </div>
+                    </div>`;
             } else {
                 serviceContainer.innerHTML = '';
                 activeServices.forEach(s => {
@@ -4685,7 +4692,7 @@ const App = {
                     <div class="report-row"><span>Presenças Confirmadas:</span> <b style="color: #10B981;">${confirmed}</b></div>
                     <div class="report-row"><span>Presenças Pendentes:</span> <b style="color: #F59E0B;">${pending}</b></div>
                     ${other > 0 ? `<div class="report-row"><span>Presenças Recusadas / Substituir:</span> <b style="color: #EF4444;">${other}</b></div>` : ''}
-                    <div class="report-row" title="Obreiros que já concluíram o atendimento no check-out"><span>Serviços Finalizados (Check-outs):</span> <b style="color: var(--teal-primary);">${finished}</b></div>
+                    <div class="report-row" title="Obreiros que já concluíram o atendimento no check-out"><span>Serviços Finalizados:</span> <b style="color: var(--teal-primary);">${finished}</b></div>
                 `;
             }
 
@@ -4714,39 +4721,53 @@ const App = {
             if (adminDashboardAfastamentosAlertas) {
                 const feriasCount = membros.filter(m => m.statusOperacional === 'Férias').length;
                 const outrosAfastadosCount = membros.filter(m => m.statusOperacional && m.statusOperacional !== 'Disponível' && m.statusOperacional !== 'Férias').length;
-                
-                let retornandoEm5Dias = 0;
-                const hoje = new Date();
-                hoje.setHours(0,0,0,0);
-                const limiteFim = new Date(hoje);
-                limiteFim.setDate(limiteFim.getDate() + 5);
+                const totalAfastados = feriasCount + outrosAfastadosCount;
 
-                membros.forEach(m => {
-                    if (m.afastamentoDataFim) {
-                        const dfim = new Date(m.afastamentoDataFim);
-                        if (dfim >= hoje && dfim <= limiteFim) {
-                            retornandoEm5Dias++;
+                if (totalAfastados === 0) {
+                    adminDashboardAfastamentosAlertas.innerHTML = `
+                        <div style="text-align: center; padding: 15px 10px;">
+                            <div style="font-size: 2.2rem; font-weight: 800; color: #0D5C5A; line-height: 1;">0</div>
+                            <div style="font-size: 0.72rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px; margin-bottom: 20px;">AFASTAMENTOS</div>
+                            <div style="border-top: 1px solid #F1F5F9; padding-top: 15px; font-size: 0.82rem; color: #64748B; max-width: 220px; margin: 0 auto; line-height: 1.4;">
+                                <div>Nenhum afastamento registrado.</div>
+                                <div style="font-size: 0.78rem; color: #94A3B8; margin-top: 3px;">Todos os membros estão disponíveis para servir.</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    let retornandoEm5Dias = 0;
+                    const hoje = new Date();
+                    hoje.setHours(0,0,0,0);
+                    const limiteFim = new Date(hoje);
+                    limiteFim.setDate(limiteFim.getDate() + 5);
+
+                    membros.forEach(m => {
+                        if (m.afastamentoDataFim) {
+                            const dfim = new Date(m.afastamentoDataFim);
+                            if (dfim >= hoje && dfim <= limiteFim) {
+                                retornandoEm5Dias++;
+                            }
                         }
-                    }
-                });
+                    });
 
-                let alertasHTML = '<div style="display:flex; flex-direction:column; gap:6px; font-size:0.85rem;">';
-                alertasHTML += `
-                    <div style="display:flex; justify-shadow:space-between; align-items:center; background:#F8FAFC; padding:8px 12px; border-radius:6px; border:1px solid #E2E8F0;">
-                        <span><i class="fa-solid fa-umbrella-beach" style="color: #3B82F6;"></i> Em Férias:</span>
-                        <span class="badge" style="background: rgba(59, 130, 246, 0.1); color: #3B82F6; font-weight: 700; border-radius: 6px; padding: 2px 8px;">${feriasCount}</span>
-                    </div>
-                    <div style="display:flex; justify-shadow:space-between; align-items:center; background:#F8FAFC; padding:8px 12px; border-radius:6px; border:1px solid #E2E8F0;">
-                        <span><i class="fa-solid fa-user-slash" style="color: #EF4444;"></i> Outros Afastamentos:</span>
-                        <span class="badge" style="background: rgba(239, 68, 68, 0.1); color: #EF4444; font-weight: 700; border-radius: 6px; padding: 2px 8px;">${outrosAfastadosCount}</span>
-                    </div>
-                    <div style="display:flex; justify-shadow:space-between; align-items:center; background:#F8FAFC; padding:8px 12px; border-radius:6px; border:1px solid #E2E8F0;">
-                        <span><i class="fa-solid fa-clock-rotate-left" style="color: #6366F1;"></i> Retornando em até 5 dias:</span>
-                        <span class="badge" style="background: rgba(99, 102, 241, 0.1); color: #6366F1; font-weight: 700; border-radius: 6px; padding: 2px 8px;">${retornandoEm5Dias}</span>
-                    </div>
-                `;
-                alertasHTML += '</div>';
-                adminDashboardAfastamentosAlertas.innerHTML = alertasHTML;
+                    let alertasHTML = '<div style="display:flex; flex-direction:column; gap:6px; font-size:0.85rem;">';
+                    alertasHTML += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:#F8FAFC; padding:8px 12px; border-radius:6px; border:1px solid #E2E8F0;">
+                            <span><i class="fa-solid fa-umbrella-beach" style="color: #3B82F6;"></i> Em Férias:</span>
+                            <span class="badge" style="background: rgba(59, 130, 246, 0.1); color: #3B82F6; font-weight: 700; border-radius: 6px; padding: 2px 8px;">${feriasCount}</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:#F8FAFC; padding:8px 12px; border-radius:6px; border:1px solid #E2E8F0;">
+                            <span><i class="fa-solid fa-user-slash" style="color: #EF4444;"></i> Outros Afastamentos:</span>
+                            <span class="badge" style="background: rgba(239, 68, 68, 0.1); color: #EF4444; font-weight: 700; border-radius: 6px; padding: 2px 8px;">${outrosAfastadosCount}</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:#F8FAFC; padding:8px 12px; border-radius:6px; border:1px solid #E2E8F0;">
+                            <span><i class="fa-solid fa-clock-rotate-left" style="color: #6366F1;"></i> Retornando em até 5 dias:</span>
+                            <span class="badge" style="background: rgba(99, 102, 241, 0.1); color: #6366F1; font-weight: 700; border-radius: 6px; padding: 2px 8px;">${retornandoEm5Dias}</span>
+                        </div>
+                    `;
+                    alertasHTML += '</div>';
+                    adminDashboardAfastamentosAlertas.innerHTML = alertasHTML;
+                }
             }
 
             // 5. Operational Pendencies panel rendering (Decoupled)
@@ -5695,11 +5716,11 @@ const App = {
 
                 const funcao = m.funcao || '-';
 
-                // Textual semantic actions (Editar | Afastamento | Inativar / Reativar)
+                // Pill Action buttons matching exact mockup (Editar, Escalas, Excluir/Inativar)
                 const isAtivo = m.status === 'ativo';
-                const archiveBtn = isAtivo
-                    ? `<button class="btn-text-action action-inativar" onclick="App.handleArchiveMembro('${m.id}', '${m.nome.replace(/'/g, "\\'")}')" title="Inativar membro">Inativar</button>`
-                    : `<button class="btn-text-action action-reativar" onclick="App.handleRestoreMembro('${m.id}', '${m.nome.replace(/'/g, "\\'")}')" title="Reativar membro">Reativar</button>`;
+                const deleteBtn = isAtivo
+                    ? `<button onclick="App.handleArchiveMembro('${m.id}', '${m.nome.replace(/'/g, "\\'")}')" style="padding: 4px 12px; background: #FFFFFF; color: #DC2626; border: 1px solid #FCA5A5; border-radius: 6px; font-weight: 600; font-size: 0.78rem; cursor: pointer; transition: all 0.2s;">Excluir</button>`
+                    : `<button onclick="App.handleRestoreMembro('${m.id}', '${m.nome.replace(/'/g, "\\'")}')" style="padding: 4px 12px; background: #FFFFFF; color: #16A34A; border: 1px solid #86EFAC; border-radius: 6px; font-weight: 600; font-size: 0.78rem; cursor: pointer; transition: all 0.2s;">Reativar</button>`;
 
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -5708,12 +5729,10 @@ const App = {
                     <td>${setorNome}</td>
                     <td>${statusBadge}</td>
                     <td style="text-align: right;">
-                        <div class="action-buttons-text" style="display: flex; gap: 8px; justify-content: flex-end; align-items: center; font-size: 0.8rem; font-weight: 600;">
-                            <button class="btn-text-action action-editar" onclick="App.handleEditMembro('${m.id}')" title="Editar membro">Editar</button>
-                            <span style="color: #CBD5E1;">|</span>
-                            <button class="btn-text-action action-afastamento" onclick="App.openAfastamentoRapidoModal('${m.id}', '${m.nome.replace(/'/g, "\\'")}')" title="Registrar afastamento">Afastamento</button>
-                            <span style="color: #CBD5E1;">|</span>
-                            ${archiveBtn}
+                        <div class="action-buttons-pills" style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
+                            <button onclick="App.handleEditMembro('${m.id}')" style="padding: 4px 12px; background: #FFFFFF; color: #334155; border: 1px solid #CBD5E1; border-radius: 6px; font-weight: 600; font-size: 0.78rem; cursor: pointer; transition: all 0.2s;">Editar</button>
+                            <button onclick="App.openAfastamentoRapidoModal('${m.id}', '${m.nome.replace(/'/g, "\\'")}')" style="padding: 4px 12px; background: #FFFFFF; color: #334155; border: 1px solid #CBD5E1; border-radius: 6px; font-weight: 600; font-size: 0.78rem; cursor: pointer; transition: all 0.2s;">Escalas</button>
+                            ${deleteBtn}
                         </div>
                     </td>
                 `;
