@@ -1835,27 +1835,75 @@ body {
 
 table.admin-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     text-align: left;
     font-size: 0.9rem;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 table.admin-table th {
-    background: #F8FAFC;
-    color: var(--slate-gray);
-    font-weight: 600;
+    background: #0D5C5A;
+    color: #FFFFFF;
+    font-weight: 700;
     padding: 12px 16px;
-    border-bottom: 1px solid #E2E8F0;
+    border-bottom: 2px solid #0A4D4B;
+    letter-spacing: 0.3px;
 }
 
 table.admin-table td {
     padding: 14px 16px;
     border-bottom: 1px solid #E2E8F0;
-    color: var(--navy-dark);
+    color: #1E293B;
 }
 
 table.admin-table tr:hover td {
     background: #F8FAFC;
+}
+
+.btn-text-action {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+}
+
+.btn-text-action.action-editar {
+    color: #0D5C5A;
+}
+.btn-text-action.action-editar:hover {
+    color: #0A4D4B;
+    background: rgba(13, 92, 90, 0.08);
+}
+
+.btn-text-action.action-afastamento {
+    color: #D97706;
+}
+.btn-text-action.action-afastamento:hover {
+    color: #B45309;
+    background: rgba(217, 119, 6, 0.08);
+}
+
+.btn-text-action.action-inativar {
+    color: #DC2626;
+}
+.btn-text-action.action-inativar:hover {
+    color: #991B1B;
+    background: rgba(220, 38, 38, 0.08);
+}
+
+.btn-text-action.action-reativar {
+    color: #16A34A;
+}
+.btn-text-action.action-reativar:hover {
+    color: #15803D;
+    background: rgba(22, 163, 74, 0.08);
 }
 
 /* Badges */

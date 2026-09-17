@@ -664,21 +664,21 @@
                         
                         <!-- TAB: Membros -->
                         <div id="admin-sub-membros" class="admin-tabview" style="display: none;">
-                            <div class="panel-card">
-                                <div class="panel-header" style="flex-wrap: wrap; gap: 15px;">
-                                    <div class="panel-title"><i class="fa-solid fa-users-gear" style="margin-right: 5px;"></i> Gerenciamento de Membros</div>
-                                    <button class="btn-primary" style="width: auto; padding: 10px 20px;" onclick="App.openMembroFormModal()">
-                                        <i class="fa-solid fa-plus"></i> Novo Membro
+                            <div class="panel-card" style="border: 1px solid #CBD5E1; border-radius: 10px;">
+                                <div class="panel-header" style="flex-wrap: wrap; gap: 15px; border-bottom: 1px solid #F1F5F9; padding-bottom: 12px; margin-bottom: 15px;">
+                                    <div class="panel-title" style="font-size: 1.25rem; font-weight: 700; color: #1E293B;">Gerenciamento de Membros</div>
+                                    <button class="btn-primary" style="width: auto; padding: 8px 18px; font-size: 0.85rem; background: #0D5C5A; border-radius: 6px;" onclick="App.openMembroFormModal()">
+                                        + Novo Membro
                                     </button>
                                 </div>
                                 
                                 <!-- Filters + Search -->
                                 <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;">
-                                    <div style="position: relative; flex: 1; min-width: 200px;">
+                                    <div style="position: relative; flex: 1; min-width: 240px;">
                                         <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94A3B8; font-size: 0.85rem;"></i>
-                                        <input type="text" id="member-search-input" placeholder="Pesquisar por nome ou função..." oninput="App.renderMembrosTable()" style="width: 100%; padding: 9px 12px 9px 36px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.9rem; color: var(--navy-dark); background: #F8FAFC; box-sizing: border-box;">
+                                        <input type="text" id="member-search-input" placeholder="Pesquisar por nome, função ou setor..." oninput="App.renderMembrosTable()" style="width: 100%; padding: 9px 12px 9px 36px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.88rem; color: #1E293B; background: #FFFFFF; box-sizing: border-box;">
                                     </div>
-                                    <select id="member-filter-sector" class="select-clean" style="padding: 9px 32px 9px 12px;" onchange="App.renderMembrosTable()">
+                                    <select id="member-filter-sector" class="select-clean" style="padding: 9px 32px 9px 12px; font-size: 0.88rem; border-color: #CBD5E1;" onchange="App.renderMembrosTable()">
                                         <option value="">Todos os Setores</option>
                                         <option value="entrada">Portaria</option>
                                         <option value="check_in">Check-in</option>
@@ -686,7 +686,7 @@
                                         <option value="apoio_templo_ronda_esq">Apoio Templo / Ronda Esq.</option>
                                         <option value="acolhimento">Acolhimento</option>
                                     </select>
-                                    <select id="member-filter-status" class="select-clean" style="padding: 9px 32px 9px 12px;" onchange="App.renderMembrosTable()">
+                                    <select id="member-filter-status" class="select-clean" style="padding: 9px 32px 9px 12px; font-size: 0.88rem; border-color: #CBD5E1;" onchange="App.renderMembrosTable()">
                                         <option value="">Todos os Status</option>
                                         <option value="ativo">Ativo</option>
                                         <option value="inativo">Inativo</option>

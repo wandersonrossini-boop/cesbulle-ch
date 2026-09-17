@@ -5644,11 +5644,18 @@ const App = {
                 membros = membros.filter(m => m.status === filterStatus);
             }
             if (searchQuery) {
-                membros = membros.filter(m => m.nome?.toLowerCase().includes(searchQuery) || m.funcao?.toLowerCase().includes(searchQuery));
+                membros = membros.filter(m => {
+                    const nomeMatch = m.nome?.toLowerCase().includes(searchQuery);
+                    const funcaoMatch = m.funcao?.toLowerCase().includes(searchQuery);
+                    const mSetores = m.setores || (m.setor ? [m.setor] : []);
+                    const setorNames = mSetores.map(sId => (this.sectorsData[sId]?.nome || sId).toLowerCase());
+                    const setorMatch = setorNames.some(sName => sName.includes(searchQuery));
+                    return nomeMatch || funcaoMatch || setorMatch;
+                });
             }
 
             if (membros.length === 0) {
-                body.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--slate-gray); padding:30px;">Nenhum membro encontrado com esses filtros.</td></tr>';
+                body.innerHTML = '<tr><td colspan="5" style="text-align:center; color: #64748B; padding:30px;">Nenhum membro encontrado com esses filtros.</td></tr>';
                 return;
             }
 
@@ -5682,11 +5689,11 @@ const App = {
 
                 const funcao = m.funcao || '-';
 
-                // Archive/deactivate instead of delete
+                // Textual semantic actions (Editar | Afastamento | Inativar / Reativar)
                 const isAtivo = m.status === 'ativo';
                 const archiveBtn = isAtivo
-                    ? `<button class="btn-table-action" onclick="App.handleArchiveMembro('${m.id}', '${m.nome.replace(/'/g, "\\'")}')" title="Inativar membro" style="color:#F59E0B;"><i class="fa-solid fa-box-archive"></i></button>`
-                    : `<button class="btn-table-action" onclick="App.handleRestoreMembro('${m.id}', '${m.nome.replace(/'/g, "\\'")}')" title="Reativar membro" style="color:#10B981;"><i class="fa-solid fa-rotate-left"></i></button>`;
+                    ? `<button class="btn-text-action action-inativar" onclick="App.handleArchiveMembro('${m.id}', '${m.nome.replace(/'/g, "\\'")}')" title="Inativar membro">Inativar</button>`
+                    : `<button class="btn-text-action action-reativar" onclick="App.handleRestoreMembro('${m.id}', '${m.nome.replace(/'/g, "\\'")}')" title="Reativar membro">Reativar</button>`;
 
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -5694,15 +5701,18 @@ const App = {
                     <td>${funcao}</td>
                     <td>${setorNome}</td>
                     <td>${statusBadge}</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-table-action" onclick="App.handleEditMembro('${m.id}')" title="Editar membro"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn-table-action" onclick="App.openAfastamentoRapidoModal('${m.id}', '${m.nome.replace(/'/g, "\\'")}')" title="Registrar afastamento" style="color:#F59E0B;"><i class="fa-solid fa-person-walking-luggage"></i></button>
+                    <td style="text-align: right;">
+                        <div class="action-buttons-text" style="display: flex; gap: 8px; justify-content: flex-end; align-items: center; font-size: 0.8rem; font-weight: 600;">
+                            <button class="btn-text-action action-editar" onclick="App.handleEditMembro('${m.id}')" title="Editar membro">Editar</button>
+                            <span style="color: #CBD5E1;">|</span>
+                            <button class="btn-text-action action-afastamento" onclick="App.openAfastamentoRapidoModal('${m.id}', '${m.nome.replace(/'/g, "\\'")}')" title="Registrar afastamento">Afastamento</button>
+                            <span style="color: #CBD5E1;">|</span>
                             ${archiveBtn}
                         </div>
                     </td>
                 `;
                 body.appendChild(row);
+            });
             });
         } catch (e) {
             body.innerHTML = '<tr><td colspan="6" style="color:red; text-align:center;">Erro ao carregar membros.</td></tr>';
