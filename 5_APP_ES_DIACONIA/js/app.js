@@ -3619,7 +3619,7 @@ const App = {
                         const parts = c.horarioInicio.split(':');
                         const h = parseInt(parts[0], 10);
                         const m = parseInt(parts[1], 10);
-                        return m === 0 ? `${h}H` : `${h}H${String(m).padStart(2, '0')}`;
+                        return m === 0 ? `${h}h${m > 0 ? String(m).padStart(2, '0') : ''}` : `${h}h${String(m).padStart(2, '0')}`;
                     })();
                     
                     let clickHandler = '';
@@ -3630,15 +3630,29 @@ const App = {
                         clickHandler = `onclick="event.stopPropagation(); App.selectMemberOrganogramEvent('${eventKey}')"`;
                     }
                     
+                    let pillClass = 'calendar-event-pill';
+                    const nameLower = (c.nome || '').toLowerCase();
+                    if (nameLower.includes('ceia') || nameLower.includes('primícias') || nameLower.includes('famílias') || nameLower.includes('especial')) {
+                        pillClass += ' event-pill-ceia';
+                    } else if (nameLower.includes('alicerce') || nameLower.includes('atualiza')) {
+                        pillClass += ' event-pill-alicerce';
+                    } else if (nameLower.includes('intercessão') || nameLower.includes('ministério') || nameLower.includes('reunião')) {
+                        pillClass += ' event-pill-intercessao';
+                    } else if (nameLower.includes('conectadas')) {
+                        pillClass += ' event-pill-conectadas';
+                    } else if (nameLower.includes('flamme')) {
+                        pillClass += ' event-pill-flamme';
+                    }
+
                     // Add active style if selected
                     let activeStyle = '';
                     if (isAdminMode && c.id === this.adminSelectedCultoId) {
-                        activeStyle = 'box-shadow: 0 0 0 2px var(--teal-primary) !important; font-weight: 800;';
+                        activeStyle = 'box-shadow: 0 0 0 2px #0D5C5A !important; font-weight: 700;';
                     }
                     
                     cultosHtml += `
-                        <div class="calendar-event-pill" ${clickHandler} style="${activeStyle}" title="${c.nome} - ${c.horarioInicio}">
-                            ${formattedHour}: ${c.nome}
+                        <div class="${pillClass}" ${clickHandler} style="${activeStyle}" title="${c.nome} - ${c.horarioInicio}">
+                            <b>${formattedHour}</b> ${c.nome}
                         </div>
                     `;
                 });

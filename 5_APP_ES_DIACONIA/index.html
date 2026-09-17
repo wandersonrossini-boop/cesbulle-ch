@@ -454,45 +454,37 @@
                     <div class="admin-sidebar-menu">
                         <div class="admin-nav-group-label" style="font-size: 0.65rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px 4px 12px;">Principal</div>
                         <a class="admin-menu-item active" onclick="App.switchAdminTab('dashboard', this)">
-                            <i class="fa-solid fa-chart-line"></i>
                             <span>Painel Geral</span>
                         </a>
 
                         <div class="admin-nav-group-label" style="font-size: 0.65rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 12px 4px 12px;">Operação & Escalas</div>
                         <a class="admin-menu-item" onclick="App.switchAdminTab('escalas', this)">
-                            <i class="fa-solid fa-calendar-days"></i>
                             <span>Escalas</span>
                         </a>
 
                         <div class="admin-nav-group-label" style="font-size: 0.65rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 12px 4px 12px;">Equipe & Ações</div>
                         <a class="admin-menu-item" onclick="App.switchAdminTab('membros', this)">
-                            <i class="fa-solid fa-users"></i>
                             <span>Membros</span>
                         </a>
                         <a class="admin-menu-item" onclick="App.switchAdminTab('central', this)">
-                            <i class="fa-solid fa-clipboard-check"></i>
                             <span>Central Administrativa</span>
                         </a>
 
                         <div class="admin-nav-group-label" style="font-size: 0.65rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 12px 4px 12px;">Comunicação</div>
                         <a class="admin-menu-item" onclick="App.switchAdminTab('avisos', this)">
-                            <i class="fa-solid fa-bullhorn"></i>
                             <span>Informativos</span>
                         </a>
 
                         <div class="admin-nav-group-label" style="font-size: 0.65rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 12px 4px 12px;">Gestão Operacional</div>
                         <a class="admin-menu-item" onclick="App.switchAdminTab('reposicoes', this)">
-                            <i class="fa-solid fa-boxes-packing"></i>
                             <span>Reposição</span>
                         </a>
                         <a class="admin-menu-item" onclick="App.switchAdminTab('relatorios', this)">
-                            <i class="fa-solid fa-file-invoice"></i>
                             <span>Relatórios</span>
                         </a>
                         
-                        <div style="margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 15px;">
+                        <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 15px;">
                             <a class="admin-menu-item" onclick="App.navigateTo('view-setor-select')" style="color: #0284c7 !important;">
-                                <i class="fa-solid fa-right-left"></i>
                                 <span>Mudar para Membro</span>
                             </a>
                         </div>
@@ -562,7 +554,7 @@
                                 <div class="panel-card" style="display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0;">
                                     <div>
                                         <div class="panel-header" style="border-bottom: 1px solid #F1F5F9; padding-bottom: 8px; margin-bottom: 12px;">
-                                            <div class="panel-title" style="font-size: 0.95rem;"><i class="fa-solid fa-clipboard-check" style="margin-right: 6px; color: #0D5C5A;"></i> Status do Diaconato</div>
+                                            <div class="panel-title" style="font-size: 0.95rem; font-weight: 700; color: #0D5C5A;">Status do Diaconato</div>
                                         </div>
                                         <h4 id="hero-central-status-title" style="font-size: 1.05rem; font-weight: 700; color: #1E293B; margin: 0 0 4px 0;">Central Administrativa</h4>
                                         <p id="hero-central-status-desc" style="font-size: 0.82rem; color: #64748B; margin: 0;">Carregando ações...</p>
@@ -578,7 +570,7 @@
                                 <div class="panel-card" style="display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0;">
                                     <div>
                                         <div class="panel-header" style="border-bottom: 1px solid #F1F5F9; padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-                                            <div class="panel-title" style="font-size: 0.95rem;"><i class="fa-solid fa-clock-rotate-left" style="margin-right: 6px; color: #0D5C5A;"></i> Serviços em Andamento</div>
+                                            <div class="panel-title" style="font-size: 0.95rem; font-weight: 700; color: #0D5C5A;">Serviços em Andamento</div>
                                             <span class="badge badge-active" style="background: rgba(16, 185, 129, 0.1); color: #0D9488; font-size: 0.72rem; font-weight: 700;" id="active-services-count">0 ativos</span>
                                         </div>
                                         <div id="admin-dashboard-active-services" style="font-size: 0.82rem; color: #64748B;">
@@ -591,7 +583,7 @@
                                 <div class="panel-card" style="display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0;">
                                     <div>
                                         <div class="panel-header" style="border-bottom: 1px solid #F1F5F9; padding-bottom: 8px; margin-bottom: 12px;">
-                                            <div class="panel-title" style="font-size: 0.95rem;"><i class="fa-solid fa-calendar-days" style="margin-right: 6px; color: #0D5C5A;"></i> Escalas da Semana</div>
+                                            <div class="panel-title" style="font-size: 0.95rem; font-weight: 700; color: #0D5C5A;">Escalas da Semana</div>
                                         </div>
                                         <div class="progress-container-stacked" style="margin-bottom: 10px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #f1f5f9;">
                                             <div class="progress-bar-stacked" id="dashboard-scales-progress-bar" style="display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: #e2e8f0; margin-bottom: 6px;">
@@ -614,7 +606,7 @@
                                 <div class="panel-card" style="display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0;">
                                     <div>
                                         <div class="panel-header" style="border-bottom: 1px solid #F1F5F9; padding-bottom: 8px; margin-bottom: 12px;">
-                                            <div class="panel-title" style="font-size: 0.95rem;"><i class="fa-solid fa-user-slash" style="margin-right: 6px; color: #0D5C5A;"></i> Afastamentos</div>
+                                            <div class="panel-title" style="font-size: 0.95rem; font-weight: 700; color: #0D5C5A;">Afastamentos</div>
                                         </div>
                                         <div id="admin-dashboard-afastamentos-alertas" style="font-size: 0.82rem; color: #64748B;">
                                             Nenhum afastamento registrado.
@@ -791,8 +783,8 @@
                             <!-- 1. Escolha o Culto / Evento -->
                             <div class="scales-section-container" id="admin-calendar-view-container" style="margin-bottom: 30px;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                    <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--navy-dark); margin: 0;"><i class="fa-solid fa-calendar-plus" style="margin-right: 5px;"></i> 1. Calendário de Cultos</h3>
-                                    <button class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 0.85rem; background: var(--teal-primary);" onclick="App.openCultoFormModal()">
+                                    <h3 style="font-size: 1.25rem; font-weight: 700; color: #1E293B; margin: 0; letter-spacing: -0.3px;">Calendário de Cultos</h3>
+                                    <button class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 0.85rem; background: #0D5C5A; border-radius: 6px;" onclick="App.openCultoFormModal()">
                                         <i class="fa-solid fa-plus"></i> Novo Culto / Evento
                                     </button>
                                 </div>

@@ -4937,62 +4937,61 @@ table.admin-table tr:hover td {
 .calendar-grid-full {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: 8px;
+    gap: 1px;
+    background: #CBD5E1;
+    border: 1px solid #CBD5E1;
+    border-radius: 6px;
+    overflow: hidden;
     margin-top: 15px;
 }
 .calendar-header-day {
     text-align: center;
     font-weight: 700;
-    font-size: 0.8rem;
-    color: var(--slate-gray);
+    font-size: 0.75rem;
+    color: #FFFFFF;
+    background: #0D5C5A;
     text-transform: uppercase;
-    padding: 8px 0;
-    letter-spacing: 0.5px;
+    padding: 10px 0;
+    letter-spacing: 0.8px;
 }
 .calendar-cell-full {
-    min-height: 120px;
-    background: rgba(0, 0, 0, 0.01);
-    border: 1px solid rgba(0, 0, 0, 0.12) !important;
-    border-radius: 12px;
+    min-height: 110px;
+    background: #F8FAFC !important;
+    border: none !important;
+    border-radius: 0 !important;
     padding: 8px;
     display: flex;
     flex-direction: column;
     position: relative;
-    transition: all 0.2s ease;
+    transition: background 0.15s ease;
     color: #1E293B !important;
 }
-.calendar-cell-full.day-dom { background: #FEF9C3 !important; color: #1E293B !important; border-color: rgba(0, 0, 0, 0.12) !important; }
-.calendar-cell-full.day-seg { background: rgba(0,0,0,0.02) !important; color: #1E293B !important; border-color: rgba(0, 0, 0, 0.12) !important; }
-.calendar-cell-full.day-ter { background: #DCFCE7 !important; color: #1E293B !important; border-color: rgba(0, 0, 0, 0.12) !important; }
-.calendar-cell-full.day-qua { background: #E0F2FE !important; color: #1E293B !important; border-color: rgba(0, 0, 0, 0.12) !important; }
-.calendar-cell-full.day-qui { background: rgba(0,0,0,0.02) !important; color: #1E293B !important; border-color: rgba(0, 0, 0, 0.12) !important; }
-.calendar-cell-full.day-sex { background: #FEE2E2 !important; color: #1E293B !important; border-color: rgba(0, 0, 0, 0.12) !important; }
-.calendar-cell-full.day-sab { background: #DBEAFE !important; color: #1E293B !important; border-color: rgba(0, 0, 0, 0.12) !important; }
+.calendar-cell-full.day-dom,
+.calendar-cell-full.day-seg,
+.calendar-cell-full.day-ter,
+.calendar-cell-full.day-qua,
+.calendar-cell-full.day-qui,
+.calendar-cell-full.day-sex,
+.calendar-cell-full.day-sab {
+    background: #F8FAFC !important;
+    color: #1E293B !important;
+}
 
-.calendar-cell-full.day-dom .day-num,
-.calendar-cell-full.day-seg .day-num,
-.calendar-cell-full.day-ter .day-num,
-.calendar-cell-full.day-qua .day-num,
-.calendar-cell-full.day-qui .day-num,
-.calendar-cell-full.day-sex .day-num,
-.calendar-cell-full.day-sab .day-num {
-    color: #475569 !important;
+.day-num {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #334155 !important;
+    margin-bottom: 6px;
+    align-self: flex-start;
 }
 
 .calendar-cell-full:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: #FFFFFF !important;
 }
 .calendar-cell-full.empty {
-    background: transparent !important;
-    border: 1px dashed rgba(0, 0, 0, 0.08) !important;
+    background: #F1F5F9 !important;
+    border: none !important;
     pointer-events: none;
-}
-.day-num {
-    font-size: 0.95rem;
-    font-weight: 800;
-    margin-bottom: 6px;
-    align-self: flex-start;
 }
 .calendar-events-container {
     display: flex;
@@ -5003,33 +5002,50 @@ table.admin-table tr:hover td {
 }
 .calendar-event-pill {
     font-size: 0.72rem;
-    padding: 4px 6px;
-    border-radius: 6px;
-    font-weight: 700;
-    line-height: 1.2;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    line-height: 1.3;
     cursor: pointer;
-    text-transform: uppercase;
     transition: all 0.15s ease;
-    border: 1px solid rgba(0,0,0,0.06);
+    border: 1px solid transparent;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    background: #E2E8F0;
+    color: #1E293B;
 }
 .calendar-event-pill:hover {
-    filter: brightness(0.9);
-    transform: scale(1.02);
+    filter: brightness(0.95);
+    transform: translateY(-1px);
 }
-.calendar-cell-full.day-seg .calendar-event-pill,
-.calendar-cell-full.day-qui .calendar-event-pill {
-    background: rgba(0, 0, 0, 0.05) !important;
-    color: #1E293B !important;
-    border-color: rgba(0, 0, 0, 0.1) !important;
+
+/* Event pillar color rules with semantic identity */
+.event-pill-ceia, .event-pill-primicias, .event-pill-especial {
+    background: #FEF3C7 !important;
+    color: #92400E !important;
+    border-left: 3px solid #D97706 !important;
 }
-.calendar-cell-full.day-dom .calendar-event-pill { background: #FEF08A !important; color: #854D0E !important; }
-.calendar-cell-full.day-ter .calendar-event-pill { background: #BBF7D0 !important; color: #166534 !important; }
-.calendar-cell-full.day-qua .calendar-event-pill { background: #BAE6FD !important; color: #075985 !important; }
-.calendar-cell-full.day-sex .calendar-event-pill { background: #FECACA !important; color: #991B1B !important; }
-.calendar-cell-full.day-sab .calendar-event-pill { background: #BFDBFE !important; color: #1E40AF !important; }
+.event-pill-alicerce, .event-pill-atualiza {
+    background: #DCFCE7 !important;
+    color: #166534 !important;
+    border-left: 3px solid #16A34A !important;
+}
+.event-pill-intercessao, .event-pill-reuniao {
+    background: #E0F2FE !important;
+    color: #075985 !important;
+    border-left: 3px solid #0284C7 !important;
+}
+.event-pill-conectadas {
+    background: #FEE2E2 !important;
+    color: #991B1B !important;
+    border-left: 3px solid #DC2626 !important;
+}
+.event-pill-flamme {
+    background: #E0E7FF !important;
+    color: #3730A3 !important;
+    border-left: 3px solid #4F46E5 !important;
+}
 
 .calendar-month-nav {
     display: flex;
