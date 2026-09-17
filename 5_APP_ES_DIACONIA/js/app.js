@@ -528,15 +528,14 @@ const App = {
         const userSectors = this.currentUser ? (Array.isArray(this.currentUser.setores) ? this.currentUser.setores : (this.currentUser.setor ? [this.currentUser.setor] : [])) : [];
         const hasOnlyOpSectors = userSectors.length > 0 && userSectors.every(s => this.isOperationalSector(s));
 
-        // If user is Admin, they can access anything
+        // Navigate to main home selector screen for all users
         if (isAdmin) {
             document.getElementById('admin-shortcut-container').style.display = 'block';
             document.getElementById('admin-profile-name-footer').innerText = this.currentUser.nome;
-            this.navigateTo('view-setor-select');
         } else {
             document.getElementById('admin-shortcut-container').style.display = 'none';
-            this.navigateTo('view-setor-select');
         }
+        this.navigateTo('view-setor-select');
 
         // Construir barra inferior dinamicamente
         this.buildBottomNav();
@@ -1674,6 +1673,13 @@ const App = {
         // Desativado temporariamente para que Limpeza use a Escala padrão e tenha botão de Voltar
         const isOp = false;
         
+        // Control standard member header visibility: Diaconia/Acolhimento uses its own custom header inside view
+        const isDiaconiaOrAcolhimentoSector = ['entrada', 'check_in', 'apoio_templo_ronda_dir', 'apoio_templo_ronda_esq', 'acolhimento', 'escala_livre'].includes(this.activeSectorId);
+        const defaultMemberHeader = document.querySelector('.member-header');
+        if (defaultMemberHeader) {
+            defaultMemberHeader.style.display = isDiaconiaOrAcolhimentoSector ? 'none' : 'flex';
+        }
+        
         // Ensure back button is always visible
         const backBtn = document.querySelector('.member-header-info .btn-icon');
         if (backBtn) {
@@ -2354,129 +2360,27 @@ const App = {
         const highlightContainer = document.getElementById('next-service-highlight');
         if (highlightContainer) highlightContainer.style.display = 'none';
 
-        // Extract user photo & scale details for top hero header
-        const currentUserInfo = membrosMap[this.currentUser.id] || {};
-        const userPhotoUrl = currentUserInfo.fotoUrl || null;
-        const directPhoto = this.getDirectPhotoUrl(userPhotoUrl);
-
-        let userAreaName = 'Templo';
-        const userScale = evtActive ? evtActive.escalas.find(e => e.membroId === this.currentUser.id && e.statusPresenca !== 'Recusada') : null;
-        let userFuncaoText = 'Apoio no Templo';
-        let userLadoText = '';
-        let userAtividadeText = '';
-
-        if (userScale) {
-            if (userScale.setorId === 'recepcao' || userScale.setorId === 'entrada' || userScale.setorId === 'check_in') {
-                userAreaName = 'Recepção';
-            } else if (userScale.setorId === 'acolhimento') {
-                userAreaName = 'Acolhimento';
-            }
-            userFuncaoText = userScale.funcao || 'Apoio no Templo';
-            const obsLower = (userScale.observacoes || '').toLowerCase();
-            const funcLower = (userScale.funcao || '').toLowerCase();
-
-            if (obsLower.includes('direito') || funcLower.includes('direito') || obsLower.includes('dir')) {
-                userLadoText = 'Lado Direito';
-            } else if (obsLower.includes('esquerdo') || funcLower.includes('esquerdo') || obsLower.includes('esq')) {
-                userLadoText = 'Lado Esquerdo';
-            } else if (userScale.observacoes) {
-                userLadoText = userScale.observacoes;
-            }
-
-            if (funcLower.includes('ronda') || obsLower.includes('ronda')) {
-                userAtividadeText = 'Ronda';
-            }
-        }
-
-        let subLinhaPartes = [];
-        if (userLadoText) subLinhaPartes.push(userLadoText);
-        if (userAtividadeText && !userFuncaoText.toLowerCase().includes('ronda')) subLinhaPartes.push(userAtividadeText);
-        let userDetalheLinha = subLinhaPartes.join(' · ');
-
-        // Member photo HTML
-        let heroPhotoHtml = '';
-        if (directPhoto) {
-            heroPhotoHtml = `<img src="${directPhoto}" alt="${this.currentUser.nome}" style="max-height: 145px; object-fit: cover; object-position: top; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25)); display: block; margin-top: -8px;">`;
-        } else {
-            const initials = this.currentUser.nome.split(' ').filter(n => n.length > 0).map(n => n[0]).slice(0, 2).join('').toUpperCase();
-            heroPhotoHtml = `<div style="width: 85px; height: 105px; border-radius: 8px; background: #0E5C54; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; border: 1px solid rgba(255,255,255,0.2); margin-top: -8px;">${initials}</div>`;
-        }
-
-        heroHeaderHtml = `
-            <div style="background: linear-gradient(165deg, #061713 0%, #0A2B24 45%, rgba(14, 92, 84, 0.75) 75%, rgba(248, 250, 252, 0) 100%); margin: -16px -16px 0 -16px; padding: 14px 16px 36px 16px; color: #FFFFFF; text-align: left;">
-                <header style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                    <button onclick="App.navigateTo('view-setor-select')" class="btn-icon" style="background: none; border: none; color: #FFFFFF !important; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 700;">
-                        <i class="fa-solid fa-chevron-left" style="color: #FFFFFF !important;"></i> <span style="color: #FFFFFF !important;">Voltar</span>
+        // Header bar matching exact user specification (Voltar left, Áreas de Serviço centered, Sair right - NO CME Lausanne)
+        const heroHeaderHtml = `
+            <div style="background: #0E5C54; margin: -16px -16px 16px -16px; padding: 14px 16px 14px 16px; color: #FFFFFF; position: relative; z-index: 10;">
+                <header style="display: flex; align-items: center; justify-content: space-between; min-height: 38px;">
+                    <button onclick="App.navigateTo('view-setor-select')" style="background: none; border: none; color: #FFFFFF !important; font-size: 1rem; cursor: pointer; font-weight: 800; padding: 4px 0; z-index: 11;">
+                        Voltar
                     </button>
-                    <div style="text-align: center;">
-                        <span style="font-weight: 800; font-size: 1.05rem; color: #FFFFFF !important; display: block;">Minha Escala</span>
+                    <div style="text-align: center; flex: 1; margin: 0 10px;">
+                        <span style="font-weight: 900; font-size: 1.3rem; color: #FFFFFF !important; display: block; font-family: sans-serif; white-space: nowrap;">Áreas de Serviço</span>
                     </div>
-                    <div style="text-align: right; color: #FFFFFF !important; font-size: 0.7rem; line-height: 1.2;">
-                        <div style="font-weight: 800; color: #FFFFFF !important; letter-spacing: 0.5px;">CME LAUSANNE</div>
-                        <div style="color: #F1F5F9 !important; font-weight: 500;">Juntos no serviço de Cristo</div>
-                    </div>
+                    <button onclick="App.handleLogout()" style="background: none; border: none; color: #FFFFFF !important; font-size: 0.95rem; cursor: pointer; font-weight: 800; padding: 4px 0;">
+                        Sair
+                    </button>
                 </header>
-
-                <div style="display: flex; align-items: flex-end; gap: 14px; padding-top: 0px;">
-                    <div style="flex-shrink: 0;">
-                        ${heroPhotoHtml}
-                    </div>
-                    <div style="text-align: left; margin-bottom: 2px;">
-                        <h1 style="font-size: 1.65rem; font-weight: 900; color: #FFFFFF !important; margin: 0; line-height: 1.1; letter-spacing: -0.5px;">${this.currentUser.nome}</h1>
-                        <div style="font-size: 0.95rem; font-weight: 700; color: #F8FAFC !important; margin-top: 3px;">${userFuncaoText}</div>
-                        ${userDetalheLinha ? `<div style="font-size: 0.82rem; color: #E2E8F0 !important; font-weight: 500; margin-top: 2px;">${userDetalheLinha}</div>` : ''}
-                    </div>
-                </div>
             </div>
         `;
-
-        let summaryCardHtml = "";
-        if (evtActive) {
-            const dateParts = evtActive.data.split('-');
-            const d = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
-            const diaSemanaShort = d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '').toUpperCase();
-            const dataFmt = `${dateParts[2]}/${dateParts[1]}`;
-
-            if (userScale) {
-                const isPending = userScale.statusPresenca === 'Pendente';
-                const statusBadgeBg = isPending ? '#FEF3C7' : '#D1FAE5';
-                const statusBadgeColor = isPending ? '#B45309' : '#065F46';
-                const statusBadgeText = isPending ? 'PENDENTE' : 'CONFIRMADO';
-
-                let linha1 = `${userAreaName} · ${userFuncaoText}`;
-                let linha2 = userDetalheLinha;
-
-                summaryCardHtml = `
-                    <div class="panel-card" style="margin: -24px 0 16px 0; position: relative; z-index: 2; text-align: left; padding: 18px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
-                            <div>
-                                <div style="font-size: 0.7rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px;">${diaSemanaShort}, ${dataFmt}</div>
-                                <h2 style="font-size: 1.25rem; font-weight: 900; color: #0F172A; margin: 2px 0 0 0; line-height: 1.2;">${evtActive.cultoNome}</h2>
-                            </div>
-                            <span style="font-size: 0.72rem; font-weight: 800; background: ${statusBadgeBg}; color: ${statusBadgeColor}; padding: 4px 12px; border-radius: 12px; letter-spacing: 0.5px; flex-shrink: 0; margin-left: 8px;">${statusBadgeText}</span>
-                        </div>
-                        <div style="font-size: 1.05rem; font-weight: 800; color: #1E293B; margin-bottom: 12px;">${evtActive.horarioInicio} — ${evtActive.horarioFim}</div>
-                        <div style="padding-top: 10px; border-top: 1px solid #F1F5F9;">
-                            <div style="font-size: 0.92rem; font-weight: 800; color: #0F172A;">${linha1}</div>
-                            ${linha2 ? `<div style="font-size: 0.82rem; font-weight: 600; color: #64748B; margin-top: 2px;">${linha2}</div>` : ''}
-                        </div>
-                    </div>
-                `;
-            } else {
-                summaryCardHtml = `
-                    <div class="panel-card" style="margin: -24px 0 16px 0; position: relative; z-index: 2; text-align: left; padding: 18px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);">
-                        <div style="font-size: 0.7rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px;">${diaSemanaShort}, ${dataFmt}</div>
-                        <h2 style="font-size: 1.25rem; font-weight: 900; color: #0F172A; margin: 2px 0 0 0; line-height: 1.2;">${evtActive.cultoNome}</h2>
-                        <div style="font-size: 1.05rem; font-weight: 800; color: #1E293B; margin-top: 4px;">${evtActive.horarioInicio} — ${evtActive.horarioFim}</div>
-                    </div>
-                `;
-            }
-        }
 
         if (!evtActive) {
             container.innerHTML = `
                 ${heroHeaderHtml}
-                <div style="text-align: center; padding: 40px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; margin-top: -20px;">
+                <div style="text-align: center; padding: 40px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; margin-top: 10px;">
                     <p style="color: #64748B; font-size: 0.95rem;">Nenhuma escala agendada para este período.</p>
                 </div>
             `;
@@ -2550,34 +2454,71 @@ const App = {
             }
         });
 
-        // Verificar se o culto é no modelo Escala Livre
-        const cultoAtivo = this.cultosData.find(c => c.id === evtActive.cultoId);
-        const isEscalaLivre = cultoAtivo && cultoAtivo.modeloEscala === 'Escala Livre';
+        // 1. Simple PRÓXIMO SERVIÇO Card (Strictly title & date, zero icons/badges)
+        let nextServiceCardHtml = '';
+        if (evtActive) {
+            const dateParts = evtActive.data.split('-');
+            const d = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+            const diaSemanaExt = d.toLocaleDateString('pt-BR', { weekday: 'long' });
+            const diaSemanaCap = diaSemanaExt.charAt(0).toUpperCase() + diaSemanaExt.slice(1);
+            const mesExt = d.toLocaleDateString('pt-BR', { month: 'long' });
+            const dataExtens = `${diaSemanaCap}, ${dateParts[2]} de ${mesExt} de ${dateParts[0]}`;
 
-        // Gerar cards das Áreas de Serviço
-        let areaCardsHtml = '';
-        if (isEscalaLivre) {
-            areaCardsHtml = this.renderAreaCard(escalaLivreScales, 'Escala Livre', 'fa-solid fa-users', 'escala_livre', '', '#6B7280', membrosMap, true);
-        } else {
-            const temploCardHtml = this.renderAreaCard([...apoioDireitoScales, ...apoioEsquerdoScales, ...rondaDireitoScales, ...rondaEsquerdoScales], 'Templo', 'fa-solid fa-place-of-worship', 'templo', '', '#14B8A6', membrosMap);
-            const recepcaoCardHtml = this.renderAreaCard([...portariaScales, ...checkinScales], 'Recepção', 'fa-solid fa-id-card', 'recepcao', '', '#3B82F6', membrosMap);
-            const acolhimentoCardHtml = this.renderAreaCard(acolhimentoScales, 'Acolhimento', 'fa-solid fa-hands-holding-child', 'acolhimento', '', '#EC4899', membrosMap);
-            
-            // Posicionar a área do próprio obreiro em primeiro lugar com o destaque "SUA ÁREA"
-            const userInTemplo = [...apoioDireitoScales, ...apoioEsquerdoScales, ...rondaDireitoScales, ...rondaEsquerdoScales].some(e => e.membroId === this.currentUser.id);
-            const userInRecepcao = [...portariaScales, ...checkinScales].some(e => e.membroId === this.currentUser.id);
-            const userInAcolhimento = acolhimentoScales.some(e => e.membroId === this.currentUser.id);
-
-            if (userInRecepcao) {
-                areaCardsHtml = `${recepcaoCardHtml}${temploCardHtml}${acolhimentoCardHtml}`;
-            } else if (userInAcolhimento) {
-                areaCardsHtml = `${acolhimentoCardHtml}${temploCardHtml}${recepcaoCardHtml}`;
-            } else {
-                areaCardsHtml = `${temploCardHtml}${recepcaoCardHtml}${acolhimentoCardHtml}`;
-            }
+            nextServiceCardHtml = `
+                <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px 16px; text-align: left; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                    <div style="font-size: 0.68rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px;">PRÓXIMO SERVIÇO</div>
+                    <h3 style="font-size: 1.25rem; font-weight: 900; color: #0F172A; margin: 0 0 3px 0; line-height: 1.2;">${evtActive.cultoNome}</h3>
+                    <div style="font-size: 0.88rem; color: #64748B; font-weight: 500;">${dataExtens}</div>
+                </div>
+            `;
         }
 
-        // --- Renderizar Escalas Pendentes (Confirmação) ---
+        // 2. ÁREAS DE SERVIÇO Integrated Geometric Composition (Significantly taller vertical height for better presence)
+        const temploScales = [...apoioDireitoScales, ...apoioEsquerdoScales, ...rondaDireitoScales, ...rondaEsquerdoScales];
+        const recepcaoScales = [...portariaScales, ...checkinScales];
+
+        const userInTemplo = temploScales.some(e => e.membroId === this.currentUser.id);
+        let userScaleInTemplo = userInTemplo ? temploScales.find(e => e.membroId === this.currentUser.id) : null;
+        let featuredFuncao = 'Apoio no Templo';
+
+        const areasGridHtml = `
+            <div style="text-align: left; margin-bottom: 8px;">
+                <span style="font-size: 0.72rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.8px;">ÁREAS DE SERVIÇO</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 25px; background: #0E5C54; padding: 4px; border-radius: 10px;">
+                <!-- Left Vertical Rectangle: SUA ÁREA (Templo) - Institutional Green (Height extended) -->
+                <div onclick="App.openAreaDetail('templo')" style="background: #0E5C54; border-radius: 8px 0 0 8px; padding: 22px 18px; color: #FFFFFF; text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-height: 300px;">
+                    <div>
+                        <div style="font-size: 0.7rem; font-weight: 800; color: #A7F3D0; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">SUA ÁREA</div>
+                        <h3 style="font-size: 2rem; font-weight: 900; color: #FFFFFF; margin: 0 0 10px 0; line-height: 1.1;">Templo</h3>
+                        <div style="font-size: 1rem; font-weight: 800; color: #FFFFFF; margin-bottom: 10px;">${featuredFuncao}</div>
+                        <div style="font-size: 0.82rem; color: #D1D5DB; font-weight: 400; line-height: 1.45;">Serviço de apoio e segurança no templo durante os cultos.</div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button onclick="event.stopPropagation(); App.renderMemberEscalaView();" style="width: 100%; height: 44px; background: #064E3B; color: #FFFFFF; border: none; border-radius: 6px; font-weight: 800; font-size: 0.88rem; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
+                            Ver minha escala &rarr;
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Column: Secondary Area Blocks - Taller vertical presence -->
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <!-- Recepção Block -->
+                    <div onclick="App.openAreaDetail('recepcao')" style="background: #146B62; border-radius: 0 8px 0 0; padding: 22px 16px; text-align: left; cursor: pointer; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                        <h4 style="font-size: 1.35rem; font-weight: 900; color: #FFFFFF; margin: 0 0 6px 0;">Recepção</h4>
+                        <div style="font-size: 0.82rem; color: #E2E8F0; font-weight: 400; line-height: 1.35;">Portaria e check-in de membros.</div>
+                    </div>
+
+                    <!-- Acolhimento Block -->
+                    <div onclick="App.openAreaDetail('acolhimento')" style="background: #1B7A70; border-radius: 0 0 8px 0; padding: 22px 16px; text-align: left; cursor: pointer; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                        <h4 style="font-size: 1.35rem; font-weight: 900; color: #FFFFFF; margin: 0 0 6px 0;">Acolhimento</h4>
+                        <div style="font-size: 0.82rem; color: #E2E8F0; font-weight: 400; line-height: 1.35;">Receber e acolher com excelência.</div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Render Escalas Pendentes if any
         const userPendingScales = escalas.filter(e => e.membroId === this.currentUser.id && e.statusPresenca === 'Pendente' && e.data >= hojeStr && !this.isOperationalSector(e.setorId));
         let pendingAlertHtml = '';
         if (userPendingScales.length > 0) {
@@ -2620,17 +2561,8 @@ const App = {
         container.innerHTML = `
             ${heroHeaderHtml}
             ${pendingAlertHtml}
-            ${summaryCardHtml}
-            
-            <div style="text-align: left; margin: 18px 0 10px 0;">
-                <div style="font-size: 0.75rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 1px;">ÁREAS DE SERVIÇO</div>
-            </div>
-
-            <div class="org-daily-container" id="org-daily-swipe-area">
-                <div style="display: flex; flex-direction: column;">
-                    ${areaCardsHtml}
-                </div>
-            </div>
+            ${nextServiceCardHtml}
+            ${areasGridHtml}
         `;
 
         // Auto-open area detail if navigation was triggered from "Próximo Serviço"
@@ -2644,68 +2576,7 @@ const App = {
     },
 
     renderAreaCard(scales, title, iconClass, nodeId, bgImageUrl, accentColor, membrosMap = {}, isFullWidth = false) {
-        const uniqueScales = [];
-        const seenMembers = new Set();
-        scales.forEach(escala => {
-            const key = escala.membroId || escala.membroNome;
-            if (key && !seenMembers.has(key)) {
-                seenMembers.add(key);
-                uniqueScales.push(escala);
-            }
-        });
-
-        const descMap = {
-            'recepcao': 'Portaria e check-in de membros',
-            'templo': 'Suporte, organização e acomodação no templo',
-            'ronda': 'Ronda periódica e segurança externa/interna',
-            'acolhimento': 'Receber e acolher com excelência',
-            'escala_livre': 'Atuar onde houver necessidade seguindo a supervisão'
-        };
-        const desc = descMap[nodeId] || '';
-
-        // Check if current user is scheduled in this area
-        const ownScale = uniqueScales.find(escala => escala.membroId === this.currentUser.id);
-        const isUserAssigned = !!ownScale;
-
-        if (isUserAssigned) {
-            let funcaoText = ownScale.funcao || 'Apoio no Templo';
-            let obsLower = (ownScale.observacoes || '').toLowerCase();
-            let funcLower = (ownScale.funcao || '').toLowerCase();
-            let ladoText = '';
-            if (obsLower.includes('direito') || funcLower.includes('direito') || obsLower.includes('dir')) {
-                ladoText = 'Lado Direito';
-            } else if (obsLower.includes('esquerdo') || funcLower.includes('esquerdo') || obsLower.includes('esq')) {
-                ladoText = 'Lado Esquerdo';
-            }
-            let atividadeText = funcLower.includes('ronda') || obsLower.includes('ronda') ? 'Ronda' : '';
-            let detalheLinha = [ladoText, atividadeText].filter(Boolean).join(' · ');
-
-            return `
-                <div style="margin-bottom: 12px;">
-                    <div onclick="App.openAreaDetail('${nodeId}')" style="background: #E6F4F1; border: 1px solid #B2DFDB; border-radius: 14px; padding: 18px; text-align: left; cursor: pointer; position: relative;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                            <h4 style="margin: 0; font-size: 1.25rem; font-weight: 900; color: #064E3B;">${title}</h4>
-                            <span style="font-size: 0.72rem; font-weight: 800; background: #A7F3D0; color: #065F46; padding: 3px 10px; border-radius: 12px; letter-spacing: 0.5px;">SUA ÁREA</span>
-                        </div>
-                        <div style="font-size: 0.95rem; font-weight: 700; color: #065F46; margin-top: 4px;">${funcaoText}</div>
-                        ${detalheLinha ? `<div style="font-size: 0.82rem; color: #047857; font-weight: 500; margin-top: 2px; margin-bottom: 14px;">${detalheLinha}</div>` : `<div style="margin-bottom: 14px;"></div>`}
-                        <button style="width: 100%; height: 42px; background: #0E5C54; color: #FFFFFF; border: none; border-radius: 8px; font-weight: 700; font-size: 0.88rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
-                            Ver minha escala <i class="fa-solid fa-chevron-right" style="font-size: 0.8rem;"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
-        } else {
-            return `
-                <div onclick="App.openAreaDetail('${nodeId}')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; text-align: left; transition: background 0.15s ease;">
-                    <div>
-                        <div style="font-size: 1.05rem; font-weight: 800; color: #0F172A;">${title}</div>
-                        <div style="font-size: 0.82rem; color: #64748B; margin-top: 2px;">${desc}</div>
-                    </div>
-                    <i class="fa-solid fa-chevron-right" style="color: #94A3B8; font-size: 0.85rem;"></i>
-                </div>
-            `;
-        }
+        return '';
     },
 
     // Static area goals and checklist configuration mapping
@@ -2777,7 +2648,6 @@ const App = {
             traje: 'Esporte Fino',
             checklist: [
                 'Rondar as vias laterais',
-                'Verificar fechamento de portões auxiliares',
                 'Garantir fechamento de portas de segurança',
                 'Relatar qualquer movimentação atípica'
             ],
@@ -2848,7 +2718,6 @@ const App = {
             traje: 'Esporte Fino',
             checklist: [
                 'Rondar as vias laterais',
-                'Verificar fechamento de portões auxiliares',
                 'Garantir fechamento de portas de segurança',
                 'Relatar qualquer movimentação atípica'
             ],
@@ -2904,34 +2773,29 @@ const App = {
                 const [dateStr, cultoId, timeStr] = activeEventKey.split('_');
                 const escalas = await DbService.getEscalas(null, dateStr, dateStr);
 
-                // Filter escalas for this specific area
+                // Filter escalas strictly for the selected area (nodeId) and active cultoId
                 const areaScales = [];
                 escalas.forEach(escala => {
-                    const sectorId = escala.setorId;
-                    const func = (escala.funcao || '').toLowerCase();
-                    const obs = (escala.observacoes || '').toLowerCase();
-
+                    if (cultoId && escala.cultoId && escala.cultoId !== cultoId) return;
                     if (escala.statusPresenca === 'Recusada') return;
 
-                    if (nodeId === 'escala_livre' && (sectorId === 'escala_livre' || func.includes('escala livre'))) {
-                        areaScales.push(escala);
-                    } else if (nodeId === 'acolhimento' && (sectorId === 'acolhimento' || func.includes('acolhimento'))) {
-                        areaScales.push(escala);
-                    } else if (nodeId === 'recepcao' && (sectorId === 'entrada' || sectorId === 'check_in' || func.includes('entrada') || func.includes('check') || func.includes('portaria') || func.includes('recep'))) {
-                        areaScales.push(escala);
-                    } else if (nodeId === 'templo' && (sectorId === 'apoio_templo_ronda_dir' || sectorId === 'apoio_templo_ronda_esq' || func.includes('apoio') || func.includes('ronda'))) {
-                        areaScales.push(escala);
-                        if (nodeId === 'portaria' && (func.includes('portaria') || func.includes('entrada'))) {
+                    const sectorId = escala.setorId;
+                    const func = (escala.funcao || '').toLowerCase();
+
+                    if (nodeId === 'escala_livre') {
+                        if (sectorId === 'escala_livre' || func.includes('escala livre')) {
                             areaScales.push(escala);
-                        } else if (nodeId === 'checkin' && func.includes('check')) {
+                        }
+                    } else if (nodeId === 'acolhimento') {
+                        if (sectorId === 'acolhimento' || func.includes('acolhimento')) {
                             areaScales.push(escala);
-                        } else if (nodeId === 'apoio-direito' && func.includes('apoio') && (func.includes('direito') || obs.includes('direito') || func.includes('dir'))) {
+                        }
+                    } else if (nodeId === 'recepcao') {
+                        if (sectorId === 'entrada' || sectorId === 'check_in' || func.includes('entrada') || func.includes('check') || func.includes('portaria') || func.includes('recep')) {
                             areaScales.push(escala);
-                        } else if (nodeId === 'apoio-esquerdo' && func.includes('apoio') && (func.includes('esquerdo') || obs.includes('esquerdo') || func.includes('esq'))) {
-                            areaScales.push(escala);
-                        } else if (nodeId === 'ronda-direito' && func.includes('ronda') && (func.includes('direito') || obs.includes('direito') || func.includes('dir'))) {
-                            areaScales.push(escala);
-                        } else if (nodeId === 'ronda-esquerdo' && func.includes('ronda') && (func.includes('esquerdo') || obs.includes('esquerdo') || func.includes('esq'))) {
+                        }
+                    } else if (nodeId === 'templo') {
+                        if (sectorId === 'apoio_templo_ronda_dir' || sectorId === 'apoio_templo_ronda_esq' || sectorId === 'templo' || func.includes('apoio') || func.includes('ronda') || func.includes('templo')) {
                             areaScales.push(escala);
                         }
                     }
@@ -3200,80 +3064,89 @@ const App = {
                     displayLocal = 'Templo';
                 }
 
-                // Photo HTML (large, integrated photo cut out naturally over green background, positioned high near Voltar)
+                // Photo HTML (integrated photo on left touching bottom divisa)
                 let heroPhotoHtml = '';
                 if (directPhoto) {
-                    heroPhotoHtml = `<img src="${directPhoto}" alt="${this.currentUser.nome}" style="max-height: 155px; object-fit: cover; object-position: top; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3)); display: block; margin-top: -14px;">`;
+                    heroPhotoHtml = `<img src="${directPhoto}" alt="${this.currentUser.nome}" style="max-height: 155px; width: auto; object-fit: cover; object-position: top; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3)); display: block; position: absolute; bottom: 0; left: 16px; z-index: 3;">`;
                 } else {
                     const initials = this.currentUser.nome.split(' ').filter(n => n.length > 0).map(n => n[0]).slice(0, 2).join('').toUpperCase();
-                    heroPhotoHtml = `<div style="width: 90px; height: 115px; border-radius: 8px; background: #0E5C54; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 1.9rem; font-weight: 800; border: 1px solid rgba(255,255,255,0.2); margin-top: -14px;">${initials}</div>`;
+                    heroPhotoHtml = `<div style="width: 100px; height: 130px; border-radius: 8px 8px 0 0; background: #0E5C54; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; font-weight: 800; border: 1px solid rgba(255,255,255,0.2); position: absolute; bottom: 0; left: 16px; z-index: 3;">${initials}</div>`;
                 }
 
                 detailContainer.innerHTML = `
-                    <!-- Top Hero Background (Compact green gradient fading early to white/transparent) -->
-                    <div style="background: linear-gradient(165deg, #061713 0%, #0A2B24 45%, rgba(14, 92, 84, 0.75) 75%, rgba(248, 250, 252, 0) 100%); margin: -16px -16px 0 -16px; padding: 12px 16px 32px 16px; color: #FFFFFF;">
+                    <!-- Top Hero Background -->
+                    <div style="background: linear-gradient(180deg, #06231D 0%, #0B3C32 60%, #0E5C54 100%); margin: -16px -16px 0 -16px; padding: 12px 16px 0 16px; color: #FFFFFF; position: relative; min-height: 195px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; overflow: hidden;">
                         
                         <!-- High Contrast Header Bar -->
-                        <header style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                        <header style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; position: relative; z-index: 5;">
                             <button onclick="App.closeAreaDetail()" class="btn-icon" style="background: none; border: none; color: #FFFFFF !important; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 700;">
-                                <i class="fa-solid fa-chevron-left" style="color: #FFFFFF !important;"></i> <span style="color: #FFFFFF !important;">Voltar</span>
+                                <i class="fa-solid fa-arrow-left" style="color: #FFFFFF !important;"></i> <span style="color: #FFFFFF !important;">Voltar</span>
                             </button>
-                            <div style="text-align: center;">
-                                <span style="font-weight: 800; font-size: 1.05rem; color: #FFFFFF !important; display: block;">Minha Escala</span>
-                            </div>
-                            <div style="text-align: right; color: #FFFFFF !important; font-size: 0.7rem; line-height: 1.2;">
-                                <div style="font-weight: 700; color: #FFFFFF !important;">CME Lausanne</div>
-                                <div style="color: #F1F5F9 !important; font-weight: 500;">Juntos no serviço de Cristo</div>
+                            <div style="text-align: right; color: #FFFFFF !important; font-size: 0.85rem; font-weight: 800; letter-spacing: 0.5px;">
+                                CME Lausanne
                             </div>
                         </header>
 
-                        <!-- Hero Member Identity Section (Positioned high closer to Voltar) -->
-                        <div style="display: flex; align-items: flex-end; gap: 14px; padding-top: 0px;">
-                            <div style="flex-shrink: 0;">
+                        <!-- Content Grid: Left Photo, Right Title & Name -->
+                        <div style="display: flex; align-items: flex-end; justify-content: space-between; position: relative; flex: 1; min-height: 145px; padding-bottom: 0;">
+                            
+                            <!-- Left Photo Container (Positioned touching bottom divisa) -->
+                            <div style="width: 130px; height: 155px; position: relative; flex-shrink: 0;">
                                 ${heroPhotoHtml}
                             </div>
-                            <div style="text-align: left; margin-bottom: 2px;">
-                                <h1 style="font-size: 1.65rem; font-weight: 900; color: #FFFFFF !important; margin: 0; line-height: 1.1; letter-spacing: -0.5px;">${this.currentUser.nome}</h1>
-                                <div style="font-size: 0.95rem; font-weight: 700; color: #F8FAFC !important; margin-top: 3px;">${userFuncaoText}</div>
-                                ${userDetalheLinha ? `<div style="font-size: 0.82rem; color: #E2E8F0 !important; font-weight: 500; margin-top: 2px;">${userDetalheLinha}</div>` : ''}
+
+                            <!-- Right Content: Title & Member Info -->
+                            <div style="flex: 1; text-align: left; padding-left: 12px; padding-bottom: 6px; position: relative; z-index: 4;">
+                                <!-- Title "MINHA ESCALA" (Elevated position) -->
+                                <div style="margin-bottom: 12px; margin-top: -6px;">
+                                    <div style="font-size: 1.05rem; font-weight: 700; color: #A7F3D0; text-transform: none; letter-spacing: 0.3px; line-height: 1;">Minha</div>
+                                    <h1 style="font-size: 2.35rem; font-weight: 900; color: #FFFFFF !important; margin: 1px 0 0 0; line-height: 0.95; text-transform: uppercase; letter-spacing: -0.5px;">ESCALA</h1>
+                                </div>
+
+                                <!-- Member Name & Function -->
+                                <div>
+                                    <h2 style="font-size: 1.3rem; font-weight: 900; color: #FFFFFF !important; margin: 0; line-height: 1.1;">${this.currentUser.nome}</h2>
+                                    <div style="font-size: 0.82rem; font-weight: 700; color: #E2E8F0 !important; margin-top: 2px;">${userFuncaoText}</div>
+                                </div>
                             </div>
+
                         </div>
 
                     </div>
 
-                    <!-- Overlapping Celebration Highlight Card -->
-                    <div class="panel-card" style="margin: -24px 0 14px 0; position: relative; z-index: 2; text-align: left; padding: 18px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);">
+                    <!-- Overlapping Celebration Highlight Card (Starting directly at divisa line) -->
+                    <div class="panel-card" style="margin: -10px 0 12px 0; position: relative; z-index: 4; text-align: left; padding: 14px 16px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);">
+                        <div style="font-size: 0.68rem; font-weight: 800; color: #0E5C54; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;">
+                            ÁREA DE SERVIÇO · ${(areaTitle || 'Templo').toUpperCase()}
+                        </div>
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
                             <div>
-                                <div style="font-size: 0.7rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px;">${fullDateFormatted}</div>
-                                <h2 style="font-size: 1.25rem; font-weight: 900; color: #0F172A; margin: 2px 0 0 0; line-height: 1.2;">${cultoNome}</h2>
+                                <div style="font-size: 0.68rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px;">${fullDateFormatted}</div>
+                                <h2 style="font-size: 1.22rem; font-weight: 900; color: #0F172A; margin: 2px 0 0 0; line-height: 1.2;">${cultoNome}</h2>
                             </div>
-                            <span style="font-size: 0.72rem; font-weight: 800; background: ${ownBadgeBg}; color: ${ownBadgeColor}; padding: 4px 12px; border-radius: 12px; letter-spacing: 0.5px; flex-shrink: 0; margin-left: 8px;">${ownStatusLabel}</span>
+                            <span style="font-size: 0.7rem; font-weight: 800; background: ${ownBadgeBg}; color: ${ownBadgeColor}; padding: 3px 10px; border-radius: 10px; letter-spacing: 0.5px; flex-shrink: 0; margin-left: 8px;">${ownStatusLabel}</span>
                         </div>
 
-                        <div style="font-size: 1.05rem; font-weight: 800; color: #1E293B; margin-bottom: 14px;">${horarioInicio} — ${horarioFim}</div>
+                        <div style="font-size: 1.05rem; font-weight: 800; color: #1E293B; margin-bottom: 12px;">${horarioInicio} — ${horarioFim}</div>
 
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid #F1F5F9; font-size: 0.8rem; color: #64748B;">
+                        <!-- Rodapé do Card: Apenas informações operacionais exclusivas (Supervisor e Chegada) -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid #F1F5F9; font-size: 0.8rem; color: #64748B;">
                             <div style="flex: 1;">
-                                <span style="display: block; font-size: 0.68rem; color: #94A3B8; font-weight: 600;">Local</span>
-                                <span style="font-weight: 800; color: #0F172A; font-size: 0.9rem;">${displayLocal}</span>
-                            </div>
-                            <div style="border-left: 1px solid #F1F5F9; padding-left: 12px; flex: 1;">
                                 <span style="display: block; font-size: 0.68rem; color: #94A3B8; font-weight: 600;">Supervisor</span>
-                                <span style="font-weight: 800; color: #0F172A; font-size: 0.9rem;">${staticData.supervisor}</span>
+                                <span style="font-weight: 800; color: #0F172A; font-size: 0.88rem;">${staticData.supervisor}</span>
                             </div>
-                            <div style="border-left: 1px solid #F1F5F9; padding-left: 12px; flex: 1;">
+                            <div style="border-left: 1px solid #F1F5F9; padding-left: 14px; flex: 1;">
                                 <span style="display: block; font-size: 0.68rem; color: #94A3B8; font-weight: 600;">Chegada</span>
-                                <span style="font-weight: 800; color: #0F172A; font-size: 0.9rem;">${arrivalTime}</span>
+                                <span style="font-weight: 800; color: #0F172A; font-size: 0.88rem;">${arrivalTime}</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Equipe Escalada -->
-                    <div class="panel-card" style="margin-bottom: 14px; text-align: left; padding: 16px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px;">
+                    <!-- Equipe Escalada (Soft Subdued Institutional Green Tint Background) -->
+                    <div class="panel-card" style="margin-bottom: 14px; text-align: left; padding: 16px; background: #EFF7F5; border: 1px solid #D2E6E2; border-radius: 12px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <span style="font-size: 0.95rem; font-weight: 800; color: #1E293B;">Equipe escalada</span>
-                            <span style="font-size: 0.75rem; color: #64748B; font-weight: 500;">Outros servos nesta escala</span>
+                            <span style="font-size: 0.95rem; font-weight: 800; color: #0E5C54;">Equipe escalada</span>
+                            <span style="font-size: 0.75rem; color: #4A7A74; font-weight: 500;">Outros servos nesta escala</span>
                         </div>
                         <div class="detail-team-list">
                             ${teamListHtml}
@@ -3311,8 +3184,11 @@ const App = {
     closeAreaDetail() {
         document.getElementById('member-sub-area-detail').style.display = 'none';
         document.getElementById('member-sub-escala').style.display = 'block';
+        const isDiaconiaOrAcolhimentoSector = ['entrada', 'check_in', 'apoio_templo_ronda_dir', 'apoio_templo_ronda_esq', 'acolhimento', 'escala_livre'].includes(this.activeSectorId);
         const memberHeader = document.querySelector('.member-header');
-        if (memberHeader) memberHeader.style.display = 'flex';
+        if (memberHeader) {
+            memberHeader.style.display = isDiaconiaOrAcolhimentoSector ? 'none' : 'flex';
+        }
     },
 
     handleChecklistItemChange(nodeId, index, element) {
@@ -4734,10 +4610,10 @@ const App = {
             // 2. Load Services in Progress
             const activeServices = await DbService.getServicosEmAndamento();
             const serviceContainer = document.getElementById('admin-dashboard-active-services');
-            document.getElementById('active-services-count').innerText = `${activeServices.length} Ativo(s)`;
+            document.getElementById('active-services-count').innerText = `${activeServices.length} ativos`;
 
             if (activeServices.length === 0) {
-                serviceContainer.innerHTML = `<div style="text-align: center; color: var(--slate-gray); padding: 30px; font-size:0.9rem;">Não há serviços em andamento no momento.</div>`;
+                serviceContainer.innerHTML = `<div style="text-align: center; color: #64748B; padding: 20px; font-size:0.85rem;">Nenhum serviço em andamento no momento.</div>`;
             } else {
                 serviceContainer.innerHTML = '';
                 activeServices.forEach(s => {
@@ -4791,7 +4667,8 @@ const App = {
                 <div class="report-row"><span>Total Planejado:</span> <b>${totalScales}</b></div>
                 <div class="report-row"><span>Presenças Confirmadas:</span> <b style="color: #10B981;">${confirmed}</b></div>
                 <div class="report-row"><span>Presenças Pendentes:</span> <b style="color: #F59E0B;">${pending}</b></div>
-                <div class="report-row"><span>Serviços Finalizados:</span> <b style="color: var(--teal-primary);">${finished}</b></div>
+                ${other > 0 ? `<div class="report-row"><span>Presenças Recusadas / Substituir:</span> <b style="color: #EF4444;">${other}</b></div>` : ''}
+                <div class="report-row" title="Obreiros que já concluíram o atendimento no check-out"><span>Serviços Finalizados (Check-outs):</span> <b style="color: var(--teal-primary);">${finished}</b></div>
             `;
 
             // 4. Pending Replenishments summary
@@ -4822,35 +4699,29 @@ const App = {
                 const hoje = new Date();
                 hoje.setHours(0,0,0,0);
                 const limiteFim = new Date(hoje);
-                limiteFim.setDate(hoje.getDate() + 5);
-
-                const parseLocalDate = (dateStr) => {
-                    if (!dateStr) return null;
-                    const parts = dateStr.split('-');
-                    return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
-                };
+                limiteFim.setDate(limiteFim.getDate() + 5);
 
                 membros.forEach(m => {
-                    if (m.statusOperacional && m.statusOperacional !== 'Disponível' && m.afastamentoFim) {
-                        const fim = parseLocalDate(m.afastamentoFim);
-                        if (fim >= hoje && fim <= limiteFim) {
+                    if (m.afastamentoDataFim) {
+                        const dfim = new Date(m.afastamentoDataFim);
+                        if (dfim >= hoje && dfim <= limiteFim) {
                             retornandoEm5Dias++;
                         }
                     }
                 });
 
-                let alertasHTML = '<div style="display: flex; flex-direction: column; gap: 8px;">';
+                let alertasHTML = '<div style="display:flex; flex-direction:column; gap:6px; font-size:0.85rem;">';
                 alertasHTML += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.03);">
-                        <span style="display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-umbrella-beach" style="color: #10B981;"></i> Obreiros em Férias</span>
-                        <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #10B981; font-weight: 700; border-radius: 6px; padding: 2px 8px;">${feriasCount}</span>
+                    <div style="display:flex; justify-shadow:space-between; align-items:center; background:#F8FAFC; padding:8px 12px; border-radius:6px; border:1px solid #E2E8F0;">
+                        <span><i class="fa-solid fa-umbrella-beach" style="color: #3B82F6;"></i> Em Férias:</span>
+                        <span class="badge" style="background: rgba(59, 130, 246, 0.1); color: #3B82F6; font-weight: 700; border-radius: 6px; padding: 2px 8px;">${feriasCount}</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.03);">
-                        <span style="display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-person-walking-luggage" style="color: #F59E0B;"></i> Outros Afastamentos</span>
-                        <span class="badge" style="background: rgba(245, 158, 11, 0.1); color: #F59E0B; font-weight: 700; border-radius: 6px; padding: 2px 8px;">${outrosAfastadosCount}</span>
+                    <div style="display:flex; justify-shadow:space-between; align-items:center; background:#F8FAFC; padding:8px 12px; border-radius:6px; border:1px solid #E2E8F0;">
+                        <span><i class="fa-solid fa-user-slash" style="color: #EF4444;"></i> Outros Afastamentos:</span>
+                        <span class="badge" style="background: rgba(239, 68, 68, 0.1); color: #EF4444; font-weight: 700; border-radius: 6px; padding: 2px 8px;">${outrosAfastadosCount}</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0;">
-                        <span style="display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-arrows-spin" style="color: #6366F1;"></i> Retornos nos próximos 5 dias</span>
+                    <div style="display:flex; justify-shadow:space-between; align-items:center; background:#F8FAFC; padding:8px 12px; border-radius:6px; border:1px solid #E2E8F0;">
+                        <span><i class="fa-solid fa-clock-rotate-left" style="color: #6366F1;"></i> Retornando em até 5 dias:</span>
                         <span class="badge" style="background: rgba(99, 102, 241, 0.1); color: #6366F1; font-weight: 700; border-radius: 6px; padding: 2px 8px;">${retornandoEm5Dias}</span>
                     </div>
                 `;
@@ -5164,34 +5035,9 @@ const App = {
                 descEl.innerText = `${aceitesPendentes.length} aceite(s) pendente(s) · ${recusasPendentes.length} recusa(s) a substituir · ${cultosPassados.length} culto(s) a fechar`;
             }
         }
-    },
 
-    renderOperationalPendingPanel(cultos, escalas) {
         const pendenciasContainer = document.getElementById('admin-dashboard-pendencias');
         if (!pendenciasContainer) return;
-
-        const agora = new Date();
-        const hojeStr = agora.toISOString().split('T')[0];
-        const horaAtual = agora.toTimeString().split(' ')[0].substring(0, 5);
-
-        const cultosPassados = cultos.filter(c => {
-            if (c.status === 'Finalizado') return false;
-            if (c.data < hojeStr) return true;
-            if (c.data === hojeStr) {
-                const fim = c.horarioFim || '23:59';
-                return horaAtual > fim;
-            }
-            return false;
-        }).filter(c => {
-            const escalasDoCulto = escalas.filter(e => e.cultoId === c.id);
-            return escalasDoCulto.length > 0;
-        });
-
-        const aceitesPendentes = escalas.filter(e => {
-            if (e.statusPresenca !== 'Pendente' || !e.membroId || e.membroNome === 'Vaga Pendente' || !e.cultoId) return false;
-            const c = cultos.find(culto => culto.id === e.cultoId);
-            return c && c.status !== 'Finalizado';
-        });
 
         const faltasSemJustificativa = escalas.filter(e => {
             if (e.statusPresenca !== 'Ausente') return false;
@@ -5285,9 +5131,8 @@ const App = {
 
         if (!itemsHtml) {
             itemsHtml = `
-                <div style="grid-column: 1 / -1; text-align: center; color: var(--slate-gray); padding: 30px; font-size:0.95rem; font-weight:500; display:flex; flex-direction:column; align-items:center; gap:10px;">
-                    <i class="fa-solid fa-circle-check" style="color:#10B981; font-size:2rem;"></i>
-                    Nenhuma pendência operacional ativa no momento.
+                <div style="grid-column: 1 / -1; text-align: center; color: #64748B; padding: 20px; font-size:0.85rem; font-weight:500;">
+                    Nenhuma ação pendente no momento.
                 </div>
             `;
         }

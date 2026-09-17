@@ -447,7 +447,7 @@
                         <img src="assets/logo.png" alt="Diaconato">
                         <div>
                             <div class="admin-logo-title">Diaconato</div>
-                            <div style="font-size: 0.7rem; color: var(--cyan-accent); font-weight: 700; text-transform: uppercase;">Supervisor Geral</div>
+                            <div style="font-size: 0.7rem; color: #38BDF8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Supervisor Geral</div>
                         </div>
                     </div>
                     
@@ -562,13 +562,13 @@
                                 <div class="panel-card" style="display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0;">
                                     <div>
                                         <div class="panel-header" style="border-bottom: 1px solid #F1F5F9; padding-bottom: 8px; margin-bottom: 12px;">
-                                            <div class="panel-title" style="font-size: 0.95rem;"><i class="fa-solid fa-clipboard-check" style="margin-right: 6px; color: #0284C7;"></i> Status do Diaconato</div>
+                                            <div class="panel-title" style="font-size: 0.95rem;"><i class="fa-solid fa-clipboard-check" style="margin-right: 6px; color: #0D5C5A;"></i> Status do Diaconato</div>
                                         </div>
-                                        <h4 id="hero-central-status-title" style="font-size: 1.1rem; font-weight: 700; color: #1E293B; margin: 0 0 4px 0;">Central Administrativa</h4>
+                                        <h4 id="hero-central-status-title" style="font-size: 1.05rem; font-weight: 700; color: #1E293B; margin: 0 0 4px 0;">Central Administrativa</h4>
                                         <p id="hero-central-status-desc" style="font-size: 0.82rem; color: #64748B; margin: 0;">Carregando ações...</p>
                                     </div>
                                     <div style="margin-top: 15px;">
-                                        <button onclick="App.switchAdminTab('central')" style="width: 100%; padding: 8px 12px; background: #1E293B; color: #FFFFFF; border: none; border-radius: 6px; font-weight: 600; font-size: 0.8rem; cursor: pointer;">
+                                        <button onclick="App.switchAdminTab('central')" style="width: 100%; padding: 8px 12px; background: #0D5C5A; color: #FFFFFF; border: none; border-radius: 6px; font-weight: 600; font-size: 0.8rem; cursor: pointer;">
                                             Ver Central
                                         </button>
                                     </div>
@@ -578,11 +578,11 @@
                                 <div class="panel-card" style="display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0;">
                                     <div>
                                         <div class="panel-header" style="border-bottom: 1px solid #F1F5F9; padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-                                            <div class="panel-title" style="font-size: 0.95rem;"><i class="fa-solid fa-bolt" style="margin-right: 6px; color: #EAB308;"></i> Serviços em Andamento</div>
-                                            <span class="badge badge-active" style="background: rgba(16, 185, 129, 0.1); color: #10B981; font-size: 0.72rem; font-weight: 700;" id="active-services-count">0 Ativo(s)</span>
+                                            <div class="panel-title" style="font-size: 0.95rem;"><i class="fa-solid fa-clock-rotate-left" style="margin-right: 6px; color: #0D5C5A;"></i> Serviços em Andamento</div>
+                                            <span class="badge badge-active" style="background: rgba(16, 185, 129, 0.1); color: #0D9488; font-size: 0.72rem; font-weight: 700;" id="active-services-count">0 ativos</span>
                                         </div>
                                         <div id="admin-dashboard-active-services" style="font-size: 0.82rem; color: #64748B;">
-                                            <div style="text-align: center; padding: 10px;">Sem serviços ativos.</div>
+                                            <div style="text-align: center; padding: 10px;">Nenhum serviço em andamento.</div>
                                         </div>
                                     </div>
                                 </div>
@@ -591,7 +591,7 @@
                                 <div class="panel-card" style="display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0;">
                                     <div>
                                         <div class="panel-header" style="border-bottom: 1px solid #F1F5F9; padding-bottom: 8px; margin-bottom: 12px;">
-                                            <div class="panel-title" style="font-size: 0.95rem;"><i class="fa-solid fa-calendar-week" style="margin-right: 6px; color: #10B981;"></i> Escalas da Semana</div>
+                                            <div class="panel-title" style="font-size: 0.95rem;"><i class="fa-solid fa-calendar-days" style="margin-right: 6px; color: #0D5C5A;"></i> Escalas da Semana</div>
                                         </div>
                                         <div class="progress-container-stacked" style="margin-bottom: 10px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #f1f5f9;">
                                             <div class="progress-bar-stacked" id="dashboard-scales-progress-bar" style="display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: #e2e8f0; margin-bottom: 6px;">
@@ -610,14 +610,14 @@
                                     </div>
                                 </div>
 
-                                <!-- Card 4: Afastamentos e Indisponibilidades -->
+                                <!-- Card 4: Afastamentos -->
                                 <div class="panel-card" style="display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0;">
                                     <div>
                                         <div class="panel-header" style="border-bottom: 1px solid #F1F5F9; padding-bottom: 8px; margin-bottom: 12px;">
-                                            <div class="panel-title" style="font-size: 0.95rem;"><i class="fa-solid fa-plane-departure" style="margin-right: 6px; color: #6366F1;"></i> Afastamentos</div>
+                                            <div class="panel-title" style="font-size: 0.95rem;"><i class="fa-solid fa-user-slash" style="margin-right: 6px; color: #0D5C5A;"></i> Afastamentos</div>
                                         </div>
                                         <div id="admin-dashboard-afastamentos-alertas" style="font-size: 0.82rem; color: #64748B;">
-                                            Todos os membros disponíveis.
+                                            Nenhum afastamento registrado.
                                         </div>
                                     </div>
                                 </div>
@@ -2391,10 +2391,10 @@
         </div>
 
         <!-- Import Main App Control logic -->
-        <script src="js/firebase-config.js?v=3.20.2"></script>
-        <script src="js/db.js?v=3.20.2"></script>
-        <script src="js/config/sectorsData.js?v=3.20.2"></script>
-        <script src="js/app.js?v=3.20.2"></script>
+        <script src="js/firebase-config.js?v=3.21.2"></script>
+        <script src="js/db.js?v=3.21.2"></script>
+        <script src="js/config/sectorsData.js?v=3.21.2"></script>
+        <script src="js/app.js?v=3.21.2"></script>
 
 
 </div></body></html>
