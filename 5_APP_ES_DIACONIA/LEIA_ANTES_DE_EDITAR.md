@@ -104,3 +104,14 @@ Recentemente, o sistema foi atualizado com a remoção dos bloqueios legados da 
    * Subir regras e índices associados: `firebase deploy --only firestore`
 3. **Backup Final**:
    * Salvar backups estruturais em: `3_LAUSANNE_ARQUIVO_HISTORICO/REPOSITORIO_DE_RESTAURACAO_E_VERSOES/`
+
+---
+
+## 📝 7. REGISTRO DE ATUALIZAÇÕES (Versão 3.25.0 - Setembro 2026)
+
+* **Interface Limpa:** Remoção total da identidade visual de Inteligência Artificial (ícones de magia, cores extravagantes e mensagens de bot) do painel de controle. A interface foi convertida para um layout administrativo padrão, mais claro e objetivo.
+* **Reestruturação de Ações:** Remoção do botão de adicionar escala manual do menu escondido de opções. O botão Adicionar Manual agora é um botão principal ao lado de Preencher Automático. O botão Normalizar foi renomeado para Corrigir Duplicatas e transferido para o menu de opções.
+* **Novo Modelo Culto de Ceia:** Adicionado um novo modelo de geração de escala com vaga exclusiva para Servir a Mesa da Ceia vinculada ao setor de Apoio Templo.
+* **Algoritmo de Escala Flexível:** O sistema automático de recrutamento deixou de exigir que a função cadastrada pelo usuário seja um match textual perfeito. Agora, o sistema aloca membros do setor correto dinamicamente para garantir o preenchimento, dando bônus de prioridade aos que possuem a função exata no perfil.
+* **Correção UTF-8:** Refatoração de caracteres acentuados que corrompiam verificações estritas do javascript (resolvendo o bug que impedia o retorno de férias da obreira).
+* **Resumo de Escala Atualizado:** Filtro atualizado para exibir as contagens estritamente focadas no mês vigente, ignorando histórico acumulado na dashboard administrativa.

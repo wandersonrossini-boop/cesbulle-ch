@@ -112,10 +112,6 @@ const DbService = {
             if (membersSnap.empty) {
                 console.log("Database empty! Seeding initial data...");
                 
-                // 1. Seed Admin Principal (CES Diaconia Lausanne)
-                const adminSalt = this.generateSalt();
-                const adminHash = await this.hashPassword("Ces120222.", adminSalt);
-                
                 await db.collection('membros').doc('admin_default').set({
                     nome: "Wanderson Rossini",
                     nomeNormalizado: "wanderson rossini",
@@ -125,11 +121,6 @@ const DbService = {
                     funcao: "Administrador",
                     status: "ativo",
                     criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                await db.collection('credenciais').doc('admin_default').set({
-                    passwordHash: adminHash,
-                    passwordSalt: adminSalt
                 });
 
                 // 4. Seed Sectors
@@ -221,134 +212,45 @@ const DbService = {
     async authenticateUser(nomeDigitado, password) {
         try {
             const nomeNorm = this.normalizeStr(nomeDigitado);
-            
-            // Garantir sessão ativa para passar pelas regras de segurança
-            if (!firebase.auth().currentUser) {
-                console.log("[Auth-Diag] Iniciando sessão anônima temporária...");
-                await firebase.auth().signInAnonymously();
-            }
-            console.log(`[Auth-Diag] Sessão anônima ativa. UID temporário: ${firebase.auth().currentUser.uid}`);
+            const nomeSemEspacos = nomeNorm.replace(/\s+/g, '');
+            const emailTecnico = `${nomeSemEspacos}@cesdiaconia.ch`;
 
-            // Buscar membro ativo pelo nome normalizado
-            console.log(`[Auth-Diag] Executando query em 'membros' para nomeNormalizado: "${nomeNorm}"`);
-            const snap = await db.collection('membros')
-                .where('nomeNormalizado', '==', nomeNorm)
-                .where('status', '==', 'ativo')
-                .limit(1)
-                .get();
+            console.log(`[Auth-Diag] Tentando autenticação Firebase Auth para e-mail técnico: "${emailTecnico}"`);
 
-            // DIAGNÓSTICO AVANÇADO (Detectar Duplicidade usando limit(1) e orderBy para burlar a restrição de listagem de forma legal)
+            let userCredential;
             try {
-                const snapDesc = await db.collection('membros')
-                    .where('nomeNormalizado', '==', nomeNorm)
-                    .where('status', '==', 'ativo')
-                    .orderBy(firebase.firestore.FieldPath.documentId(), 'desc')
-                    .limit(1)
-                    .get();
-
-                if (!snap.empty && !snapDesc.empty) {
-                    const docFirst = snap.docs[0];
-                    const docLast = snapDesc.docs[0];
-
-                    if (docFirst.id !== docLast.id) {
-                        console.log(`[Auth-Diag] ATENÇÃO: MÚLTIPLOS DOCUMENTOS ENCONTRADOS para "${nomeNorm}"! (Pelo menos 2)`);
-                        console.log(`[Auth-Diag] Documento A (Ascendente) -> ID: ${docFirst.id.substring(0,3)}***${docFirst.id.substring(docFirst.id.length-3)}, Perfil: ${docFirst.data().perfil}, Nome: ${docFirst.data().nome}`);
-                        console.log(`[Auth-Diag] Documento B (Descendente) -> ID: ${docLast.id.substring(0,3)}***${docLast.id.substring(docLast.id.length-3)}, Perfil: ${docLast.data().perfil}, Nome: ${docLast.data().nome}`);
-                    } else {
-                        console.log(`[Auth-Diag] Apenas 1 documento existe no banco para "${nomeNorm}".`);
-                    }
+                userCredential = await firebase.auth().signInWithEmailAndPassword(emailTecnico, password);
+            } catch (authErr) {
+                console.warn("[Auth-Diag] Falha na autenticação Firebase Auth:", authErr.code, authErr.message);
+                if (authErr.code === 'auth/wrong-password' || authErr.code === 'auth/user-not-found' || authErr.code === 'auth/invalid-credential' || authErr.code === 'auth/invalid-email') {
+                    return { success: false, error: 'Nome ou senha incorretos.' };
                 }
-            } catch (diagErr) {
-                console.warn("[Auth-Diag] Aviso: não foi possível executar diagnóstico secundário de duplicidade.", diagErr.message);
+                return { success: false, error: 'Falha na autenticação: ' + authErr.message };
             }
 
-            let matchedDoc = null;
-            let mData = null;
+            const authenticatedUid = userCredential.user.uid;
+            console.log(`[Auth-Diag] Autenticado com sucesso no Firebase Auth! UID: ${authenticatedUid}`);
 
-            if (!snap.empty) {
-                matchedDoc = snap.docs[0];
-                mData = matchedDoc.data();
-                console.log("[Auth-Diag] Membro SELECIONADO para o login:");
-                console.log(`[Auth-Diag] ID: ${matchedDoc.id.substring(0, 3)}***${matchedDoc.id.substring(matchedDoc.id.length - 3)}`);
-                console.log(`[Auth-Diag] perfil: ${mData.perfil || 'vazio'}`);
-                console.log(`[Auth-Diag] nome: ${mData.nome}`);
-                console.log(`[Auth-Diag] nomeNormalizado: ${mData.nomeNormalizado}`);
-                console.log(`[Auth-Diag] status: ${mData.status}`);
-            } else {
-                console.log("[Auth-Diag] Membro NÃO ENCONTRADO na query.");
+            // Buscar documento correspondente do membro no Firestore pelo UID (membroId)
+            const userDoc = await db.collection('membros').doc(authenticatedUid).get();
+            if (!userDoc.exists || userDoc.data().status !== 'ativo') {
+                console.warn(`[Auth-Diag] Membro correspondente ao UID ${authenticatedUid} não encontrado ou inativo.`);
+                await firebase.auth().signOut();
+                return { success: false, error: 'Usuário não encontrado ou inativo.' };
             }
 
-            if (!matchedDoc) {
-                return { success: false, error: 'Nome não encontrado. Verifique se digitou o nome completo.' };
-            }
-
-            const membroId = matchedDoc.id;
-            const maskedId = membroId.substring(0, 3) + '***' + membroId.substring(membroId.length - 3);
-            console.log(`[Auth-Diag] ID do Membro resolvido (parcial): ${maskedId}`);
-
-            console.log(`[Auth-Diag] Tentando ler credenciais/${maskedId}...`);
-            const credRef = db.collection('credenciais').doc(membroId);
-            const credSnap = await credRef.get();
-
-            let passwordMatch = false;
-            let needsMigration = false;
-
-            if (credSnap.exists) {
-                console.log("[Auth-Diag] Documento de credencial EXISTE.");
-                const credData = credSnap.data();
-                const computedHash = await this.hashPassword(password, credData.passwordSalt);
-                passwordMatch = (computedHash === credData.passwordHash);
-                console.log(`[Auth-Diag] Comparação de hash concluída. Result: ${passwordMatch}`);
-            } else if (mData.senha) {
-                console.log("[Auth-Diag] Credencial não existe, testando senha em texto plano legado.");
-                if (mData.senha === password) {
-                    passwordMatch = true;
-                    needsMigration = true;
-                }
-            } else {
-                console.log("[Auth-Diag] Documento de credencial NÃO EXISTE e sem senha legada.");
-            }
-
-            if (!passwordMatch) {
-                return { success: false, error: 'Senha incorreta.' };
-            }
-
-            // Realizar migração híbrida segura no client-side
-            if (needsMigration) {
-                const salt = this.generateSalt();
-                const hash = await this.hashPassword(password, salt);
-
-                const batch = db.batch();
-                // 1. Criar credencial com hash e salt
-                batch.set(credRef, {
-                    passwordHash: hash,
-                    passwordSalt: salt
-                });
-                // 2. Remover senha em texto plano e gravar nomeNormalizado
-                batch.update(db.collection('membros').doc(membroId), {
-                    nomeNormalizado: nomeNorm,
-                    senha: firebase.firestore.FieldValue.delete()
-                });
-                await batch.commit();
-                console.log(`[Segurança] Membro '${mData.nome}' migrado com sucesso client-side!`);
-            } else if (!mData.nomeNormalizado && mData.nome) {
-                // Apenas atualizar nome normalizado se estiver ausente
-                await db.collection('membros').doc(membroId).update({
-                    nomeNormalizado: nomeNorm
-                });
-            }
-
-            // Simular claims/perfil do usuário na sessão ativa do frontend
+            const mData = userDoc.data();
             const sessionUser = {
-                id: membroId,
+                id: authenticatedUid,
                 nome: mData.nome,
-                email: mData.email,
+                email: mData.email || emailTecnico,
                 perfil: mData.perfil || 'membro',
                 setor: mData.setor,
                 setores: mData.setores || (mData.setor ? [mData.setor] : []),
                 funcao: mData.funcao,
                 fotoUrl: mData.fotoUrl || null,
-                eRepositor: mData.eRepositor || false
+                eRepositor: mData.eRepositor || false,
+                status: mData.status
             };
 
             this.limparCache();
@@ -404,37 +306,7 @@ const DbService = {
             returnId = docRef.id;
         }
 
-        // 2. Se houver uma nova senha informada (ou for cadastro novo), salvar de forma segura no client-side
-        if (inputPassword && inputPassword.trim() !== '') {
-            try {
-                console.log(`[Segurança] Salvando credenciais do membro no client-side...`);
-                const salt = this.generateSalt();
-                const hash = await this.hashPassword(inputPassword, salt);
-                
-                await db.collection('credenciais').doc(returnId).set({
-                    passwordHash: hash,
-                    passwordSalt: salt
-                });
-            } catch (e) {
-                console.error("Erro ao salvar credenciais do obreiro:", e);
-                throw e;
-            }
-        } else if (!id) {
-            // Novo cadastro sem senha informada (usar senha padrão de segurança)
-            try {
-                console.log(`[Segurança] Gerando credencial padrão para o novo obreiro...`);
-                const salt = this.generateSalt();
-                const hash = await this.hashPassword("Ces120222.", salt);
-                
-                await db.collection('credenciais').doc(returnId).set({
-                    passwordHash: hash,
-                    passwordSalt: salt
-                });
-            } catch (e) {
-                console.error("Erro ao definir credencial padrão de novo obreiro:", e);
-            }
-        }
-
+        // [GATE C2.11] A gravação na coleção legada 'credenciais' foi desativada. A autenticação é 100% gerenciada pelo Firebase Auth.
         this.limparCache('membros');
         return returnId;
     },
@@ -806,6 +678,11 @@ const DbService = {
     async getEscalasDoMembro(membroId) {
         const escalas = await this.getEscalas();
         return escalas.filter(e => e.membroId === membroId);
+    },
+
+    async getEscalaById(id) {
+        const escalas = await this.getEscalas();
+        return escalas.find(e => e.id === id) || null;
     },
 
     async updatePresenca(id, statusPresenca) {

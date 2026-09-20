@@ -2,17 +2,167 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Como o sistema utiliza autenticação customizada via front-end (Autenticação por Nome)
-    // e o Firebase Auth é usado apenas de forma anônima, não é possível validar
-    // a identidade real do usuário nas regras do Firestore.
-    // Portanto, o controle de acesso é delegado ao aplicativo (Front-end).
+    // --- FUNÇÕES AUXILIARES DE SEGURANÇA (GATE C2.9-C) ---
 
+    // Autenticação básica no Firebase Auth
     function isAuthenticated() {
-      return request.auth != null;
+      return request.auth != null && request.auth.token.firebase.sign_in_provider != 'anonymous';
     }
 
-    match /{document=**} {
-      allow read, write: if isAuthenticated();
+    // Verifica se o UID autenticado é o dono do recurso
+    function isOwner(membroId) {
+      return isAuthenticated() && request.auth.uid == membroId;
+    }
+
+    // Busca dados do documento do membro autenticado no Firestore
+    function getMembroData() {
+      return get(/databases/$(database)/documents/membros/$(request.auth.uid)).data;
+    }
+
+    // Verifica se o usuário autenticado possui o perfil Admin/Supervisor ou se é admin_default
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.uid == 'admin_default' ||
+        (exists(/databases/$(database)/documents/membros/$(request.auth.uid)) &&
+         getMembroData().perfil == 'admin')
+      );
+    }
+
+    // Verifica se o membro é comprador/repositor oficial
+    function isRepositor() {
+      return isAuthenticated() && (
+        isAdmin() ||
+        (exists(/databases/$(database)/documents/membros/$(request.auth.uid)) &&
+         getMembroData().eRepositor == true)
+      );
+    }
+
+    // --- REGRAS POR COLEÇÃO ---
+
+    // 1. Coleção membros
+    match /membros/{membroId} {
+      allow read: if isAuthenticated();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || (
+        isOwner(membroId) &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['perfil', 'status', 'setor', 'setores', 'funcao', 'eRepositor'])
+      );
+    }
+
+    // 2. Coleção credenciais (Exclusiva do Admin - Protege credenciais legadas)
+    match /credenciais/{membroId} {
+      allow read, write: if isAdmin();
+    }
+
+    // 3. Coleção setores
+    match /setores/{setorId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // 4. Coleção cultos
+    match /cultos/{cultoId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // 5. Coleção escalas
+    match /escalas/{escalaId} {
+      allow read: if isAuthenticated();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || (
+        isAuthenticated() &&
+        (resource.data.membroId == request.auth.uid || (resource.data.membrosIds != null && request.auth.uid in resource.data.membrosIds)) &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['cultoId', 'data', 'setorId', 'funcao'])
+      );
+    }
+
+    // 6. Coleção disponibilidades
+    match /disponibilidades/{dispId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.resource.data.membroId == request.auth.uid;
+      allow update, delete: if isAdmin() || (isAuthenticated() && resource.data.membroId == request.auth.uid);
+    }
+
+    // 7. Coleção produtos
+    match /produtos/{produtoId} {
+      allow read: if isAuthenticated();
+      allow write: if isRepositor();
+    }
+
+    // 8. Coleção reposicoes (Restrito a Admin ou Repositor para criar/atualizar, Admin para deletar)
+    match /reposicoes/{repId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isRepositor();
+      allow delete: if isAdmin();
+    }
+
+    // 9. Coleções de histórico (historico_estoque e historico_substituicoes)
+    match /historico_estoque/{id} {
+      allow read: if isAuthenticated();
+      allow write: if isRepositor();
+    }
+    match /historico_substituicoes/{id} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin() || (
+        isAuthenticated() && (
+          (request.resource.data.membroSaindoId != null && request.resource.data.membroSaindoId == request.auth.uid) ||
+          (request.resource.data.membroEntrandoId != null && request.resource.data.membroEntrandoId == request.auth.uid)
+        )
+      );
+      allow update, delete: if isAdmin();
+    }
+
+    // 10. Coleção avisos (Mural)
+    match /avisos/{avisoId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // 11. Coleção notificacoes (Restrito a autor correspondente a request.auth.uid para criar e destinatário para gerenciar)
+    match /notificacoes/{notifId} {
+      allow read: if isAuthenticated() && (isAdmin() || resource.data.paraUsuarioId == request.auth.uid || resource.data.paraUsuarioId == 'admin_default');
+      allow create: if isAdmin() || (
+        isAuthenticated() &&
+        request.resource.data.deUsuarioId != null &&
+        request.resource.data.deUsuarioId == request.auth.uid
+      );
+      allow update, delete: if isAdmin() || (isAuthenticated() && resource.data.paraUsuarioId == request.auth.uid);
+    }
+
+    // 12. Mensagens de Supervisão
+    match /mensagens_supervisao/{msgId} {
+      allow read: if isAuthenticated() && (isAdmin() || getMembroData().perfil == 'supervisor' || resource.data.membroId == request.auth.uid);
+      allow create: if isAuthenticated() && request.resource.data.membroId == request.auth.uid;
+      allow update, delete: if isAdmin() || getMembroData().perfil == 'supervisor';
+    }
+
+    // 13. Configuracoes
+    match /configuracoes/{configId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // 14. Colecao servicos
+    match /servicos/{servicoId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // 15. Colecao tarefas
+    match /tarefas/{tarefaId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // 16. Arquivamento
+    match /escalas_arquivadas/{arqId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    match /controle_arquivamento/{ctrlId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
     }
   }
 }

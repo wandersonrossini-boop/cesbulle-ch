@@ -17,7 +17,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=3.20.0">
+    <link rel="stylesheet" href="css/style.css?v=3.26.0">
     
     <!-- Firebase SDK (v8 Compat) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -602,24 +602,13 @@
                                     </div>
                                 </div>
 
-                                <!-- Card 3: Escalas da Semana -->
+                                <!-- Card 3: Resumo de Escalas (Histórico Geral) -->
                                 <div class="panel-card" style="display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0;">
                                     <div>
                                         <div class="panel-header" style="border-bottom: 1px solid #F1F5F9; padding-bottom: 8px; margin-bottom: 12px;">
-                                            <div class="panel-title" style="font-size: 0.95rem; font-weight: 700; color: #0D5C5A;">Escalas da Semana</div>
+                                            <div class="panel-title" style="font-size: 0.95rem; font-weight: 700; color: #0D5C5A;">Resumo de Escalas (Mês Atual)</div>
                                         </div>
-                                        <div class="progress-container-stacked" style="margin-bottom: 10px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #f1f5f9;">
-                                            <div class="progress-bar-stacked" id="dashboard-scales-progress-bar" style="display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: #e2e8f0; margin-bottom: 6px;">
-                                                <div class="progress-segment confirmed" style="width: 0%; background: #10B981; transition: width 0.5s ease;" title="Confirmadas"></div>
-                                                <div class="progress-segment pending" style="width: 0%; background: #F59E0B; transition: width 0.5s ease;" title="Pendentes"></div>
-                                                <div class="progress-segment other" style="width: 0%; background: #6B7280; transition: width 0.5s ease;" title="Finalizadas/Outras"></div>
-                                            </div>
-                                            <div class="progress-labels" style="display: flex; justify-content: space-between; font-size: 0.72rem; font-weight: 500;">
-                                                <span class="label confirmed" style="color: #10B981;">Confirmadas (<span id="dash-progress-pct-confirmed">0%</span>)</span>
-                                                <span class="label pending" style="color: #F59E0B;">Pendentes (<span id="dash-progress-pct-pending">0%</span>)</span>
-                                            </div>
-                                        </div>
-                                        <div id="admin-dashboard-scales-summary" style="display: flex; flex-direction: column; gap: 4px; font-size: 0.8rem;">
+                                        <div id="admin-dashboard-scales-summary" style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: #334155;">
                                             <!-- Summary numbers -->
                                         </div>
                                     </div>
@@ -852,33 +841,26 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="selected-culto-actions-right" style="display: flex; gap: 10px; align-items: flex-end;">
-                                        <div class="dropdown-wrapper">
-                                            <label style="font-size: 0.75rem; color: var(--slate-gray); display: block; margin-bottom: 2px;">Visualização</label>
-                                            <select class="select-clean" style="padding: 6px 32px 6px 12px; font-size: 0.85rem; width: 140px;" id="admin-scale-view-mode">
-                                                <option value="setor" selected="">Por Setor</option>
-                                            </select>
-                                        </div>
+                                    <div class="selected-culto-actions-right" style="display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;">
                                         
-                                        <button class="btn-primary" style="padding: 8px 16px; font-size: 0.85rem; background-color: #10B981; border: none; display: flex; align-items: center; gap: 6px; width: auto; height: 38px;" onclick="App.openAutoGeneratorWizard()">
-                                            <i class="fa-solid fa-wand-magic-sparkles"></i> Gerar Automática
+                                        <button id="btn-auto-fill-scales" class="btn-primary" style="padding: 8px 16px; font-size: 0.85rem; display: inline-flex !important; align-items: center; gap: 6px; width: auto; height: 38px;" onclick="App.openAutoGeneratorWizard()">
+                                            <i class="fa-solid fa-users-gear"></i> Preencher Automático
                                         </button>
                                         
-                                        <button class="btn-secondary" style="padding: 8px 16px; font-size: 0.85rem; color: #D97706; border-color: #FDE68A; background-color: #FEF3C7; display: flex; align-items: center; gap: 6px; width: auto; height: 38px;" onclick="App.normalizarEscalasDuplicadas()">
-                                            <i class="fa-solid fa-broom"></i> Normalizar
+                                        <button class="btn-secondary" style="padding: 8px 16px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; width: auto; height: 38px;" onclick="App.openEscalaFormModal()">
+                                            <i class="fa-solid fa-user-plus"></i> Adicionar Manual
                                         </button>
                                         
                                         <div class="dropdown-wrapper actions-dropdown" style="position: relative;">
-                                            <label style="font-size: 0.75rem; color: var(--slate-gray); display: block; margin-bottom: 2px; visibility: hidden;">Ações</label>
-                                            <button class="btn-secondary" style="padding: 8px 16px; font-size: 0.85rem;" onclick="App.toggleActiveCultoActionsDropdown(event)">
-                                                <i class="fa-solid fa-ellipsis-vertical"></i> Ações <i class="fa-solid fa-chevron-down" style="font-size:0.7rem; margin-left:5px;"></i>
+                                            <button class="btn-secondary" style="padding: 8px 16px; font-size: 0.85rem; height: 38px;" onclick="App.toggleActiveCultoActionsDropdown(event)">
+                                                <i class="fa-solid fa-gear"></i> Opções <i class="fa-solid fa-chevron-down" style="font-size:0.7rem; margin-left:5px;"></i>
                                             </button>
-                                            <div class="dropdown-menu-list" id="active-culto-actions-menu" style="display:none; position: absolute; right: 0; top: 100%; z-index: 10; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; box-shadow: var(--shadow-md); min-width: 150px;">
-                                                <a onclick="App.handleEditActiveCulto()" id="action-edit-culto" style="padding: 8px 12px; display: block; font-size: 0.85rem; color: var(--navy-dark); cursor: pointer; text-decoration: none;"><i class="fa-solid fa-pen" style="margin-right: 5px;"></i> Editar Culto</a>
-                                                <a onclick="App.handleDeleteActiveCulto()" id="action-delete-culto" class="delete" style="padding: 8px 12px; display: block; font-size: 0.85rem; color: #EF4444; cursor: pointer; text-decoration: none; border-top: 1px solid #F1F5F9;"><i class="fa-solid fa-trash" style="margin-right: 5px;"></i> Excluir Culto</a>
-                                                <a onclick="App.openEscalaFormModal()" style="padding: 8px 12px; display: block; font-size: 0.85rem; color: var(--teal-primary); cursor: pointer; text-decoration: none; border-top: 1px solid #F1F5F9;"><i class="fa-solid fa-user-plus" style="margin-right: 5px;"></i> Montar Escala</a>
-                                                <a onclick="App.openDuplicarCultoModal()" style="padding: 8px 12px; display: block; font-size: 0.85rem; color: var(--teal-primary); cursor: pointer; text-decoration: none; border-top: 1px solid #F1F5F9;"><i class="fa-solid fa-copy" style="margin-right: 5px;"></i> Duplicar Culto com Escala</a>
-                                                <a onclick="App.openFechamentoCultoModal()" id="action-fechamento-culto" style="padding: 8px 12px; display: block; font-size: 0.85rem; color: var(--teal-primary); cursor: pointer; text-decoration: none; border-top: 1px solid #F1F5F9;"><i class="fa-solid fa-lock" style="margin-right: 5px;"></i> Fechar Culto</a>
+                                            <div class="dropdown-menu-list" id="active-culto-actions-menu" style="display:none; position: absolute; right: 0; top: 100%; z-index: 10; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; box-shadow: var(--shadow-md); min-width: 190px;">
+                                                <a onclick="App.handleEditActiveCulto()" id="action-edit-culto" style="padding: 10px 12px; display: block; font-size: 0.85rem; color: var(--navy-dark); cursor: pointer; text-decoration: none;"><i class="fa-solid fa-pen" style="margin-right: 5px; width: 15px; text-align: center;"></i> Editar Culto</a>
+                                                <a onclick="App.openDuplicarCultoModal()" style="padding: 10px 12px; display: block; font-size: 0.85rem; color: var(--navy-dark); cursor: pointer; text-decoration: none; border-top: 1px solid #F1F5F9;"><i class="fa-solid fa-copy" style="margin-right: 5px; width: 15px; text-align: center;"></i> Duplicar Culto</a>
+                                                <a onclick="App.openFechamentoCultoModal()" id="action-fechamento-culto" style="padding: 10px 12px; display: block; font-size: 0.85rem; color: var(--navy-dark); cursor: pointer; text-decoration: none; border-top: 1px solid #F1F5F9;"><i class="fa-solid fa-lock" style="margin-right: 5px; width: 15px; text-align: center;"></i> Fechar Culto</a>
+                                                <a onclick="App.normalizarEscalasDuplicadas()" style="padding: 10px 12px; display: block; font-size: 0.85rem; color: #D97706; cursor: pointer; text-decoration: none; border-top: 1px solid #F1F5F9;"><i class="fa-solid fa-check-double" style="margin-right: 5px; width: 15px; text-align: center;"></i> Corrigir Duplicatas</a>
+                                                <a onclick="App.handleDeleteActiveCulto()" id="action-delete-culto" class="delete" style="padding: 10px 12px; display: block; font-size: 0.85rem; color: #EF4444; cursor: pointer; text-decoration: none; border-top: 1px solid #F1F5F9;"><i class="fa-solid fa-trash" style="margin-right: 5px; width: 15px; text-align: center;"></i> Excluir Culto</a>
                                             </div>
                                         </div>
                                     </div>
@@ -1489,7 +1471,7 @@
                     <div class="form-group">
                         <label for="membro-email">E-mail de Login</label>
                         <div class="input-icon-wrapper">
-                            <i class="fa-solid fa-envelope"></i>
+                            <i class="fa-solid fa-eNívelope"></i>
                             <input type="email" id="membro-email" required="" placeholder="usuario@exemplo.com">
                         </div>
                     </div>
@@ -1568,96 +1550,70 @@
                 <div id="membro-tab-disp" class="membro-modal-tab-content" style="display: none;">
                     <div class="form-group">
                         <label for="membro-disponibilidade">Disponibilidade Geral</label>
-                        <div class="input-icon-wrapper">
-                            <i class="fa-solid fa-calendar-days"></i>
-                            <select id="membro-disponibilidade" required="" style="padding-left: 45px;">
-                                <option value="Sempre Disponível">Sempre Disponível</option>
-                                <option value="Disponível para Escala" selected="">Disponível para Escala</option>
-                                <option value="Consultar Primeiro">Consultar Primeiro</option>
-                            </select>
-                        </div>
-                        <small style="display: block; margin-top: 4px; font-size: 0.75rem; color: #64748B;">Atenção: Impacta as sugestões automáticas da IA na montagem das escalas.</small>
+                        <select id="membro-disponibilidade" required="">
+                            <option value="Sempre Disponível">Sempre Disponível</option>
+                            <option value="Disponível para Escala" selected="">Disponível para Escala</option>
+                            <option value="Consultar Primeiro">Consultar Primeiro</option>
+                        </select>
                     </div>
 
                     <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
                         <div class="form-group">
                             <label for="membro-participa-substituicao">Participa de Substituição?</label>
-                            <div class="input-icon-wrapper">
-                                <i class="fa-solid fa-shuffle"></i>
-                                <select id="membro-participa-substituicao" required="" style="padding-left: 45px;">
-                                    <option value="Sim">Sim</option>
-                                    <option value="Não">Não</option>
-                                </select>
-                            </div>
-                            <small style="display: block; margin-top: 4px; font-size: 0.75rem; color: #64748B;">Se "Não", remove o membro das recomendações de substituição urgente.</small>
+                            <select id="membro-participa-substituicao" required="">
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="membro-prioridade">Prioridade / Nível</label>
-                            <div class="input-icon-wrapper">
-                                <i class="fa-solid fa-arrow-up-9-1"></i>
-                                <select id="membro-prioridade" required="" style="padding-left: 45px;">
-                                    <option value="Normal">Normal</option>
-                                    <option value="Supervisor">Supervisor</option>
-                                    <option value="Coordenador">Coordenador</option>
-                                </select>
-                            </div>
+                            <select id="membro-prioridade" required="">
+                                <option value="Normal">Normal</option>
+                                <option value="Supervisor">Supervisor</option>
+                                <option value="Coordenador">Coordenador</option>
+                            </select>
                         </div>
                     </div>
 
                     <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
                         <div class="form-group">
                             <label for="membro-status">Status Cadastral</label>
-                            <div class="input-icon-wrapper">
-                                <i class="fa-solid fa-circle-info"></i>
-                                <select id="membro-status" required="">
-                                    <option value="ativo">Ativo</option>
-                                    <option value="inativo">Inativo</option>
-                                </select>
-                            </div>
+                            <select id="membro-status" required="">
+                                <option value="ativo">Ativo</option>
+                                <option value="inativo">Inativo</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="membro-status-operacional">Status Operacional</label>
-                            <div class="input-icon-wrapper">
-                                <i class="fa-solid fa-user-clock"></i>
-                                <select id="membro-status-operacional" required="" onchange="App.toggleAfastamentoDatesFields(this.value)">
-                                    <option value="Disponível" selected="">Disponível</option>
-                                    <option value="Férias">Férias</option>
-                                    <option value="Afastado">Afastado</option>
-                                    <option value="Licença Médica">Licença Médica</option>
-                                    <option value="Viagem / Intercâmbio">Viagem / Intercâmbio</option>
-                                    <option value="Inativo Temporário">Inativo Temporário</option>
-                                </select>
-                            </div>
+                            <select id="membro-status-operacional" required="" onchange="App.toggleAfastamentoDatesFields(this.value)">
+                                <option value="Disponível" selected="">Disponível</option>
+                                <option value="Férias">Férias</option>
+                                <option value="Afastado">Afastado</option>
+                                <option value="Licença Médica">Licença Médica</option>
+                                <option value="Viagem / Intercâmbio">Viagem / Intercâmbio</option>
+                                <option value="Inativo Temporário">Inativo Temporário</option>
+                            </select>
                         </div>
                     </div>
 
                     <!-- Detalhes do Afastamento (condicional) -->
                     <div id="afastamento-dates-fields" style="display: none; flex-direction: column; gap: 15px; margin-top: 15px; background: #F8FAFC; padding: 15px; border-radius: 12px; border: 1px solid #E2E8F0;">
                         <div style="font-weight: 700; font-size: 0.85rem; color: #1E293B; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #E2E8F0; padding-bottom: 6px; margin-bottom: 5px;">
-                            <i class="fa-solid fa-plane-departure" style="margin-right: 4px;"></i> Detalhes do Afastamento
+                            Detalhes do Afastamento
                         </div>
                         <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                             <div class="form-group">
                                 <label for="membro-afastamento-inicio">Data Inicial</label>
-                                <div class="input-icon-wrapper">
-                                    <i class="fa-solid fa-calendar-day"></i>
-                                    <input type="date" id="membro-afastamento-inicio">
-                                </div>
+                                <input type="date" id="membro-afastamento-inicio">
                             </div>
                             <div class="form-group">
                                 <label for="membro-afastamento-fim">Data Final Prevista</label>
-                                <div class="input-icon-wrapper">
-                                    <i class="fa-solid fa-calendar-check"></i>
-                                    <input type="date" id="membro-afastamento-fim">
-                                </div>
+                                <input type="date" id="membro-afastamento-fim">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="membro-afastamento-motivo">Motivo</label>
-                            <div class="input-icon-wrapper">
-                                <i class="fa-solid fa-comment-dots"></i>
-                                <input type="text" id="membro-afastamento-motivo" placeholder="Ex: Viagem de trabalho">
-                            </div>
+                            <input type="text" id="membro-afastamento-motivo" placeholder="Ex: Viagem de trabalho">
                         </div>
                         <div class="form-group">
                             <label for="membro-afastamento-obs">Observações da Supervisão</label>
@@ -1665,21 +1621,18 @@
                         </div>
                         <div class="form-group">
                             <label for="membro-afastamento-retorno">Retorno Automático?</label>
-                            <div class="input-icon-wrapper">
-                                <i class="fa-solid fa-arrows-spin"></i>
-                                <select id="membro-afastamento-retorno">
-                                    <option value="Sim" selected="">Sim (Reativa automaticamente ao expirar)</option>
-                                    <option value="Não">Não (Aguardar confirmação da supervisão)</option>
-                                </select>
-                            </div>
+                            <select id="membro-afastamento-retorno">
+                                <option value="Sim" selected="">Sim (Reativa automaticamente ao expirar)</option>
+                                <option value="Não">Não (Aguardar confirmação da supervisão)</option>
+                            </select>
                         </div>
                     </div>
                 </div>
                 
                 <!-- BOTOES DE AÇÃO -->
-                <div style="display: flex; gap: 15px; margin-top: 25px; border-top: 1px solid #E2E8F0; padding-top: 15px;">
-                    <button type="button" class="btn-secondary" onclick="App.closeMembroFormModal()">Cancelar</button>
-                    <button type="submit" class="btn-primary" style="flex: 2;">Salvar Membro</button>
+                <div style="display: flex; gap: 15px; margin-top: 25px; border-top: 1px solid #E2E8F0; padding-top: 15px; width: 100%;">
+                    <button type="button" class="btn-secondary" onclick="App.closeMembroFormModal()" style="flex: 1; border: 1px solid #CBD5E1; color: #475569; background: white;">Cancelar</button>
+                    <button type="submit" class="btn-primary" style="flex: 2; background-color: var(--teal-primary); color: white; opacity: 1; visibility: visible; display: block; border: none; font-weight: 700;">Salvar Membro</button>
                 </div>
             </form>
         </div>
@@ -1992,6 +1945,7 @@
                         <select id="culto-modelo-escala" required="" onchange="App.toggleVagasEscalaLivre()">
                             <option value="Manter Existente" selected="">Manter Existente (Sem autogeração)</option>
                             <option value="Culto Completo">Culto Completo (Todas as funções)</option>
+                            <option value="Culto de Ceia">Culto de Ceia (Com Serviço de Mesa)</option>
                             <option value="Escala Livre">Escala Livre (Geral sem Setor)</option>
                         </select>
                     </div>
@@ -2416,10 +2370,10 @@
         </div>
 
         <!-- Import Main App Control logic -->
-        <script src="js/firebase-config.js?v=3.21.2"></script>
-        <script src="js/db.js?v=3.21.2"></script>
-        <script src="js/config/sectorsData.js?v=3.21.2"></script>
-        <script src="js/app.js?v=3.21.2"></script>
+        <script src="js/firebase-config.js?v=3.26.0"></script>
+        <script src="js/db.js?v=3.26.0"></script>
+        <script src="js/config/sectorsData.js?v=3.26.0"></script>
+        <script src="js/app.js?v=3.26.0"></script>
 
 
 </div></body></html>

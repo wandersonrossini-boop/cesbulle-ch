@@ -74,7 +74,17 @@ const App = {
         }
         
         const sector = this.sectorsData[sectorId];
-        return sector ? sector.funcoes : [];
+        let funcoes = sector ? [...sector.funcoes] : [];
+
+        if (modeloEscala === 'Culto de Ceia') {
+            if (sectorId === 'apoio_templo_ronda_dir' || sectorId === 'apoio_templo_ronda_esq') {
+                if (!funcoes.includes('Servir a Mesa da Ceia')) {
+                    funcoes.push('Servir a Mesa da Ceia');
+                }
+            }
+        }
+
+        return funcoes;
     },
 
     isExclusiveContinuousMember(user) {
@@ -167,6 +177,14 @@ const App = {
                 }
             });
         });
+    },
+
+    isScaleActionAllowed(dataStr, horarioInicio) {
+        if (!dataStr || !horarioInicio) return true;
+        const [hh, mm] = horarioInicio.split(':');
+        const cultoDate = new Date(`${dataStr}T${hh}:${mm}:00`);
+        const limite = new Date(cultoDate.getTime() - 36000000); // 10 horas
+        return new Date() <= limite;
     },
 
     async init() {
@@ -346,6 +364,16 @@ const App = {
             // Aguarda o Firebase Auth estar estável antes de ler o Firestore
             try {
                 await this.waitForAuth();
+                
+                // Segurança: Garantir que a sessão auth não caiu para anônima
+                const fbUser = firebase.auth().currentUser;
+                if (!fbUser || fbUser.isAnonymous) {
+                    console.log('[Sessão] Firebase Auth expirou (anônimo). Exigindo novo login.');
+                    localStorage.removeItem('diaconia_user_session');
+                    sessionStorage.removeItem('diaconia_user_session');
+                    return; // Retorna a tela de login
+                }
+
                 const userDoc = await db.collection('membros').doc(sessionData.id).get();
                 if (!userDoc.exists || userDoc.data().status !== 'ativo') {
                     console.log('[Sessão] Usuário não encontrado ou inativo. Exigindo novo login.');
@@ -355,7 +383,15 @@ const App = {
                 }
             } catch (netErr) {
                 // Sem conexão — mantém sessão em cache para modo offline
-                console.warn('[Sessão] Sem conexão. Usando sessão em cache.', netErr);
+                console.warn('[Sessão] Erro de conexão ou Firebase. Usando sessão em cache.', netErr);
+
+                // Se foi um erro de permissão, significa que a sessão era inválida
+                if (netErr.code === 'permission-denied') {
+                    console.warn('[Sessão] Permissão negada. Exigindo novo login.');
+                    localStorage.removeItem('diaconia_user_session');
+                    sessionStorage.removeItem('diaconia_user_session');
+                    return;
+                }
             }
 
             // Sessão válida — restaura e navega
@@ -3203,6 +3239,14 @@ const App = {
 
     async handleConfirmPresencaFromDetail(escalaId, status) {
         try {
+            // Retrieve scale to check date/time for 10-hour limit
+            const es = await DbService.getEscalaById(escalaId);
+            if (es && !this.isScaleActionAllowed(es.data, es.horarioInicio)) {
+                alert(`Nǜo  mais possvel ${status === 'Confirmada' ? 'confirmar' : 'recusar'} a presena. O limite 
+de 10 horas antes do culto foi ultrapassado. Por favor, contate o supervisor.`);
+                return;
+            }
+
             await DbService.updatePresenca(escalaId, status);
             if (status === 'Confirmada') {
                 this.showToast(`Presença confirmada com sucesso!`, 'success');
@@ -3778,6 +3822,11 @@ const App = {
 
     async handleConfirmPresenca(escalaId, status) {
         try {
+            const es = await DbService.getEscalaById(escalaId);
+            if (es && !this.isScaleActionAllowed(es.data, es.horarioInicio)) {
+                alert(`Nǜo  mais possvel ${status === 'Confirmada' ? 'confirmar' : 'recusar'} a presena. O limite de 10 horas antes do culto foi ultrapassado. Por favor, contate o supervisor.`);
+                return;
+            }
             await DbService.updatePresenca(escalaId, status);
             if (status === 'Confirmada') {
                 this.showToast(`Presença confirmada com sucesso!`, 'success');
@@ -4662,29 +4711,16 @@ const App = {
                 summaryContainer.innerHTML = '';
             }
             
-            const escalasLiturgicas = escalas.filter(e => !this.isOperationalSector(e.setorId));
+            const currentMonthPrefix = new Date().toISOString().substring(0, 7);
+            const escalasLiturgicas = escalas.filter(e => {
+                return !this.isOperationalSector(e.setorId) && e.data && e.data.startsWith(currentMonthPrefix);
+            });
             const totalScales = escalasLiturgicas.length;
             const confirmed = escalasLiturgicas.filter(e => e.statusPresenca === 'Confirmada').length;
             const pending = escalasLiturgicas.filter(e => e.statusPresenca === 'Pendente').length;
             const finished = escalasLiturgicas.filter(e => e.statusServico === 'Finalizado').length;
             const other = totalScales - confirmed - pending;
 
-            const pctConfirmed = totalScales > 0 ? Math.round((confirmed / totalScales) * 100) : 0;
-            const pctPending = totalScales > 0 ? Math.round((pending / totalScales) * 100) : 0;
-            const pctOther = totalScales > 0 ? (100 - pctConfirmed - pctPending) : 0;
-
-            const confirmedEl = document.querySelector('#dashboard-scales-progress-bar .confirmed');
-            const pendingEl = document.querySelector('#dashboard-scales-progress-bar .pending');
-            const otherEl = document.querySelector('#dashboard-scales-progress-bar .other');
-
-            if (confirmedEl) confirmedEl.style.width = `${pctConfirmed}%`;
-            if (pendingEl) pendingEl.style.width = `${pctPending}%`;
-            if (otherEl) otherEl.style.width = `${pctOther}%`;
-
-            const pctConfirmedEl = document.getElementById('dash-progress-pct-confirmed');
-            const pctPendingEl = document.getElementById('dash-progress-pct-pending');
-            if (pctConfirmedEl) pctConfirmedEl.innerText = `${pctConfirmed}%`;
-            if (pctPendingEl) pctPendingEl.innerText = `${pctPending}%`;
 
             if (summaryContainer) {
                 summaryContainer.innerHTML = `
@@ -4917,7 +4953,7 @@ const App = {
                                 <strong style="color: #991B1B; font-size: 0.9rem; display: block;">Culto PENDENTE de Fechamento</strong>
                                 <span style="font-size: 0.82rem; color: #7F1D1D;">${c.nome || 'Culto'} (${dataFmt}) - Culto encerrado aguardando fechamento de lista</span>
                             </div>
-                            <button onclick="App.switchAdminTab('escalas'); App.selectCulto('${c.id}');" style="padding: 6px 12px; background: #991B1B; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+                            <button onclick="App.adminSelectedCultoId='${c.id}'; App.openFechamentoCultoModal();" style="padding: 6px 12px; background: #991B1B; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
                                 Fechar Culto
                             </button>
                         </div>
@@ -5731,13 +5767,12 @@ const App = {
                     <td style="text-align: right;">
                         <div class="action-buttons-pills" style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
                             <button onclick="App.handleEditMembro('${m.id}')" style="padding: 4px 12px; background: #FFFFFF; color: #334155; border: 1px solid #CBD5E1; border-radius: 6px; font-weight: 600; font-size: 0.78rem; cursor: pointer; transition: all 0.2s;">Editar</button>
-                            <button onclick="App.openAfastamentoRapidoModal('${m.id}', '${m.nome.replace(/'/g, "\\'")}')" style="padding: 4px 12px; background: #FFFFFF; color: #334155; border: 1px solid #CBD5E1; border-radius: 6px; font-weight: 600; font-size: 0.78rem; cursor: pointer; transition: all 0.2s;">Escalas</button>
+                            <button onclick="App.openAfastamentoRapidoModal('${m.id}', '${m.nome.replace(/'/g, "\\'")}')" style="padding: 4px 12px; background: #FFFFFF; color: #334155; border: 1px solid #CBD5E1; border-radius: 6px; font-weight: 600; font-size: 0.78rem; cursor: pointer; transition: all 0.2s;">Afastar</button>
                             ${deleteBtn}
                         </div>
                     </td>
                 `;
                 body.appendChild(row);
-            });
             });
         } catch (e) {
             body.innerHTML = '<tr><td colspan="6" style="color:red; text-align:center;">Erro ao carregar membros.</td></tr>';
@@ -6000,12 +6035,18 @@ const App = {
 
     handleMembroPerfilChange(perfil) {
         const fields = document.getElementById('membro-setor-funcao-fields');
-        if (perfil === 'admin') {
-            fields.style.display = 'none';
-            document.getElementById('membro-funcao').required = false;
-        } else {
-            fields.style.display = 'block';
-            document.getElementById('membro-funcao').required = true;
+        const funcaoField = document.getElementById('membro-funcao');
+        
+        if (fields) {
+            if (perfil === 'admin') {
+                fields.style.display = 'none';
+            } else {
+                fields.style.display = 'block';
+            }
+        }
+        
+        if (funcaoField) {
+            funcaoField.required = (perfil !== 'admin');
         }
     },
 
@@ -9246,7 +9287,18 @@ const App = {
 
             const messages = await DbService.getSupervisionMessages();
             
-            const totalAlerts = standbys.length + rejections.length + messages.length;
+            // FASE 3.3: Filtro para pendentes nas próximas 24h
+            const amanha = new Date();
+            amanha.setDate(amanha.getDate() + 1);
+            const amanhaStr = amanha.toISOString().split('T')[0];
+            
+            const pendentes24h = allEscalas.filter(e => {
+                if (e.statusPresenca !== 'Pendente') return false;
+                if (e.data < hojeStr || e.data > amanhaStr) return false;
+                return true;
+            });
+            
+            const totalAlerts = standbys.length + rejections.length + messages.length + pendentes24h.length;
             
             if (badgeEl) badgeEl.innerText = totalAlerts;
             
@@ -9359,6 +9411,34 @@ const App = {
                 `;
                 listContainer.appendChild(item);
             });
+
+            // Render Pendentes 24h
+            pendentes24h.forEach(escala => {
+                const item = document.createElement('div');
+                item.className = 'alert-item';
+                item.id = `alert-pendente-${escala.id}`;
+                item.style.cssText = 'background: #fff; border-left: 4px solid #F59E0B; border-radius: 8px; padding: 12px; display: flex; align-items: center; justify-content: space-between; gap: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);';
+                
+                const dateParts = escala.data.split('-');
+                const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+                
+                item.innerHTML = `
+                    <div style="flex: 1; text-align: left;">
+                        <span style="font-weight: 700; color: #D97706; font-size: 0.8rem; text-transform: uppercase; display: block; margin-bottom: 2px;"><i class="fa-solid fa-clock"></i> Escala Pendente (&lt; 24h)</span>
+                        <span style="font-size: 0.88rem; color: var(--navy-dark); font-weight: 600;">${escala.membroNome}</span> ainda não confirmou presena para <span style="font-weight: 600;">${escala.cultoNome}</span> (${formattedDate} - ${escala.horarioInicio}).
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button class="btn-primary" style="padding: 6px 12px; font-size: 0.78rem; width: auto; background: #10B981; border: 1px solid #059669;" onclick="App.confirmarPresencaPeloMembro('${escala.id}')" title="Confirmar presença por ele">
+                            <i class="fa-solid fa-check-double"></i> Confirmar
+                        </button>
+                        <button class="btn-secondary" style="padding: 6px 12px; font-size: 0.78rem; width: auto; color: #D97706; border-color: #FCD34D; background: #FFFBEB;" onclick="App.cobrarPresenca('${escala.id}')" title="Enviar lembrete via Push">
+                            <i class="fa-solid fa-bell"></i> Cobrar
+                        </button>
+                    </div>
+                `;
+                listContainer.appendChild(item);
+            });
+
         } catch (e) {
             console.error("Error loading supervisor alerts:", e);
         }
@@ -9429,6 +9509,35 @@ const App = {
             App.showToast('Erro ao dispensar voluntário no servidor.', 'danger');
             // Restore original UI state if database write failed
             await App.loadAndRenderSupervisorAlerts();
+        }
+    },
+
+    async confirmarPresencaPeloMembro(escalaId) {
+        if (!confirm("Tem certeza que deseja confirmar a presena no lugar deste membro?")) return;
+        try {
+            await DbService.updatePresenca(escalaId, 'Confirmada');
+            App.showToast('Presena confirmada pelo supervisor.', 'success');
+            App.removeAlertFromDOM(`alert-pendente-${escalaId}`);
+            const badgeEl = document.getElementById('admin-supervisor-alerts-badge');
+            if (badgeEl) badgeEl.innerText = Math.max(0, (parseInt(badgeEl.innerText) || 1) - 1);
+        } catch (e) {
+            console.error("Erro ao confirmar:", e);
+            App.showToast('Erro ao confirmar presena.', 'danger');
+        }
+    },
+
+    async cobrarPresenca(escalaId) {
+        try {
+            const btn = document.querySelector(`#alert-pendente-${escalaId} button.btn-secondary`);
+            if (btn) btn.disabled = true;
+            await DbService.saveEscala(escalaId, { ultimaCobranca: new Date().toISOString() });
+            App.showToast('Lembrete enviado ao membro.', 'info');
+            App.removeAlertFromDOM(`alert-pendente-${escalaId}`);
+            const badgeEl = document.getElementById('admin-supervisor-alerts-badge');
+            if (badgeEl) badgeEl.innerText = Math.max(0, (parseInt(badgeEl.innerText) || 1) - 1);
+        } catch (e) {
+            console.error("Erro ao cobrar:", e);
+            App.showToast('Erro ao enviar lembrete.', 'danger');
         }
     },
 
@@ -11257,7 +11366,7 @@ const App = {
             App.showLoading();
             await this.runAutoScaleAndPublish(c);
             App.hideLoading();
-            this.showToast("Escala gerada e publicada com sucesso pela I.A!", "success");
+            this.showToast("Escala gerada e publicada com sucesso pelo sistema!", "success");
             this.loadAdminEscalas();
         } catch(e) {
             App.hideLoading();
@@ -11292,6 +11401,19 @@ const App = {
                     { setorId: 'acolhimento', funcao: 'Conduzir ao Acolhimento' },
                     { setorId: 'acolhimento', funcao: 'Recepcionar' },
                     { setorId: 'acolhimento', funcao: 'Servir' }
+                ];
+            } else if (model === 'Culto de Ceia') {
+                baseBlueprint = [
+                    { setorId: 'entrada', funcao: 'Portaria' },
+                    { setorId: 'check_in', funcao: 'Check-in' },
+                    { setorId: 'apoio_templo_ronda_dir', funcao: 'Apoio Templo / Ronda Lado Direito', sexoExigido: 'Masculino' },
+                    { setorId: 'apoio_templo_ronda_dir', funcao: 'Apoio Templo / Ronda Lado Direito', sexoExigido: 'Feminino' },
+                    { setorId: 'apoio_templo_ronda_esq', funcao: 'Apoio Templo / Ronda Lado Esquerdo', sexoExigido: 'Masculino' },
+                    { setorId: 'apoio_templo_ronda_esq', funcao: 'Apoio Templo / Ronda Lado Esquerdo', sexoExigido: 'Feminino' },
+                    { setorId: 'acolhimento', funcao: 'Conduzir ao Acolhimento' },
+                    { setorId: 'acolhimento', funcao: 'Recepcionar' },
+                    { setorId: 'acolhimento', funcao: 'Servir' },
+                    { setorId: 'apoio_templo_ronda_dir', funcao: 'Servir a Mesa da Ceia' }
                 ];
             } else if (model === 'Culto Menor') {
                 baseBlueprint = [
@@ -11397,6 +11519,19 @@ const App = {
                 { setorId: 'acolhimento', funcao: 'Conduzir ao Acolhimento' },
                 { setorId: 'acolhimento', funcao: 'Recepcionar' },
                 { setorId: 'acolhimento', funcao: 'Servir' }
+            ];
+        } else if (model === 'Culto de Ceia') {
+            baseBlueprint = [
+                { setorId: 'entrada', funcao: 'Portaria' },
+                { setorId: 'check_in', funcao: 'Check-in' },
+                { setorId: 'apoio_templo_ronda_dir', funcao: 'Apoio Templo / Ronda Lado Direito', sexoExigido: 'Masculino' },
+                { setorId: 'apoio_templo_ronda_dir', funcao: 'Apoio Templo / Ronda Lado Direito', sexoExigido: 'Feminino' },
+                { setorId: 'apoio_templo_ronda_esq', funcao: 'Apoio Templo / Ronda Lado Esquerdo', sexoExigido: 'Masculino' },
+                { setorId: 'apoio_templo_ronda_esq', funcao: 'Apoio Templo / Ronda Lado Esquerdo', sexoExigido: 'Feminino' },
+                { setorId: 'acolhimento', funcao: 'Conduzir ao Acolhimento' },
+                { setorId: 'acolhimento', funcao: 'Recepcionar' },
+                { setorId: 'acolhimento', funcao: 'Servir' },
+                { setorId: 'apoio_templo_ronda_dir', funcao: 'Servir a Mesa da Ceia' }
             ];
         } else if (model === 'Culto Menor') {
             baseBlueprint = [
@@ -11550,20 +11685,7 @@ const App = {
                 const mSectors = m.setores || (m.setor ? [m.setor] : []);
                 if (!mSectors.includes(slot.setorId)) return false;
 
-                const fPrincipal = (m.funcaoPrincipal || '').toLowerCase().trim();
-                const fSecundaria = (m.funcaoSecundaria || '').toLowerCase().trim();
-                const fSlot = slot.funcao.toLowerCase().trim();
-                
-                const principalMatch = fPrincipal && (fPrincipal.includes(fSlot) || fSlot.includes(fPrincipal));
-                const secundariaMatch = fSecundaria && (fSecundaria.includes(fSlot) || fSlot.includes(fSecundaria));
-                
-                const isAcolhimentoBypass = slot.setorId === 'acolhimento' && 
-                    (fPrincipal.includes('acolhimento') || fSecundaria.includes('acolhimento'));
-                const isPortariaBypass = slot.setorId === 'entrada' && 
-                    (fPrincipal.includes('portaria') || fPrincipal.includes('entrada') || 
-                     fSecundaria.includes('portaria') || fSecundaria.includes('entrada'));
-                
-                return principalMatch || secundariaMatch || isAcolhimentoBypass || isPortariaBypass;
+                return true;
             });
 
             // Evitar obreiros que já estão escalados na mesma data em outros cultos, a menos que queiram servir sempre

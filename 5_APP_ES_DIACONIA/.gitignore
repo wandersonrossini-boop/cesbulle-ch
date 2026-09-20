@@ -6,6 +6,7 @@ serviceAccountKey.json
 *.serviceAccountKey.json
 *.private.json
 *.credentials.json
+*firebase-adminsdk*.json
 firebase-secrets/
 secrets/
 .env
@@ -53,3 +54,5 @@ scratch/exports/
 backup/
 *.backup
 firestore_backup/
+
+firebase_users_import.json
