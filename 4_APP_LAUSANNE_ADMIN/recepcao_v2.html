@@ -510,14 +510,61 @@
         }
 
         /* MEMBER & CONVERT CARDS (Secondary Look) */
-        /* MEMBER & CONVERT CARDS (Secondary Look) */
         .secondary-card {
             background: rgba(0, 0, 0, 0.03);
-            /* Slight dark bg */
             border: 1px dashed rgba(0, 0, 0, 0.2);
-            /* Visible dashed border */
             border-radius: 12px;
             padding: 20px;
+        }
+
+        /* --- DESKTOP / PC RESPONSIVE ADAPTATIONS (min-width: 900px) --- */
+        @media (min-width: 900px) {
+            .container {
+                max-width: 1200px !important;
+                padding: 30px 40px !important;
+            }
+
+            .acolhedor-bar {
+                margin-bottom: 25px;
+                padding: 14px 24px;
+            }
+
+            /* Hide mobile-only sub-tab toggle on desktop since both columns are displayed side by side */
+            .mobile-only-segmented {
+                display: none !important;
+            }
+
+            /* Visitor Mode Desktop Grid: 2 Columns */
+            #mode-visitor .card-floating {
+                background: transparent !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+            }
+
+            .pc-visitor-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 25px;
+                align-items: start;
+            }
+
+            .pc-column-left, .pc-column-right {
+                background: var(--bg-card);
+                border-radius: 16px;
+                padding: 25px 30px;
+                box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+                color: var(--text-primary);
+            }
+
+            .pc-column-right {
+                border-left: 3px solid var(--gold);
+            }
+
+            /* Ensure both sub-areas are visible on desktop grid */
+            #mode-visitor #visitor-sub-new,
+            #mode-visitor #visitor-sub-exist {
+                display: block !important;
+            }
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -674,106 +721,110 @@
             <!-- 1. VISITOR CONTENT -->
             <div id="mode-visitor" class="tab-content-area active">
                 <div class="card-floating">
-                    <!-- INNER SEGMENTED CONTROL -->
-                    <div class="segmented-control" style="margin-bottom:15px;">
+                    <!-- INNER SEGMENTED CONTROL (MOBILE VIEW) -->
+                    <div class="segmented-control mobile-only-segmented" style="margin-bottom:15px;">
                         <button class="segment-btn active" onclick="switchVisitorSubMode('new', this)">NOVO</button>
-                        <button class="segment-btn" onclick="switchVisitorSubMode('exist', this)">JA VISITOU</button>
+                        <button class="segment-btn" onclick="switchVisitorSubMode('exist', this)">JÁ VISITOU</button>
                     </div>
 
-                    <!-- SUB-MODE: NEW REGISTRATION -->
-                    <div id="visitor-sub-new" class="visitor-sub-area">
-                        <!-- WIZARD STEP 1 -->
-                        <div id="step-1" class="step-container active">
-                            <div style="display: flex; align-items: center; margin-bottom: 25px; margin-top: 10px;">
-                                <div style="width: 55px; height: 55px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; margin-right: 18px;">
-                                    <i class="fas fa-user" style="color: var(--gold); font-size: 1.6rem;"></i>
+                    <div class="pc-visitor-grid">
+                        <!-- LEFT COLUMN: RAPID CAPTURE (NOVO VISITANTE) -->
+                        <div class="pc-column-left">
+                            <!-- SUB-MODE: NEW REGISTRATION (RAPID CAPTURE) -->
+                            <div id="visitor-sub-new" class="visitor-sub-area">
+                                <div class="step-container active">
+                                    <div style="display: flex; align-items: center; margin-bottom: 20px; margin-top: 5px;">
+                                        <div style="width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; margin-right: 14px; flex-shrink: 0;">
+                                            <i class="fas fa-user-plus" style="color: var(--gold); font-size: 1.4rem;"></i>
+                                        </div>
+                                        <div>
+                                            <h3 style="font-family: 'Playfair Display', serif; font-size: 1.6rem; margin: 0; color: var(--text-primary); font-weight: 700;">Entrada de Visitante</h3>
+                                            <p style="margin: 2px 0 0 0; color: #666; font-size: 0.85rem;">Registre o nome para liberar a entrada imediatamente.</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Campo Nome (Obrigatório) -->
+                                    <label style="color:var(--gold); font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">Nome Completo *</label>
+                                    <input type="text" id="vis-name" placeholder="Digite o Nome do Visitante..." autofocus onkeydown="if(event.key==='Enter'){event.preventDefault();submitVisitor();}" style="font-size:1.15rem; padding:16px; border:2px solid #ddd; border-radius:12px; width:100%; box-sizing:border-box; margin-bottom:14px; font-weight:700;">
+
+                                    <!-- Campo Telefone (Opcional) -->
+                                    <label style="color:#666; font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">WhatsApp / Celular (Opcional)</label>
+                                    <div style="display: flex; gap: 10px; margin-bottom: 18px;">
+                                        <select id="vis-ddi" style="width: 110px; font-size: 1rem; padding: 14px 8px; border: 1px solid #ccc; border-radius: 12px; background: #FAFAFA; color: #333; font-weight:700;">
+                                            <option value="+41">CH +41</option>
+                                            <option value="+351">PT +351</option>
+                                            <option value="+34">ES +34</option>
+                                            <option value="+33">FR +33</option>
+                                            <option value="+39">IT +39</option>
+                                            <option value="+49">DE +49</option>
+                                            <option value="+44">GB +44</option>
+                                            <option value="+55">BR +55</option>
+                                        </select>
+                                        <input type="tel" id="vis-phone" placeholder="Número com DDD/Código..." onkeydown="if(event.key==='Enter'){event.preventDefault();submitVisitor();}" style="font-size:1.05rem; padding:14px; flex: 1; border: 1px solid #ccc; border-radius: 12px; background: #FAFAFA;">
+                                    </div>
+
+                                    <!-- Botão Principal de Registro -->
+                                    <button onclick="submitVisitor()" class="btn-large btn-gold" style="width:100%; font-size:1.1rem; font-weight:900; letter-spacing:1px; padding:18px; margin-bottom:14px; border-radius:12px; box-shadow:0 4px 15px rgba(212,175,55,0.25);">
+                                        <i class="fas fa-check-circle" style="margin-right:8px;"></i> REGISTRAR ENTRADA
+                                    </button>
+
+                                    <!-- Informações Opcionais (Gaveta Retrátil) -->
+                                    <details style="border:1px solid #eee; border-radius:12px; padding:12px; background:#fbfbfb; margin-top:10px;">
+                                        <summary style="cursor:pointer; font-size:0.82rem; font-weight:800; color:var(--gold); text-transform:uppercase; letter-spacing:0.5px; user-select:none;">
+                                            <i class="fas fa-sliders-h" style="margin-right:6px;"></i> + Informações Opcionais (Igreja, Convidado, etc.)
+                                        </summary>
+                                        <div style="margin-top:12px;">
+                                            <label style="color:#666; font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">É Evangélico?</label>
+                                            <select id="vis-christian" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; margin-bottom:10px;">
+                                                <option value="nao">Não</option>
+                                                <option value="sim">Sim</option>
+                                            </select>
+
+                                            <label style="color:#666; font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">Igreja de Origem</label>
+                                            <input type="text" id="vis-church" placeholder="Nome da igreja anterior (se houver)..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; margin-bottom:10px; box-sizing:border-box;">
+
+                                            <label style="color:#666; font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">Quem Convidou?</label>
+                                            <input type="text" id="vis-invited-by" placeholder="Nome de quem trouxe o visitante..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; margin-bottom:10px; box-sizing:border-box;">
+
+                                            <label style="color:#666; font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">Finalidade da Visita</label>
+                                            <select id="vis-reason" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc;">
+                                                <option value="culto">Culto de Celebração (Integrar)</option>
+                                                <option value="evento">Evento Especial (Apenas Registro)</option>
+                                            </select>
+                                        </div>
+                                    </details>
                                 </div>
-                                <div>
-                                    <h3 style="font-family: 'Playfair Display', serif; font-size: 2rem; margin: 0; color: var(--text-primary); font-weight: 400;">Visitante</h3>
-                                    <p style="margin: 5px 0 0 0; color: #666; font-size: 0.95rem;">Queremos te conhecer melhor.</p>
+                            </div> <!-- END visitor-sub-new -->
+                        </div> <!-- END pc-column-left -->
+
+                        <!-- RIGHT COLUMN: SEARCH EXISTING VISITORS (JÁ VISITOU) -->
+                        <div class="pc-column-right">
+                            <!-- SUB-MODE: SEARCH EXISTING -->
+                            <div id="visitor-sub-exist" class="visitor-sub-area" style="text-align:left;">
+                                <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                                    <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 179, 0, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                                        <i class="fas fa-search" style="color: var(--gold); font-size: 1.1rem;"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="title-modern" style="color:var(--primary); margin:0; font-size: 1.3rem;">Encontrar Visitante (Já Visitou)</h3>
+                                        <p style="color:#666; font-size:0.8rem; margin:2px 0 0 0;">Localize cadastros anteriores para registrar nova entrada.</p>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <input type="text" id="vis-name" placeholder="Nome do Visitante (Obrigatorio)...">
-                            <button onclick="nextStep(1)" class="btn-large btn-gold" style="margin-top:10px;">
-                                CONTINUAR <i class="fas fa-arrow-right"></i>
-                            </button>
-                        </div>
+                                <input type="text" id="visitor-search-input"
+                                    placeholder="Digite 3 letras ou mais para buscar..." onkeyup="searchReturningVisitor()"
+                                    style="font-size:1.05rem; padding:16px; border:2px solid #eee; width:100%; box-sizing:border-box; border-radius:12px; font-weight: bold;">
 
-                        <!-- WIZARD STEP 2 -->
-                        <div id="step-2" class="step-container">
-                            <h3 class="title-modern" style="margin-top:0;">Mais Informacoes</h3>
-                            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                                <select id="vis-ddi"
-                                    style="width: 110px; font-size: 1.1rem; padding: 18px 10px; border: 2px solid #eee; border-radius: 12px; background: #FAFAFA; color: #333;">
-                                    <option value="+41">CH +41</option>
-                                    <option value="+351">PT +351</option>
-                                    <option value="+34">ES +34</option>
-                                    <option value="+33">FR +33</option>
-                                    <option value="+39">IT +39</option>
-                                    <option value="+49">DE +49</option>
-                                    <option value="+44">GB +44</option>
-                                    <option value="+55">BR +55</option>
-                                </select>
-                                <input type="tel" id="vis-phone" placeholder="WhatsApp / Celular (Opcional)"
-                                    style="font-size:1.1rem; padding:18px; flex: 1; border: 2px solid #eee; border-radius: 12px; background: #FAFAFA;">
-                            </div>
-                            <div style="display:flex; gap:10px; margin-top:20px;">
-                                <button onclick="prevStep(2)" class="btn-large btn-outline"
-                                    style="color:#333; border-color:#ccc;">Voltar</button>
-                                <button onclick="nextStep(2)" class="btn-large btn-gold">Continuar</button>
-                            </div>
-                        </div>
-
-                        <!-- WIZARD STEP 3 -->
-                        <div id="step-3" class="step-container">
-                            <h3 class="title-modern" style="margin-top:0;">Finalizar</h3>
-                            <label style="color:var(--text-muted);">E Evangelico?</label>
-                            <select id="vis-christian">
-                                <option value="nao">Nao</option>
-                                <option value="sim">Sim</option>
-                            </select>
-
-                            <label style="color:var(--text-muted);">Igreja de Origem</label>
-                            <input type="text" id="vis-church" placeholder="Se houver...">
-
-                            <label style="color:var(--text-muted);">Quem convidou?</label>
-                            <input type="text" id="vis-invited-by">
-
-                            <label style="color:var(--text-muted);">Finalidade da Visita</label>
-                            <select id="vis-reason">
-                                <option value="culto">Culto de Celebração (Integrar)</option>
-                                <option value="evento">Evento Especial (Apenas Registro)</option>
-                            </select>
-
-                            <div style="display:flex; gap:10px; margin-top:20px;">
-                                <button onclick="prevStep(3)" class="btn-large btn-outline"
-                                    style="color:#333; border-color:#ccc;">Voltar</button>
-                                <button onclick="submitVisitor()" class="btn-large btn-gold">Finalizar Cadastro</button>
-                            </div>
-                        </div>
-                    </div> <!-- END visitor-sub-new -->
-
-                    <!-- SUB-MODE: SEARCH EXISTING -->
-                    <div id="visitor-sub-exist" class="visitor-sub-area" style="display:none; text-align:left;">
-                        <h3 class="title-modern" style="color:var(--primary); margin-top:0;">Encontrar Visitante
-                        </h3>
-                        <p style="color:#666; font-size:0.9rem; margin-bottom:15px; line-height: 1.4;">Digite o nome
-                            do visitante abaixo para localizar seu cadastro e registrar uma nova visita. Ao
-                            completar 3 visitas, ele sera promovido automaticamente a <b>Congregado</b>.</p>
-
-                        <input type="text" id="visitor-search-input"
-                            placeholder="Digite 3 letras ou mais para buscar..." onkeyup="searchReturningVisitor()"
-                            style="font-size:1.1rem; padding:18px; border:2px solid #eee; width:100%; box-sizing:border-box; border-radius:12px; font-weight: bold;">
-
-                        <div id="visitor-search-results" style="margin-top:15px; min-height: 50px;">
-                            <div style="color:#aaa; text-align:center; padding:20px; font-style: italic;">
-                                <i class="fas fa-search"
-                                    style="font-size: 2rem; display: block; margin-bottom: 10px; opacity: 0.5;"></i>
-                                Use a barra acima para pesquisar...
-                            </div>
-                        </div>
-                    </div> <!-- END visitor-sub-exist -->
+                                <div id="visitor-search-results" style="margin-top:15px; min-height: 50px;">
+                                    <div style="color:#aaa; text-align:center; padding:20px; font-style: italic;">
+                                        <i class="fas fa-search"
+                                            style="font-size: 1.8rem; display: block; margin-bottom: 8px; opacity: 0.5;"></i>
+                                        Use a barra acima para pesquisar...
+                                    </div>
+                                </div>
+                            </div> <!-- END visitor-sub-exist -->
+                        </div> <!-- END pc-column-right -->
+                    </div> <!-- END pc-visitor-grid -->
 
                 </div> <!-- END card-floating -->
             </div> <!-- END mode-visitor -->

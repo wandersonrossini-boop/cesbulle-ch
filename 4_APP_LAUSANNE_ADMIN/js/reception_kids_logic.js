@@ -520,36 +520,28 @@ async function triggerIntegrationWorkflow(personId, name, phone, extraStr, isNew
         const nowString = new Date().toLocaleDateString('pt-PT');
         const historyEntry = {
             date: nowString,
-            action: isNew ? 'Entrada na Integração' : 'Retorno na Recepcao',
+            action: isNew ? 'Entrada na Recepção' : 'Retorno na Recepção',
             by: 'Receção Automática',
             notes: isNew 
-                ? 'Ficha recebida pela Receção. Direcionado automaticamente para Novos Amigos.' 
-                : 'Visitante retornou e foi registrado na recepção hoje. Direcionado automaticamente para Novos Amigos.',
-            stage: 'Novos Amigos',
+                ? 'Ficha recebida pela Recepção. Encaminhado para Acolhimento.' 
+                : 'Visitante retornou e foi registrado na recepção hoje. Encaminhado para Acolhimento.',
+            stage: 'Acolhimento',
             timestamp: firebase.firestore.Timestamp.now()
         };
 
         if (!snapPending.empty) {
-            // Already in Triage/Acolhimento - Promote to active integration
-            console.log("💎 Diamond: Person in Triage. Promoting to active integration.");
-            const promoEntry = {
-                date: nowString,
-                action: 'Promoção Automática',
-                by: 'Receção Automática',
-                notes: 'Visitante retornou. Promovido automaticamente para Novos Amigos.',
-                stage: 'Novos Amigos',
-                timestamp: firebase.firestore.Timestamp.now()
-            };
+            // Already in Acolhimento (pending_integracao) - Refresh last_seen and log visit
+            console.log("💎 Diamond: Person already in Acolhimento.");
             batch.update(db.collection('integracao').doc(snapPending.docs[0].id), {
-                status: 'em_integracao',
-                integ_stage: 'Novos Amigos',
                 last_seen: firebase.firestore.FieldValue.serverTimestamp(),
-                history: firebase.firestore.FieldValue.arrayUnion(promoEntry),
-                timeline: firebase.firestore.FieldValue.arrayUnion(promoEntry)
+                contact: phone || snapPending.docs[0].data().contact || '',
+                extra: extraStr || snapPending.docs[0].data().extra || '',
+                history: firebase.firestore.FieldValue.arrayUnion(historyEntry),
+                timeline: firebase.firestore.FieldValue.arrayUnion(historyEntry)
             });
         } 
         else if (!snapActive.empty) {
-            // Already in Followup - Log the visit in the integration history
+            // Already in Active Followup - Log visit
             console.log("💎 Diamond: Person already in Active Followup. Logging visit.");
             batch.update(db.collection('integracao').doc(snapActive.docs[0].id), {
                 last_visit: firebase.firestore.FieldValue.serverTimestamp(),
@@ -558,16 +550,16 @@ async function triggerIntegrationWorkflow(personId, name, phone, extraStr, isNew
             });
         }
         else {
-            // Not in integration flow - Create new record directly in active integration
-            console.log("💎 Diamond: Creating new active integration record.");
+            // New entry in integracao -> Set status: 'pending_integracao' for Acolhimento!
+            console.log("💎 Diamond: Creating new record in pending_integracao for Acolhimento.");
             const refIntegracao = db.collection('integracao').doc();
             batch.set(refIntegracao, {
                 person_id: personId,
                 name: name,
-                contact: phone,
+                contact: phone || '',
                 type: 'visitante',
-                status: 'em_integracao',
-                integ_stage: 'Novos Amigos',
+                status: 'pending_integracao', // <--- ENTERS ACOLHIMENTO QUEUE
+                integ_stage: 'Acolhimento',
                 extra: extraStr,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 origin: isNew ? 'reception_new' : 'reception_return',
@@ -697,44 +689,16 @@ window.submitVisitor = async function () {
             origin: isNewPerson ? 'reception_visitor_new' : 'reception_visitor_returning'
         });
 
-        // 4. Send to Integration Team (Unified v51.2.5)
+        // 4. Send to Integration Team Workflow (Acolhimento queue via pending_integracao)
         if (visitReason === 'culto') {
-            const hasContact = phone && phone.trim().replace(/[^\d]/g, '').length >= 5;
-            const isFromAnotherChurch = church && church.trim().length > 0;
-            const goToTriage = !hasContact || isFromAnotherChurch;
-
-            if (goToTriage) {
-                let triageType = '';
-                let triageNotes = '';
-                if (!hasContact) {
-                    triageType = 'visitante_sem_contato';
-                    triageNotes = 'Visitante sem número de contato. Encaminhado para triagem.';
-                } else {
-                    triageType = 'visitante_outra_igreja';
-                    triageNotes = `Visitante de outra igreja (${church}). Encaminhado para triagem.`;
-                }
-
-                const refSecretariat = db.collection('pending').doc();
-                batch.set(refSecretariat, {
-                    type: triageType,
-                    action: 'Triagem — Recepção',
-                    person_name: name.trim(),
-                    contact: phone || '',
-                    origin: isNewPerson ? 'reception_new' : 'reception_return',
-                    notes: triageNotes,
-                    status: 'pending',
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            } else {
-                await triggerIntegrationWorkflow(personId, name, phone, extraStr, isNewPerson, batch);
-            }
+            await triggerIntegrationWorkflow(personId, name, phone, extraStr, isNewPerson, batch);
         } else {
             // [RULE v63.2] - Event visitors don't enter integration, but log for Secretariat
             const refSecretariat = db.collection('pending').doc();
             batch.set(refSecretariat, {
                 type: 'visitante_evento',
                 name: name,
-                contact: phone,
+                contact: phone || '',
                 extra: `Registro via Recepção (Apenas Evento). Extra: ${extraStr}`,
                 status: 'pending',
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -756,8 +720,26 @@ window.submitVisitor = async function () {
             );
         }
 
-        alert("Check-in Registrado com Sucesso!");
-        location.reload();
+        // 6. Reset formulário para o próximo visitante sem reload
+        document.getElementById('vis-name').value = '';
+        if (document.getElementById('vis-phone')) document.getElementById('vis-phone').value = '';
+        if (document.getElementById('vis-church')) document.getElementById('vis-church').value = '';
+        if (document.getElementById('vis-invited-by')) document.getElementById('vis-invited-by').value = '';
+        if (document.getElementById('vis-christian')) document.getElementById('vis-christian').value = 'nao';
+        if (document.getElementById('vis-reason')) document.getElementById('vis-reason').value = 'culto';
+
+        if (btn && btn.tagName === 'BUTTON') {
+            btn.disabled = false;
+            btn.innerText = originalText;
+            btn.style.opacity = '1';
+        }
+
+        alert("Check-in de " + name + " registrado com sucesso!");
+        
+        setTimeout(() => {
+            const el = document.getElementById('vis-name');
+            if (el) el.focus();
+        }, 150);
 
     } catch (err) {
         console.error(err);
@@ -779,6 +761,13 @@ window.switchVisitorSubMode = function (mode, btn) {
     // View Toggle
     document.querySelectorAll('.visitor-sub-area').forEach(div => div.style.display = 'none');
     document.getElementById('visitor-sub-' + mode).style.display = 'block';
+
+    if (mode === 'new') {
+        setTimeout(() => {
+            const el = document.getElementById('vis-name');
+            if (el) el.focus();
+        }, 150);
+    }
 }
 
 let visitorSearchTimeout;

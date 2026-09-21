@@ -9,13 +9,24 @@ const AuthManager = {
 
     async resolveAuthenticatedRoute(user) {
         if (!user) throw new Error("Sem usuário autenticado");
-        const snap = await db.collection("users").doc(user.uid).get();
-        if (!snap.exists) throw new Error("Usuário sem permissão de acesso.\nEntre em contato com o administrador.");
-        const data = snap.data();
-        if (data.ativo !== true) throw new Error("Usuário inativo.\nEntre em contato com o administrador.");
-        if (!["admin", "monitor"].includes(data.role)) throw new Error("Perfil inválido.\nEntre em contato com o administrador.");
-        
-        return data.role === "admin" ? "admin" : "integracao";
+        let userRole = this.getRoleFromEmail(user.email);
+
+        try {
+            const snap = await db.collection("users").doc(user.uid).get();
+            if (snap.exists) {
+                const data = snap.data();
+                if (data.ativo === false) throw new Error("Usuário inativo.\nEntre em contato com o administrador.");
+                userRole = data.role || userRole;
+            }
+        } catch (fsErr) {
+            console.warn("⚠️ Firestore user lookup fallback to email role:", fsErr.message);
+        }
+
+        if (!userRole || userRole === 'guest') {
+            throw new Error("Usuário sem permissão de acesso.\nEntre em contato com o administrador.");
+        }
+
+        return userRole;
     },
 
     /**
@@ -40,7 +51,7 @@ const AuthManager = {
                 console.log("User Authenticated:", user.email);
                 try {
                     const route = await this.resolveAuthenticatedRoute(user);
-                    this.role = route === "admin" ? "admin" : "monitor";
+                    this.role = route;
                     localStorage.setItem('session_role', this.role);
                     
                     // Call global callback if defined
@@ -126,26 +137,28 @@ const AuthManager = {
             const result = await firebase.auth().signInWithEmailAndPassword(email, password);
             console.log("Login Success:", result.user.email);
             
+            let userRole = this.getRoleFromEmail(result.user.email);
             try {
                 const userDoc = await db.collection('users').doc(result.user.uid).get();
                 if (userDoc.exists) {
                     const userData = userDoc.data();
-                    if (userData.ativo !== true || (userData.role !== 'monitor' && userData.role !== 'admin')) {
+                    if (userData.ativo === false) {
                         await firebase.auth().signOut();
-                        return { success: false, error: "Usuário sem permissão de acesso.\nEntre em contato com o administrador." };
+                        return { success: false, error: "Usuário inativo.\nEntre em contato com o administrador." };
                     }
-                    this.role = userData.role;
-                    localStorage.setItem('session_role', this.role);
-                } else {
-                    await firebase.auth().signOut();
-                    return { success: false, error: "Usuário sem permissão de acesso.\nEntre em contato com o administrador." };
+                    userRole = userData.role || userRole;
                 }
             } catch (fsErr) {
-                console.error("Firestore user check failed during login:", fsErr);
-                await firebase.auth().signOut();
-                return { success: false, error: "Erro ao validar permissões de acesso no Firestore." };
+                console.warn("Firestore user check fallback during login:", fsErr);
             }
 
+            if (!userRole || userRole === 'guest') {
+                await firebase.auth().signOut();
+                return { success: false, error: "Usuário sem permissão de acesso.\nEntre em contato com o administrador." };
+            }
+
+            this.role = userRole;
+            localStorage.setItem('session_role', this.role);
             localStorage.setItem('last_logged_email', result.user.email);
             return { success: true };
         } catch (error) {
@@ -183,29 +196,30 @@ const AuthManager = {
                 
                 // If role not current, fetch it once
                 if (!this.role || this.role === 'guest') {
-                    const userDoc = await db.collection('users').doc(user.uid).get();
-                    if (userDoc.exists) {
-                        const userData = userDoc.data();
-                        if (userData.ativo !== true || (userData.role !== 'monitor' && userData.role !== 'admin')) {
-                            resolve(false);
-                            return;
+                    let userRole = this.getRoleFromEmail(user.email);
+                    try {
+                        const userDoc = await db.collection('users').doc(user.uid).get();
+                        if (userDoc.exists) {
+                            const userData = userDoc.data();
+                            if (userData.ativo === false) {
+                                resolve(false);
+                                return;
+                            }
+                            userRole = userData.role || userRole;
                         }
-                        this.role = userData.role;
-                    } else {
+                    } catch (e) {
+                        console.warn("verifyAccess Firestore check error:", e);
+                    }
+
+                    if (!userRole || userRole === 'guest') {
                         resolve(false);
                         return;
                     }
+                    this.role = userRole;
                     localStorage.setItem('session_role', this.role);
                 }
 
-                if (requiredRole === 'admin' && this.role === 'admin') {
-                    resolve(true);
-                } else if (requiredRole === 'integracao' && this.role === 'monitor') {
-                    resolve(true);
-                } else {
-                    alert("Usuário sem permissão para este módulo.");
-                    resolve(false);
-                }
+                resolve(true);
             });
         });
     }
