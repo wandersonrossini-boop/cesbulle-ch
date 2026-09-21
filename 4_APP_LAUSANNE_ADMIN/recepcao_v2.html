@@ -63,44 +63,31 @@
 
 
     <style>
-        /* RECEPTION LAUSANNE - CHATGPT WHITE/RED THEME */
+        /* RECEPTION LAUSANNE - ELEGANT LIGHT & DARK LAYOUT (REF MATCH) */
         :root {
-            --gold: #ffb300;
-            --red-active: #d32f2f;
-            --bg: #0b0c10;
+            --gold: #9e793e;
+            --gold-hover: #86642d;
+            --bg-dark-sidebar: #0f141c;
+            --bg-light-page: #f4f5f7;
             --bg-card: #ffffff;
-            --bg-dark-element: #15161d;
-            --border: #eeeeee;
+            --border-light: #e2e8f0;
             --border-dark: rgba(255, 255, 255, 0.08);
-            --text-primary: #1a1a1a;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
             --text-white: #ffffff;
-            --text-muted: #8e8e93;
-            --font-body: 'Outfit', sans-serif;
-            --font-serif: 'Playfair Display', serif;
+            --text-muted: #94a3b8;
+            --font-body: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-serif: 'Playfair Display', Georgia, serif;
         }
 
         html, body {
-            background-color: var(--bg) !important;
-            background: var(--bg) !important;
-            color: var(--text-white) !important;
+            background-color: var(--bg-light-page) !important;
+            background: var(--bg-light-page) !important;
+            color: var(--text-primary) !important;
             padding-bottom: 80px;
+            margin: 0;
+            font-family: var(--font-body);
             overflow-y: auto;
-            scrollbar-width: none;
-            border-top: 2px solid var(--gold);
-        }
-
-        body::before {
-            content: "LAUSANNE";
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-30deg);
-            font-size: 15vw;
-            font-weight: 900;
-            color: rgba(201, 160, 80, 0.012);
-            z-index: -1;
-            pointer-events: none;
-            white-space: nowrap;
         }
 
         body::-webkit-scrollbar { display: none; }
@@ -517,6 +504,30 @@
             padding: 20px;
         }
 
+        /* --- BUTTON & CARD STYLING MATCHING REFERENCE --- */
+        .btn-gold {
+            background: #9e793e !important;
+            color: #ffffff !important;
+            border-radius: 8px !important;
+            font-family: var(--font-body) !important;
+            font-weight: 700 !important;
+            text-transform: none !important;
+            letter-spacing: 0.3px !important;
+            transition: all 0.2s ease !important;
+            border: 1px solid #86642d !important;
+        }
+
+        .btn-gold:hover {
+            background: #86642d !important;
+        }
+
+        .card-floating {
+            background: #ffffff !important;
+            border-radius: 12px !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+        }
+
         /* --- DESKTOP / PC RESPONSIVE ADAPTATIONS (min-width: 900px) --- */
         @media (min-width: 900px) {
             .container {
@@ -527,6 +538,18 @@
             .acolhedor-bar {
                 margin-bottom: 25px;
                 padding: 14px 24px;
+                background: #ffffff !important;
+                border: 1px solid #e2e8f0 !important;
+                color: #1e293b !important;
+                border-radius: 12px !important;
+            }
+
+            .acolhedor-bar input {
+                color: #1e293b !important;
+            }
+
+            .acolhedor-bar label {
+                color: #9e793e !important;
             }
 
             /* Hide mobile-only sub-tab toggle on desktop since both columns are displayed side by side */
@@ -539,25 +562,27 @@
                 background: transparent !important;
                 box-shadow: none !important;
                 padding: 0 !important;
+                border: none !important;
             }
 
             .pc-visitor-grid {
                 display: grid;
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 1.2fr 0.8fr;
                 gap: 25px;
                 align-items: start;
             }
 
             .pc-column-left, .pc-column-right {
                 background: var(--bg-card);
-                border-radius: 16px;
-                padding: 25px 30px;
-                box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+                border-radius: 14px;
+                padding: 28px 32px;
+                border: 1px solid #e2e8f0;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
                 color: var(--text-primary);
             }
 
             .pc-column-right {
-                border-left: 3px solid var(--gold);
+                border-top: 3px solid var(--gold);
             }
 
             /* Ensure both sub-areas are visible on desktop grid */
@@ -733,39 +758,35 @@
                             <!-- SUB-MODE: NEW REGISTRATION (RAPID CAPTURE) -->
                             <div id="visitor-sub-new" class="visitor-sub-area">
                                 <div class="step-container active">
-                                    <div style="display: flex; align-items: center; margin-bottom: 20px; margin-top: 5px;">
-                                        <div style="width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; margin-right: 14px; flex-shrink: 0;">
-                                            <i class="fas fa-user-plus" style="color: var(--gold); font-size: 1.4rem;"></i>
-                                        </div>
-                                        <div>
-                                            <h3 style="font-family: 'Playfair Display', serif; font-size: 1.6rem; margin: 0; color: var(--text-primary); font-weight: 700;">Entrada de Visitante</h3>
-                                            <p style="margin: 2px 0 0 0; color: #666; font-size: 0.85rem;">Registre o nome para liberar a entrada imediatamente.</p>
-                                        </div>
+                                    <div style="margin-bottom: 24px;">
+                                        <h2 style="font-family: var(--font-serif); font-size: 2.1rem; margin: 0 0 6px 0; color: #0f172a; font-weight: 700; letter-spacing: -0.5px;">Registrar visitante</h2>
+                                        <p style="margin: 0; color: #64748b; font-size: 0.95rem;">Receba, registre e faça parte desta jornada.</p>
                                     </div>
 
                                     <!-- Campo Nome (Obrigatório) -->
-                                    <label style="color:var(--gold); font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">Nome Completo *</label>
-                                    <input type="text" id="vis-name" placeholder="Digite o Nome do Visitante..." autofocus onkeydown="if(event.key==='Enter'){event.preventDefault();submitVisitor();}" style="font-size:1.15rem; padding:16px; border:2px solid #ddd; border-radius:12px; width:100%; box-sizing:border-box; margin-bottom:14px; font-weight:700;">
+                                    <label style="color:#0f172a; font-size:0.85rem; font-weight:700; display:block; margin-bottom:8px;">Nome <span style="color:#9e793e;">*</span></label>
+                                    <input type="text" id="vis-name" placeholder="Digite o nome do visitante" autofocus onkeydown="if(event.key==='Enter'){event.preventDefault();submitVisitor();}" style="font-size:1.05rem; padding:14px 16px; border:1px solid #cbd5e1; border-radius:8px; width:100%; box-sizing:border-box; margin-bottom:20px; font-weight:500; background:#ffffff;">
 
                                     <!-- Campo Telefone (Opcional) -->
-                                    <label style="color:#666; font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">WhatsApp / Celular (Opcional)</label>
-                                    <div style="display: flex; gap: 10px; margin-bottom: 18px;">
-                                        <select id="vis-ddi" style="width: 110px; font-size: 1rem; padding: 14px 8px; border: 1px solid #ccc; border-radius: 12px; background: #FAFAFA; color: #333; font-weight:700;">
-                                            <option value="+41">CH +41</option>
-                                            <option value="+351">PT +351</option>
-                                            <option value="+34">ES +34</option>
-                                            <option value="+33">FR +33</option>
-                                            <option value="+39">IT +39</option>
-                                            <option value="+49">DE +49</option>
-                                            <option value="+44">GB +44</option>
-                                            <option value="+55">BR +55</option>
+                                    <label style="color:#0f172a; font-size:0.85rem; font-weight:700; display:block; margin-bottom:8px;">WhatsApp (opcional)</label>
+                                    <div style="display: flex; gap: 10px; margin-bottom: 24px;">
+                                        <select id="vis-ddi" style="width: 100px; font-size: 0.95rem; padding: 12px 10px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; color: #334155; font-weight:600;">
+                                            <option value="+41">+41 🇨🇭</option>
+                                            <option value="+351">+351 🇵🇹</option>
+                                            <option value="+34">+34 🇪🇸</option>
+                                            <option value="+33">+33 🇫🇷</option>
+                                            <option value="+39">+39 🇮🇹</option>
+                                            <option value="+49">+49 🇩🇪</option>
+                                            <option value="+44">+44 🇬🇧</option>
+                                            <option value="+55">+55 🇧🇷</option>
                                         </select>
-                                        <input type="tel" id="vis-phone" placeholder="Número com DDD/Código..." onkeydown="if(event.key==='Enter'){event.preventDefault();submitVisitor();}" style="font-size:1.05rem; padding:14px; flex: 1; border: 1px solid #ccc; border-radius: 12px; background: #FAFAFA;">
+                                        <input type="tel" id="vis-phone" placeholder="Ex.: 76 123 45 67" onkeydown="if(event.key==='Enter'){event.preventDefault();submitVisitor();}" style="font-size:1rem; padding:12px 16px; flex: 1; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff;">
                                     </div>
 
                                     <!-- Botão Principal de Registro -->
-                                    <button onclick="submitVisitor()" class="btn-large btn-gold" style="width:100%; font-size:1.1rem; font-weight:900; letter-spacing:1px; padding:18px; margin-bottom:14px; border-radius:12px; box-shadow:0 4px 15px rgba(212,175,55,0.25);">
-                                        <i class="fas fa-check-circle" style="margin-right:8px;"></i> REGISTRAR ENTRADA
+                                    <button onclick="submitVisitor()" class="btn-large btn-gold" style="width:100%; font-size:1.05rem; font-weight:700; padding:16px; margin-bottom:18px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; background:#9e793e; color:#fff;">
+                                        <span>Registrar entrada</span>
+                                        <span style="font-size:0.75rem; opacity:0.8; font-weight:500; background:rgba(255,255,255,0.15); padding:3px 8px; border-radius:4px;">Enter ↵</span>
                                     </button>
 
                                     <!-- Informações Opcionais (Gaveta Retrátil) -->
