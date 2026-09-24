@@ -786,15 +786,16 @@
             <!-- 1. VISITOR CONTENT -->
             <div id="mode-visitor" class="tab-content-area active">
                 <div class="card-floating">
-                    <!-- INNER SEGMENTED CONTROL (MOBILE VIEW) -->
-                    <div class="segmented-control mobile-only-segmented" style="margin-bottom:15px;">
-                        <button class="segment-btn active" onclick="switchVisitorSubMode('new', this)">NOVO</button>
-                        <button class="segment-btn" onclick="switchVisitorSubMode('exist', this)">JÁ VISITOU</button>
-                    </div>
+                    
 
                     <div class="pc-visitor-grid">
                         <!-- LEFT COLUMN: RAPID CAPTURE (NOVO VISITANTE) -->
                         <div class="pc-column-left">
+                            <!-- INNER SEGMENTED CONTROL (MOBILE VIEW) -->
+                    <div class="segmented-control" style="margin-bottom:15px; background: #f8fafc; border-radius: 4px; border: 1px solid #e2e8f0; height: auto;">
+                        <button class="segment-btn active" onclick="switchVisitorSubMode('new', this)">NOVO</button>
+                        <button class="segment-btn" onclick="switchVisitorSubMode('exist', this)">JÁ VISITOU</button>
+                    </div>
                             <!-- SUB-MODE: NEW REGISTRATION (RAPID CAPTURE) -->
                             <div id="visitor-sub-new" class="visitor-sub-area">
                                 <div class="step-container active">
@@ -824,9 +825,9 @@
                                     </div>
 
                                     <!-- Botão Principal de Registro -->
-                                    <button onclick="submitVisitor()" class="btn-large btn-gold" style="width:100%; font-size:1.05rem; font-weight:700; padding:16px; margin-bottom:18px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; background:#9e793e; color:#fff;">
+                                    <button onclick="submitVisitor()" class="btn-large btn-gold" style="width:100%; font-size:1rem; font-weight:600; padding:12px; margin-bottom:18px; border-radius:4px; display:flex; justify-content:space-between; align-items:center; background:#0f172a; color:#fff;">
                                         <span>Registrar entrada</span>
-                                        <span style="font-size:0.75rem; opacity:0.8; font-weight:500; background:rgba(255,255,255,0.15); padding:3px 8px; border-radius:4px;">Enter ↵</span>
+                                        <span style="font-size:0.75rem; opacity:0.8; font-weight:500; background:rgba(255,255,255,0.2); padding:3px 8px; border-radius:4px;">Enter ↵</span>
                                     </button>
 
                                     <!-- Informações Opcionais (Gaveta Retrátil) -->
@@ -856,12 +857,7 @@
                                     </details>
                                 </div>
                             </div> <!-- END visitor-sub-new -->
-                        </div> <!-- END pc-column-left -->
-
-                        <!-- RIGHT COLUMN: SEARCH EXISTING VISITORS (JÁ VISITOU) -->
-                        <div class="pc-column-right">
-                            <!-- SUB-MODE: SEARCH EXISTING -->
-                            <div id="visitor-sub-exist" class="visitor-sub-area" style="text-align:left;">
+                        <div id="visitor-sub-exist" class="visitor-sub-area" style="text-align:left;">
                                 <div style="display: flex; align-items: center; margin-bottom: 15px;">
                                     <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 179, 0, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
                                         <i class="fas fa-search" style="color: var(--gold); font-size: 1.1rem;"></i>
@@ -884,6 +880,12 @@
                                     </div>
                                 </div>
                             </div> <!-- END visitor-sub-exist -->
+                            </div> <!-- END pc-column-left -->
+
+                        <!-- RIGHT COLUMN: SEARCH EXISTING VISITORS (JÁ VISITOU) -->
+                        <div class="pc-column-right">
+                            <!-- SUB-MODE: SEARCH EXISTING -->
+                            
 
         <!-- LATEST ENTRIES MODULE -->
         <div class="ultimas-entradas-container" style="margin-top: 5px;">
@@ -958,7 +960,7 @@
                 setTab("checkin");
                 console.log("Inline switchCheckinMode:", mode);
                 // UI
-                document.querySelectorAll('.sidebar-menu .segment-btn, #tab-checkin .segment-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.sidebar-menu .segment-btn, #tab-checkin > .segmented-control .segment-btn').forEach(b => b.classList.remove('active'));
                 if (btn) btn.classList.add('active');
 
                 // Views
