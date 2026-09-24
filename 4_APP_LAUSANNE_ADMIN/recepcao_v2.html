@@ -580,7 +580,7 @@
             .app-main { flex: 1; overflow-y: auto; padding: 0; }
             
             #tab-checkin > .segmented-control { display: none !important; }
-            .bottom-nav { display: none !important; }
+            /* .bottom-nav hidden removed */
             #tab-checkin > div:first-child { display: none !important; } /* Hide Bem-vindo text on PC */
             
             body { padding-bottom: 0 !important; padding-top: 0 !important; }
@@ -599,8 +599,8 @@
                 margin-top: 30px;
             }
             .quick-card {
-                background: #ffffff;
-                border: 1px solid #e2e8f0;
+                background: var(--navy-main);
+                border: 1px solid var(--border-dark);
                 border-radius: 4px;
                 padding: 24px 15px;
                 text-align: center;
@@ -780,9 +780,7 @@
         }
 
         /* Hide bottom nav bar on mobile if redundant */
-        .bottom-nav {
-            display: none !important;
-        }
+        /* bottom nav hidden removed */
 
         label {
             font-size: 14px !important;
@@ -1254,6 +1252,152 @@
         }
     </style>
 
+
+    <style>
+        /* INJECTED DARK THEME */
+        :root {
+            --navy-main: #0A131F !important;
+            --navy-card: #0F172A !important;
+            --navy-hover: #14263D !important;
+            --gold-main: #C9A96A !important;
+            --text-light: #F8FAFC !important;
+            --text-muted: #94A3B8 !important;
+            --border-dark: #1E293B !important;
+            --font-serif: 'Playfair Display', serif !important;
+        }
+        
+        body, .app-layout, .app-main {
+            background-color: var(--navy-main) !important;
+            color: var(--text-light) !important;
+        }
+
+        .pc-sidebar {
+            display: none !important;
+        }
+
+        /* Convert to top nav header */
+        .mobile-header {
+            display: flex !important;
+            background: var(--navy-card) !important;
+            padding: 15px 30px !important;
+            border-bottom: 1px solid var(--border-dark) !important;
+        }
+        .mobile-header .brand-title { color: #FFF !important; font-size: 1.4rem !important; }
+        .mobile-header .brand-sub { color: var(--gold-main) !important; }
+
+        /* Hide the hamburger icon as we will use bottom nav */
+        .mobile-header > div:nth-child(2) { display: none !important; }
+
+        /* The main container */
+        .app-main { padding: 30px 20px !important; }
+        
+        .card-floating {
+            background: var(--navy-card) !important;
+            border: 1px solid var(--border-dark) !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+            margin: 0 auto !important;
+            max-width: 700px !important;
+        }
+
+        /* Top Check-in Tabs (VISITANTE, CRIANCA...) */
+        #tab-checkin > .segmented-control {
+            display: flex !important;
+            background: transparent !important;
+            border: none !important;
+            border-bottom: 1px solid var(--border-dark) !important;
+            max-width: 800px !important;
+            margin: 0 auto 30px auto !important;
+        }
+        #tab-checkin > .segmented-control .segment-btn {
+            color: var(--text-muted) !important;
+            background: transparent !important;
+            font-size: 0.95rem !important;
+            padding: 12px 10px !important;
+        }
+        #tab-checkin > .segmented-control .segment-btn.active {
+            color: var(--gold-main) !important;
+            border-bottom: 2px solid var(--gold-main) !important;
+            border-radius: 0 !important;
+        }
+
+        /* Input fields */
+        input[type="text"], input[type="tel"], input[type="email"], select, textarea {
+            background: var(--navy-main) !important;
+            border: 1px solid var(--border-dark) !important;
+            color: var(--text-light) !important;
+        }
+        input:focus, select:focus {
+            border-color: var(--gold-main) !important;
+        }
+
+        /* Sub tabs (NOVO / JA VISITOU) */
+        .visitor-subtabs {
+            background: var(--navy-main) !important;
+            border: 1px solid var(--border-dark) !important;
+            gap: 0 !important;
+            padding: 4px !important;
+            border-radius: 6px !important;
+            margin-bottom: 20px !important;
+        }
+        .visitor-subtabs .subtab-btn {
+            color: var(--text-muted) !important;
+            padding: 10px !important;
+            font-size: 0.85rem !important;
+            border-radius: 4px !important;
+        }
+        .visitor-subtabs .subtab-btn.active {
+            background: var(--gold-main) !important;
+            color: #000 !important;
+        }
+        .visitor-subtabs .subtab-btn.active::after { display: none !important; }
+
+        /* Submit Button */
+        .submit-btn-container, .btn-gold, #btn-submit-visitor {
+            background: var(--gold-main) !important;
+            color: #000 !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+        }
+        .submit-btn-container .enter-badge { display: none !important; }
+
+        /* Typography */
+        h1, h2, h3, h4, label, p { color: var(--text-light) !important; }
+        .page-title { color: #FFF !important; }
+        .page-subtitle-top { display: none !important; }
+
+        /* Hide Ultimas entradas / Fix grid */
+        .pc-visitor-grid { display: block !important; }
+        /* .pc-column-right restored */ /* Hide Ultimas entradas permanently from main view */
+        
+        /* Bottom Nav */
+        .bottom-nav {
+            display: flex !important;
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            background: var(--navy-card) !important;
+            border-top: 1px solid var(--border-dark) !important;
+            z-index: 1000 !important;
+            margin: 0 !important;
+            transform: none !important;
+            padding: 0 !important;
+        }
+        .bottom-nav .nav-item {
+            padding: 15px 5px !important;
+            border-top: 2px solid transparent !important;
+            color: var(--text-muted) !important;
+        }
+        .bottom-nav .nav-item.active {
+            border-top-color: var(--gold-main) !important;
+            color: var(--text-light) !important;
+        }
+
+        /* Hide the bottom 4 cards duplicate */
+        .four-cards-row { display: none !important; }
+    </style>
+
 </head>
 
 <body>
@@ -1336,10 +1480,7 @@
         <!-- === TAB 1: CHECK-IN ROOT (Merged Flow) === -->
         <div id="tab-checkin" class="tab-section active">
 
-            <div style="margin-bottom: 20px;">
-                <p class="page-subtitle-top" style="font-size: 13px; color: #64748B; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 2px 0;">Recepção</p>
-                <h1 class="page-title" style="font-size: 30px; font-weight: 700; color: #0F172A; margin: 0; letter-spacing: -0.5px;">Visitante</h1>
-            </div>
+            
 
             <!-- SEGMENTED CONTROL -->
             <div class="segmented-control" style="margin-bottom: 25px;">
@@ -1366,11 +1507,11 @@
                     <div style="font-size:2rem; margin-bottom:8px; color:#ec4899;"></div>
                     <h3 class="title-modern" style="margin:0 0 8px; font-size:1.3rem; letter-spacing:-0.5px;">
                         Auto-Cadastro KIDS</h3>
-                    <p style="font-size:0.9rem; color:#666; margin:0 0 20px; line-height:1.4;">Aponte sua camera para o
+                    <p style="font-size:0.9rem; color:var(--text-muted); margin:0 0 20px; line-height:1.4;">Aponte sua camera para o
                         QR Code abaixo e cadastre seu filho rapido pelo seu celular.</p>
 
                     <div
-                        style="display:inline-block; padding:15px; background:#fff; border-radius:30px; box-shadow:0 15px 45px rgba(236, 72, 153, 0.2); border:1px solid #fce7f3; margin-bottom: 40px;">
+                        style="display:inline-block; padding:15px; background:var(--navy-card); border-radius:30px; box-shadow:0 15px 45px rgba(236, 72, 153, 0.2); border:1px solid #fce7f3; margin-bottom: 40px;">
                         <div id="qr-code-online" style="display:inline-block;"></div>
                     </div>
 
@@ -1413,12 +1554,12 @@
                     <h3 class="title-modern" style="margin:0 0 10px; font-size:1.3rem; color:#10b981;">
                          Mural de Entrada Kids
                     </h3>
-                    <p style="color:#666; font-size:0.9rem; margin-bottom:20px; line-height:1.4;">
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px; line-height:1.4;">
                         Lista de todas as criancas que ja foram <b>recebidas e confirmadas</b> pela equipe da Sala das Criancas hoje.
                     </p>
 
                     <div id="mural-kids-container" style="display:flex; flex-direction:column; gap:10px;">
-                        <div style="text-align:center; color:#aaa; font-style:italic; padding:20px;">
+                        <div style="text-align:center; color:var(--text-muted); font-style:italic; padding:20px;">
                              Aguardando atualizacoes...
                         </div>
                     </div>
@@ -1428,7 +1569,7 @@
                         <!-- MODE CHILD (CRIANÇAS CHECK-IN) -->
             <div id="mode-child" class="tab-content-area">
                 <div class="card-floating">
-                    <div class="segmented-control" style="margin-bottom:15px; background: #f8fafc; border-radius: 4px; border: 1px solid #e2e8f0; height: auto;">
+                    <div class="segmented-control" style="margin-bottom:15px; background: var(--navy-main); border-radius: 4px; border: 1px solid var(--border-dark); height: auto;">
                         <button class="segment-btn active" onclick="switchChildSubMode('exist', this)">LISTA DE CRIANÇAS</button>
                         <button class="segment-btn" onclick="switchChildSubMode('new', this)">NOVA CRIANÇA</button>
                     </div>
@@ -1438,37 +1579,37 @@
                             <!-- SUB-MODE: EXISTING KIDS (LIST & SEARCH) -->
                             <div id="child-sub-exist" class="child-sub-area">
                                 <div style="margin-bottom: 15px;">
-                                    <h3 style="margin: 0 0 4px 0; font-size: 1.2rem; color: #0f172a; font-weight: 600;">Check-in de Crianças</h3>
+                                    <h3 style="margin: 0 0 4px 0; font-size: 1.2rem; color: var(--text-light); font-weight: 600;">Check-in de Crianças</h3>
                                     <p style="margin: 0; color: #64748b; font-size: 0.85rem;">Localize a criança para registrar a entrada na sala.</p>
                                 </div>
-                                <input type="text" id="child-search-input" placeholder="Digite o nome da criança ou responsável..." onkeyup="renderKidsSelection(this.value)" style="font-size:1rem; padding:12px; border:1px solid #cbd5e1; border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:15px; background:#ffffff;">
+                                <input type="text" id="child-search-input" placeholder="Digite o nome da criança ou responsável..." onkeyup="renderKidsSelection(this.value)" style="font-size:1rem; padding:12px; border: 1px solid var(--border-dark); border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:15px; background:var(--navy-main);">
                                 <div id="child-search-results"></div>
                             </div>
 
                             <!-- SUB-MODE: NEW CHILD REGISTRATION -->
                             <div id="child-sub-new" class="child-sub-area" style="display:none;">
                                 <div style="margin-bottom: 15px;">
-                                    <h3 style="margin: 0 0 4px 0; font-size: 1.2rem; color: #0f172a; font-weight: 600;">Cadastrar Nova Criança</h3>
+                                    <h3 style="margin: 0 0 4px 0; font-size: 1.2rem; color: var(--text-light); font-weight: 600;">Cadastrar Nova Criança</h3>
                                     <p style="margin: 0; color: #64748b; font-size: 0.85rem;">Preencha os dados do responsável e da criança.</p>
                                 </div>
 
                                 <div id="child-step-1">
-                                    <label style="color:#0f172a; font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">WhatsApp do Responsável *</label>
-                                    <input type="tel" id="child-phone" placeholder="Digite o WhatsApp..." onkeyup="searchParentForChild(this.value)" style="font-size:1rem; padding:12px; border:1px solid #cbd5e1; border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:10px; background:#ffffff;">
+                                    <label style="color:var(--text-light); font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">WhatsApp do Responsável *</label>
+                                    <input type="tel" id="child-phone" placeholder="Digite o WhatsApp..." onkeyup="searchParentForChild(this.value)" style="font-size:1rem; padding:12px; border: 1px solid var(--border-dark); border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:10px; background:var(--navy-main);">
                                     <div id="parent-search-status" style="font-size:0.85rem; margin-bottom:15px; font-weight:500;"></div>
                                 </div>
 
                                 <div id="child-step-2" style="display:none;">
-                                    <label style="color:#0f172a; font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Nome do Responsável *</label>
-                                    <input type="text" id="child-parent" placeholder="Nome do responsável" onkeyup="checkChildStep(2)" style="font-size:1rem; padding:12px; border:1px solid #cbd5e1; border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:15px; background:#ffffff;">
+                                    <label style="color:var(--text-light); font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Nome do Responsável *</label>
+                                    <input type="text" id="child-parent" placeholder="Nome do responsável" onkeyup="checkChildStep(2)" style="font-size:1rem; padding:12px; border: 1px solid var(--border-dark); border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:15px; background:var(--navy-main);">
 
-                                    <label style="color:#0f172a; font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Nome da Criança *</label>
-                                    <input type="text" id="child-name" placeholder="Nome completo da criança" onkeyup="checkChildStep(2)" style="font-size:1rem; padding:12px; border:1px solid #cbd5e1; border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:15px; background:#ffffff;">
+                                    <label style="color:var(--text-light); font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Nome da Criança *</label>
+                                    <input type="text" id="child-name" placeholder="Nome completo da criança" onkeyup="checkChildStep(2)" style="font-size:1rem; padding:12px; border: 1px solid var(--border-dark); border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:15px; background:var(--navy-main);">
                                 </div>
 
                                 <div id="child-step-3" style="display:none;">
-                                    <label style="color:#0f172a; font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Faixa Etária *</label>
-                                    <select id="child-age" onchange="checkChildStep(3)" style="font-size:0.95rem; padding:12px; border:1px solid #cbd5e1; border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:15px; background:#ffffff;">
+                                    <label style="color:var(--text-light); font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Faixa Etária *</label>
+                                    <select id="child-age" onchange="checkChildStep(3)" style="font-size:0.95rem; padding:12px; border: 1px solid var(--border-dark); border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:15px; background:var(--navy-main);">
                                         <option value="">Selecione a faixa etária...</option>
                                         <option value="Berçário (0-2 anos)">Berçário (0-2 anos)</option>
                                         <option value="Maternal (3-5 anos)">Maternal (3-5 anos)</option>
@@ -1476,15 +1617,15 @@
                                         <option value="Juniores (11-12 anos)">Juniores (11-12 anos)</option>
                                     </select>
 
-                                    <label style="color:#0f172a; font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Alergias / Restrições (opcional)</label>
-                                    <input type="text" id="child-allergies" placeholder="Ex: Amendoim, Lactose..." style="font-size:1rem; padding:12px; border:1px solid #cbd5e1; border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:15px; background:#ffffff;">
+                                    <label style="color:var(--text-light); font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Alergias / Restrições (opcional)</label>
+                                    <input type="text" id="child-allergies" placeholder="Ex: Amendoim, Lactose..." style="font-size:1rem; padding:12px; border: 1px solid var(--border-dark); border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:15px; background:var(--navy-main);">
 
-                                    <label style="color:#0f172a; font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Atenção Especial (opcional)</label>
-                                    <input type="text" id="child-special" placeholder="Ex: TDAH, Cuidado especial..." style="font-size:1rem; padding:12px; border:1px solid #cbd5e1; border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:15px; background:#ffffff;">
+                                    <label style="color:var(--text-light); font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Atenção Especial (opcional)</label>
+                                    <input type="text" id="child-special" placeholder="Ex: TDAH, Cuidado especial..." style="font-size:1rem; padding:12px; border: 1px solid var(--border-dark); border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:15px; background:var(--navy-main);">
                                 </div>
 
                                 <div id="child-step-4" style="display:none; margin-bottom:15px;">
-                                    <label style="display:flex; align-items:center; gap:8px; font-size:0.9rem; color:#0f172a;">
+                                    <label style="display:flex; align-items:center; gap:8px; font-size:0.9rem; color:var(--text-light);">
                                         <input type="checkbox" id="child-presentation-new" style="width:auto; margin:0;">
                                         Apresentação de Bebê no Culto
                                     </label>
@@ -1497,8 +1638,8 @@
                         </div>
 
                         <div class="pc-column-right">
-                            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:4px; padding:15px;">
-                                <h4 style="margin:0 0 6px 0; color:#0f172a; font-size:0.95rem; font-weight:600;">Instruções Crianças</h4>
+                            <div style="background:var(--navy-main); border:1px solid var(--border-dark); border-radius:4px; padding:15px;">
+                                <h4 style="margin:0 0 6px 0; color:var(--text-light); font-size:0.95rem; font-weight:600;">Instruções Crianças</h4>
                                 <p style="margin:0; font-size:0.85rem; color:#64748b; line-height:1.4;">
                                     Utilize a busca rápida para crianças já cadastradas. Em caso de primeiro acesso, preencha o formulário de cadastro com o WhatsApp do responsável.
                                 </p>
@@ -1527,17 +1668,18 @@
                             <div id="visitor-sub-new" class="visitor-sub-area">
                                 <div class="step-container active">
                                     <div style="margin-bottom: 24px;">
-                                        <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin: 0 0 16px 0;">Registrar Entrada</h2>
+                                        <h2 style="font-size: 1.8rem; font-weight: 700; color: var(--text-light); margin: 0 0 5px 0; font-family: var(--font-serif);">Visitante</h2>
+
                                     </div>
 
                                     <!-- Campo Nome (Obrigatório) -->
-                                    <label style="color:#0f172a; font-size:0.85rem; font-weight:700; display:block; margin-bottom:8px;">Nome <span style="color:#0f172a;">*</span></label>
-                                    <input type="text" id="vis-name" placeholder="Digite o nome do visitante" autofocus onkeydown="if(event.key==='Enter'){event.preventDefault();submitVisitor();}" style="font-size:1.05rem; padding:14px 16px; border:1px solid #cbd5e1; border-radius:8px; width:100%; box-sizing:border-box; margin-bottom:20px; font-weight:500; background:#ffffff;">
+                                    <label style="color:var(--text-light); font-size:0.85rem; font-weight:700; display:block; margin-bottom:8px;">Nome <span style="color:var(--text-light);">*</span></label>
+                                    <input type="text" id="vis-name" placeholder="Digite o nome do visitante" autofocus onkeydown="if(event.key==='Enter'){event.preventDefault();submitVisitor();}" style="font-size:1.05rem; padding:14px 16px; border: 1px solid var(--border-dark); border-radius:8px; width:100%; box-sizing:border-box; margin-bottom:20px; font-weight:500; background:var(--navy-main);">
 
                                     <!-- Campo Telefone (Opcional) -->
-                                    <label style="color:#0f172a; font-size:0.85rem; font-weight:700; display:block; margin-bottom:8px;">WhatsApp (opcional)</label>
+                                    <label style="color:var(--text-light); font-size:0.85rem; font-weight:700; display:block; margin-bottom:8px;">WhatsApp (opcional)</label>
                                     <div style="display: flex; gap: 10px; margin-bottom: 24px;">
-                                        <select id="vis-ddi" style="width: 100px; font-size: 0.95rem; padding: 12px 10px; border: 1px solid #cbd5e1; border-radius: 4px; background: #ffffff; color: #334155; font-weight:600;">
+                                        <select id="vis-ddi" style="width: 100px; font-size: 0.95rem; padding: 12px 10px; border: 1px solid var(--border-dark); border-radius: 4px; background: var(--navy-main); color: var(--text-light); font-weight:600;">
                                             <option value="+41">+41 </option>
                                             <option value="+351">+351 </option>
                                             <option value="+34">+34 </option>
@@ -1547,7 +1689,7 @@
                                             <option value="+44">+44 </option>
                                             <option value="+55">+55 </option>
                                         </select>
-                                        <input type="tel" id="vis-phone" placeholder="Ex.: 76 123 45 67" onkeydown="if(event.key==='Enter'){event.preventDefault();submitVisitor();}" style="font-size:1rem; padding:12px 16px; flex: 1; border: 1px solid #cbd5e1; border-radius: 4px; background: #ffffff;">
+                                        <input type="tel" id="vis-phone" placeholder="Ex.: 76 123 45 67" onkeydown="if(event.key==='Enter'){event.preventDefault();submitVisitor();}" style="font-size:1rem; padding:12px 16px; flex: 1; border: 1px solid var(--border-dark); border-radius: 4px; background: var(--navy-main);">
                                     </div>
 
                                     <!-- Botão Principal de Registro -->
@@ -1559,24 +1701,24 @@
     
 
                                     <!-- Informações Opcionais (Gaveta Retrátil) -->
-                                    <details style="border:1px solid #eee; border-radius:12px; padding:12px; background:#fbfbfb; margin-top:10px;">
-                                        <summary style="cursor:pointer; font-size:0.82rem; font-weight:800; color:var(--gold); text-transform:uppercase; letter-spacing:0.5px; user-select:none;">
-                                             + Informações Opcionais (Igreja, Convidado, etc.)
+                                    <details style="border:1px solid var(--border-dark); border-radius:12px; padding:12px; background:var(--navy-main); margin-top:10px;">
+                                        <summary style="cursor:pointer; font-size:0.82rem; font-weight:800; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px; user-select:none;">
+                                             Mais informações
                                         </summary>
                                         <div style="margin-top:12px;">
-                                            <label style="color:#666; font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">É Evangélico?</label>
+                                            <label style="color:var(--text-muted); font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">É Evangélico?</label>
                                             <select id="vis-christian" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; margin-bottom:10px;">
                                                 <option value="nao">Não</option>
                                                 <option value="sim">Sim</option>
                                             </select>
 
-                                            <label style="color:#666; font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">Igreja de Origem</label>
+                                            <label style="color:var(--text-muted); font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">Igreja de Origem</label>
                                             <input type="text" id="vis-church" placeholder="Nome da igreja anterior (se houver)..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; margin-bottom:10px; box-sizing:border-box;">
 
-                                            <label style="color:#666; font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">Quem Convidou?</label>
+                                            <label style="color:var(--text-muted); font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">Quem Convidou?</label>
                                             <input type="text" id="vis-invited-by" placeholder="Nome de quem trouxe o visitante..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; margin-bottom:10px; box-sizing:border-box;">
 
-                                            <label style="color:#666; font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">Finalidade da Visita</label>
+                                            <label style="color:var(--text-muted); font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">Finalidade da Visita</label>
                                             <select id="vis-reason" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc;">
                                                 <option value="culto">Culto de Celebração (Integrar)</option>
                                                 <option value="evento">Evento Especial (Apenas Registro)</option>
@@ -1586,24 +1728,16 @@
                                 </div>
                             </div> <!-- END visitor-sub-new -->
                         <div id="visitor-sub-exist" class="visitor-sub-area" style="text-align:left;">
-                                <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                                    <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 179, 0, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
-                                        
-                                    </div>
-                                    <div>
-                                        <h3 class="title-modern" style="color:var(--primary); margin:0; font-size: 1.3rem;">Encontrar Visitante (Já Visitou)</h3>
-                                        <p style="color:#666; font-size:0.8rem; margin:2px 0 0 0;">Localize cadastros anteriores para registrar nova entrada.</p>
-                                    </div>
-                                </div>
+                                <h2 style="font-size: 1.8rem; font-weight: 700; color: var(--text-light); margin: 0 0 24px 0; font-family: var(--font-serif);">Já visitou</h2>
 
                                 <input type="text" id="visitor-search-input"
-                                    placeholder="Digite 3 letras ou mais para buscar..." onkeyup="searchReturningVisitor()"
-                                    style="font-size:1.05rem; padding:16px; border:2px solid #eee; width:100%; box-sizing:border-box; border-radius:12px; font-weight: bold;">
+                                    placeholder="Nome" onkeyup="searchReturningVisitor()"
+                                    style="font-size:1.05rem; padding:16px; border:1px solid var(--border-dark); background:var(--navy-main); color:var(--text-light); width:100%; box-sizing:border-box; border-radius:12px; font-weight: bold;">
 
                                 <div id="visitor-search-results" style="margin-top:15px; min-height: 50px;">
-                                    <div style="color:#aaa; text-align:center; padding:20px; font-style: italic;">
+                                    <div style="color:var(--text-muted); text-align:center; padding:20px; font-style: italic;">
                                         
-                                        Use a barra acima para pesquisar...
+                                        
                                     </div>
                                 </div>
                             </div> <!-- END visitor-sub-exist -->
@@ -1615,18 +1749,22 @@
                             
 
         <!-- LATEST ENTRIES MODULE -->
-        <div class="ultimas-entradas-container" style="margin-top: 5px;">
+        <details class="ultimas-entradas-details" style="margin-top: 30px; border: 1px solid var(--border-dark); border-radius: 8px; padding: 15px; background: var(--navy-main);">
+    <summary style="cursor: pointer; color: var(--gold-main); font-weight: 700; font-size: 0.95rem; text-transform: uppercase;">
+        Ver Últimas Entradas
+    </summary>
+    <div class="ultimas-entradas-container" style="margin-top: 15px;">
             <div style="display: flex; align-items: center; margin-bottom: 15px;">
                 <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
                     
                 </div>
                 <div>
                     <h3 class="title-modern" style="color:var(--primary); margin:0; font-size: 1.3rem;">Últimas Entradas</h3>
-                    <p style="color:#666; font-size:0.8rem; margin:2px 0 0 0;">Visitantes registrados hoje.</p>
+                    <p style="color:var(--text-muted); font-size:0.8rem; margin:2px 0 0 0;">Visitantes registrados hoje.</p>
                 </div>
             </div>
             <div id="latest-visitors-list" style="display:flex; flex-direction:column; gap:10px; max-height: 400px; overflow-y:auto; padding-right: 5px;">
-                <div style="color:#aaa; text-align:center; padding:10px; font-style: italic; font-size: 0.9rem;">
+                <div style="color:var(--text-muted); text-align:center; padding:10px; font-style: italic; font-size: 0.9rem;">
                     Aguardando atualizações...
                 </div>
             </div>
@@ -1647,12 +1785,12 @@
                               docs.sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
                               
                               if(docs.length === 0) {
-                                  container.innerHTML = '<div style="color:#aaa; text-align:center; padding:10px; font-style: italic; font-size: 0.9rem;">Nenhum visitante registrado hoje.</div>';
+                                  container.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:10px; font-style: italic; font-size: 0.9rem;">Nenhum visitante registrado hoje.</div>';
                                   return;
                               }
                               
                               container.innerHTML = docs.slice(0, 15).map(d => `
-                                  <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 4px; padding: 12px 15px; display: flex; align-items: center; gap: 12px;">
+                                  <div style="background: var(--navy-card); border: 1px solid var(--border-dark); border-radius: 4px; padding: 12px 15px; display: flex; align-items: center; gap: 12px;">
                                       <div style="width:36px; height:36px; border-radius:50%; background:#f1f5f9; color:#64748b; display:flex; justify-content:center; align-items:center; font-weight:700; font-size:0.9rem;">
                                           ${d.name ? d.name.charAt(0).toUpperCase() : '?'}
                                       </div>
@@ -1671,6 +1809,7 @@
             </script>
         </div>
 
+                        </details>
                         </div> <!-- END pc-column-right -->
                     
                     </div> <!-- END pc-visitor-grid -->
@@ -1740,7 +1879,7 @@
 
 
                     <textarea id="live-obs-prayer" rows="3" placeholder="Motivo da oracao..."
-                        style="width:100%; padding:15px; border-radius:12px; border:2px solid #eee; background:#FAFAFA; resize:none; font-family:inherit; font-size:1rem;"></textarea>
+                        style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border-dark); background:var(--navy-main); color:var(--text-light); background:#FAFAFA; resize:none; font-family:inherit; font-size:1rem;"></textarea>
 
                     <button onclick="submitLiveAction('prayer')" class="btn-large btn-gold" style="margin-top:20px;">
                         Enviar ao Altar
@@ -1973,30 +2112,30 @@
                         <p style="color:var(--text-muted); font-size:0.85rem; margin:0;">Registro para Certificado de Consagracao</p>
                     </div>
 
-                    <label style="color:#666; font-size:0.75rem;">Nome Completo da Crianca*</label>
+                    <label style="color:var(--text-muted); font-size:0.75rem;">Nome Completo da Crianca*</label>
                     <input type="text" id="sched-baby-name" placeholder="Nome Completo..." style="margin-bottom:10px;">
 
                     <div style="display:flex; gap:10px; margin-bottom:10px;">
                         <div style="flex:1;">
-                            <label style="color:#666; font-size:0.75rem;">Data de Nascimento</label>
+                            <label style="color:var(--text-muted); font-size:0.75rem;">Data de Nascimento</label>
                             <input type="date" id="sched-baby-dob">
                         </div>
                         <div style="flex:1;">
-                            <label style="color:#666; font-size:0.75rem;">Cidade de Nasc.</label>
+                            <label style="color:var(--text-muted); font-size:0.75rem;">Cidade de Nasc.</label>
                             <input type="text" id="sched-baby-city" placeholder="Cidade">
                         </div>
                     </div>
 
-                    <label style="color:#666; font-size:0.75rem;">Nome do Pai</label>
+                    <label style="color:var(--text-muted); font-size:0.75rem;">Nome do Pai</label>
                     <input type="text" id="sched-baby-father" placeholder="Nome do Pai..." style="margin-bottom:10px;">
                     
-                    <label style="color:#666; font-size:0.75rem;">Nome da Mae</label>
+                    <label style="color:var(--text-muted); font-size:0.75rem;">Nome da Mae</label>
                     <input type="text" id="sched-baby-mother" placeholder="Nome da Mae..." style="margin-bottom:10px;">
 
-                    <label style="color:#666; font-size:0.75rem;">Nome da Testemunha</label>
+                    <label style="color:var(--text-muted); font-size:0.75rem;">Nome da Testemunha</label>
                     <input type="text" id="sched-baby-godparents" placeholder="Nome da Testemunha..." style="margin-bottom:10px;">
 
-                    <label style="color:#666; font-size:0.75rem;">WhatsApp do Responsavel*</label>
+                    <label style="color:var(--text-muted); font-size:0.75rem;">WhatsApp do Responsavel*</label>
                     <input type="tel" id="sched-contact-baby" placeholder="Telefone para contato..." style="margin-bottom:15px;">
 
                     <button onclick="submitScheduleAction('baby')" class="btn-large btn-gold">Solicitar Agendamento</button>
@@ -2330,7 +2469,7 @@
                             font-size: 0.75rem;
                             margin-top: 8px;
                             font-weight: 600;
-                            color: #666;
+                            color: var(--text-muted);
                             display: block;
                         }
 
@@ -2349,8 +2488,8 @@
                 margin-top: 30px;
             }
             .quick-card {
-                background: #ffffff;
-                border: 1px solid #e2e8f0;
+                background: var(--navy-main);
+                border: 1px solid var(--border-dark);
                 border-radius: 4px;
                 padding: 24px 15px;
                 text-align: center;
@@ -2822,8 +2961,8 @@
                 }
 
                 .ministry-card.selected {
-                    background: #fff;
-                    border-color: #0f172a;
+                    background: var(--navy-card);
+                    border-color: var(--text-light);
                     box-shadow: 0 4px 10px rgba(255, 199, 44, 0.2);
                 }
 
@@ -2860,8 +2999,8 @@
                 margin-top: 30px;
             }
             .quick-card {
-                background: #ffffff;
-                border: 1px solid #e2e8f0;
+                background: var(--navy-main);
+                border: 1px solid var(--border-dark);
                 border-radius: 4px;
                 padding: 24px 15px;
                 text-align: center;
@@ -2987,7 +3126,7 @@
                 
             </div>
             <h2 style="color: #fff; margin-bottom: 5px; font-weight: 600; letter-spacing: -0.5px;">ACESSO RECEPCAO</h2>
-            <p style="color:#666; font-size:0.85rem; margin-bottom:25px;">Digite a senha do departamento</p>
+            <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:25px;">Digite a senha do departamento</p>
 
             <input type="password" id="login-pin" placeholder="••••••" maxlength="15"
                 style="width: 100%; padding: 15px; background: #222; border: 1px solid #444; color: white; border-radius: 4px; text-align: center; font-size: 1.5rem; letter-spacing: 5px; margin-bottom: 20px; font-family: monospace;">

@@ -51,6 +51,13 @@
           "ces-diaconia-prod"
         ]
       }
+    },
+    "cme-lausanne-mvp-12345": {
+      "hosting": {
+        "admin-lausanne": [
+          "cme-lausanne-mvp-12345"
+        ]
+      }
     }
   },
   "etags": {}

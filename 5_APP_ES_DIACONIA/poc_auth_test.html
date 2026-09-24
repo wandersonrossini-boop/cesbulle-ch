@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>PoC Firebase Auth</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="js/firebase-config.js"></script>
+</head>
+<body>
+    <h1>Teste Firebase Auth Nativo</h1>
+    <button onclick="testAuth()">Rodar Teste</button>
+    <pre id="log"></pre>
+
+    <script>
+        function log(msg) {
+            document.getElementById('log').innerText += msg + '\n';
+        }
+        async function testAuth() {
+            try {
+                const testEmail = 'poc_teste_' + Date.now() + '@cesdiaconia.ch';
+                const testPass = 'pocTest123!';
+                
+                log('1. Tentando criar usuário de teste: ' + testEmail);
+                const cred = await firebase.auth().createUserWithEmailAndPassword(testEmail, testPass);
+                log('? Sucesso! UID persistente gerado: ' + cred.user.uid);
+                
+                log('2. Testando login...');
+                await firebase.auth().signOut();
+                await firebase.auth().signInWithEmailAndPassword(testEmail, testPass);
+                log('? Login efetuado com sucesso!');
+
+                log('3. Limpando usuário...');
+                await firebase.auth().currentUser.delete();
+                log('? Usuário de teste removido.');
+                
+                log('\nCONCLUSÃO: O provedor Email/Password ESTÁ HABILITADO no Firebase deste projeto.');
+            } catch(e) {
+                log('ERRO: ' + e.message);
+                log('\nSe o erro for "auth/operation-not-allowed", significa que Email/Password não está habilitado no Console do Firebase.');
+            }
+        }
+    </script>
+</body>
+</html>

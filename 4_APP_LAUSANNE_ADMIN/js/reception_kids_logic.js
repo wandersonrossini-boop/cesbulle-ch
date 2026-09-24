@@ -756,7 +756,7 @@ window.submitVisitor = async function () {
 // --- VISITOR RETURNING LOGIC ---
 window.switchVisitorSubMode = function (mode, btn) {
     // UI Toggle
-    document.querySelectorAll('#mode-visitor .segment-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('#mode-visitor .subtab-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
 
     // View Toggle
@@ -778,11 +778,11 @@ window.searchReturningVisitor = function () {
     const results = document.getElementById('visitor-search-results');
 
     if (val.length < 3) {
-        results.innerHTML = '<div style="color:#aaa; text-align:center; padding:20px; font-style: italic;">Use a barra acima para pesquisar (Mínimo 3 letras... )</div>';
+        results.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:20px; font-style: italic;">Digite 3 letras...</div>';
         return;
     }
 
-    results.innerHTML = '<div style="color:#666; text-align:center; padding:20px;"><br>Buscando visitantes...</div>';
+    results.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:20px;"><br>Buscando...</div>';
 
     visitorSearchTimeout = setTimeout(() => {
         const valTitle = val.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
@@ -808,11 +808,11 @@ window.searchReturningVisitor = function () {
             });
 
             if (uniquePeople.size === 0) {
-                results.innerHTML = '<div style="color:#854d0e; background:#fefce8; padding:15px; border-radius:12px; border:1px solid #fef08a; text-align:center;"><br>Nenhum visitante encontrado com esse nome.<br><button onclick="switchVisitorSubMode(\'new\', document.querySelector(\'#mode-visitor .segment-btn\'))" class="btn-large btn-outline" style="margin-top:10px; border-color:#ca8a04; color:#a16207;">Criar Novo Cadastro</button></div>';
+                results.innerHTML = '<div style="color:var(--text-light); background:var(--navy-main); padding:15px; border-radius:12px; border:1px solid var(--border-dark); text-align:center;">Nenhum visitante encontrado.<br><button onclick="switchVisitorSubMode(\'new\', document.querySelector(\'#mode-visitor .segment-btn\'))" class="btn-large btn-outline" style="margin-top:10px; border-color:var(--gold-main); color:var(--gold-main);">Criar Novo Cadastro</button></div>';
             } else {
                 uniquePeople.forEach((p, id) => {
                     const div = document.createElement('div');
-                    div.style.cssText = "background:#fff; border:1px solid #e2e8f0; padding:15px; margin-bottom:10px; border-radius:12px; cursor:pointer; color:#333; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 5px rgba(0,0,0,0.02); transition: 0.2s;";
+                    div.style.cssText = "background:var(--navy-card); border:1px solid var(--border-dark); padding:15px; margin-bottom:10px; border-radius:12px; cursor:pointer; color:var(--text-light); display:flex; justify-content:space-between; align-items:center; transition: 0.2s;";
                     div.onmouseover = () => div.style.borderColor = "#0f172a";
                     div.onmouseout = () => div.style.borderColor = "#e2e8f0";
 
@@ -827,7 +827,7 @@ window.searchReturningVisitor = function () {
                 });
             }
         }).catch(err => {
-            results.innerHTML = '<div style="color:#b91c1c; background:#fee2e2; padding:15px; border-radius:12px; text-align:center;">Erro ao buscar. Verifique a conexão.</div>';
+            results.innerHTML = '<div style="color:#f87171; background:var(--navy-main); border:1px solid var(--border-dark); padding:15px; border-radius:12px; text-align:center;">Erro ao buscar. Verifique a conexão.</div>';
             console.error(err);
         });
     }, 600);
@@ -1353,3 +1353,4 @@ window.registrarAtaDigital = async function(tipo, descricao, responsavel = 'Secr
         console.error("Erro ao registrar Ata Digital:", e);
     }
 };
+
