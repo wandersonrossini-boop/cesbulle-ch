@@ -49,7 +49,7 @@
     <meta name="theme-color" content="#f8f9fa">
     <link rel="stylesheet" href="css/style-v2.css?v=61.0.0">
     <link rel="stylesheet" href="css/mobile-v2.css?v=61.0.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     
     <script>
         // Singleton pattern to prevent "already declared" errors
@@ -619,6 +619,641 @@
     
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <style>
+        :root {
+            --navy-main: #0B1626;
+            --navy-hover: #14263D;
+            --gold-accent: #C9A96A;
+            --bg-page: #F8FAFC;
+            --bg-card: #FFFFFF;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --border-color: #E5E7EB;
+            --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --gold: #C9A96A;
+            --gold-hover: #14263D;
+        }
+
+        body {
+            background-color: var(--bg-page) !important;
+            background: var(--bg-page) !important;
+            color: var(--text-main) !important;
+            font-family: var(--font-inter) !important;
+            margin: 0;
+            padding-bottom: 40px;
+        }
+
+        h1, h2, h3, h4, label, input, select, button, span, p, div {
+            font-family: var(--font-inter) !important;
+        }
+
+        .pc-sidebar {
+            background: var(--navy-main) !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+        }
+        .sidebar-header h2 {
+            color: #FFFFFF !important;
+            font-size: 1.25rem !important;
+            font-weight: 700 !important;
+        }
+        .sidebar-header h2 span {
+            color: var(--gold-accent) !important;
+        }
+        .sidebar-menu .segment-btn {
+            color: rgba(255, 255, 255, 0.7) !important;
+            font-weight: 500 !important;
+            font-size: 0.95rem !important;
+            padding: 12px 16px !important;
+            border-radius: 4px !important;
+            border: none !important;
+            background: transparent !important;
+            text-align: left !important;
+            width: 100% !important;
+        }
+        .sidebar-menu .segment-btn.active {
+            background: var(--navy-hover) !important;
+            color: #FFFFFF !important;
+            border-left: 3px solid var(--gold-accent) !important;
+            border-radius: 0 4px 4px 0 !important;
+        }
+
+        .btn-gold, button.btn-primary {
+            background: var(--navy-main) !important;
+            color: #FFFFFF !important;
+            font-weight: 600 !important;
+            font-size: 1rem !important;
+            border-radius: 4px !important;
+            border: none !important;
+            padding: 14px 20px !important;
+            cursor: pointer !important;
+            transition: background 0.2s ease !important;
+            text-transform: none !important;
+            letter-spacing: normal !important;
+        }
+        .btn-gold:hover, button.btn-primary:hover {
+            background: var(--navy-hover) !important;
+        }
+
+        .page-title {
+            font-size: 30px !important;
+            font-weight: 700 !important;
+            color: var(--text-main) !important;
+            margin: 0 0 4px 0 !important;
+            letter-spacing: -0.5px !important;
+        }
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 26px !important;
+            }
+        }
+        .page-subtitle-top {
+            font-size: 13px !important;
+            color: var(--text-muted) !important;
+            font-weight: 600 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            margin: 0 0 2px 0 !important;
+        }
+
+        .card-floating {
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 4px !important;
+            box-shadow: none !important;
+            padding: 24px !important;
+        }
+
+        .segmented-control {
+            display: flex !important;
+            background: #F1F5F9 !important;
+            border-radius: 4px !important;
+            padding: 3px !important;
+            border: 1px solid var(--border-color) !important;
+            gap: 4px !important;
+            margin-bottom: 20px !important;
+        }
+        .segment-btn {
+            flex: 1 !important;
+            padding: 10px 14px !important;
+            font-size: 0.85rem !important;
+            font-weight: 600 !important;
+            color: var(--text-muted) !important;
+            border: none !important;
+            background: transparent !important;
+            border-radius: 4px !important;
+            cursor: pointer !important;
+            text-align: center !important;
+        }
+        .segment-btn.active {
+            background: var(--navy-main) !important;
+            color: #FFFFFF !important;
+        }
+
+        .four-access-grid {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 12px !important;
+            margin-top: 25px !important;
+        }
+        @media (max-width: 600px) {
+            .four-access-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+        }
+        .access-btn {
+            background: #FFFFFF !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 4px !important;
+            padding: 14px 10px !important;
+            text-align: center !important;
+            color: var(--text-main) !important;
+            font-weight: 600 !important;
+            font-size: 0.9rem !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+        .access-btn:hover {
+            border-color: var(--navy-main) !important;
+            background: #F1F5F9 !important;
+        }
+
+        /* Hide bottom nav bar on mobile if redundant */
+        .bottom-nav {
+            display: none !important;
+        }
+
+        label {
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            color: var(--text-main) !important;
+            margin-bottom: 6px !important;
+            display: block !important;
+        }
+
+        input[type="text"], input[type="tel"], select {
+            font-size: 16px !important;
+            font-weight: 400 !important;
+            padding: 12px 14px !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 4px !important;
+            background: #FFFFFF !important;
+            color: var(--text-main) !important;
+            margin-bottom: 16px !important;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--navy-main) !important;
+            outline: none !important;
+        }
+
+        /* Hide any explanatory text below Visitante */
+        .remove-subtitle {
+            display: none !important;
+        }
+    </style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --navy-dark: #0A131F;
+            --navy-sidebar: #09121D;
+            --navy-active: #192A3E;
+            --gold-sub: #C9A96A;
+            --blue-accent: #007AFF;
+            --bg-body: #F8FAFC;
+            --bg-card: #FFFFFF;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --border-light: #E2E8F0;
+            --font-serif: 'Playfair Display', Georgia, serif;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body) !important;
+            color: var(--text-main) !important;
+            font-family: var(--font-sans) !important;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1, h2, h3, h4, label, input, select, button, span, p, div {
+            font-family: var(--font-sans);
+        }
+
+        .serif-title {
+            font-family: var(--font-serif) !important;
+        }
+
+        /* App Layout */
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Left Sidebar (PC) */
+        .pc-sidebar {
+            width: 240px;
+            background: var(--navy-sidebar) !important;
+            color: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 30px 0;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            flex-shrink: 0;
+        }
+        .sidebar-brand {
+            padding: 0 28px 35px 28px;
+        }
+        .sidebar-brand h2 {
+            font-family: var(--font-serif);
+            font-size: 1.4rem;
+            color: #FFFFFF;
+            margin: 0;
+            line-height: 1.2;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .sidebar-brand .sub-brand {
+            font-family: var(--font-sans);
+            color: var(--gold-sub);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-top: 4px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .sidebar-nav .nav-link {
+            padding: 14px 28px;
+            color: #94A3B8;
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .sidebar-nav .nav-link:hover {
+            color: #FFFFFF;
+        }
+        .sidebar-nav .nav-link.active {
+            background: var(--navy-active);
+            color: #FFFFFF;
+            font-weight: 600;
+            position: relative;
+        }
+        .sidebar-nav .nav-link.active::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-right: 6px solid var(--bg-body);
+        }
+
+        .sidebar-bottom {
+            padding: 0 28px;
+        }
+        .sidebar-bottom .logout-link {
+            color: #64748B;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            display: none;
+            background: var(--navy-sidebar);
+            padding: 16px 20px;
+            color: #FFFFFF;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .mobile-header .brand-title {
+            font-family: var(--font-serif);
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin: 0;
+            color: #FFF;
+        }
+        .mobile-header .brand-sub {
+            color: var(--gold-sub);
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 899px) {
+            .pc-sidebar { display: none !important; }
+            .mobile-header { display: flex !important; }
+            .app-layout { flex-direction: column; }
+        }
+
+        /* Main App Area */
+        .app-main {
+            flex: 1;
+            padding: 40px 48px;
+            overflow-y: auto;
+        }
+        @media (max-width: 899px) {
+            .app-main {
+                padding: 24px 20px;
+            }
+        }
+
+        /* Header Info Bar Top Right */
+        .top-info-bar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 24px;
+            gap: 15px;
+            font-size: 0.82rem;
+            color: #64748B;
+        }
+        .top-info-bar .date-str { font-weight: 500; }
+        .top-info-bar .role-str { font-weight: 600; color: #475569; }
+
+        /* Main Header Titles */
+        .header-title-block {
+            margin-bottom: 24px;
+        }
+        .header-title-block .section-label {
+            font-size: 0.85rem;
+            color: #64748B;
+            font-weight: 500;
+            margin: 0 0 2px 0;
+        }
+        .header-title-block .main-title {
+            font-family: var(--font-serif);
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #0F172A;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        /* Sub-tab Toggle (Novo visitante / Já visitou) */
+        .visitor-subtabs {
+            display: flex;
+            gap: 32px;
+            border-bottom: 1px solid var(--border-light);
+            margin-bottom: 28px;
+        }
+        .subtab-btn {
+            background: transparent;
+            border: none;
+            padding: 10px 0 14px 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #64748B;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.15s ease;
+        }
+        .subtab-btn.active {
+            color: #0F172A;
+        }
+        .subtab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--blue-accent);
+        }
+
+        /* Form Controls */
+        .form-label {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #0F172A;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 13px 16px;
+            background: #F8FAFC !important;
+            border: 1px solid var(--border-light) !important;
+            border-radius: 6px !important;
+            font-size: 0.95rem !important;
+            color: #0F172A !important;
+            box-sizing: border-box;
+            margin-bottom: 20px !important;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+        .form-input:focus {
+            border-color: var(--navy-dark) !important;
+            background: #FFFFFF !important;
+        }
+
+        .phone-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .ddi-select {
+            width: 90px;
+            padding: 13px 12px;
+            background: #F8FAFC !important;
+            border: 1px solid var(--border-light) !important;
+            border-radius: 6px !important;
+            font-size: 0.95rem !important;
+            font-weight: 600;
+            color: #0F172A !important;
+            outline: none;
+        }
+
+        /* Submit Button with Enter Badge */
+        .submit-btn-container {
+            width: 100%;
+            background: var(--navy-dark);
+            color: #FFFFFF;
+            border: none;
+            border-radius: 6px;
+            padding: 14px 20px;
+            font-size: 0.98rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-align: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            box-sizing: border-box;
+            margin-bottom: 18px;
+        }
+        .submit-btn-container:hover {
+            background: var(--navy-active);
+        }
+        .submit-btn-container .btn-text {
+            flex: 1;
+            text-align: center;
+            padding-left: 30px;
+        }
+        .submit-btn-container .enter-badge {
+            background: #192A3E;
+            color: #94A3B8;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        /* Drawer Toggle Link */
+        .drawer-toggle-link {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #475569;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+        }
+
+        /* Layout Grid PC */
+        .pc-main-grid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 40px;
+        }
+        @media (max-width: 1024px) {
+            .pc-main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Right Column Card: Últimas Entradas */
+        .latest-entries-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .latest-entries-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .latest-entries-header h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0F172A;
+            margin: 0;
+        }
+        .latest-entries-header .view-all {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--blue-accent);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .entry-row {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #F1F5F9;
+            font-size: 0.88rem;
+        }
+        .entry-row:last-child {
+            border-bottom: none;
+        }
+        .entry-row .time {
+            width: 55px;
+            color: #64748B;
+            font-size: 0.82rem;
+            font-weight: 500;
+        }
+        .entry-row .name {
+            flex: 1;
+            font-weight: 600;
+            color: #0F172A;
+        }
+        .entry-row .badge-visitante {
+            background: #E2E8F0;
+            color: #475569;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 4px;
+        }
+        .entry-row .badge-membro {
+            background: #D1FAE5;
+            color: #065F46;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 4px;
+        }
+
+        /* 4 Lower Access Cards */
+        .four-cards-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-top: 40px;
+        }
+        @media (max-width: 600px) {
+            .four-cards-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        .access-card-single {
+            background: #FFFFFF;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            padding: 24px 16px;
+            text-align: left;
+            position: relative;
+            cursor: pointer;
+            transition: border-color 0.15s ease;
+        }
+        .access-card-single::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20px;
+            width: 36px;
+            height: 3px;
+            background: var(--blue-accent);
+            border-radius: 0 0 2px 2px;
+        }
+        .access-card-single:hover {
+            border-color: #CBD5E1;
+        }
+        .access-card-single h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0F172A;
+            margin: 0;
+        }
+    </style>
+
 </head>
 
 <body>
@@ -647,18 +1282,28 @@
         </div>
     </nav>
 
-    <div class="app-layout">
-    <aside class="pc-sidebar">
-        <div class="sidebar-header">
-            <h2><span>ES</span> LAUSANNE</h2>
+        <div class="mobile-header">
+        <div>
+            <h2 class="brand-title">CME LAUSANNE</h2>
+            <div class="brand-sub">RECEPÇÃO</div>
         </div>
-        <div class="sidebar-menu">
-            <button class="segment-btn active" onclick="switchCheckinMode('visitor', this)"> Visitante</button>
-            <button class="segment-btn" onclick="switchCheckinMode('child', this)"> Criança</button>
-            <button class="segment-btn" onclick="switchCheckinMode('online', this)"> Online / QR</button>
-            <button class="segment-btn" onclick="switchCheckinMode('mural', this)"> Mural Kids</button>
-            <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:15px 0; width: 100%;">
-            <button class="segment-btn" onclick="setTab('events')"> Eventos</button>
+        <div style="font-size: 1.2rem; cursor: pointer;" onclick="document.querySelector('.sidebar-nav').classList.toggle('show-mobile')">☰</div>
+    </div>
+    <div class="app-layout">
+        <aside class="pc-sidebar">
+        <div class="sidebar-brand">
+            <h2>CME<br>LAUSANNE</h2>
+            <div class="sub-brand">RECEPÇÃO</div>
+        </div>
+        <div class="sidebar-nav">
+            <div class="nav-link active" onclick="switchCheckinMode('visitor', this)">Visitante</div>
+            <div class="nav-link" onclick="switchCheckinMode('child', this)">Criança</div>
+            <div class="nav-link" onclick="setTab('events')">Eventos</div>
+            <div class="nav-link" onclick="switchCheckinMode('online', this)">Online / QR</div>
+            <div class="nav-link" onclick="switchCheckinMode('mural', this)">Mural</div>
+        </div>
+        <div class="sidebar-bottom">
+            <div class="logout-link" onclick="if(typeof AuthManager!=='undefined')AuthManager.logout();">Sair</div>
         </div>
     </aside>
     <main class="app-main">
@@ -691,9 +1336,9 @@
         <!-- === TAB 1: CHECK-IN ROOT (Merged Flow) === -->
         <div id="tab-checkin" class="tab-section active">
 
-            <div style="text-align:center; margin-bottom:30px;">
-                <h2 style="color:#ffffff; margin:0; font-size:1.6rem; font-weight: 600;">Bem-vindo</h2>
-                <p style="color:var(--text-muted); margin-top: 5px; font-size: 0.9rem;">Selecione uma opcao para iniciar</p>
+            <div style="margin-bottom: 20px;">
+                <p class="page-subtitle-top" style="font-size: 13px; color: #64748B; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 2px 0;">Recepção</p>
+                <h1 class="page-title" style="font-size: 30px; font-weight: 700; color: #0F172A; margin: 0; letter-spacing: -0.5px;">Visitante</h1>
             </div>
 
             <!-- SEGMENTED CONTROL -->
@@ -872,16 +1517,17 @@
                         <!-- LEFT COLUMN: RAPID CAPTURE (NOVO VISITANTE) -->
                         <div class="pc-column-left">
                             <!-- INNER SEGMENTED CONTROL (MOBILE VIEW) -->
-                    <div class="segmented-control" style="margin-bottom:15px; background: #f8fafc; border-radius: 4px; border: 1px solid #e2e8f0; height: auto;">
-                        <button class="segment-btn active" onclick="switchVisitorSubMode('new', this)">NOVO</button>
-                        <button class="segment-btn" onclick="switchVisitorSubMode('exist', this)">JÁ VISITOU</button>
-                    </div>
+                    
+    <div class="visitor-subtabs">
+        <button class="subtab-btn active" id="btn-subtab-new" onclick="switchVisitorSubMode('new', this)">Novo visitante</button>
+        <button class="subtab-btn" id="btn-subtab-exist" onclick="switchVisitorSubMode('exist', this)">Já visitou</button>
+    </div>
+    
                             <!-- SUB-MODE: NEW REGISTRATION (RAPID CAPTURE) -->
                             <div id="visitor-sub-new" class="visitor-sub-area">
                                 <div class="step-container active">
                                     <div style="margin-bottom: 24px;">
-                                        <h2 style="font-family: var(--font-serif); font-size: 2.1rem; margin: 0 0 6px 0; color: #0f172a; font-weight: 600; letter-spacing: -0.5px;">Registrar visitante</h2>
-                                        <p style="margin: 0; color: #64748b; font-size: 0.95rem;">Receba, registre e faça parte desta jornada.</p>
+                                        <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin: 0 0 16px 0;">Registrar Entrada</h2>
                                     </div>
 
                                     <!-- Campo Nome (Obrigatório) -->
@@ -905,10 +1551,12 @@
                                     </div>
 
                                     <!-- Botão Principal de Registro -->
-                                    <button onclick="submitVisitor()" class="btn-large btn-gold" style="width:100%; font-size:1rem; font-weight:600; padding:12px; margin-bottom:18px; border-radius:4px; display:flex; justify-content:space-between; align-items:center; background:#0f172a; color:#fff;">
-                                        <span>Registrar entrada</span>
-                                        <span style="font-size:0.75rem; opacity:0.8; font-weight:500; background:rgba(255,255,255,0.2); padding:3px 8px; border-radius:4px;">Enter </span>
-                                    </button>
+                                    
+    <button onclick="submitVisitor()" class="submit-btn-container" id="btn-submit-visitor">
+        <span class="btn-text">Registrar entrada</span>
+        <span class="enter-badge">Enter</span>
+    </button>
+    
 
                                     <!-- Informações Opcionais (Gaveta Retrátil) -->
                                     <details style="border:1px solid #eee; border-radius:12px; padding:12px; background:#fbfbfb; margin-top:10px;">
@@ -1030,6 +1678,25 @@
                     </div>
 </div>
 </div>
+
+        
+            <!-- 4 ACESSOS INFERIORES (SOMENTE TÍTULOS) -->
+            
+    <div class="four-cards-row">
+        <div class="access-card-single" onclick="switchCheckinMode('child', this)">
+            <h4>Criança</h4>
+        </div>
+        <div class="access-card-single" onclick="setTab('events')">
+            <h4>Eventos</h4>
+        </div>
+        <div class="access-card-single" onclick="switchCheckinMode('online', this)">
+            <h4>Online / QR</h4>
+        </div>
+        <div class="access-card-single" onclick="switchCheckinMode('mural', this)">
+            <h4>Mural</h4>
+        </div>
+    </div>
+    
 
         </div> <!-- END TAB CHECKIN (Merged) -->
 
