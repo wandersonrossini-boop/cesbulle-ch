@@ -41,7 +41,7 @@ window.loadAllKidsList = async function() {
     const listEl = document.getElementById('child-search-results');
     if (!listEl) return;
 
-    listEl.innerHTML = '<div style="color:#aaa; text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin"></i> Sincronizando lista...</div>';
+    listEl.innerHTML = '<div style="color:#aaa; text-align:center; padding:20px;"> Sincronizando lista...</div>';
 
     try {
         // 1. Fetch kids already checked in today to filter them out
@@ -108,7 +108,7 @@ window.renderKidsSelection = function(filter = '') {
                 <div style="flex:1;">
                     <strong style="font-size:1.15rem; display:block; color:#1a1a1a; margin-bottom:4px;">${kidName}</strong>
                     <div style='font-size:0.85rem; color:#666; display:flex; align-items:center; gap:6px;'>
-                        <i class="fas fa-user-friends" style="color:#da291c;"></i>
+                        
                         <span>Resp: <b>${parentName}</b></span>
                     </div>
                 </div>
@@ -163,12 +163,12 @@ window.searchParentForChild = function (phone) {
                     // Check if Membro
                     if (p.baptized === true || (p.type && p.type.toLowerCase().includes('membro'))) {
                         isParentMembro = true;
-                        if (statusEl) statusEl.innerHTML = `<span style="color:#16a34a;"><i class="fas fa-check-circle"></i> Responsável Encontrado (Membro)</span>`;
+                        if (statusEl) statusEl.innerHTML = `<span style="color:#16a34a;"> Responsável Encontrado (Membro)</span>`;
                     } else {
-                        if (statusEl) statusEl.innerHTML = `<span style="color:#2563eb;"><i class="fas fa-check-circle"></i> Responsável Encontrado</span>`;
+                        if (statusEl) statusEl.innerHTML = `<span style="color:#2563eb;"> Responsável Encontrado</span>`;
                     }
                 } else {
-                    if (statusEl) statusEl.innerHTML = `<span style="color:#d97706;"><i class="fas fa-info-circle"></i> Novo Responsável — Prossiga</span>`;
+                    if (statusEl) statusEl.innerHTML = `<span style="color:#d97706;"> Novo Responsável — Prossiga</span>`;
                 }
 
                 // Advance to step 2 automatically
@@ -344,8 +344,9 @@ window.submitChildExisting = function (kidData) {
 
 window.switchCheckinMode = function (mode, btn) {
     console.log("Switching mode to:", mode);
+    if(typeof window.setTab === "function") window.setTab("checkin");
     if(btn) {
-        btn.parentNode.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.sidebar-menu .segment-btn, .segmented-control .segment-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
 
@@ -362,7 +363,7 @@ window.loadSecretariatEvents = function() {
     const container = document.getElementById('secretariat-events-container');
     if(!container) return;
     
-    container.innerHTML = '<div style="text-align:center; color:#aaa; padding:20px;"><i class="fas fa-spinner fa-spin"></i> Sincronizando...</div>';
+    container.innerHTML = '<div style="text-align:center; color:#aaa; padding:20px;"> Sincronizando...</div>';
 
     const todayStr = new Date().toISOString().split('T')[0];
     
@@ -389,7 +390,7 @@ window.loadSecretariatEvents = function() {
                     <div>
                         <strong style="font-size:1rem; color:#1a1a1a;">${ev.name || ev.title || 'Evento'}</strong>
                         <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">
-                            <i class="fas fa-clock"></i> ${displayDate} ${ev.startTime ? ' às ' + ev.startTime : ''}
+                             ${displayDate} ${ev.startTime ? ' às ' + ev.startTime : ''}
                         </div>
                     </div>
                 </div>`;
@@ -462,7 +463,7 @@ window.switchSubMode = function(mode, btn) {
 
 window.switchLiveMode = function(mode, btn) {
     if(btn) {
-        btn.parentNode.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.sidebar-menu .segment-btn, .segmented-control .segment-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
     document.querySelectorAll('#tab-live .tab-content-area').forEach(c => c.classList.remove('active'));
@@ -472,7 +473,7 @@ window.switchLiveMode = function(mode, btn) {
 
 window.switchSchedSub = function(mode, btn) {
     if(btn) {
-        btn.parentNode.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.sidebar-menu .segment-btn, .segmented-control .segment-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
     document.querySelectorAll('.sub-sched').forEach(s => s.classList.remove('active'));
@@ -777,11 +778,11 @@ window.searchReturningVisitor = function () {
     const results = document.getElementById('visitor-search-results');
 
     if (val.length < 3) {
-        results.innerHTML = '<div style="color:#aaa; text-align:center; padding:20px; font-style: italic;"><i class="fas fa-search" style="font-size: 2rem; display: block; margin-bottom: 10px; opacity: 0.5;"></i>Use a barra acima para pesquisar (Mínimo 3 letras... )</div>';
+        results.innerHTML = '<div style="color:#aaa; text-align:center; padding:20px; font-style: italic;">Use a barra acima para pesquisar (Mínimo 3 letras... )</div>';
         return;
     }
 
-    results.innerHTML = '<div style="color:#666; text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; color: var(--gold-primary); margin-bottom:10px;"></i><br>Buscando visitantes...</div>';
+    results.innerHTML = '<div style="color:#666; text-align:center; padding:20px;"><br>Buscando visitantes...</div>';
 
     visitorSearchTimeout = setTimeout(() => {
         const valTitle = val.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
@@ -807,19 +808,19 @@ window.searchReturningVisitor = function () {
             });
 
             if (uniquePeople.size === 0) {
-                results.innerHTML = '<div style="color:#854d0e; background:#fefce8; padding:15px; border-radius:12px; border:1px solid #fef08a; text-align:center;"><i class="fas fa-exclamation-circle" style="margin-bottom:8px; font-size:1.2rem;"></i><br>Nenhum visitante encontrado com esse nome.<br><button onclick="switchVisitorSubMode(\'new\', document.querySelector(\'#mode-visitor .segment-btn\'))" class="btn-large btn-outline" style="margin-top:10px; border-color:#ca8a04; color:#a16207;">Criar Novo Cadastro</button></div>';
+                results.innerHTML = '<div style="color:#854d0e; background:#fefce8; padding:15px; border-radius:12px; border:1px solid #fef08a; text-align:center;"><br>Nenhum visitante encontrado com esse nome.<br><button onclick="switchVisitorSubMode(\'new\', document.querySelector(\'#mode-visitor .segment-btn\'))" class="btn-large btn-outline" style="margin-top:10px; border-color:#ca8a04; color:#a16207;">Criar Novo Cadastro</button></div>';
             } else {
                 uniquePeople.forEach((p, id) => {
                     const div = document.createElement('div');
                     div.style.cssText = "background:#fff; border:1px solid #e2e8f0; padding:15px; margin-bottom:10px; border-radius:12px; cursor:pointer; color:#333; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 5px rgba(0,0,0,0.02); transition: 0.2s;";
-                    div.onmouseover = () => div.style.borderColor = "#d4af37";
+                    div.onmouseover = () => div.style.borderColor = "#0f172a";
                     div.onmouseout = () => div.style.borderColor = "#e2e8f0";
 
                     const count = p.attendance_count || 1;
                     const isCong = (p.type || '').toLowerCase().includes('congrega');
                     const badgeStr = isCong ? `<span style="background:#f3e8ff; color:#7e22ce; padding:4px 10px; border-radius:8px; font-size:0.75rem; font-weight:800; border:1px solid #e9d5ff;">Congregado</span>` : `<span style="background:#fefce8; color:#a16207; padding:4px 10px; border-radius:8px; font-size:0.75rem; font-weight:800; border:1px solid #fef08a;">Visita #${count}</span>`;
 
-                    div.innerHTML = `<div style="flex:1;"><strong style="font-size:1.1rem; display:block; margin-bottom:2px;">${p.name}</strong> <span style='font-size:0.85rem; color:#64748b;'><i class="fas fa-phone-alt" style="font-size:0.7rem; margin-right:4px;"></i>${p.contact || p.phone || p.whatsapp || 'Sem Contato'}</span></div> <div style="margin-left:10px;">${badgeStr}</div>`;
+                    div.innerHTML = `<div style="flex:1;"><strong style="font-size:1.1rem; display:block; margin-bottom:2px;">${p.name}</strong> <span style='font-size:0.85rem; color:#64748b;'>${p.contact || p.phone || p.whatsapp || 'Sem Contato'}</span></div> <div style="margin-left:10px;">${badgeStr}</div>`;
 
                     div.onclick = () => window.submitReturningVisitor(id, p);
                     results.appendChild(div);
@@ -1133,7 +1134,7 @@ window.appendKidToMural = function(id, data) {
         </div>
         <div style="text-align:right;">
             <span style="background:rgba(16, 185, 129, 0.1); color:#059669; border:1px solid rgba(16, 185, 129, 0.2); padding:6px 12px; border-radius:20px; font-size:0.8rem; font-weight:800; display:inline-block;">
-                <i class="fas fa-check-circle" style="margin-right:2px;"></i> ${data.age_group || 'Sala'}
+                 ${data.age_group || 'Sala'}
             </span>
             <div style="font-size:0.7rem; color:#999; margin-top:5px;">Entregue</div>
         </div>
@@ -1145,7 +1146,7 @@ window.appendKidToMural = function(id, data) {
 function checkMuralEmpty() {
     const container = document.getElementById('mural-kids-container');
     if (container && container.children.length === 0) {
-        container.innerHTML = '<div style="text-align:center; color:#aaa; font-style:italic; padding:20px;"><i class="fas fa-child" style="font-size:2rem; color:#ddd; display:block; margin-bottom:10px;"></i>Nenhuma criança confirmada na sala ainda hoje.</div>';
+        container.innerHTML = '<div style="text-align:center; color:#aaa; font-style:italic; padding:20px;">Nenhuma criança confirmada na sala ainda hoje.</div>';
     }
 }
 
@@ -1270,7 +1271,7 @@ window.navToTab = function(tabId, el) {
 
 window.navToMode = function(mode, btn) {
     if(btn) {
-        btn.parentNode.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.sidebar-menu .segment-btn, .segmented-control .segment-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
     document.querySelectorAll('#tab-checkin > .tab-content-area').forEach(div => div.classList.remove('active'));
@@ -1280,7 +1281,7 @@ window.navToMode = function(mode, btn) {
 
 window.navToSub = function(subId, btn) {
     if(btn) {
-        btn.parentNode.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.sidebar-menu .segment-btn, .segmented-control .segment-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
     const parentClass = subId.startsWith('visitor') ? 'visitor-sub-area' : 'child-sub-area';
@@ -1297,7 +1298,7 @@ window.navToSub = function(subId, btn) {
 
 window.navToLive = function(mode, btn) {
     if(btn) {
-        btn.parentNode.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.sidebar-menu .segment-btn, .segmented-control .segment-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
     document.querySelectorAll('#tab-live .tab-content-area').forEach(c => c.classList.remove('active'));
@@ -1307,7 +1308,7 @@ window.navToLive = function(mode, btn) {
 
 window.navToSched = function(mode, btn) {
     if(btn) {
-        btn.parentNode.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.sidebar-menu .segment-btn, .segmented-control .segment-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
     document.querySelectorAll('.sub-sched').forEach(s => s.classList.remove('active'));

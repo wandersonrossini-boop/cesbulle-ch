@@ -60,8 +60,8 @@
     <style>
         /* RECEPTION LAUSANNE - ELEGANT LIGHT & DARK LAYOUT (REF MATCH) */
         :root {
-            --gold: #a68a56;
-            --gold-hover: #8b7348;
+            --gold: #0f172a;
+            --gold-hover: #1e293b;
             --bg-dark-sidebar: #0f141c;
             --bg-light-page: #f4f5f7;
             --bg-card: #ffffff;
@@ -71,8 +71,8 @@
             --text-secondary: #64748b;
             --text-white: #ffffff;
             --text-muted: #94a3b8;
-            --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            --font-serif: 'Playfair Display', Georgia, serif;
+            --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
+            --font-serif: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
         }
 
         html, body {
@@ -93,6 +93,7 @@
 
         /* RECEPTIONIST IDENTIFICATION BAR */
         .acolhedor-bar {
+            display: none !important;
             background: var(--bg-dark-element);
             border: 1px solid var(--border-dark);
             border-radius: 4px;
@@ -501,7 +502,7 @@
 
         /* --- BUTTON & CARD STYLING MATCHING REFERENCE --- */
         .btn-gold {
-            background: #a68a56 !important;
+            background: #0f172a !important;
             color: #ffffff !important;
             border-radius: 8px !important;
             font-family: var(--font-body) !important;
@@ -513,7 +514,7 @@
         }
 
         .btn-gold:hover {
-            background: #86642d !important;
+            background: #0f172a !important;
         }
 
         .card-floating {
@@ -625,23 +626,23 @@
     <!-- RECEPTION BOTTOM NAV -->
     <nav class="bottom-nav">
         <div class="nav-item active" id="nav-checkin" onclick="setTab('checkin')">
-            <i class="fas fa-check-circle"></i>
+            
             <span>Check-in</span>
         </div>
         <div class="nav-item" id="nav-live" onclick="setTab('live')">
-            <i class="fas fa-broadcast-tower"></i>
+            
             <span>Ao Vivo</span>
         </div>
         <div class="nav-item" id="nav-schedule" onclick="setTab('schedule')">
-            <i class="fas fa-calendar-alt"></i>
+            
             <span>Agendar</span>
         </div>
         <div class="nav-item" id="nav-services" onclick="setTab('services')">
-            <i class="fas fa-hands-helping"></i>
+            
             <span>Servir</span>
         </div>
         <div class="nav-item" id="nav-events" onclick="setTab('events')">
-            <i class="fas fa-calendar-check"></i>
+            
             <span>Eventos</span>
         </div>
     </nav>
@@ -652,23 +653,19 @@
             <h2><span>ES</span> LAUSANNE</h2>
         </div>
         <div class="sidebar-menu">
-            <button class="segment-btn active" onclick="switchCheckinMode('visitor', this)"><i class="fas fa-user"></i> Visitante</button>
-            <button class="segment-btn" onclick="switchCheckinMode('child', this)"><i class="fas fa-child"></i> Criança</button>
-            <button class="segment-btn" onclick="switchCheckinMode('online', this)"><i class="fas fa-qrcode"></i> Online / QR</button>
-            <button class="segment-btn" onclick="switchCheckinMode('mural', this)"><i class="fas fa-list-check"></i> Mural Kids</button>
+            <button class="segment-btn active" onclick="switchCheckinMode('visitor', this)"> Visitante</button>
+            <button class="segment-btn" onclick="switchCheckinMode('child', this)"> Criança</button>
+            <button class="segment-btn" onclick="switchCheckinMode('online', this)"> Online / QR</button>
+            <button class="segment-btn" onclick="switchCheckinMode('mural', this)"> Mural Kids</button>
             <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:15px 0; width: 100%;">
-            <button class="segment-btn" onclick="setTab('events')"><i class="fas fa-calendar-check"></i> Eventos</button>
+            <button class="segment-btn" onclick="setTab('events')"> Eventos</button>
         </div>
     </aside>
     <main class="app-main">
 <div class="container" style="padding-bottom: 20px;">
 
         <!-- ACOHLEDOR IDENTIFICATION -->
-        <div class="acolhedor-bar" id="acolhedor-container">
-            
-            <label>Acolhedor(a):</label>
-            <input type="text" id="acolhedor-name" placeholder="Digite seu nome..." oninput="saveAcolhedor(this.value)">
-        </div>
+        
 
         <script>
             // PERSISTENCE FOR ACOLHEDOR NAME
@@ -704,10 +701,10 @@
                 <button class="segment-btn active" onclick="switchCheckinMode('visitor', this)">VISITANTE</button>
                 <button class="segment-btn" onclick="switchCheckinMode('child', this)">CRIANCA</button>
                 <button class="segment-btn" onclick="switchCheckinMode('online', this)">
-                    <i class="fas fa-qrcode" style="margin-right:2px;"></i>ONLINE
+                    ONLINE
                 </button>
                 <button class="segment-btn" onclick="switchCheckinMode('mural', this)">
-                    <i class="fas fa-list-check" style="margin-right:2px;"></i>MURAL
+                    MURAL
                 </button>
             </div>
 
@@ -769,7 +766,7 @@
             <div id="mode-mural" class="tab-content-area">
                 <div class="card-floating" style="padding:20px !important;">
                     <h3 class="title-modern" style="margin:0 0 10px; font-size:1.3rem; color:#10b981;">
-                        <i class="fas fa-check-circle"></i> Mural de Entrada Kids
+                         Mural de Entrada Kids
                     </h3>
                     <p style="color:#666; font-size:0.9rem; margin-bottom:20px; line-height:1.4;">
                         Lista de todas as criancas que ja foram <b>recebidas e confirmadas</b> pela equipe da Sala das Criancas hoje.
@@ -777,13 +774,96 @@
 
                     <div id="mural-kids-container" style="display:flex; flex-direction:column; gap:10px;">
                         <div style="text-align:center; color:#aaa; font-style:italic; padding:20px;">
-                            <i class="fas fa-spinner fa-spin"></i> Aguardando atualizacoes...
+                             Aguardando atualizacoes...
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 1. VISITOR CONTENT -->
+                        <!-- MODE CHILD (CRIANÇAS CHECK-IN) -->
+            <div id="mode-child" class="tab-content-area">
+                <div class="card-floating">
+                    <div class="segmented-control" style="margin-bottom:15px; background: #f8fafc; border-radius: 4px; border: 1px solid #e2e8f0; height: auto;">
+                        <button class="segment-btn active" onclick="switchChildSubMode('exist', this)">LISTA DE CRIANÇAS</button>
+                        <button class="segment-btn" onclick="switchChildSubMode('new', this)">NOVA CRIANÇA</button>
+                    </div>
+
+                    <div class="pc-visitor-grid">
+                        <div class="pc-column-left">
+                            <!-- SUB-MODE: EXISTING KIDS (LIST & SEARCH) -->
+                            <div id="child-sub-exist" class="child-sub-area">
+                                <div style="margin-bottom: 15px;">
+                                    <h3 style="margin: 0 0 4px 0; font-size: 1.2rem; color: #0f172a; font-weight: 600;">Check-in de Crianças</h3>
+                                    <p style="margin: 0; color: #64748b; font-size: 0.85rem;">Localize a criança para registrar a entrada na sala.</p>
+                                </div>
+                                <input type="text" id="child-search-input" placeholder="Digite o nome da criança ou responsável..." onkeyup="renderKidsSelection(this.value)" style="font-size:1rem; padding:12px; border:1px solid #cbd5e1; border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:15px; background:#ffffff;">
+                                <div id="child-search-results"></div>
+                            </div>
+
+                            <!-- SUB-MODE: NEW CHILD REGISTRATION -->
+                            <div id="child-sub-new" class="child-sub-area" style="display:none;">
+                                <div style="margin-bottom: 15px;">
+                                    <h3 style="margin: 0 0 4px 0; font-size: 1.2rem; color: #0f172a; font-weight: 600;">Cadastrar Nova Criança</h3>
+                                    <p style="margin: 0; color: #64748b; font-size: 0.85rem;">Preencha os dados do responsável e da criança.</p>
+                                </div>
+
+                                <div id="child-step-1">
+                                    <label style="color:#0f172a; font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">WhatsApp do Responsável *</label>
+                                    <input type="tel" id="child-phone" placeholder="Digite o WhatsApp..." onkeyup="searchParentForChild(this.value)" style="font-size:1rem; padding:12px; border:1px solid #cbd5e1; border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:10px; background:#ffffff;">
+                                    <div id="parent-search-status" style="font-size:0.85rem; margin-bottom:15px; font-weight:500;"></div>
+                                </div>
+
+                                <div id="child-step-2" style="display:none;">
+                                    <label style="color:#0f172a; font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Nome do Responsável *</label>
+                                    <input type="text" id="child-parent" placeholder="Nome do responsável" onkeyup="checkChildStep(2)" style="font-size:1rem; padding:12px; border:1px solid #cbd5e1; border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:15px; background:#ffffff;">
+
+                                    <label style="color:#0f172a; font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Nome da Criança *</label>
+                                    <input type="text" id="child-name" placeholder="Nome completo da criança" onkeyup="checkChildStep(2)" style="font-size:1rem; padding:12px; border:1px solid #cbd5e1; border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:15px; background:#ffffff;">
+                                </div>
+
+                                <div id="child-step-3" style="display:none;">
+                                    <label style="color:#0f172a; font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Faixa Etária *</label>
+                                    <select id="child-age" onchange="checkChildStep(3)" style="font-size:0.95rem; padding:12px; border:1px solid #cbd5e1; border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:15px; background:#ffffff;">
+                                        <option value="">Selecione a faixa etária...</option>
+                                        <option value="Berçário (0-2 anos)">Berçário (0-2 anos)</option>
+                                        <option value="Maternal (3-5 anos)">Maternal (3-5 anos)</option>
+                                        <option value="Kids (6-10 anos)">Kids (6-10 anos)</option>
+                                        <option value="Juniores (11-12 anos)">Juniores (11-12 anos)</option>
+                                    </select>
+
+                                    <label style="color:#0f172a; font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Alergias / Restrições (opcional)</label>
+                                    <input type="text" id="child-allergies" placeholder="Ex: Amendoim, Lactose..." style="font-size:1rem; padding:12px; border:1px solid #cbd5e1; border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:15px; background:#ffffff;">
+
+                                    <label style="color:#0f172a; font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Atenção Especial (opcional)</label>
+                                    <input type="text" id="child-special" placeholder="Ex: TDAH, Cuidado especial..." style="font-size:1rem; padding:12px; border:1px solid #cbd5e1; border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:15px; background:#ffffff;">
+                                </div>
+
+                                <div id="child-step-4" style="display:none; margin-bottom:15px;">
+                                    <label style="display:flex; align-items:center; gap:8px; font-size:0.9rem; color:#0f172a;">
+                                        <input type="checkbox" id="child-presentation-new" style="width:auto; margin:0;">
+                                        Apresentação de Bebê no Culto
+                                    </label>
+                                </div>
+
+                                <button id="btn-child-submit" onclick="submitChildNew()" class="btn-gold" style="display:none; width:100%; font-size:1rem; font-weight:600; padding:12px; margin-top:10px; border-radius:4px; background:#0f172a; color:#fff;">
+                                    Registrar Entrada da Criança
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="pc-column-right">
+                            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:4px; padding:15px;">
+                                <h4 style="margin:0 0 6px 0; color:#0f172a; font-size:0.95rem; font-weight:600;">Instruções Crianças</h4>
+                                <p style="margin:0; font-size:0.85rem; color:#64748b; line-height:1.4;">
+                                    Utilize a busca rápida para crianças já cadastradas. Em caso de primeiro acesso, preencha o formulário de cadastro com o WhatsApp do responsável.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+<!-- 1. VISITOR CONTENT -->
             <div id="mode-visitor" class="tab-content-area active">
                 <div class="card-floating">
                     
@@ -805,7 +885,7 @@
                                     </div>
 
                                     <!-- Campo Nome (Obrigatório) -->
-                                    <label style="color:#0f172a; font-size:0.85rem; font-weight:700; display:block; margin-bottom:8px;">Nome <span style="color:#9e793e;">*</span></label>
+                                    <label style="color:#0f172a; font-size:0.85rem; font-weight:700; display:block; margin-bottom:8px;">Nome <span style="color:#0f172a;">*</span></label>
                                     <input type="text" id="vis-name" placeholder="Digite o nome do visitante" autofocus onkeydown="if(event.key==='Enter'){event.preventDefault();submitVisitor();}" style="font-size:1.05rem; padding:14px 16px; border:1px solid #cbd5e1; border-radius:8px; width:100%; box-sizing:border-box; margin-bottom:20px; font-weight:500; background:#ffffff;">
 
                                     <!-- Campo Telefone (Opcional) -->
@@ -827,13 +907,13 @@
                                     <!-- Botão Principal de Registro -->
                                     <button onclick="submitVisitor()" class="btn-large btn-gold" style="width:100%; font-size:1rem; font-weight:600; padding:12px; margin-bottom:18px; border-radius:4px; display:flex; justify-content:space-between; align-items:center; background:#0f172a; color:#fff;">
                                         <span>Registrar entrada</span>
-                                        <span style="font-size:0.75rem; opacity:0.8; font-weight:500; background:rgba(255,255,255,0.2); padding:3px 8px; border-radius:4px;">Enter ↵</span>
+                                        <span style="font-size:0.75rem; opacity:0.8; font-weight:500; background:rgba(255,255,255,0.2); padding:3px 8px; border-radius:4px;">Enter </span>
                                     </button>
 
                                     <!-- Informações Opcionais (Gaveta Retrátil) -->
                                     <details style="border:1px solid #eee; border-radius:12px; padding:12px; background:#fbfbfb; margin-top:10px;">
                                         <summary style="cursor:pointer; font-size:0.82rem; font-weight:800; color:var(--gold); text-transform:uppercase; letter-spacing:0.5px; user-select:none;">
-                                            <i class="fas fa-sliders-h" style="margin-right:6px;"></i> + Informações Opcionais (Igreja, Convidado, etc.)
+                                             + Informações Opcionais (Igreja, Convidado, etc.)
                                         </summary>
                                         <div style="margin-top:12px;">
                                             <label style="color:#666; font-size:0.75rem; font-weight:700; display:block; margin-bottom:4px;">É Evangélico?</label>
@@ -860,7 +940,7 @@
                         <div id="visitor-sub-exist" class="visitor-sub-area" style="text-align:left;">
                                 <div style="display: flex; align-items: center; margin-bottom: 15px;">
                                     <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 179, 0, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
-                                        <i class="fas fa-search" style="color: var(--gold); font-size: 1.1rem;"></i>
+                                        
                                     </div>
                                     <div>
                                         <h3 class="title-modern" style="color:var(--primary); margin:0; font-size: 1.3rem;">Encontrar Visitante (Já Visitou)</h3>
@@ -874,8 +954,7 @@
 
                                 <div id="visitor-search-results" style="margin-top:15px; min-height: 50px;">
                                     <div style="color:#aaa; text-align:center; padding:20px; font-style: italic;">
-                                        <i class="fas fa-search"
-                                            style="font-size: 1.8rem; display: block; margin-bottom: 8px; opacity: 0.5;"></i>
+                                        
                                         Use a barra acima para pesquisar...
                                     </div>
                                 </div>
@@ -891,7 +970,7 @@
         <div class="ultimas-entradas-container" style="margin-top: 5px;">
             <div style="display: flex; align-items: center; margin-bottom: 15px;">
                 <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
-                    <i class="fas fa-history" style="color: #10b981; font-size: 1.1rem;"></i>
+                    
                 </div>
                 <div>
                     <h3 class="title-modern" style="color:var(--primary); margin:0; font-size: 1.3rem;">Últimas Entradas</h3>
@@ -968,6 +1047,7 @@
                 const target = document.getElementById('mode-' + mode);
                 if (target) {
                     target.classList.add('active');
+                    if (mode === 'child' && typeof window.loadAllKidsList === 'function') window.loadAllKidsList();
                 } else {
                     console.error("Target ID not found: mode-" + mode);
                 }
@@ -1188,7 +1268,7 @@
             <div id="sched-mode-group" class="tab-content-area">
                 <div class="card-floating">
                     <div style="text-align:center; margin-bottom:15px;">
-                        <i class="fas fa-users" style="font-size:2rem; color: #a78bfa; margin-bottom:10px;"></i>
+                        
                         <h3 class="title-modern" style="margin:0; font-size:1.3rem;">Entrar em Grupo</h3>
                         <p style="color:var(--text-muted); font-size:0.9rem; margin:0;">Participe de um pequeno
                             grupo.
@@ -1221,7 +1301,7 @@
             <div id="sched-mode-baby" class="tab-content-area">
                 <div class="card-floating" style="padding: 20px;">
                     <div style="text-align:center; margin-bottom:15px;">
-                        <i class="fas fa-baby-carriage" style="font-size:2rem; color: #ec4899; margin-bottom:10px;"></i>
+                        
                         <h3 class="title-modern" style="margin:0; font-size:1.3rem;">Apresentacao de Bebe</h3>
                         <p style="color:var(--text-muted); font-size:0.85rem; margin:0;">Registro para Certificado de Consagracao</p>
                     </div>
@@ -1260,7 +1340,7 @@
             <div id="sched-mode-baptism" class="tab-content-area">
                 <div class="card-floating">
                     <div style="text-align:center; margin-bottom:15px;">
-                        <i class="fas fa-water" style="font-size:2rem; color: #60a5fa; margin-bottom:10px;"></i>
+                        
                         <h3 class="title-modern" style="margin:0; font-size:1.3rem;">Proximo Batismo</h3>
                         <p style="color:var(--text-muted); font-size:0.9rem; margin:0;">Inscreva-se para o proximo.
                         </p>
@@ -1282,7 +1362,7 @@
 
                     <!-- Wizard Header -->
                     <div style="text-align:center; margin-bottom:20px;">
-                        <i class="fas fa-id-card-alt" style="font-size:1.8rem; color: #10b981; margin-bottom:10px;"></i>
+                        
                         <h3 class="title-modern" style="margin:0; font-size:1.2rem;">Ficha Completa de Membro</h3>
                         <div id="diagnostic-panel" style="position:fixed; bottom:0; width:100%; background:rgba(0,0,0,0.8); color:#0f0; font-family:monospace; font-size:10px; padding:5px; z-index:10000; border-top:1px solid #0f0; display:none !important; justify-content:space-between; font-weight:bold;">
                             <span>V: v48.12.17</span>
@@ -2076,7 +2156,7 @@
 
                 .ministry-card.selected {
                     background: #fff;
-                    border-color: #FFC72C;
+                    border-color: #0f172a;
                     box-shadow: 0 4px 10px rgba(255, 199, 44, 0.2);
                 }
 
@@ -2134,22 +2214,14 @@
     </style>
 
             <div class="ministry-grid">
-                <div class="ministry-card" onclick="toggleMinistry(this, 'Cantina')"><i
-                        class="fas fa-utensils"></i><span>Cantina</span></div>
-                <div class="ministry-card" onclick="toggleMinistry(this, 'Danca')"><i
-                        class="fas fa-music"></i><span>Danca</span></div>
-                <div class="ministry-card" onclick="toggleMinistry(this, 'Diaconos')"><i
-                        class="fas fa-user-tie"></i><span>Diaconos</span></div>
-                <div class="ministry-card" onclick="toggleMinistry(this, 'Louvor')"><i
-                        class="fas fa-microphone-alt"></i><span>Louvor</span></div>
-                <div class="ministry-card" onclick="toggleMinistry(this, 'Manutencao')"><i
-                        class="fas fa-tools"></i><span>Manutencao</span></div>
-                <div class="ministry-card" onclick="toggleMinistry(this, 'Midia')"><i
-                        class="fas fa-camera"></i><span>Midia</span></div>
-                <div class="ministry-card" onclick="toggleMinistry(this, 'Social')"><i
-                        class="fas fa-hand-holding-heart"></i><span>Social</span></div>
-                <div class="ministry-card" onclick="toggleMinistry(this, 'Kids')"><i
-                        class="fas fa-child"></i><span>Kids</span></div>
+                <div class="ministry-card" onclick="toggleMinistry(this, 'Cantina')"><span>Cantina</span></div>
+                <div class="ministry-card" onclick="toggleMinistry(this, 'Danca')"><span>Danca</span></div>
+                <div class="ministry-card" onclick="toggleMinistry(this, 'Diaconos')"><span>Diaconos</span></div>
+                <div class="ministry-card" onclick="toggleMinistry(this, 'Louvor')"><span>Louvor</span></div>
+                <div class="ministry-card" onclick="toggleMinistry(this, 'Manutencao')"><span>Manutencao</span></div>
+                <div class="ministry-card" onclick="toggleMinistry(this, 'Midia')"><span>Midia</span></div>
+                <div class="ministry-card" onclick="toggleMinistry(this, 'Social')"><span>Social</span></div>
+                <div class="ministry-card" onclick="toggleMinistry(this, 'Kids')"><span>Kids</span></div>
             </div>
         </div>
 
@@ -2245,7 +2317,7 @@
         style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 99999; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(10px);">
         <div style="background: #111; padding: 40px; border-radius: 20px; border: 1px solid #333; width: 320px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
             <div style="width: 60px; height: 60px; background: #FFD700; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                <i class="fas fa-concierge-bell" style="color: black; font-size: 1.5rem;"></i>
+                
             </div>
             <h2 style="color: #fff; margin-bottom: 5px; font-weight: 600; letter-spacing: -0.5px;">ACESSO RECEPCAO</h2>
             <p style="color:#666; font-size:0.85rem; margin-bottom:25px;">Digite a senha do departamento</p>
