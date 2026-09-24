@@ -1289,7 +1289,20 @@
         .mobile-header > div:nth-child(2) { display: none !important; }
 
         /* The main container */
-        .app-main { padding: 30px 20px !important; }
+        .app-main { 
+    padding: 30px 20px !important; 
+    min-height: calc(100vh - 180px); /* Account for header and footer */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Default for mobile */
+}
+@media(min-width: 900px) {
+    .app-main {
+        justify-content: center; /* Center vertically on large screens */
+        padding-top: 5vh !important; /* Push it down a bit */
+    }
+}
+
         
         .card-floating {
             background: var(--navy-card) !important;
