@@ -1264,11 +1264,12 @@
 
         /* RECEPTION ISOLATED CENTERING AND SPACING */
         #tab-checkin {
-            max-width: 700px;
-            margin: 0 auto !important; /* Mobile default: centered with no huge margins */
-            padding: 0 15px !important; /* Breathing room for mobile */
-            width: 100%;
+            max-width: 100vw;
+            margin: 0 -10px !important; /* Reclaim some left/right space from parent padding */
+            padding: 0 10px !important; 
+            width: calc(100% + 20px) !important;
             box-sizing: border-box;
+            overflow-x: hidden; /* Prevent horizontal overflow */
         }
 
         #tab-checkin > .segmented-control {
@@ -1276,12 +1277,13 @@
             justify-content: flex-start !important; /* Safe alignment for horizontal scrolling */
             background: transparent !important;
             border: none !important;
-            padding: 0 5px !important;
-            gap: 15px !important; /* Moderate gap */
+            padding: 0 15px !important; /* Increase lateral margin so MURAL is not so close to the edge */
+            gap: 15px !important;
             margin-bottom: 2vh !important;
             max-width: 100% !important;
-            overflow-x: auto; /* Allow scrolling if it doesn't fit */
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            overflow-x: auto; 
+            -webkit-overflow-scrolling: touch;
+            box-sizing: border-box;
         }
         
         #tab-checkin > .segmented-control::-webkit-scrollbar {
@@ -1291,7 +1293,11 @@
         /* Desktop Adjustments */
         @media (min-width: 900px) {
             #tab-checkin {
+                max-width: 700px !important;
+                width: 100% !important;
+                padding: 0 !important;
                 margin: 2vh 15% 0 auto !important; /* Push it right on desktop */
+                overflow-x: visible !important;
             }
             #tab-checkin > .segmented-control {
                 justify-content: center !important;
@@ -1395,6 +1401,8 @@
             background: var(--navy-card) !important;
             border: 1px solid var(--border-dark) !important;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+            box-sizing: border-box !important;
+            max-width: 100% !important;
             /* margin and max-width removed to prevent breaking global modules like Ao Vivo */
         }
 
