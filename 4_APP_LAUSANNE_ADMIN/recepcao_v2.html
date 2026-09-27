@@ -1265,21 +1265,42 @@
         /* RECEPTION ISOLATED CENTERING AND SPACING */
         #tab-checkin {
             max-width: 700px;
-            /* margin-top: 2vh to move it up */
-            /* margin-left: auto, margin-right: 15% pushes it rightwards within the container */
-            margin: 2vh 15% 0 auto !important; 
+            margin: 0 auto !important; /* Mobile default: centered with no huge margins */
+            padding: 0 15px !important; /* Breathing room for mobile */
             width: 100%;
+            box-sizing: border-box;
         }
 
         #tab-checkin > .segmented-control {
             display: flex !important;
-            justify-content: center !important;
+            justify-content: flex-start !important; /* Safe alignment for horizontal scrolling */
             background: transparent !important;
             border: none !important;
-            padding: 0 20px !important;
-            gap: 40px !important;
-            margin-bottom: 4vh !important;
-            max-width: 700px !important;
+            padding: 0 5px !important;
+            gap: 15px !important; /* Moderate gap */
+            margin-bottom: 2vh !important;
+            max-width: 100% !important;
+            overflow-x: auto; /* Allow scrolling if it doesn't fit */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
+        
+        #tab-checkin > .segmented-control::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Desktop Adjustments */
+        @media (min-width: 900px) {
+            #tab-checkin {
+                margin: 2vh 15% 0 auto !important; /* Push it right on desktop */
+            }
+            #tab-checkin > .segmented-control {
+                justify-content: center !important;
+                padding: 0 20px !important;
+                gap: 40px !important;
+                margin-bottom: 4vh !important;
+                max-width: 700px !important;
+                overflow-x: visible;
+            }
         }
 
         #tab-checkin > .segmented-control .segment-btn {
