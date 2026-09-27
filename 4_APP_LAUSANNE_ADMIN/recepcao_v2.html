@@ -1705,14 +1705,6 @@
                                         <input type="tel" id="vis-phone" placeholder="Ex.: 76 123 45 67" onkeydown="if(event.key==='Enter'){event.preventDefault();submitVisitor();}" style="font-size:1rem; padding:12px 16px; flex: 1; border: 1px solid var(--border-dark); border-radius: 4px; background: var(--navy-main);">
                                     </div>
 
-                                    <!-- Botão Principal de Registro -->
-                                    
-    <button onclick="submitVisitor()" class="submit-btn-container" id="btn-submit-visitor">
-        <span class="btn-text">Registrar entrada</span>
-        <span class="enter-badge">Enter</span>
-    </button>
-    
-
                                     <!-- Informações Opcionais (Gaveta Retrátil) -->
                                     <details style="border:1px solid var(--border-dark); border-radius:12px; padding:12px; background:var(--navy-main); margin-top:10px;">
                                         <summary style="cursor:pointer; font-size:0.82rem; font-weight:800; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px; user-select:none;">
@@ -1738,9 +1730,19 @@
                                             </select>
                                         </div>
                                     </details>
+
+                                    <!-- Botão Principal de Registro -->
+                                    
+    <button onclick="submitVisitor()" class="submit-btn-container" id="btn-submit-visitor">
+        <span class="btn-text">Registrar entrada</span>
+        <span class="enter-badge">Enter</span>
+    </button>
+    
+
+                                    
                                 </div>
                             </div> <!-- END visitor-sub-new -->
-                        <div id="visitor-sub-exist" class="visitor-sub-area" style="text-align:left;">
+                        <div id="visitor-sub-exist" class="visitor-sub-area" style="text-align:left; display:none;">
                                 <h2 style="font-size: 1.8rem; font-weight: 700; color: var(--text-light); margin: 0 0 24px 0; font-family: var(--font-serif);">Já visitou</h2>
 
                                 <input type="text" id="visitor-search-input"
