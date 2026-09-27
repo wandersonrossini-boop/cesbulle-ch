@@ -581,7 +581,7 @@
             
             
             /* .bottom-nav hidden removed */
-            #tab-checkin > div:first-child { display: none !important; } /* Hide Bem-vindo text on PC */
+            /* Bem-vindo text was already removed */
             
             body { padding-bottom: 0 !important; padding-top: 0 !important; }
             .container { max-width: 1400px !important; margin: 0 !important; padding: 40px 50px !important; }
@@ -1256,6 +1256,12 @@
     <style>
         /* INJECTED DARK THEME */
 
+        /* HIDE LATEST ENTRIES FROM RECEPTION MAIN VIEW AS REQUESTED */
+        .ultimas-entradas-details {
+            display: none !important;
+        }
+
+
         /* RECEPTION ISOLATED CENTERING AND SPACING */
         #tab-checkin {
             max-width: 700px;
@@ -1366,8 +1372,7 @@
             background: var(--navy-card) !important;
             border: 1px solid var(--border-dark) !important;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
-            margin: 0 auto !important;
-            max-width: 700px !important;
+            /* margin and max-width removed to prevent breaking global modules like Ao Vivo */
         }
 
         /* Top Check-in Tabs (VISITANTE, CRIANCA...) */
