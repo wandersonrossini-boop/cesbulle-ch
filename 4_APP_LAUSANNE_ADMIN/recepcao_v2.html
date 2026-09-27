@@ -1255,6 +1255,45 @@
 
     <style>
         /* INJECTED DARK THEME */
+
+        .global-top-nav {
+            display: flex;
+            justify-content: center;
+            background: transparent;
+            border: none; /* Removed full width border */
+            padding: 0 20px;
+            gap: 40px;
+            margin-top: 5vh; /* ESPAÇO ENTRE CABEÇALHO E MENU */
+            margin-bottom: 3vh; /* ESPAÇO ENTRE MENU E FORMULÁRIO */
+        }
+
+        .top-nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 10px 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .top-nav-btn.active {
+            color: var(--gold-main);
+        }
+
+        .top-nav-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gold-main);
+        }
+
         :root {
             --navy-main: #0A131F !important;
             --navy-card: #0F172A !important;
@@ -1299,7 +1338,7 @@
 @media(min-width: 900px) {
     .app-main {
         justify-content: center; /* Center vertically on large screens */
-        padding-top: 5vh !important; /* Push it down a bit */
+        padding-top: 2vh !important; /* Push it down a bit */
     }
 }
 
