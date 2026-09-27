@@ -703,8 +703,17 @@
             localStorage.setItem('session_role', moduleName === 'admin' ? 'admin' : 'monitor');
 
             document.getElementById('view-login').style.display='none';
-            document.getElementById('app-header').style.display='flex';
             document.getElementById('app-container').style.display='block';
+            
+            if (moduleName === 'reception') {
+                document.getElementById('app-header').style.display='none';
+                document.getElementById('app-container').style.top='0px';
+                document.getElementById('app-container').style.height='100%';
+            } else {
+                document.getElementById('app-header').style.display='flex';
+                document.getElementById('app-container').style.top='60px';
+                document.getElementById('app-container').style.height='calc(100% - 60px)';
+            }
             
             const moduleFiles = {
                 'reception': 'recepcao_v2.html',
