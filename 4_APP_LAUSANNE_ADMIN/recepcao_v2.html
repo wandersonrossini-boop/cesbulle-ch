@@ -973,7 +973,18 @@
         }
         @media (max-width: 899px) {
             .app-main {
-                padding: 24px 20px;
+                padding: 15px 15px !important; /* Reclaim massive 40px double padding */
+                overflow-x: hidden !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            .container {
+                padding: 0 !important; /* Remove double padding */
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            body {
+                overflow-x: hidden !important;
             }
         }
 
@@ -1264,12 +1275,11 @@
 
         /* RECEPTION ISOLATED CENTERING AND SPACING */
         #tab-checkin {
-            max-width: 100vw;
-            margin: 0 -10px !important; /* Reclaim some left/right space from parent padding */
-            padding: 0 10px !important; 
-            width: calc(100% + 20px) !important;
-            box-sizing: border-box;
-            overflow-x: hidden; /* Prevent horizontal overflow */
+            max-width: 100%;
+            margin: 0 auto !important; 
+            padding: 0 !important; 
+            width: 100% !important;
+            box-sizing: border-box !important;
         }
 
         #tab-checkin > .segmented-control {
@@ -1425,6 +1435,8 @@
             background: var(--navy-main) !important;
             border: 1px solid var(--border-dark) !important;
             color: var(--text-light) !important;
+            box-sizing: border-box !important;
+            max-width: 100% !important;
         }
         input:focus, select:focus {
             border-color: var(--gold-main) !important;
