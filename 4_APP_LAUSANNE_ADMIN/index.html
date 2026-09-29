@@ -551,11 +551,11 @@
         window.onAuthSuccess = (user, role) => {
             console.log("💎 Shell Auth Success:", role);
             
-            // Se o usuário já escolheu um módulo específico na interface (ex: reception, kids, etc), mantemos ele.
-            // Se não, o padrão para 'admin' é admin, e o padrão para 'monitor' é integracao.
-            let targetModule = currentRole;
+            const savedModule = localStorage.getItem('current_module');
+            let targetModule = savedModule || currentRole || role;
+            
             if (!targetModule || targetModule === 'guest') {
-                targetModule = role === 'admin' ? 'admin' : 'integracao';
+                targetModule = role;
             }
             
             currentRole = targetModule;
@@ -700,7 +700,7 @@
                 return;
             }
 
-            localStorage.setItem('session_role', moduleName === 'admin' ? 'admin' : 'monitor');
+            localStorage.setItem('current_module', moduleName);
 
             document.getElementById('view-login').style.display='none';
             document.getElementById('app-container').style.display='block';
@@ -751,7 +751,11 @@
             }
         });
 
-        function logout() { AuthManager.logout(); location.reload(); }
+        function logout() { 
+            localStorage.removeItem('current_module');
+            AuthManager.logout(); 
+            location.reload(); 
+        }
     </script>
 </body>
 </html>
