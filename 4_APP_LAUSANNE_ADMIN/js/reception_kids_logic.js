@@ -106,8 +106,8 @@ window.renderKidsSelection = function(filter = '') {
         div.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div style="flex:1;">
-                    <strong style="font-size:1.15rem; display:block; color:#1a1a1a; margin-bottom:4px;">${kidName}</strong>
-                    <div style='font-size:0.85rem; color:#666; display:flex; align-items:center; gap:6px;'>
+                    <strong style="font-size:1.15rem; display:block; color:var(--text-light); margin-bottom:4px;">${kidName}</strong>
+                    <div style='font-size:0.85rem; color:var(--text-muted); display:flex; align-items:center; gap:6px;'>
                         
                         <span>Resp: <b>${parentName}</b></span>
                     </div>
@@ -388,8 +388,8 @@ window.loadSecretariatEvents = function() {
               card.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <div>
-                        <strong style="font-size:1rem; color:#1a1a1a;">${ev.name || ev.title || 'Evento'}</strong>
-                        <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">
+                        <strong style="font-size:1rem; color:var(--text-light);">${ev.name || ev.title || 'Evento'}</strong>
+                        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">
                              ${displayDate} ${ev.startTime ? ' às ' + ev.startTime : ''}
                         </div>
                     </div>
@@ -440,8 +440,8 @@ window.loadMuralKids = window.initReceptionMonitor = function() {
                 div.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div>
-                            <strong style="font-size:1.1rem; color:#1a1a1a;">${data.name}</strong>
-                            <div style="font-size:0.75rem; color:#666;">${data.age_group || ''} | Resp: ${data.parent_name || '...'}</div>
+                            <strong style="font-size:1.1rem; color:var(--text-light);">${data.name}</strong>
+                            <div style="font-size:0.75rem; color:var(--text-muted);">${data.age_group || ''} | Resp: ${data.parent_name || '...'}</div>
                         </div>
                         ${statusLabel}
                     </div>`;
@@ -820,7 +820,7 @@ window.searchReturningVisitor = function () {
                     const isCong = (p.type || '').toLowerCase().includes('congrega');
                     const badgeStr = isCong ? `<span style="background:#f3e8ff; color:#7e22ce; padding:4px 10px; border-radius:8px; font-size:0.75rem; font-weight:800; border:1px solid #e9d5ff;">Congregado</span>` : `<span style="background:#fefce8; color:#a16207; padding:4px 10px; border-radius:8px; font-size:0.75rem; font-weight:800; border:1px solid #fef08a;">Visita #${count}</span>`;
 
-                    div.innerHTML = `<div style="flex:1;"><strong style="font-size:1.1rem; display:block; margin-bottom:2px;">${p.name}</strong> <span style='font-size:0.85rem; color:#64748b;'>${p.contact || p.phone || p.whatsapp || 'Sem Contato'}</span></div> <div style="margin-left:10px;">${badgeStr}</div>`;
+                    div.innerHTML = `<div style="flex:1;"><strong style="font-size:1.1rem; display:block; margin-bottom:2px;">${p.name}</strong> <span style='font-size:0.85rem; color:var(--text-muted);'>${p.contact || p.phone || p.whatsapp || 'Sem Contato'}</span></div> <div style="margin-left:10px;">${badgeStr}</div>`;
 
                     div.onclick = () => window.submitReturningVisitor(id, p);
                     results.appendChild(div);
@@ -1129,8 +1129,8 @@ window.appendKidToMural = function(id, data) {
     div.style.cssText = "background:#fff; border:1px solid rgba(16, 185, 129, 0.3); padding:15px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 15px rgba(16, 185, 129, 0.05); margin-bottom:10px;";
     div.innerHTML = `
         <div style="flex:1;">
-            <strong style="font-size:1.15rem; display:block; color:#1a1a1a; margin-bottom:4px;">${data.name || 'Criança'}</strong>
-            <div style='font-size:0.85rem; color:#666;'>Resp: <b>${data.parent_name || data.parent || 'Não informado'}</b></div>
+            <strong style="font-size:1.15rem; display:block; color:var(--text-light); margin-bottom:4px;">${data.name || 'Criança'}</strong>
+            <div style='font-size:0.85rem; color:var(--text-muted);'>Resp: <b>${data.parent_name || data.parent || 'Não informado'}</b></div>
         </div>
         <div style="text-align:right;">
             <span style="background:rgba(16, 185, 129, 0.1); color:#059669; border:1px solid rgba(16, 185, 129, 0.2); padding:6px 12px; border-radius:20px; font-size:0.8rem; font-weight:800; display:inline-block;">

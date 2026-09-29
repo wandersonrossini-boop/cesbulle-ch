@@ -613,8 +613,8 @@
                 transform: translateY(-2px);
                 box-shadow: none; border-color: #d1d5db;
             }
-            .quick-card h4 { margin: 0 0 5px 0; font-size: 1.1rem; color: #1e293b; font-weight: 600; }
-            .quick-card p { margin: 0; font-size: 0.85rem; color: #64748b; }
+            .quick-card h4 { margin: 0 0 5px 0; font-size: 1.1rem; color: var(--text-light); font-weight: 600; }
+            .quick-card p { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
         }
     
     </style>
@@ -1690,7 +1690,7 @@
                             <div id="child-sub-exist" class="child-sub-area">
                                 <div style="margin-bottom: 15px;">
                                     <h3 style="margin: 0 0 4px 0; font-size: 1.2rem; color: var(--text-light); font-weight: 600;">Check-in de Crianças</h3>
-                                    <p style="margin: 0; color: #64748b; font-size: 0.85rem;">Localize a criança para registrar a entrada na sala.</p>
+                                    <p style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">Localize a criança para registrar a entrada na sala.</p>
                                 </div>
                                 <input type="text" id="child-search-input" placeholder="Digite o nome da criança ou responsável..." onkeyup="renderKidsSelection(this.value)" style="font-size:1rem; padding:12px; border: 1px solid var(--border-dark); border-radius:4px; width:100%; box-sizing:border-box; margin-bottom:15px; background:var(--navy-main);">
                                 <div id="child-search-results"></div>
@@ -1700,7 +1700,7 @@
                             <div id="child-sub-new" class="child-sub-area" style="display:none;">
                                 <div style="margin-bottom: 15px;">
                                     <h3 style="margin: 0 0 4px 0; font-size: 1.2rem; color: var(--text-light); font-weight: 600;">Cadastrar Nova Criança</h3>
-                                    <p style="margin: 0; color: #64748b; font-size: 0.85rem;">Preencha os dados do responsável e da criança.</p>
+                                    <p style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">Preencha os dados do responsável e da criança.</p>
                                 </div>
 
                                 <div id="child-step-1">
@@ -1750,7 +1750,7 @@
                         <div class="pc-column-right">
                             <div style="background:var(--navy-main); border:1px solid var(--border-dark); border-radius:4px; padding:15px;">
                                 <h4 style="margin:0 0 6px 0; color:var(--text-light); font-size:0.95rem; font-weight:600;">Instruções Crianças</h4>
-                                <p style="margin:0; font-size:0.85rem; color:#64748b; line-height:1.4;">
+                                <p style="margin:0; font-size:0.85rem; color:var(--text-muted); line-height:1.4;">
                                     Utilize a busca rápida para crianças já cadastradas. Em caso de primeiro acesso, preencha o formulário de cadastro com o WhatsApp do responsável.
                                 </p>
                             </div>
@@ -1903,12 +1903,12 @@
                               
                               container.innerHTML = docs.slice(0, 15).map(d => `
                                   <div style="background: var(--navy-card); border: 1px solid var(--border-dark); border-radius: 4px; padding: 12px 15px; display: flex; align-items: center; gap: 12px;">
-                                      <div style="width:36px; height:36px; border-radius:50%; background:#f1f5f9; color:#64748b; display:flex; justify-content:center; align-items:center; font-weight:700; font-size:0.9rem;">
+                                      <div style="width:36px; height:36px; border-radius:50%; background:#f1f5f9; color:var(--text-muted); display:flex; justify-content:center; align-items:center; font-weight:700; font-size:0.9rem;">
                                           ${d.name ? d.name.charAt(0).toUpperCase() : '?'}
                                       </div>
                                       <div style="flex: 1;">
-                                          <div style="font-weight: 600; color: #1e293b; font-size: 0.95rem;">${d.name}</div>
-                                          <div style="color: #64748b; font-size: 0.75rem;">${d.detail || 'Visitante'}</div>
+                                          <div style="font-weight: 600; color: var(--text-light); font-size: 0.95rem;">${d.name}</div>
+                                          <div style="color: var(--text-muted); font-size: 0.75rem;">${d.detail || 'Visitante'}</div>
                                       </div>
                                       <div style="font-size: 0.75rem; color: #94a3b8; white-space: nowrap;">
                                           ${d.timestamp ? new Date(d.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Agora'}
@@ -2613,8 +2613,8 @@
                 transform: translateY(-2px);
                 box-shadow: none; border-color: #d1d5db;
             }
-            .quick-card h4 { margin: 0 0 5px 0; font-size: 1.1rem; color: #1e293b; font-weight: 600; }
-            .quick-card p { margin: 0; font-size: 0.85rem; color: #64748b; }
+            .quick-card h4 { margin: 0 0 5px 0; font-size: 1.1rem; color: var(--text-light); font-weight: 600; }
+            .quick-card p { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
         }
     
     </style>
@@ -3123,8 +3123,8 @@
                 transform: translateY(-2px);
                 box-shadow: none; border-color: #d1d5db;
             }
-            .quick-card h4 { margin: 0 0 5px 0; font-size: 1.1rem; color: #1e293b; font-weight: 600; }
-            .quick-card p { margin: 0; font-size: 0.85rem; color: #64748b; }
+            .quick-card h4 { margin: 0 0 5px 0; font-size: 1.1rem; color: var(--text-light); font-weight: 600; }
+            .quick-card p { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
         }
     
     </style>
