@@ -505,7 +505,8 @@
         <!-- PIN / LOGIN SCREEN -->
         <div id="pin-screen">
             <div class="pin-container">
-                <h2 style="font-family: var(--font-heading); font-weight: 800; margin-bottom: 24px; letter-spacing: 2px; color: #fff; font-size: 1.2rem; text-transform: uppercase;">ACESSO AO MÓDULO</h2>
+                <h2 id="pin-screen-title" style="font-family: var(--font-heading); font-weight: 800; margin-bottom: 4px; letter-spacing: 1px; color: #fff; font-size: 1.3rem; text-transform: uppercase;">ACESSO À RECEPÇÃO</h2>
+                <h3 id="pin-screen-subtitle" style="font-family: var(--font-main); font-weight: 600; margin-bottom: 32px; color: var(--gold); font-size: 0.9rem; text-transform: uppercase;">CME LAUSANNE<br><span id="pin-screen-subtext" style="font-weight: 400; color: #94A3B8; font-size: 0.8rem; text-transform: none;">Área de Recepção</span></h3>
                 
                 <div id="pin-input-wrapper">
                     <input type="password" id="pin-input" class="pin-input" placeholder="••••">
@@ -522,7 +523,9 @@
                     <span style="font-size:0.85rem; font-weight:500; color:#CBD5E1;">Manter conectado</span>
                 </div>
                 <button class="btn-confirm" onclick="validatePin()">Confirmar Acesso</button>
-                <p onclick="showRoles()" style="margin-top:20px; color:#94A3B8; font-size:0.8rem; cursor:pointer; font-weight:700; text-transform: uppercase; letter-spacing: 1.5px;">← Voltar ao Menu</p>
+                <div onclick="showRoles()" style="margin-top:24px; color:#94A3B8; font-size:0.85rem; cursor:pointer; font-weight:600; display: flex; align-items: center; justify-content: center; gap: 8px; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94A3B8'">
+                    <i class="fas fa-arrow-left"></i> Voltar ao menu
+                </div>
             </div>
         </div>
 
@@ -612,6 +615,29 @@
             currentRole = role;
             document.getElementById('role-selection').style.display='none';
             document.getElementById('pin-screen').style.display='flex';
+            
+            const roleDisplayNames = {
+                'reception': 'ACESSO À RECEPÇÃO',
+                'kids': 'ACESSO À ÁREA INFANTIL',
+                'altar': 'ACESSO AO ALTAR',
+                'integracao': 'ACESSO À INTEGRAÇÃO',
+                'admin': 'ACESSO À SECRETARIA',
+                'gabinete': 'ACESSO AO GABINETE'
+            };
+            const subtitleDisplayNames = {
+                'reception': 'Área de Recepção',
+                'kids': 'Ministério Infantil',
+                'altar': 'Operação do Culto',
+                'integracao': 'Departamento de Integração',
+                'admin': 'Administração e Secretaria',
+                'gabinete': 'Gabinete Pastoral'
+            };
+            
+            const titleEl = document.getElementById('pin-screen-title');
+            if(titleEl) titleEl.innerText = roleDisplayNames[role] || 'ACESSO AO MÓDULO';
+            
+            const subtextEl = document.getElementById('pin-screen-subtext');
+            if(subtextEl) subtextEl.innerText = subtitleDisplayNames[role] || 'CME Lausanne';
 
             const pinWrapper = document.getElementById('pin-input-wrapper');
             const emailPassWrapper = document.getElementById('email-password-wrapper');
@@ -756,6 +782,22 @@
             AuthManager.logout(); 
             location.reload(); 
         }
+
+        // Add Enter key listener for login fields
+        document.addEventListener('DOMContentLoaded', () => {
+            const handleEnter = (e) => {
+                if (e.key === 'Enter') {
+                    validatePin();
+                }
+            };
+            const pinInput = document.getElementById('pin-input');
+            const emailInput = document.getElementById('email-input');
+            const passwordInput = document.getElementById('password-input');
+            
+            if (pinInput) pinInput.addEventListener('keypress', handleEnter);
+            if (emailInput) emailInput.addEventListener('keypress', handleEnter);
+            if (passwordInput) passwordInput.addEventListener('keypress', handleEnter);
+        });
     </script>
 </body>
 </html>
