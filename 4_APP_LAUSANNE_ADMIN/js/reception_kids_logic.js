@@ -401,7 +401,7 @@ window.loadSecretariatEvents = function() {
 }
 
 window.loadMuralKids = window.initReceptionMonitor = function() {
-    const container = document.getElementById('mural-kids-container-root');
+    const container = document.getElementById('mural-kids-container');
     if(!container) return;
 
     const todayStart = new Date();
@@ -433,6 +433,14 @@ window.loadMuralKids = window.initReceptionMonitor = function() {
                 const isConfirmed = data.status === 'confirmed' || data.status === 'present';
                 div.style.borderLeft = isConfirmed ? "4px solid #10b981" : "4px solid #f59e0b";
                 
+                // Add dark background and styling
+                div.style.background = '#121418';
+                div.style.color = '#ffffff';
+                div.style.padding = '15px';
+                div.style.borderRadius = '8px';
+                div.style.marginBottom = '10px';
+                div.style.boxShadow = '0 4px 6px rgba(0,0,0,0.3)';
+                
                 const statusLabel = isConfirmed ? 
                     '<span style="color:#10b981; font-size:0.6rem; font-weight:900; margin-left:10px;">• NA SALA</span>' : 
                     '<span style="color:#f59e0b; font-size:0.6rem; font-weight:900; margin-left:10px;">• AGUARDANDO TIA</span>';
@@ -440,8 +448,8 @@ window.loadMuralKids = window.initReceptionMonitor = function() {
                 div.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div>
-                            <strong style="font-size:1.1rem; color:var(--text-light);">${data.name}</strong>
-                            <div style="font-size:0.75rem; color:var(--text-muted);">${data.age_group || ''} | Resp: ${data.parent_name || '...'}</div>
+                            <strong style="font-size:1.1rem; color:#ffffff;">${data.name}</strong>
+                            <div style="font-size:0.75rem; color:#aaaaaa;">${data.age_group || ''} | Resp: <span style="color:var(--gold);">${data.parent_name || '...'}</span></div>
                         </div>
                         ${statusLabel}
                     </div>`;
@@ -483,7 +491,7 @@ window.switchSchedSub = function(mode, btn) {
 
 // Auto-init mural if element exists
 window.addEventListener('load', () => {
-    if (document.getElementById('kids-mural-list') && typeof initReceptionMonitor === 'function') {
+    if (document.getElementById('mural-kids-container') && typeof initReceptionMonitor === 'function') {
         initReceptionMonitor();
     }
 });
