@@ -248,7 +248,7 @@
             #col-e.active {
                 position: fixed;
                 top: 0; left: 0; width: 100%; height: 100%;
-                background: var(--bg-dark);
+                background: var(--bg);
                 z-index: 1000;
                 overflow-y: auto;
                 padding: 0;
@@ -927,7 +927,7 @@
             #col-e.active {
                 position: fixed;
                 top: 0; left: 0; width: 100%; height: 100%;
-                background: var(--bg-dark);
+                background: var(--bg);
                 z-index: 1000;
                 overflow-y: auto;
                 padding: 0;
@@ -981,21 +981,7 @@
                         }
                     <\/script>
                 
-    <div id="modal-mais" class="modal-mais">
-        <div class="modal-mais-content">
-            <div class="modal-mais-header">
-                <i class="fas fa-times" onclick="document.getElementById('modal-mais').style.display='none';" style="cursor: pointer; font-size: 1.2rem; color: #94A3B8;"></i>
-            </div>
-            
-            <div class="modal-mais-btn" onclick="openEscalaMobile()">Escala de culto</div>
-            <div class="modal-mais-btn" onclick="alert('Função em desenvolvimento'); document.getElementById('modal-mais').style.display='none';">Enviar mensagem (Check-in)</div>
-            
-            <div class="modal-mais-divider"></div>
-            
-            <div class="modal-mais-btn gold" onclick="window.parent.postMessage('go_home', '*'); document.getElementById('modal-mais').style.display='none';">Página principal</div>
-            <div class="modal-mais-btn" onclick="logout()">Sair</div>
-        </div>
-    </div>
+    
 
 </body>
                 </html>
