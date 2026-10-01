@@ -1388,7 +1388,7 @@
         .mobile-header .brand-sub { color: var(--gold-main) !important; }
 
         /* Hide the hamburger icon as we will use bottom nav */
-        .mobile-header > div:nth-child(2) { display: none !important; }
+        /* .mobile-header > div:nth-child(2) { display: none !important; } removed so INICIO button is visible */
 
         /* The main container */
         .app-main { 
@@ -1542,7 +1542,7 @@
             <h2 class="brand-title">CME LAUSANNE</h2>
             <div class="brand-sub">RECEPÇÃO</div>
         </div>
-        <div style="display: flex; gap: 15px; align-items: center;"><div onclick="window.parent.postMessage('go_home', '*');" style="font-size: 0.85rem; font-weight: 600; color: var(--gold); letter-spacing: 0.5px; cursor: pointer;">&larr; INÍCIO</div><div style="font-size: 1.2rem; cursor: pointer;" onclick="document.querySelector('.sidebar-nav').classList.toggle('show-mobile')">☰</div></div>
+        <div onclick="window.parent.postMessage('go_home', '*');" style="font-size: 0.85rem; font-weight: 600; color: var(--gold); letter-spacing: 0.5px; cursor: pointer;">&larr; INÍCIO</div>
     </div>
     <div class="app-layout">
         <aside class="pc-sidebar">
