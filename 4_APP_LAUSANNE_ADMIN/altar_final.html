@@ -54,6 +54,11 @@
         }
 
         /* HEADER */
+        .pc-only { display: block; }
+        @media (max-width: 900px) {
+            .pc-only { display: none !important; }
+            .mobile-brand-bar { display: flex !important; }
+        }
         .topbar { display: flex; align-items: center; justify-content: space-between; }
         .header-left { display: flex; align-items: center; gap: 25px; }
         
@@ -194,31 +199,75 @@
             #btn-e {
                 display: none !important;
             }
-            .mobile-escala-trigger {
-                display: flex !important;
-                width: 100%;
-                background: rgba(201, 160, 80, 0.08);
-                border: 1px solid rgba(201, 160, 80, 0.3);
-                color: var(--gold);
-                padding: 14px;
-                border-radius: 12px;
-                justify-content: center;
-                align-items: center;
-                gap: 10px;
-                font-size: 0.85rem;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 1px;
-                cursor: pointer;
-                transition: 0.2s;
-            }
-            .mobile-escala-trigger:active {
-                background: rgba(201, 160, 80, 0.15);
-            }
+            
+            
         }
-        .mobile-escala-trigger {
+        
+    
+        /* MODAL MAIS */
+        .modal-mais {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 2000;
             display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
+        .modal-mais-content {
+            background: #121418;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 320px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            overflow: hidden;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-mais-header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .modal-mais-btn {
+            padding: 16px 25px;
+            color: #E2E8F0;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .modal-mais-btn:active { background: rgba(255,255,255,0.05); }
+        .modal-mais-btn.gold { color: var(--gold); }
+        .modal-mais-divider { height: 1px; background: rgba(255,255,255,0.05); margin: 5px 20px; }
+
+        @media (max-width: 900px) {
+            #col-e.active {
+                position: fixed;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: var(--bg-dark);
+                z-index: 1000;
+                overflow-y: auto;
+                padding: 0;
+            }
+            .mobile-escala-header {
+                display: flex !important;
+                align-items: center;
+                gap: 15px;
+                padding: 20px;
+                background: rgba(255,255,255,0.02);
+                border-bottom: 1px solid var(--border);
+                position: sticky; top: 0; z-index: 10;
+                backdrop-filter: blur(10px);
+            }
+            #col-e .col-list { padding: 20px; }
+            #col-e .col-header { display: none !important; }
+        }
+        .mobile-escala-header { display: none; }
+
     </style>
 </head>
 <body>
@@ -230,8 +279,18 @@
 
     <div class="container">
         <div class="topbar">
+            <div class="mobile-brand-bar" style="display: none; width: 100%; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                <div class="brand-text">
+                    <h2 style="font-family: var(--font-serif); font-size: 1.15rem; color: #fff; margin: 0; line-height: 1.1;">CME<br>LAUSANNE</h2>
+                    <div style="color: var(--gold); font-size: 0.65rem; font-weight: 700; letter-spacing: 1.5px; margin-top: 4px;">OPERAÇÃO</div>
+                </div>
+                <div onclick="document.getElementById('modal-mais').style.display='flex';" style="color: var(--gold); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                    <span style="font-size: 0.75rem; font-weight: 700;">Mais</span>
+                    <i class="fas fa-bars" style="font-size: 1.2rem;"></i>
+                </div>
+            </div>
             <div class="header-left">
-                <div class="logo-box"><img src="assets/logo_3.png?v=70.3.79" alt="Logo"></div>
+                <div class="logo-box pc-only"><img src="assets/logo_3.png?v=70.3.79" alt="Logo"></div>
                 <div class="clock-box">
                     <div id="clock">00:00</div>
                     <div id="timer-label">
@@ -260,14 +319,15 @@
                 </div>
             </div>
             
-            <!-- Mobile Escala Trigger -->
-            <div class="mobile-escala-trigger" onclick="toggleMobileEscala()">
-                <i class="fas fa-list-ul"></i> Escala de Culto
-            </div>
+
         </div>
 
         <div class="main-view">
             <div class="feed-col active" id="col-e">
+                <div class="mobile-escala-header">
+                    <i class="fas fa-arrow-left" onclick="closeEscalaMobile()" style="cursor:pointer; font-size:1.2rem; color:#fff;"></i>
+                    <h2 style="font-family: var(--font-heading); font-size: 1rem; color: #fff; margin:0; text-transform:uppercase; letter-spacing:1px; font-weight:700;">Escala de Culto</h2>
+                </div>
                 <div class="col-header" style="display:flex; justify-content:space-between; align-items:center;">
                     <h2>Escala de Culto</h2>
                     <button id="btn-print-escala" onclick="printActiveEscala()" style="background:var(--gold-dim); border:1px solid var(--border); color:var(--gold); border-radius:8px; padding:6px 15px; cursor:pointer; font-size:0.8rem; font-weight:800; display:none; transition: all 0.3s ease;">
@@ -303,16 +363,7 @@
         }
         setInterval(updateClock, 1000); updateClock();
 
-        function updateMobileEscalaButton() {
-            const trigger = document.querySelector('.mobile-escala-trigger');
-            if(!trigger) return;
-            const colE = document.getElementById('col-e');
-            if(colE && colE.classList.contains('active')) {
-                trigger.innerHTML = '<i class="fas fa-times"></i> Fechar Escala';
-            } else {
-                trigger.innerHTML = '<i class="fas fa-list-ul"></i> Escala de Culto';
-            }
-        }
+        
 
         function setTab(t) {
             const col = document.getElementById('col-'+t);
@@ -329,21 +380,11 @@
             updateMobileEscalaButton();
         }
 
-        function toggleMobileEscala() {
-            const col = document.getElementById('col-e');
-            if (col.classList.contains('active')) {
-                col.classList.remove('active');
-                document.getElementById('btn-e').classList.remove('active');
-                updateMobileEscalaButton();
-            } else {
-                setTab('e');
-            }
-        }
+        
 
         window.addEventListener('DOMContentLoaded', () => {
             if (window.innerWidth <= 900) {
-                document.getElementById('btn-e').classList.remove('active');
-                document.getElementById('col-e').classList.remove('active');
+                setTab('v');
             }
         });
 
@@ -821,7 +862,72 @@
                             }
                         }
 
-                    </style>
+                    
+        /* MODAL MAIS */
+        .modal-mais {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-mais-content {
+            background: #121418;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 320px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            overflow: hidden;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-mais-header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .modal-mais-btn {
+            padding: 16px 25px;
+            color: #E2E8F0;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .modal-mais-btn:active { background: rgba(255,255,255,0.05); }
+        .modal-mais-btn.gold { color: var(--gold); }
+        .modal-mais-divider { height: 1px; background: rgba(255,255,255,0.05); margin: 5px 20px; }
+
+        @media (max-width: 900px) {
+            #col-e.active {
+                position: fixed;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: var(--bg-dark);
+                z-index: 1000;
+                overflow-y: auto;
+                padding: 0;
+            }
+            .mobile-escala-header {
+                display: flex !important;
+                align-items: center;
+                gap: 15px;
+                padding: 20px;
+                background: rgba(255,255,255,0.02);
+                border-bottom: 1px solid var(--border);
+                position: sticky; top: 0; z-index: 10;
+                backdrop-filter: blur(10px);
+            }
+            #col-e .col-list { padding: 20px; }
+            #col-e .col-header { display: none !important; }
+        }
+        .mobile-escala-header { display: none; }
+
+    </style>
                 </head>
                 <body>
                     <div class="escala-container">
@@ -854,7 +960,24 @@
                             }, 500);
                         }
                     <\/script>
-                </body>
+                
+    <div id="modal-mais" class="modal-mais">
+        <div class="modal-mais-content">
+            <div class="modal-mais-header">
+                <i class="fas fa-times" onclick="document.getElementById('modal-mais').style.display='none';" style="cursor: pointer; font-size: 1.2rem; color: #94A3B8;"></i>
+            </div>
+            
+            <div class="modal-mais-btn" onclick="openEscalaMobile()">Escala de culto</div>
+            <div class="modal-mais-btn" onclick="alert('Função em desenvolvimento'); document.getElementById('modal-mais').style.display='none';">Enviar mensagem (Check-in)</div>
+            
+            <div class="modal-mais-divider"></div>
+            
+            <div class="modal-mais-btn gold" onclick="window.parent.postMessage('go_home', '*'); document.getElementById('modal-mais').style.display='none';">Página principal</div>
+            <div class="modal-mais-btn" onclick="logout()">Sair</div>
+        </div>
+    </div>
+
+</body>
                 </html>
             `;
             printWindow.document.write(htmlContent);
@@ -871,5 +994,22 @@
             }
         }
     </script>
+
+    <div id="modal-mais" class="modal-mais">
+        <div class="modal-mais-content">
+            <div class="modal-mais-header">
+                <i class="fas fa-times" onclick="document.getElementById('modal-mais').style.display='none';" style="cursor: pointer; font-size: 1.2rem; color: #94A3B8;"></i>
+            </div>
+            
+            <div class="modal-mais-btn" onclick="openEscalaMobile()">Escala de culto</div>
+            <div class="modal-mais-btn" onclick="alert('Função em desenvolvimento'); document.getElementById('modal-mais').style.display='none';">Enviar mensagem (Check-in)</div>
+            
+            <div class="modal-mais-divider"></div>
+            
+            <div class="modal-mais-btn gold" onclick="window.parent.postMessage('go_home', '*'); document.getElementById('modal-mais').style.display='none';">Página principal</div>
+            <div class="modal-mais-btn" onclick="logout()">Sair</div>
+        </div>
+    </div>
+
 </body>
 </html>
