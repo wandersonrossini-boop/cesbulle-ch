@@ -1542,13 +1542,14 @@
             <h2 class="brand-title">CME LAUSANNE</h2>
             <div class="brand-sub">RECEPÇÃO</div>
         </div>
-        <div style="font-size: 1.2rem; cursor: pointer;" onclick="document.querySelector('.sidebar-nav').classList.toggle('show-mobile')">☰</div>
+        <div style="display: flex; gap: 15px; align-items: center;"><div onclick="window.parent.postMessage('go_home', '*');" style="font-size: 0.85rem; font-weight: 600; color: var(--gold); letter-spacing: 0.5px; cursor: pointer;">&larr; INÍCIO</div><div style="font-size: 1.2rem; cursor: pointer;" onclick="document.querySelector('.sidebar-nav').classList.toggle('show-mobile')">☰</div></div>
     </div>
     <div class="app-layout">
         <aside class="pc-sidebar">
-        <div class="sidebar-brand">
+        <div class="sidebar-brand" style="position: relative;">
             <h2>CME<br>LAUSANNE</h2>
             <div class="sub-brand">RECEPÇÃO</div>
+            <div onclick="window.parent.postMessage('go_home', '*');" style="cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--gold); margin-top: 15px; letter-spacing: 0.5px;">&larr; INÍCIO</div>
         </div>
         <div class="sidebar-nav">
             <div class="nav-link active" onclick="switchCheckinMode('visitor', this)">Visitante</div>

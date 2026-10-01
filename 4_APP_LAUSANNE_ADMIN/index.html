@@ -783,6 +783,18 @@
             location.reload(); 
         }
 
+        // Listen for navigation messages from iframes (e.g. Recepcao returning home)
+        window.addEventListener('message', (event) => {
+            if (event.data === 'go_home') {
+                localStorage.removeItem('current_module');
+                document.getElementById('app-container').style.display = 'none';
+                document.getElementById('app-header').style.display = 'none';
+                
+                // Keep auth intact, just show the module selection again
+                showLoginView();
+            }
+        });
+
         // Add Enter key listener for login fields
         document.addEventListener('DOMContentLoaded', () => {
             const handleEnter = (e) => {
