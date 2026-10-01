@@ -55,6 +55,7 @@
 
         /* HEADER */
         .pc-only { display: block; }
+        @media (max-width: 900px) { .exit-btn { display: none !important; } }
         @media (max-width: 900px) {
             .pc-only { display: none !important; }
             .mobile-brand-bar { display: flex !important; }
@@ -208,9 +209,9 @@
         .modal-mais {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             z-index: 2000;
             display: none;
             justify-content: center;
@@ -220,29 +221,33 @@
         .modal-mais-content {
             background: #121418;
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: 20px;
             width: 100%;
-            max-width: 320px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            max-width: 300px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
             overflow: hidden;
             animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            padding-bottom: 10px;
         }
         .modal-mais-header {
-            padding: 15px 20px;
+            padding: 20px;
             display: flex;
             justify-content: flex-end;
         }
         .modal-mais-btn {
-            padding: 16px 25px;
+            padding: 18px 25px;
             color: #E2E8F0;
-            font-size: 0.95rem;
-            font-weight: 500;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             cursor: pointer;
             transition: 0.2s;
         }
-        .modal-mais-btn:active { background: rgba(255,255,255,0.05); }
+        .modal-mais-btn:active { background: rgba(255,255,255,0.03); }
         .modal-mais-btn.gold { color: var(--gold); }
-        .modal-mais-divider { height: 1px; background: rgba(255,255,255,0.05); margin: 5px 20px; }
+        .modal-mais-divider { height: 1px; background: rgba(255,255,255,0.05); margin: 0 25px; }
+        .modal-mais-spacer { height: 20px; }
 
         @media (max-width: 900px) {
             #col-e.active {
@@ -887,9 +892,9 @@
         .modal-mais {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             z-index: 2000;
             display: none;
             justify-content: center;
@@ -899,29 +904,33 @@
         .modal-mais-content {
             background: #121418;
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: 20px;
             width: 100%;
-            max-width: 320px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            max-width: 300px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
             overflow: hidden;
             animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            padding-bottom: 10px;
         }
         .modal-mais-header {
-            padding: 15px 20px;
+            padding: 20px;
             display: flex;
             justify-content: flex-end;
         }
         .modal-mais-btn {
-            padding: 16px 25px;
+            padding: 18px 25px;
             color: #E2E8F0;
-            font-size: 0.95rem;
-            font-weight: 500;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             cursor: pointer;
             transition: 0.2s;
         }
-        .modal-mais-btn:active { background: rgba(255,255,255,0.05); }
+        .modal-mais-btn:active { background: rgba(255,255,255,0.03); }
         .modal-mais-btn.gold { color: var(--gold); }
-        .modal-mais-divider { height: 1px; background: rgba(255,255,255,0.05); margin: 5px 20px; }
+        .modal-mais-divider { height: 1px; background: rgba(255,255,255,0.05); margin: 0 25px; }
+        .modal-mais-spacer { height: 20px; }
 
         @media (max-width: 900px) {
             #col-e.active {
@@ -1004,16 +1013,19 @@
     <div id="modal-mais" class="modal-mais">
         <div class="modal-mais-content">
             <div class="modal-mais-header">
-                <i class="fas fa-times" onclick="document.getElementById('modal-mais').style.display='none';" style="cursor: pointer; font-size: 1.2rem; color: #94A3B8;"></i>
+                <i class="fas fa-times" onclick="document.getElementById('modal-mais').style.display='none';" style="cursor: pointer; font-size: 1.4rem; color: #64748B;"></i>
             </div>
             
+            <div class="modal-mais-btn gold" onclick="window.parent.postMessage('go_home', '*'); document.getElementById('modal-mais').style.display='none';">Página principal</div>
+            <div class="modal-mais-divider"></div>
             <div class="modal-mais-btn" onclick="openEscalaMobile()">Escala de culto</div>
+            <div class="modal-mais-divider"></div>
             <div class="modal-mais-btn" onclick="alert('Função em desenvolvimento'); document.getElementById('modal-mais').style.display='none';">Enviar mensagem (Check-in)</div>
             
+            <div class="modal-mais-spacer"></div>
             <div class="modal-mais-divider"></div>
             
-            <div class="modal-mais-btn gold" onclick="window.parent.postMessage('go_home', '*'); document.getElementById('modal-mais').style.display='none';">Página principal</div>
-            <div class="modal-mais-btn" onclick="logout()">Sair</div>
+            <div class="modal-mais-btn" style="color: #94A3B8;" onclick="logout()">Sair</div>
         </div>
     </div>
 

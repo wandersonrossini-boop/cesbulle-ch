@@ -617,6 +617,34 @@
             .quick-card p { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
         }
     
+    
+        /* TEMPORARY TOAST */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: #121418;
+            border: 1px solid var(--gold);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toast-notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -810,6 +838,34 @@
         .remove-subtitle {
             display: none !important;
         }
+    
+        /* TEMPORARY TOAST */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: #121418;
+            border: 1px solid var(--gold);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toast-notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
     </style>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1260,6 +1316,34 @@
             color: #0F172A;
             margin: 0;
         }
+    
+        /* TEMPORARY TOAST */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: #121418;
+            border: 1px solid var(--gold);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toast-notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
     </style>
 
 
@@ -1507,6 +1591,34 @@
 
         /* Hide the bottom 4 cards duplicate */
         .four-cards-row { display: none !important; }
+    
+        /* TEMPORARY TOAST */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: #121418;
+            border: 1px solid var(--gold);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toast-notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
     </style>
 
 </head>
@@ -2123,7 +2235,7 @@
                 });
 
                 batch.commit().then(() => {
-                    alert("Enviada com sucesso!");
+                    showToast("Mensagem enviada com sucesso");
                     const SW_VERSION = 'v48.12.17';
                     // Security v48.12.17 Enforce
                     navigator.serviceWorker.register('sw-v3.js?v=' + SW_VERSION).then(reg => {
@@ -2618,6 +2730,34 @@
             .quick-card p { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
         }
     
+    
+        /* TEMPORARY TOAST */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: #121418;
+            border: 1px solid var(--gold);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toast-notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
     </style>
                 </div> <!-- END card-floating -->
             </div> <!-- END sched-mode-member -->
@@ -2672,7 +2812,7 @@
                 status: 'pending',
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
-                alert("Enviada com sucesso!");
+                showToast("Mensagem enviada com sucesso");
                 document.getElementById('sched-name-visit').value = '';
                 document.getElementById('sched-contact-visit').value = '';
                 document.getElementById('sched-visit-date').value = '';
@@ -2699,7 +2839,7 @@
                 status: 'pending',
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
-                alert("Enviada com sucesso!");
+                showToast("Mensagem enviada com sucesso");
                 document.getElementById('sched-name-group').value = '';
                 document.getElementById('sched-contact-group').value = '';
             }).catch(err => {
@@ -2764,7 +2904,7 @@
                     status: 'pending',
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 }).then(() => {
-                    alert("Enviada com sucesso!");
+                    showToast("Mensagem enviada com sucesso");
                     document.getElementById('sched-name-baptism').value = '';
                     document.getElementById('sched-contact-baptism').value = '';
                 }).catch(err => {
@@ -2870,7 +3010,7 @@
             data.contact = phone; // Legacy support
 
             db.collection('schedule_requests').add(data).then(docRef => {
-                alert("Enviada com sucesso!");
+                showToast("Mensagem enviada com sucesso");
                 // AUTO-SEND TO INTEGRAÇÃO (Novos Amigos)
                 sendToIntegracao(name, phone, data.type, 'recepcao');
                 // Reset form
@@ -2972,7 +3112,7 @@
                 status: 'pending',
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
-                alert("Enviada com sucesso!");
+                showToast("Mensagem enviada com sucesso");
                 document.getElementById('sched-name-visit').value = '';
                 document.getElementById('sched-visit-date').value = '';
                 document.getElementById('sched-contact-visit').value = '';
@@ -3005,7 +3145,7 @@
                 status: 'pending',
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
-                alert("Enviada com sucesso!");
+                showToast("Mensagem enviada com sucesso");
                 document.getElementById('sched-name-group').value = '';
                 document.getElementById('sched-contact-group').value = '';
                 document.getElementById('sched-group-opt').value = '';
@@ -3128,6 +3268,34 @@
             .quick-card p { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
         }
     
+    
+        /* TEMPORARY TOAST */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: #121418;
+            border: 1px solid var(--gold);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toast-notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
     </style>
 
             <div class="ministry-grid">
@@ -3209,7 +3377,7 @@
                 origin: 'reception_services',
                 uid: user.uid
             }).then(() => {
-                alert("Enviada com sucesso!");
+                showToast("Mensagem enviada com sucesso");
                 document.getElementById('serv-name').value = '';
                 document.getElementById('serv-contact').value = '';
                 selectedMinistries.clear();
@@ -3463,6 +3631,13 @@
 
     <!-- TOAST CONTAINER -->
     <div id="toast-container"></div>
+
+    <!-- Toast Notification -->
+    <div id="toast-notification" class="toast-notification">
+        <i class="fas fa-check-circle" style="color: var(--gold);"></i>
+        <span id="toast-message">Mensagem enviada com sucesso</span>
+    </div>
+
 </body>
 
 </html>
