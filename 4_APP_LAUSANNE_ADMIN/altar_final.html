@@ -261,7 +261,7 @@
             </div>
             
             <!-- Mobile Escala Trigger -->
-            <div class="mobile-escala-trigger" onclick="setTab('e')">
+            <div class="mobile-escala-trigger" onclick="toggleMobileEscala()">
                 <i class="fas fa-list-ul"></i> Escala de Culto
             </div>
         </div>
@@ -304,11 +304,34 @@
         setInterval(updateClock, 1000); updateClock();
 
         function setTab(t) {
+            const col = document.getElementById('col-'+t);
+            if (window.innerWidth <= 900 && col.classList.contains('active')) {
+                col.classList.remove('active');
+                document.getElementById('btn-'+t).classList.remove('active');
+                return;
+            }
             document.querySelectorAll('.stat-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.feed-col').forEach(c => c.classList.remove('active'));
             document.getElementById('btn-'+t).classList.add('active');
-            document.getElementById('col-'+t).classList.add('active');
+            col.classList.add('active');
         }
+
+        function toggleMobileEscala() {
+            const col = document.getElementById('col-e');
+            if (col.classList.contains('active')) {
+                col.classList.remove('active');
+                document.getElementById('btn-e').classList.remove('active');
+            } else {
+                setTab('e');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.innerWidth <= 900) {
+                document.getElementById('btn-e').classList.remove('active');
+                document.getElementById('col-e').classList.remove('active');
+            }
+        });
 
         firebase.auth().onAuthStateChanged(user => {
             if(user) startMonitor();
