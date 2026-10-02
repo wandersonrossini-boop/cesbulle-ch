@@ -7,25 +7,30 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="js/firebase-config.js?v=70.3.49"></script>
+    <script src="js/firebase-config.js?v=70.3.87"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         
         :root {
-            --bg-light: #F0F4F8;
-            --text-dark: #0F172A;
-            --text-muted: #64748B;
-            --accent-blue: #0284C7;
-            --btn-blue: #0F172A;
-            --border-line: rgba(15, 23, 42, 0.1);
+            /* Navy Blue Dark Theme */
+            --bg-dark: #090e17; /* Very dark navy */
+            --card-bg: #111827; /* Slightly lighter */
+            --border-line: #1f2937; /* Subtle border */
+            
+            --text-light: #F8FAFC;
+            --text-muted: #94A3B8;
+            
+            --gold: #C9A050;
+            --green: #10B981;
+            --red: #EF4444;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         html, body {
-            background: var(--bg-light);
-            color: var(--text-dark);
+            background: var(--bg-dark);
+            color: var(--text-light);
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
         }
@@ -38,105 +43,54 @@
 
         /* HEADER */
         .header { margin-bottom: 40px; }
-        .header-brand { font-size: 0.85rem; font-weight: 800; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 15px; }
-        .header h1 { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); line-height: 1.1; margin-bottom: 5px; }
+        .header h1 { font-size: 2.2rem; font-weight: 800; color: var(--text-light); line-height: 1.1; margin-bottom: 5px; }
         .header p { font-size: 1.1rem; color: var(--text-muted); font-weight: 500; }
 
         /* TABS */
         .tabs-container { display: flex; gap: 30px; margin-bottom: 40px; border-bottom: 1px solid var(--border-line); }
         .tab-btn { background: transparent; border: none; padding: 0 0 10px 0; color: var(--text-muted); font-weight: 700; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; position: relative; transition: 0.2s; }
-        .tab-btn.active { color: var(--accent-blue); }
-        .tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background: var(--accent-blue); }
+        .tab-btn.active { color: var(--gold); }
+        .tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background: var(--gold); }
 
         /* SECTION TITLE */
         .section-title { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
 
-        /* LIST ITEM */
-        .kid-item { margin-bottom: 25px; padding-bottom: 25px; border-bottom: 1px solid var(--border-line); }
-        .kid-info-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
-        .kid-name { font-size: 1.25rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
-        .kid-parent { font-size: 0.95rem; color: var(--text-muted); }
-        .kid-age { font-size: 0.95rem; color: var(--text-muted); font-weight: 600; }
-
-        .actions-row { display: flex; justify-content: flex-end; align-items: center; gap: 25px; }
-        .btn-cancel { background: transparent; border: none; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn-cancel:hover { color: #ef4444; }
-        .btn-confirm { background: var(--btn-blue); color: #ffffff; border: none; padding: 12px 24px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15); }
-
-        
-        /* PRESENCE LIST */
-        .presence-container { margin-top: 50px; }
-        .presence-header { display: flex; align-items: center; gap: 8px; padding-bottom: 20px; cursor: pointer; }
-        .presence-title { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); text-transform: uppercase; letter-spacing: 1px; }
-        
-        .presence-card {
-            background: #ffffff;
+        /* CARD STYLE */
+        .kid-card {
+            background: var(--card-bg);
             border: 1px solid var(--border-line);
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(15, 23, 42, 0.03);
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
-        .presence-card-header {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .presence-card-name {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-        .presence-card-age {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-        .presence-card-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid var(--border-line);
-            padding-top: 12px;
-            margin-top: 5px;
-        }
-        .presence-status {
-            font-size: 0.85rem;
-            color: #10B981; /* Emerald green for active */
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .presence-status::before {
-            content: '';
-            display: block;
-            width: 6px;
-            height: 6px;
-            background: #10B981;
-            border-radius: 50%;
-        }
-        .btn-checkout {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: color 0.2s;
-        }
-        .btn-checkout:hover { color: #ef4444; }
-</style>
+        .kid-info-row { display: flex; justify-content: space-between; align-items: flex-start; }
+        .kid-name { font-size: 1.15rem; font-weight: 700; color: var(--text-light); margin-bottom: 4px; }
+        .kid-parent { font-size: 0.9rem; color: var(--text-muted); }
+        .kid-age { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
+
+        .actions-row { display: flex; justify-content: flex-end; align-items: center; gap: 25px; border-top: 1px solid var(--border-line); padding-top: 12px; margin-top: 5px; }
+        
+        .btn-confirm { background: transparent; color: var(--gold); border: none; font-size: 0.85rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: color 0.2s; }
+        .btn-confirm:hover { color: #fff; }
+        
+        .btn-checkout { background: transparent; color: var(--text-muted); border: none; font-size: 0.85rem; font-weight: 600; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; transition: color 0.2s; }
+        .btn-checkout:hover { color: var(--red); }
+
+        .presence-status { font-size: 0.85rem; color: var(--green); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .presence-status::before { content: ''; display: block; width: 6px; height: 6px; background: var(--green); border-radius: 50%; }
+
+        /* PRESENCE LIST */
+        .presence-container { margin-top: 50px; }
+        .presence-header { display: flex; align-items: center; gap: 8px; padding-bottom: 20px; cursor: pointer; }
+        .presence-title { font-size: 0.95rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; }
+    </style>
 </head>
 <body>
     <div class="container-kids">
         <div class="header">
-            
             <h1>KIDS</h1>
             <p>Identificação e cuidado</p>
         </div>
@@ -160,7 +114,7 @@
             <div id="presence-list-content" style="display:none;">
                 <div id="kids-list-active"></div>
                 <div style="display: flex; justify-content: center; margin-top: 30px; border-top: 1px solid var(--border-line); padding-top: 25px;">
-                    <button onclick="endKidsSession()" style="background:transparent; border:none; color:#ef4444; font-weight:600; cursor:pointer; text-transform:uppercase; font-size: 0.75rem; letter-spacing: 1px; opacity: 0.7;">
+                    <button onclick="endKidsSession()" style="background:transparent; border:none; color:var(--red); font-weight:600; cursor:pointer; text-transform:uppercase; font-size: 0.75rem; letter-spacing: 1px; opacity: 0.7;">
                         Encerrar Todos
                     </button>
                 </div>
@@ -222,37 +176,39 @@
             if(waiting.length === 0) listWaiting.innerHTML = '<div style="color:var(--text-muted); padding:20px 0;">Nenhuma criança aguardando.</div>';
             waiting.forEach(d => {
                 const item = document.createElement('div');
-                item.className = 'kid-item';
-                item.innerHTML = `
+                item.className = 'kid-card';
+                item.innerHTML = 
                     <div class="kid-info-row">
                         <div>
-                            <div class="kid-name">${d.name}</div>
-                            <div class="kid-parent">${d.parent_name || ''}</div>
+                            <div class="kid-name"></div>
+                            <div class="kid-parent">Responsável: </div>
                         </div>
-                        <div class="kid-age">${d.age_group || ''}</div>
+                        <div class="kid-age"></div>
                     </div>
                     <div class="actions-row">
-                        <button class="btn-cancel" onclick="updateStatus('${d.id}', 'cancelled')">Recusar</button>
-                        <button class="btn-confirm" onclick="updateStatus('${d.id}', 'confirmed')">Confirmar</button>
+                        <button class="btn-confirm" onclick="updateStatus('', 'confirmed')">Confirmar</button>
                     </div>
-                `;
+                ;
                 listWaiting.appendChild(item);
             });
 
-            document.getElementById('presence-header-title').innerHTML = `PRESENÇAS HOJE &middot; ${active.length}`;
+            document.getElementById('presence-header-title').innerHTML = PRESENÇAS HOJE &middot; ;
             active.forEach((d, i) => {
                 const item = document.createElement('div');
-                item.className = 'presence-card';
-                item.innerHTML = `
-                    <div class="presence-card-header">
-                        <div class="presence-card-name">${d.name}</div>
-                        <div class="presence-card-age">${d.age_group || ''}</div>
+                item.className = 'kid-card';
+                item.innerHTML = 
+                    <div class="kid-info-row">
+                        <div>
+                            <div class="kid-name"></div>
+                            <div class="kid-parent">Responsável: </div>
+                        </div>
+                        <div class="kid-age"></div>
                     </div>
-                    <div class="presence-card-footer">
+                    <div class="actions-row">
                         <div class="presence-status">Sala ativa</div>
-                        <button class="btn-checkout" onclick="checkoutKid('${d.id}', '${d.name}')">Encerrar</button>
+                        <button class="btn-checkout" onclick="checkoutKid('', '')">Encerrar</button>
                     </div>
-                `;
+                ;
                 listActive.appendChild(item);
             });
         }
@@ -260,16 +216,16 @@
         function updateStatus(id, status) {
             db.collection('attendance').doc(id).update({ status: status });
         }
+        
+        function checkoutKid(id, name) {
+            if(confirm(Deseja encerrar a presença de ?)) {
+                updateStatus(id, 'finished');
+            }
+        }
 
         function togglePresenceList() {
             const content = document.getElementById('presence-list-content');
             content.style.display = content.style.display === 'none' ? 'block' : 'none';
-        }
-
-        function checkoutKid(id, name) {
-            if(confirm(`Deseja encerrar a presença de ${name}?`)) {
-                updateStatus(id, 'finished');
-            }
         }
 
         function endKidsSession() {

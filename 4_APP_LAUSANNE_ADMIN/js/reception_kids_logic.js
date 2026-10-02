@@ -103,8 +103,16 @@ window.renderKidsSelection = function(filter = '') {
         const kidName = k.name || k.child_name || k.nome || 'Sem Nome';
         const parentName = k.parent || k.parent_name || k.responsavel || 'Responsável não informado';
 
-        div.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center;">
+            div.innerHTML = 
+        <div style="flex:1;">
+            <strong style="font-size:1.15rem; display:block; color:#F8FAFC; margin-bottom:4px;"></strong>
+            <div style='font-size:0.85rem; color:#94A3B8;'>Resp: <b style="color:#CBD5E1;"></b></div>
+        </div>
+        <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+            <div style="font-size:0.85rem; color:#94A3B8; font-weight:600;"></div>
+            <div style="font-size:0.75rem; color:#10B981; font-weight:700; display:flex; align-items:center; gap:4px;"><span style="display:block; width:6px; height:6px; background:#10B981; border-radius:50%;"></span> Entregue</div>
+        </div>
+    ; justify-content:space-between; align-items:center;">
                 <div style="flex:1;">
                     <strong style="font-size:1.15rem; display:block; color:var(--text-light); margin-bottom:4px;">${kidName}</strong>
                     <div style='font-size:0.85rem; color:var(--text-muted); display:flex; align-items:center; gap:6px;'>
@@ -1134,7 +1142,7 @@ window.appendKidToMural = function(id, data) {
 
     const div = document.createElement('div');
     // Premium Antigravity Card
-    div.style.cssText = "background:#fff; border:1px solid rgba(16, 185, 129, 0.3); padding:15px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 15px rgba(16, 185, 129, 0.05); margin-bottom:10px;";
+    div.style.cssText = "background:#111827; border:1px solid #1F2937; padding:18px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1);";
     div.innerHTML = `
         <div style="flex:1;">
             <strong style="font-size:1.15rem; display:block; color:var(--text-light); margin-bottom:4px;">${data.name || 'Criança'}</strong>
