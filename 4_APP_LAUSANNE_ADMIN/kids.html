@@ -63,15 +63,75 @@
         .btn-cancel:hover { color: #ef4444; }
         .btn-confirm { background: var(--btn-blue); color: #ffffff; border: none; padding: 12px 24px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15); }
 
+        
         /* PRESENCE LIST */
         .presence-container { margin-top: 50px; }
-        .presence-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid var(--border-line); margin-bottom: 15px; cursor: pointer; }
-        .presence-title { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; }
-        .presence-count { font-size: 1rem; font-weight: 700; color: var(--text-dark); }
-        .presence-item { display: flex; padding: 12px 0; align-items: center; }
-        .presence-name { font-size: 1rem; font-weight: 600; color: var(--text-dark); flex: 1; }
-        .presence-age { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
-    </style>
+        .presence-header { display: flex; align-items: center; gap: 8px; padding-bottom: 20px; cursor: pointer; }
+        .presence-title { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); text-transform: uppercase; letter-spacing: 1px; }
+        
+        .presence-card {
+            background: #ffffff;
+            border: 1px solid var(--border-line);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(15, 23, 42, 0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .presence-card-header {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .presence-card-name {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        .presence-card-age {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .presence-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-line);
+            padding-top: 12px;
+            margin-top: 5px;
+        }
+        .presence-status {
+            font-size: 0.85rem;
+            color: #10B981; /* Emerald green for active */
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .presence-status::before {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 6px;
+            background: #10B981;
+            border-radius: 50%;
+        }
+        .btn-checkout {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
+        }
+        .btn-checkout:hover { color: #ef4444; }
+</style>
 </head>
 <body>
     <div class="container-kids">
@@ -94,15 +154,14 @@
 
         <div class="presence-container">
             <div class="presence-header" onclick="togglePresenceList()">
-                <div class="presence-title">PRESENÇAS HOJE</div>
-                <div class="presence-count" id="kids-count-active">0</div>
+                <div class="presence-title" id="presence-header-title">PRESENÇAS HOJE &middot; 0</div>
             </div>
             
             <div id="presence-list-content" style="display:none;">
                 <div id="kids-list-active"></div>
-                <div style="display: flex; justify-content: flex-end; margin-top: 30px;">
-                    <button onclick="endKidsSession()" style="background:transparent; border:none; color:#ef4444; font-weight:600; cursor:pointer; text-transform:uppercase; font-size: 0.8rem; letter-spacing: 1px;">
-                        Encerrar Sala
+                <div style="display: flex; justify-content: center; margin-top: 30px; border-top: 1px solid var(--border-line); padding-top: 25px;">
+                    <button onclick="endKidsSession()" style="background:transparent; border:none; color:#ef4444; font-weight:600; cursor:pointer; text-transform:uppercase; font-size: 0.75rem; letter-spacing: 1px; opacity: 0.7;">
+                        Encerrar Todos
                     </button>
                 </div>
             </div>
@@ -164,27 +223,36 @@
             waiting.forEach(d => {
                 const item = document.createElement('div');
                 item.className = 'kid-item';
-                item.innerHTML = 
+                item.innerHTML = `
                     <div class="kid-info-row">
                         <div>
-                            <div class="kid-name"></div>
-                            <div class="kid-parent"></div>
+                            <div class="kid-name">${d.name}</div>
+                            <div class="kid-parent">${d.parent_name || ''}</div>
                         </div>
-                        <div class="kid-age"></div>
+                        <div class="kid-age">${d.age_group || ''}</div>
                     </div>
                     <div class="actions-row">
-                        <button class="btn-cancel" onclick="updateStatus('', 'cancelled')">Recusar</button>
-                        <button class="btn-confirm" onclick="updateStatus('', 'confirmed')">Confirmar</button>
+                        <button class="btn-cancel" onclick="updateStatus('${d.id}', 'cancelled')">Recusar</button>
+                        <button class="btn-confirm" onclick="updateStatus('${d.id}', 'confirmed')">Confirmar</button>
                     </div>
-                ;
+                `;
                 listWaiting.appendChild(item);
             });
 
-            document.getElementById('kids-count-active').innerText = active.length;
+            document.getElementById('presence-header-title').innerHTML = `PRESENÇAS HOJE &middot; ${active.length}`;
             active.forEach((d, i) => {
                 const item = document.createElement('div');
-                item.className = 'presence-item';
-                item.innerHTML = <div class="presence-name"></div><div class="presence-age"></div>;
+                item.className = 'presence-card';
+                item.innerHTML = `
+                    <div class="presence-card-header">
+                        <div class="presence-card-name">${d.name}</div>
+                        <div class="presence-card-age">${d.age_group || ''}</div>
+                    </div>
+                    <div class="presence-card-footer">
+                        <div class="presence-status">Sala ativa</div>
+                        <button class="btn-checkout" onclick="checkoutKid('${d.id}', '${d.name}')">Encerrar</button>
+                    </div>
+                `;
                 listActive.appendChild(item);
             });
         }
@@ -196,6 +264,12 @@
         function togglePresenceList() {
             const content = document.getElementById('presence-list-content');
             content.style.display = content.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function checkoutKid(id, name) {
+            if(confirm(`Deseja encerrar a presença de ${name}?`)) {
+                updateStatus(id, 'finished');
+            }
         }
 
         function endKidsSession() {
