@@ -393,6 +393,203 @@
                 </div>
             </div>
 
+            <!-- PAGE: ESCALAS (List View) -->
+            <div id="page-escalas" class="page-content">
+                <div class="glass-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:15px;">
+                        <div>
+                            <h3 style="margin:0; color:var(--gold); font-size:1.5rem;"><i class="fas fa-calendar-alt"></i> Gerenciamento de Escalas</h3>
+                            <p style="margin:5px 0 0 0; color:var(--text-dim); font-size:0.9rem;">Histórico completo e agendamentos de escalas de culto.</p>
+                        </div>
+                        <button class="btn-gold" style="width:auto; padding:10px 20px;" onclick="openNovaEscala()"><i class="fas fa-plus"></i> Criar Nova Escala</button>
+                    </div>
+
+                    <div style="overflow-x:auto;">
+                        <table class="premium-table">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Culto</th>
+                                    <th>Dirigente</th>
+                                    <th>Tipo</th>
+                                    <th>Status</th>
+                                    <th style="text-align:right;">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="escalas-table-body">
+                                <tr>
+                                    <td colspan="6" style="text-align:center; color:var(--text-dim); padding:40px;">Carregando escalas salvas...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE: NOVA ESCALA (Wizard View) -->
+            <div id="page-nova-escala" class="page-content">
+                <div class="glass-card" style="max-width:900px; margin:0 auto;">
+                    <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
+                        <button onclick="switchPage('escalas')" style="background:transparent; border:1px solid var(--border); color:#fff; width:35px; height:35px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="fas fa-arrow-left"></i></button>
+                        <div>
+                            <h3 style="margin:0; color:var(--gold); font-size:1.4rem;" id="wizard-title">Nova Escala de Culto</h3>
+                            <p style="margin:2px 0 0 0; color:var(--text-dim); font-size:0.85rem;">Preencha os detalhes e a programação oficial do culto.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step Tracker -->
+                    <div class="wizard-steps">
+                        <div class="wizard-step active" id="wstep-1">1. Informações</div>
+                        <div class="wizard-step" id="wstep-2">2. Programação</div>
+                        <div class="wizard-step" id="wstep-3">3. Participantes</div>
+                        <div class="wizard-step" id="wstep-4">4. Revisão</div>
+                    </div>
+
+                    <!-- Hidden Edit ID -->
+                    <input type="hidden" id="escala-id">
+
+                    <!-- STEP 1: INFORMAÇÕES -->
+                    <div class="wizard-form-step active" id="wform-1">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Nome do Culto</label>
+                                <input type="text" id="escala-nome" placeholder="Ex: Culto das Primícias">
+                            </div>
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Tipo de Culto</label>
+                                <select id="escala-tipo-culto" onchange="prefillProgramacao()">
+                                    <option value="Outro">Outro (Manual)</option>
+                                    <option value="Domingo Manhã">Domingo Manhã (Culto das Primícias)</option>
+                                    <option value="Domingo Noite">Domingo Noite (Celebração)</option>
+                                    <option value="Terça-feira">Terça-feira (Ensino/Alicerce)</option>
+                                    <option value="Sexta-feira">Sexta-feira (Clamor)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:15px; margin-top:10px;">
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Data</label>
+                                <input type="date" id="escala-data">
+                            </div>
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Horário de Início</label>
+                                <input type="time" id="escala-horario">
+                            </div>
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Local</label>
+                                <input type="text" id="escala-local" value="Templo Sede">
+                            </div>
+                        </div>
+
+                        <div style="margin-top:10px;">
+                            <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Tema / Descrição</label>
+                            <input type="text" id="escala-tema" placeholder="Ex: Provai e vede que o Senhor é bom.">
+                        </div>
+
+                        <div style="margin-top:10px;">
+                            <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Dirigente do Culto</label>
+                            <input type="text" id="escala-dirigente" placeholder="Ex: Pb. Binho Ribeiro">
+                        </div>
+
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:10px;">
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Repetir escala?</label>
+                                <select id="escala-repetir">
+                                    <option value="Não">Não repetir</option>
+                                    <option value="Semanal">Semanalmente</option>
+                                    <option value="Mensal">Mensalmente</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Publicar escala?</label>
+                                <select id="escala-status">
+                                    <option value="Publicada">Sim - Disponível no Altar e Geral</option>
+                                    <option value="Rascunho">Não - Salvar como Rascunho</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:10px;">
+                            <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Observações</label>
+                            <textarea id="escala-obs" rows="3" placeholder="Avisos gerais ou observações da escala..."></textarea>
+                        </div>
+
+                        <div style="display:flex; justify-content:flex-end; margin-top:20px;">
+                            <button class="btn-gold" style="width:auto; padding:12px 30px;" onclick="goToStep(2)">Próximo <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: PROGRAMAÇÃO -->
+                    <div class="wizard-form-step" id="wform-2">
+                        <p style="color:var(--text-dim); font-size:0.9rem; margin-bottom:20px;">Adicione as atividades e momentos do culto na ordem sequencial.</p>
+                        
+                        <div id="escala-itens-container">
+                            <!-- Injected rows of program items -->
+                        </div>
+
+                        <button onclick="addProgramacaoRow()" style="background:transparent; border:1px dashed var(--gold); color:var(--gold); border-radius:10px; padding:12px; cursor:pointer; width:100%; font-weight:700; margin-top:10px;"><i class="fas fa-plus"></i> Adicionar Atividade</button>
+
+                        <div style="display:flex; justify-content:space-between; margin-top:30px;">
+                            <button onclick="goToStep(1)" style="background:transparent; border:1px solid var(--border); color:#fff; padding:12px 25px; border-radius:10px; cursor:pointer;"><i class="fas fa-arrow-left"></i> Voltar</button>
+                            <button class="btn-gold" style="width:auto; padding:12px 30px;" onclick="goToStep(3)">Próximo <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: PARTICIPANTES -->
+                    <div class="wizard-form-step" id="wform-3">
+                        <p style="color:var(--text-dim); font-size:0.9rem; margin-bottom:20px;">Defina os responsáveis pelas demais equipes de apoio no culto.</p>
+                        
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Ministério de Louvor</label>
+                                <input type="text" id="escala-part-louvor" placeholder="Ex: Banda Lausanne e Backs">
+                            </div>
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Sonoplastia / Mídia / Projeção</label>
+                                <input type="text" id="escala-part-midia" placeholder="Ex: Equipe de Mídia">
+                            </div>
+                        </div>
+
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:10px;">
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Recepção / Diaconato</label>
+                                <input type="text" id="escala-part-recepcao" placeholder="Ex: Pb. Binho e Diáconos">
+                            </div>
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Kids (Espaço Crianças)</label>
+                                <input type="text" id="escala-part-kids" placeholder="Ex: Ministério Infantil">
+                            </div>
+                        </div>
+
+                        <div style="margin-top:10px;">
+                            <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Intercessão / Oração Apoio</label>
+                            <input type="text" id="escala-part-intercessao" placeholder="Ex: Equipe de Clamor">
+                        </div>
+
+                        <div style="display:flex; justify-content:space-between; margin-top:30px;">
+                            <button onclick="goToStep(2)" style="background:transparent; border:1px solid var(--border); color:#fff; padding:12px 25px; border-radius:10px; cursor:pointer;"><i class="fas fa-arrow-left"></i> Voltar</button>
+                            <button class="btn-gold" style="width:auto; padding:12px 30px;" onclick="goToStep(4)">Próximo <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: REVISÃO -->
+                    <div class="wizard-form-step" id="wform-4">
+                        <p style="color:var(--text-dim); font-size:0.9rem; margin-bottom:20px;">Confira a visualização final da folha de escala de culto antes de salvar.</p>
+                        
+                        <!-- Page Preview Box (reproducing the sage sheet look in miniature) -->
+                        <div id="escala-preview-sheet" style="background:#b3d2be; color:#000; border-radius:15px; padding:35px; margin-bottom:25px; box-shadow:0 15px 40px rgba(0,0,0,0.4); font-family:'Outfit';">
+                            <!-- Rendered preview content matching design -->
+                        </div>
+
+                        <div style="display:flex; justify-content:space-between; margin-top:30px;">
+                            <button onclick="goToStep(3)" style="background:transparent; border:1px solid var(--border); color:#fff; padding:12px 25px; border-radius:10px; cursor:pointer;"><i class="fas fa-arrow-left"></i> Voltar</button>
+                            <button class="btn-gold" style="width:auto; padding:12px 35px; background:#10b981; color:#fff;" id="btn-salvar-escala" onclick="salvarEscalaCompleta()"><i class="fas fa-save"></i> Salvar e Publicar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- OTHER PAGES PLACEHOLDERS -->
             <div id="page-lideres" class="page-content">
                 <div class="glass-card">
