@@ -294,10 +294,7 @@
                     <i class="fas fa-history"></i>
                     <span>Ata Digital</span>
                 </div>
-                <div class="nav-item" onclick="switchPage('relatorios')" id="nav-relatorios">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Relatórios</span>
-                </div>
+                
 
                 <div style="font-size: 0.65rem; color: var(--text-dim); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin: 25px 0 10px 15px;">Gestão</div>
                 <div class="nav-item" onclick="switchPage('lideres')" id="nav-lideres">
@@ -603,12 +600,12 @@
                                 <tr>
                                     <th>Nome</th>
                                     <th>Função</th>
-                                    <th>E-mail</th>
+                                    
                                     <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody id="lideres-table-body">
-                                <tr><td colspan="4" style="text-align:center; color:var(--text-dim);">Carregando líderes...</td></tr>
+                                <tr><td colspan="3" style="text-align:center; color:var(--text-dim);">Carregando líderes...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -630,7 +627,7 @@
                                 </tr>
                             </thead>
                             <tbody id="ministerios-table-body">
-                                <tr><td colspan="4" style="text-align:center; color:var(--text-dim);">Carregando ministérios...</td></tr>
+                                <tr><td colspan="3" style="text-align:center; color:var(--text-dim);">Carregando ministérios...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -648,7 +645,7 @@
             <div id="page-ata" class="page-content">
                 <div class="glass-card">
                     <h3 style="color:var(--gold); border-bottom:1px solid var(--border); padding-bottom:10px;"><i class="fas fa-clipboard-list"></i> Ata Digital Completa</h3>
-                    <p style="color:var(--text-dim); margin-top:10px;">Histórico detalhado em tempo real de logs de recepção, decisões e eventos.</p>
+                    <p style="color:var(--text-dim); margin-top:10px;">Registro das atividades realizadas no sistema.</p>
                     <div id="ata-digital-feed-completa" style="margin-top:20px; overflow-y:auto; max-height:600px;"></div>
                 </div>
             </div>
@@ -669,20 +666,6 @@
                         <div>
                             <h4 style="color:var(--text-dim); margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:10px;">Concluídas</h4>
                             <div id="diretrizes-page-concluidas"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="page-relatorios" class="page-content">
-                <div class="glass-card">
-                    <h3 style="color:var(--gold); border-bottom:1px solid var(--border); padding-bottom:10px;"><i class="fas fa-chart-bar"></i> Relatórios Gerais</h3>
-                    <p style="color:var(--text-dim); margin-top:10px;">Acesso a relatórios demográficos, frequência nos cultos e novos visitantes.</p>
-                    <div style="display:flex; align-items:center; justify-content:center; padding:100px 0; border:1px dashed var(--border); border-radius:15px; margin-top:20px;">
-                        <div style="text-align:center; color:var(--text-dim);">
-                            <i class="fas fa-tools" style="font-size:3rem; color:var(--gold); margin-bottom:15px;"></i>
-                            <h4>Módulo de Inteligência de Relatórios</h4>
-                            <p style="font-size:0.85rem; margin-top:5px;">Esta seção estará disponível na próxima atualização do sistema.</p>
                         </div>
                     </div>
                 </div>
@@ -1006,7 +989,7 @@
             try {
                 const doc = await db.collection('config').doc('notification_leaders').get();
                 if(!doc.exists || !doc.data().leaders || doc.data().leaders.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-dim);">Nenhum líder cadastrado na secretaria.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-dim);">Nenhum líder cadastrado na secretaria.</td></tr>';
                     return;
                 }
                 const leaders = doc.data().leaders;
@@ -1016,15 +999,14 @@
                         <tr>
                             <td style="font-weight:700; color:#fff;">${l.name || 'Sem nome'}</td>
                             <td><span style="background:var(--gold-dim); color:var(--gold); border:1px solid var(--border); padding:4px 10px; border-radius:12px; font-size:0.8rem; font-weight:800;">${l.title || 'Líder'}</span></td>
-                            <td style="color:var(--text-dim);">${l.source || 'Secretaria'}</td>
-                            <td><span style="color:#10b981;"><i class="fas fa-check-circle"></i> Ativo</span></td>
+                                                        <td><span style="color:#10b981;"><i class="fas fa-check-circle"></i> Ativo</span></td>
                         </tr>
                     `;
                 });
                 tbody.innerHTML = html;
             } catch(e) {
                 console.error(e);
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#ef4444;">Erro ao carregar líderes da secretaria.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#ef4444;">Erro ao carregar líderes da secretaria.</td></tr>';
             }
         }
 
@@ -1033,7 +1015,7 @@
             try {
                 const snap = await db.collection('ministerios_list').get();
                 if(snap.empty) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-dim);">Nenhum ministério cadastrado na secretaria.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-dim);">Nenhum ministério cadastrado na secretaria.</td></tr>';
                     return;
                 }
                 
@@ -1055,7 +1037,7 @@
                 tbody.innerHTML = html;
             } catch(e) {
                 console.error(e);
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#ef4444;">Erro ao carregar ministérios da secretaria.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#ef4444;">Erro ao carregar ministérios da secretaria.</td></tr>';
             }
         }
 
@@ -1504,17 +1486,26 @@
                         else if(d.tipo === 'Atualização') color = '#3b82f6';
                         else if(d.tipo === 'Saída' || d.tipo === 'Exclusão') color = '#ef4444';
 
+                        // Simplify description
+                        let shortDesc = d.descricao;
+                        if(shortDesc.includes("foi registrado(a) pela primeira vez no sistema")) {
+                            let nome = shortDesc.split(" foi ")[0];
+                            nome = nome.charAt(0).toUpperCase() + nome.slice(1);
+                            shortDesc = `${nome} entrou`;
+                        } else if (shortDesc.includes("publicou uma nova escala")) {
+                            let partes = shortDesc.split("nova escala de culto: ");
+                            if (partes.length > 1) {
+                                shortDesc = `Escala criada: ${partes[1].split(" para ")[0]}`;
+                            }
+                        }
+
+                        let timeStr = dateObj.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+                        let dateStr = dateObj.toLocaleDateString('pt-BR').substring(0,5);
+
                         html += `
-                            <div style="display:flex; gap:15px; margin-bottom:15px; background:#1e293b; padding:15px; border-radius:12px; border-left:3px solid ${color};">
-                                <div style="min-width:70px; text-align:right;">
-                                    <div style="font-size:0.75rem; color:#94a3b8; font-weight:800;">${dateObj.toLocaleDateString('pt-BR')}</div>
-                                    <div style="font-size:0.7rem; color:#64748b;">${dateObj.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</div>
-                                </div>
-                                <div>
-                                    <div style="font-size:0.8rem; color:${color}; font-weight:800; text-transform:uppercase; margin-bottom:3px;">${d.tipo}</div>
-                                    <div style="font-size:0.95rem; color:#f8fafc;">${d.descricao}</div>
-                                    <div style="font-size:0.75rem; color:#64748b; margin-top:4px;"><i class="fas fa-user-circle"></i> Responsável: ${d.responsavel}</div>
-                                </div>
+                            <div style="padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.03); display:flex; gap:15px; align-items:baseline;">
+                                <div style="color:var(--text-dim); font-size:0.85rem; min-width:85px; font-variant-numeric: tabular-nums;">${dateStr} &middot; ${timeStr}</div>
+                                <div style="font-size:0.9rem; color:#cbd5e1;">${shortDesc}</div>
                             </div>
                         `;
                     });
