@@ -103,16 +103,8 @@ window.renderKidsSelection = function(filter = '') {
         const kidName = k.name || k.child_name || k.nome || 'Sem Nome';
         const parentName = k.parent || k.parent_name || k.responsavel || 'Responsável não informado';
 
-            div.innerHTML = 
-        <div style="flex:1;">
-            <strong style="font-size:1.15rem; display:block; color:#F8FAFC; margin-bottom:4px;"></strong>
-            <div style='font-size:0.85rem; color:#94A3B8;'>Resp: <b style="color:#CBD5E1;"></b></div>
-        </div>
-        <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
-            <div style="font-size:0.85rem; color:#94A3B8; font-weight:600;"></div>
-            <div style="font-size:0.75rem; color:#10B981; font-weight:700; display:flex; align-items:center; gap:4px;"><span style="display:block; width:6px; height:6px; background:#10B981; border-radius:50%;"></span> Entregue</div>
-        </div>
-    ; justify-content:space-between; align-items:center;">
+        div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div style="flex:1;">
                     <strong style="font-size:1.15rem; display:block; color:var(--text-light); margin-bottom:4px;">${kidName}</strong>
                     <div style='font-size:0.85rem; color:var(--text-muted); display:flex; align-items:center; gap:6px;'>
@@ -1136,27 +1128,25 @@ window.appendKidToMural = function(id, data) {
     if (!container) return;
     
     // Clear waiting text if it's there
-    if(container.innerHTML.includes('Aguardando atualizações') || container.innerHTML.includes('Nenhuma criança')) {
+    if(container.innerHTML.includes('Aguardando atualiza') || container.innerHTML.includes('Nenhuma crian')) {
         container.innerHTML = '';
     }
 
     const div = document.createElement('div');
-    // Premium Antigravity Card
+    // Dark Theme Antigravity Card
     div.style.cssText = "background:#111827; border:1px solid #1F2937; padding:18px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1);";
     div.innerHTML = `
         <div style="flex:1;">
-            <strong style="font-size:1.15rem; display:block; color:var(--text-light); margin-bottom:4px;">${data.name || 'Criança'}</strong>
-            <div style='font-size:0.85rem; color:var(--text-muted);'>Resp: <b>${data.parent_name || data.parent || 'Não informado'}</b></div>
+            <strong style="font-size:1.15rem; display:block; color:#F8FAFC; margin-bottom:4px;">${data.name || 'Criança'}</strong>
+            <div style='font-size:0.85rem; color:#94A3B8;'>Resp: <b style="color:#CBD5E1;">${data.parent_name || data.parent || 'Não informado'}</b></div>
         </div>
-        <div style="text-align:right;">
-            <span style="background:rgba(16, 185, 129, 0.1); color:#059669; border:1px solid rgba(16, 185, 129, 0.2); padding:6px 12px; border-radius:20px; font-size:0.8rem; font-weight:800; display:inline-block;">
-                 ${data.age_group || 'Sala'}
-            </span>
-            <div style="font-size:0.7rem; color:#999; margin-top:5px;">Entregue</div>
+        <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+            <div style="font-size:0.85rem; color:#94A3B8; font-weight:600;">${data.age_group || ''}</div>
+            <div style="font-size:0.75rem; color:#10B981; font-weight:700; display:flex; align-items:center; gap:4px;"><span style="display:block; width:6px; height:6px; background:#10B981; border-radius:50%;"></span> Entregue</div>
         </div>
     `;
-    // Prepend so newest is on top
-    container.insertBefore(div, container.firstChild);
+    
+    container.appendChild(div);
 }
 
 function checkMuralEmpty() {
