@@ -275,13 +275,12 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
                 <img src="assets/logo_3.png" height="35" style="filter: drop-shadow(0 0 5px rgba(201, 160, 80, 0.3));">
-                <h1 style="font-size: 1.1rem; margin: 0; font-weight: 800; letter-spacing: 1px; color:#fff;">CES LAUSANNE</h1>
             </div>
 
             <nav class="sidebar-nav">
                 <div class="nav-item active" onclick="switchPage('dashboard')" id="nav-dashboard">
                     <i class="fas fa-home"></i>
-                    <span>Dashboard</span>
+                    <span>Início</span>
                 </div>
                 <div class="nav-item" onclick="switchPage('lideres')" id="nav-lideres">
                     <i class="fas fa-users"></i>
@@ -303,10 +302,7 @@
                     <i class="fas fa-scroll"></i>
                     <span>Diretrizes</span>
                 </div>
-                <div class="nav-item" onclick="switchPage('escalas')" id="nav-escalas">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Escala de Cultos</span>
-                </div>
+
                 <div class="nav-item" onclick="switchPage('relatorios')" id="nav-relatorios">
                     <i class="fas fa-chart-bar"></i>
                     <span>Relatórios</span>
@@ -345,272 +341,54 @@
 
             <!-- PAGE: DASHBOARD -->
             <div id="page-dashboard" class="page-content active">
-                <!-- KPIs -->
-                <div class="kpi-row" style="padding:0; margin-bottom:25px;">
-                    <div class="kpi-card">
-                        <div class="kpi-number" id="kpi-lideres">0</div>
-                        <div style="font-size:0.8rem; color:var(--text-dim); text-transform:uppercase; font-weight:800; letter-spacing:1px; margin-top:5px;">Líderes Ativos</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-number" id="kpi-ministerios">0</div>
-                        <div style="font-size:0.8rem; color:var(--text-dim); text-transform:uppercase; font-weight:800; letter-spacing:1px; margin-top:5px;">Ministérios</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-number" id="kpi-igreja">0</div>
-                        <div style="font-size:0.8rem; color:var(--text-dim); text-transform:uppercase; font-weight:800; letter-spacing:1px; margin-top:5px;">Igreja</div>
-                    </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h2 style="font-size: 1.4rem; font-weight: 800; color: #fff; margin:0;">Escalas</h2>
+                    <button class="btn-gold" style="width:auto; padding:8px 16px; font-size:0.85rem;" onclick="openNovaEscala()"><i class="fas fa-plus"></i> Criar</button>
                 </div>
 
-                <!-- TOP QUICK ESCALA AD -->
-                <div class="glass-card" style="margin-bottom:25px; background: linear-gradient(135deg, rgba(201, 160, 80, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);">
-                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
-                        <div>
-                            <h3 style="margin:0; color:var(--gold); font-size:1.2rem; font-weight:800; text-transform:uppercase;"><i class="fas fa-calendar-day"></i> Escala de Cultos</h3>
-                            <p style="margin:5px 0 0 0; color:var(--text-dim); font-size:0.85rem;">Gerencie as escalas dos próximos cultos da igreja e compartilhe com as equipes.</p>
-                        </div>
-                        <button class="btn-gold" style="width:auto; padding:10px 20px;" onclick="openNovaEscala()"><i class="fas fa-plus"></i> Nova Escala</button>
-                    </div>
-                </div>
-
-                <!-- 3 COLUMNS -->
-                <div class="dashboard-grid" style="padding:0;">
-                    <!-- COLUMN 1: ATA DIGITAL -->
-                    <div class="glass-card">
-                        <h3 style="margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px; color:var(--gold);"><i class="fas fa-history"></i> Ata Digital (Real-Time)</h3>
-                        <div id="ata-digital-feed" style="overflow-y:auto; max-height:450px; padding-right:5px;">
-                            <div style="text-align:center; padding:20px; color:var(--text-dim);">Carregando feed...</div>
-                        </div>
-                    </div>
-
-                    <!-- COLUMN 2: DIRETRIZES -->
-                    <div class="glass-card">
-                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:15px;">
-                            <h3 style="margin:0; color:var(--gold);"><i class="fas fa-paper-plane"></i> Diretrizes Pastorais</h3>
-                            <button onclick="document.getElementById('modal-nova-diretriz').style.display='flex'" style="background:var(--gold-dim); border:1px solid var(--border); color:#fff; border-radius:8px; padding:5px 10px; cursor:pointer; font-size:0.8rem; font-weight:800;"><i class="fas fa-plus"></i> Despachar</button>
-                        </div>
-                        <div style="flex:1; display:flex; flex-direction:column; gap:15px; overflow-y:auto; max-height:450px;">
-                            <h4 style="margin:0; font-size:0.85rem; text-transform:uppercase; color:var(--gold);">Enviadas / Ativas</h4>
-                            <div id="gabinete-active-list" style="overflow-y:auto;">
-                                <div style="text-align:center; padding:20px; color:var(--text-dim);">Carregando diretrizes...</div>
-                            </div>
-                            <h4 style="margin:20px 0 0 0; font-size:0.85rem; text-transform:uppercase; color:var(--text-dim); border-top:1px solid var(--border); padding-top:15px;">Histórico (Concluídas)</h4>
-                            <div id="gabinete-history-list" style="overflow-y:auto;"></div>
-                        </div>
-                    </div>
-
-                    <!-- COLUMN 3: ESCALAS SUMMARY -->
-                    <div class="glass-card">
-                        <h3 style="margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px; color:var(--gold);"><i class="fas fa-calendar-alt"></i> Escala de Cultos</h3>
-                        <div style="flex:1; display:flex; flex-direction:column; gap:15px; overflow-y:auto; max-height:450px;">
-                            <h4 style="margin:0; font-size:0.85rem; text-transform:uppercase; color:var(--gold);">Próximos Cultos</h4>
-                            <div id="dashboard-proximos-cultos">
-                                <div style="text-align:center; padding:15px; color:var(--text-dim); font-size:0.85rem;">Carregando...</div>
-                            </div>
-                            <h4 style="margin:20px 0 0 0; font-size:0.85rem; text-transform:uppercase; color:var(--text-dim); border-top:1px solid var(--border); padding-top:15px;">Escalas Recentes</h4>
-                            <div id="dashboard-recentes-cultos">
-                                <div style="text-align:center; padding:15px; color:var(--text-dim); font-size:0.85rem;">Carregando...</div>
-                            </div>
-                            <div style="margin-top:15px; text-align:center;">
-                                <a href="javascript:void(0)" onclick="switchPage('escalas')" style="color:var(--gold); font-size:0.9rem; font-weight:800; text-decoration:none;">Ver todas as escalas <i class="fas fa-chevron-right"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PAGE: ESCALAS (List View) -->
-            <div id="page-escalas" class="page-content">
-                <div class="glass-card">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:15px;">
-                        <div>
-                            <h3 style="margin:0; color:var(--gold); font-size:1.5rem;"><i class="fas fa-calendar-alt"></i> Gerenciamento de Escalas</h3>
-                            <p style="margin:5px 0 0 0; color:var(--text-dim); font-size:0.9rem;">Histórico completo e agendamentos de escalas de culto.</p>
-                        </div>
-                        <button class="btn-gold" style="width:auto; padding:10px 20px;" onclick="openNovaEscala()"><i class="fas fa-plus"></i> Criar Nova Escala</button>
-                    </div>
-
-                    <div style="overflow-x:auto;">
-                        <table class="premium-table">
-                            <thead>
-                                <tr>
-                                    <th>Data</th>
-                                    <th>Culto</th>
-                                    <th>Dirigente</th>
-                                    <th>Tipo</th>
-                                    <th>Status</th>
-                                    <th style="text-align:right;">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="escalas-table-body">
-                                <tr>
-                                    <td colspan="6" style="text-align:center; color:var(--text-dim); padding:40px;">Carregando escalas salvas...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PAGE: NOVA ESCALA (Wizard View) -->
-            <div id="page-nova-escala" class="page-content">
-                <div class="glass-card" style="max-width:900px; margin:0 auto;">
-                    <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
-                        <button onclick="switchPage('escalas')" style="background:transparent; border:1px solid var(--border); color:#fff; width:35px; height:35px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="fas fa-arrow-left"></i></button>
-                        <div>
-                            <h3 style="margin:0; color:var(--gold); font-size:1.4rem;" id="wizard-title">Nova Escala de Culto</h3>
-                            <p style="margin:2px 0 0 0; color:var(--text-dim); font-size:0.85rem;">Preencha os detalhes e a programação oficial do culto.</p>
-                        </div>
-                    </div>
-
-                    <!-- Step Tracker -->
-                    <div class="wizard-steps">
-                        <div class="wizard-step active" id="wstep-1">1. Informações</div>
-                        <div class="wizard-step" id="wstep-2">2. Programação</div>
-                        <div class="wizard-step" id="wstep-3">3. Participantes</div>
-                        <div class="wizard-step" id="wstep-4">4. Revisão</div>
-                    </div>
-
-                    <!-- Hidden Edit ID -->
-                    <input type="hidden" id="escala-id">
-
-                    <!-- STEP 1: INFORMAÇÕES -->
-                    <div class="wizard-form-step active" id="wform-1">
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-                            <div>
-                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Nome do Culto</label>
-                                <input type="text" id="escala-nome" placeholder="Ex: Culto das Primícias">
-                            </div>
-                            <div>
-                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Tipo de Culto</label>
-                                <select id="escala-tipo-culto" onchange="prefillProgramacao()">
-                                    <option value="Outro">Outro (Manual)</option>
-                                    <option value="Domingo Manhã">Domingo Manhã (Culto das Primícias)</option>
-                                    <option value="Domingo Noite">Domingo Noite (Celebração)</option>
-                                    <option value="Terça-feira">Terça-feira (Ensino/Alicerce)</option>
-                                    <option value="Sexta-feira">Sexta-feira (Clamor)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:15px; margin-top:10px;">
-                            <div>
-                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Data</label>
-                                <input type="date" id="escala-data">
-                            </div>
-                            <div>
-                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Horário de Início</label>
-                                <input type="time" id="escala-horario">
-                            </div>
-                            <div>
-                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Local</label>
-                                <input type="text" id="escala-local" value="Templo Sede">
-                            </div>
-                        </div>
-
-                        <div style="margin-top:10px;">
-                            <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Tema / Descrição</label>
-                            <input type="text" id="escala-tema" placeholder="Ex: Provai e vede que o Senhor é bom.">
-                        </div>
-
-                        <div style="margin-top:10px;">
-                            <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Dirigente do Culto</label>
-                            <input type="text" id="escala-dirigente" placeholder="Ex: Pb. Binho Ribeiro">
-                        </div>
-
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:10px;">
-                            <div>
-                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Repetir escala?</label>
-                                <select id="escala-repetir">
-                                    <option value="Não">Não repetir</option>
-                                    <option value="Semanal">Semanalmente</option>
-                                    <option value="Mensal">Mensalmente</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Publicar escala?</label>
-                                <select id="escala-status">
-                                    <option value="Publicada">Sim - Disponível no Altar e Geral</option>
-                                    <option value="Rascunho">Não - Salvar como Rascunho</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div style="margin-top:10px;">
-                            <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Observações</label>
-                            <textarea id="escala-obs" rows="3" placeholder="Avisos gerais ou observações da escala..."></textarea>
-                        </div>
-
-                        <div style="display:flex; justify-content:flex-end; margin-top:20px;">
-                            <button class="btn-gold" style="width:auto; padding:12px 30px;" onclick="goToStep(2)">Próximo <i class="fas fa-arrow-right"></i></button>
-                        </div>
-                    </div>
-
-                    <!-- STEP 2: PROGRAMAÇÃO -->
-                    <div class="wizard-form-step" id="wform-2">
-                        <p style="color:var(--text-dim); font-size:0.9rem; margin-bottom:20px;">Adicione as atividades e momentos do culto na ordem sequencial.</p>
+                <div class="dashboard-grid" style="padding:0; grid-template-columns: 1fr 1fr;">
+                    
+                    <!-- LEFT COLUMN: ESCALAS -->
+                    <div style="display:flex; flex-direction:column; gap:20px;">
                         
-                        <div id="escala-itens-container">
-                            <!-- Injected rows of program items -->
+                        <!-- NEXT CULTO -->
+                        <div class="glass-card" style="background:#111827; border:1px solid #1F2937;">
+                            <h3 style="margin-top:0; border-bottom:1px solid #1F2937; padding-bottom:10px; color:var(--text-dim); font-size:0.8rem; text-transform:uppercase; letter-spacing:1px;">Próximo Culto</h3>
+                            <div id="proximo-culto-container" style="padding-top:10px; min-height:100px;">
+                                <div style="text-align:center; color:var(--text-dim);">Carregando próximo culto...</div>
+                            </div>
                         </div>
 
-                        <button onclick="addProgramacaoRow()" style="background:transparent; border:1px dashed var(--gold); color:var(--gold); border-radius:10px; padding:12px; cursor:pointer; width:100%; font-weight:700; margin-top:10px;"><i class="fas fa-plus"></i> Adicionar Atividade</button>
-
-                        <div style="display:flex; justify-content:space-between; margin-top:30px;">
-                            <button onclick="goToStep(1)" style="background:transparent; border:1px solid var(--border); color:#fff; padding:12px 25px; border-radius:10px; cursor:pointer;"><i class="fas fa-arrow-left"></i> Voltar</button>
-                            <button class="btn-gold" style="width:auto; padding:12px 30px;" onclick="goToStep(3)">Próximo <i class="fas fa-arrow-right"></i></button>
+                        <!-- ESCALAS RECENTES -->
+                        <div class="glass-card" style="background:#111827; border:1px solid #1F2937;">
+                            <h3 style="margin-top:0; border-bottom:1px solid #1F2937; padding-bottom:10px; color:var(--text-dim); font-size:0.8rem; text-transform:uppercase; letter-spacing:1px;">Escalas Recentes</h3>
+                            <div id="escalas-recentes-container" style="padding-top:10px;">
+                                <div style="text-align:center; color:var(--text-dim);">Carregando escalas...</div>
+                            </div>
                         </div>
+
                     </div>
 
-                    <!-- STEP 3: PARTICIPANTES -->
-                    <div class="wizard-form-step" id="wform-3">
-                        <p style="color:var(--text-dim); font-size:0.9rem; margin-bottom:20px;">Defina os responsáveis pelas demais equipes de apoio no culto.</p>
+                    <!-- RIGHT COLUMN: ATIVIDADE & DIRETRIZES -->
+                    <div style="display:flex; flex-direction:column; gap:20px;">
                         
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-                            <div>
-                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Ministério de Louvor</label>
-                                <input type="text" id="escala-part-louvor" placeholder="Ex: Banda Lausanne e Backs">
+                        <!-- DIRETRIZES PASTORAIS (Only shows if active) -->
+                        <div class="glass-card" id="diretrizes-block" style="display:none; background:#111827; border:1px solid #1F2937; border-left:4px solid var(--gold);">
+                            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1F2937; padding-bottom:10px; margin-bottom:15px;">
+                                <h3 style="margin:0; font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:#fff;">Diretrizes Pastorais Pendentes</h3>
+                                <button onclick="document.getElementById('modal-nova-diretriz').style.display='flex'" style="background:transparent; border:none; color:var(--gold); cursor:pointer; font-size:0.8rem; font-weight:800;"><i class="fas fa-plus"></i></button>
                             </div>
-                            <div>
-                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Sonoplastia / Mídia / Projeção</label>
-                                <input type="text" id="escala-part-midia" placeholder="Ex: Equipe de Mídia">
-                            </div>
+                            <div id="gabinete-active-list" style="overflow-y:auto; max-height:200px;"></div>
                         </div>
 
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:10px;">
-                            <div>
-                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Recepção / Diaconato</label>
-                                <input type="text" id="escala-part-recepcao" placeholder="Ex: Pb. Binho e Diáconos">
-                            </div>
-                            <div>
-                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Kids (Espaço Crianças)</label>
-                                <input type="text" id="escala-part-kids" placeholder="Ex: Ministério Infantil">
+                        <!-- ATIVIDADE RECENTE -->
+                        <div class="glass-card" style="background:#111827; border:1px solid #1F2937;">
+                            <h3 style="margin-top:0; border-bottom:1px solid #1F2937; padding-bottom:10px; color:var(--text-dim); font-size:0.8rem; text-transform:uppercase; letter-spacing:1px;">Atividade Recente</h3>
+                            <div id="ata-digital-feed" style="overflow-y:auto; max-height:400px; padding-top:10px; padding-right:5px;">
+                                <div style="text-align:center; color:var(--text-dim);">Carregando feed...</div>
                             </div>
                         </div>
 
-                        <div style="margin-top:10px;">
-                            <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Intercessão / Oração Apoio</label>
-                            <input type="text" id="escala-part-intercessao" placeholder="Ex: Equipe de Clamor">
-                        </div>
-
-                        <div style="display:flex; justify-content:space-between; margin-top:30px;">
-                            <button onclick="goToStep(2)" style="background:transparent; border:1px solid var(--border); color:#fff; padding:12px 25px; border-radius:10px; cursor:pointer;"><i class="fas fa-arrow-left"></i> Voltar</button>
-                            <button class="btn-gold" style="width:auto; padding:12px 30px;" onclick="goToStep(4)">Próximo <i class="fas fa-arrow-right"></i></button>
-                        </div>
-                    </div>
-
-                    <!-- STEP 4: REVISÃO -->
-                    <div class="wizard-form-step" id="wform-4">
-                        <p style="color:var(--text-dim); font-size:0.9rem; margin-bottom:20px;">Confira a visualização final da folha de escala de culto antes de salvar.</p>
-                        
-                        <!-- Page Preview Box (reproducing the sage sheet look in miniature) -->
-                        <div id="escala-preview-sheet" style="background:#b3d2be; color:#000; border-radius:15px; padding:35px; margin-bottom:25px; box-shadow:0 15px 40px rgba(0,0,0,0.4); font-family:'Outfit';">
-                            <!-- Rendered preview content matching design -->
-                        </div>
-
-                        <div style="display:flex; justify-content:space-between; margin-top:30px;">
-                            <button onclick="goToStep(3)" style="background:transparent; border:1px solid var(--border); color:#fff; padding:12px 25px; border-radius:10px; cursor:pointer;"><i class="fas fa-arrow-left"></i> Voltar</button>
-                            <button class="btn-gold" style="width:auto; padding:12px 35px; background:#10b981; color:#fff;" id="btn-salvar-escala" onclick="salvarEscalaCompleta()"><i class="fas fa-save"></i> Salvar e Publicar</button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -874,6 +652,67 @@
             }
         }
 
+        
+        async function loadEscalasDash() {
+            try {
+                db.collection('escalas').orderBy('data', 'asc').onSnapshot(snap => {
+                    const nextContainer = document.getElementById('proximo-culto-container');
+                    const recentContainer = document.getElementById('escalas-recentes-container');
+                    if(!nextContainer || !recentContainer) return;
+                    
+                    if(snap.empty) {
+                        nextContainer.innerHTML = '<div style="color:var(--text-dim); padding:10px 0;">Nenhum culto agendado.</div>';
+                        recentContainer.innerHTML = '<div style="color:var(--text-dim); padding:10px 0;">Nenhuma escala recente.</div>';
+                        return;
+                    }
+                    
+                    const now = new Date();
+                    now.setHours(0,0,0,0);
+                    
+                    const todas = [];
+                    snap.forEach(doc => {
+                        const data = doc.data();
+                        data.id = doc.id;
+                        todas.push(data);
+                    });
+                    
+                    const futuras = todas.filter(d => new Date(d.data + 'T00:00:00') >= now);
+                    const proximas = futuras.slice(0, 1);
+                    const recentes = todas.slice(0, 5); // Just show the top 5
+                    
+                    if(proximas.length > 0) {
+                        const p = proximas[0];
+                        const dObj = new Date(p.data + 'T00:00:00');
+                        
+                        nextContainer.innerHTML = `
+                            <div style="font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 5px;">${p.nome_culto || 'Culto'}</div>
+                            <div style="font-size: 0.9rem; color: var(--gold); font-weight: 700; margin-bottom: 10px;">${dObj.toLocaleDateString('pt-BR')} &middot; ${p.programacao && p.programacao[0] ? p.programacao[0].horario : '00:00'}</div>
+                            <div style="font-size: 0.85rem; color: var(--text-dim);">
+                                Dirigente: <span style="color:#CBD5E1;">${p.dirigente || 'Não informado'}</span><br>
+                                Local: <span style="color:#CBD5E1;">${p.local || 'Sede'}</span>
+                            </div>
+                        `;
+                    } else {
+                        nextContainer.innerHTML = '<div style="color:var(--text-dim); padding:10px 0;">Nenhum culto futuro.</div>';
+                    }
+                    
+                    let rHtml = '';
+                    recentes.forEach(r => {
+                        const dObj = new Date(r.data + 'T00:00:00');
+                        rHtml += `
+                            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #1F2937;">
+                                <div style="font-size:0.9rem; color:#fff; font-weight:600;">${r.nome_culto || 'Culto'}</div>
+                                <div style="font-size:0.75rem; color:var(--text-dim);">${dObj.toLocaleDateString('pt-BR')}</div>
+                            </div>
+                        `;
+                    });
+                    recentContainer.innerHTML = rHtml;
+                });
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
         async function loadAtaDigitalFeed() {
             const feedContainer = document.getElementById('ata-digital-feed');
             try {
@@ -916,14 +755,16 @@
 
         async function loadGabineteCards() {
             const activeList = document.getElementById('gabinete-active-list');
-            const historyList = document.getElementById('gabinete-history-list');
 
             try {
                 // Pendentes
                 db.collection('pastoral_tasks').where('status', '==', 'pendente').onSnapshot(snapP => {
+                    const block = document.getElementById('diretrizes-block');
                     if(snapP.empty) {
-                        activeList.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8; font-size:0.9rem;">Nenhuma diretriz pendente no momento.</div>';
+                        if(block) block.style.display = 'none';
+                        if(activeList) activeList.innerHTML = '';
                     } else {
+                        if(block) block.style.display = 'block';
                         let htmlP = '';
                         snapP.forEach(doc => {
                             const d = doc.data();
@@ -940,29 +781,6 @@
                             `;
                         });
                         activeList.innerHTML = htmlP;
-                    }
-                });
-
-                // Concluidas
-                db.collection('pastoral_tasks').where('status', '==', 'concluido').orderBy('concluido_em', 'desc').limit(15).onSnapshot(snapC => {
-                    if(snapC.empty) {
-                        historyList.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8; font-size:0.9rem;">O histórico está vazio.</div>';
-                    } else {
-                        let htmlC = '';
-                        snapC.forEach(doc => {
-                            const d = doc.data();
-                            const dateObj = d.concluido_em ? d.concluido_em.toDate() : new Date();
-                            htmlC += `
-                                <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #334155;">
-                                    <div>
-                                        <div style="color:#94a3b8; font-size:0.85rem; text-decoration:line-through;">${d.titulo}</div>
-                                        <div style="font-size:0.7rem; color:#64748b;">${d.tipo} • ${dateObj.toLocaleDateString('pt-BR')}</div>
-                                    </div>
-                                    <i class="fas fa-check-circle" style="color:#10b981;"></i>
-                                </div>
-                            `;
-                        });
-                        historyList.innerHTML = htmlC;
                     }
                 });
             } catch(e) {
