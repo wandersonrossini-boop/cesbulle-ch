@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link rel="icon" href="assets/logo_3.png">
     <script>
-        // EMERGENCY CACHE BUSTER v70.3.89
+        // EMERGENCY CACHE BUSTER v70.3.91
         (function() {
             // Unregister all Service Workers immediately
             if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
@@ -23,7 +23,7 @@
                 });
             }
 
-            const CURRENT_VER = "70.3.89";
+            const CURRENT_VER = "70.3.91";
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('v') !== CURRENT_VER && window.location.protocol !== 'file:') {
                 urlParams.set('v', CURRENT_VER);
@@ -41,8 +41,8 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="js/firebase-config.js?v=70.3.89"></script>
-    <script src="js/auth-manager.js?v=70.3.89"></script>
+    <script src="js/firebase-config.js?v=70.3.91"></script>
+    <script src="js/auth-manager.js?v=70.3.91"></script>
 
     <style>
         :root {
@@ -387,11 +387,11 @@
         <!-- Top Bar Branding -->
         <div class="portal-top-bar">
             <div class="portal-brand">
-                <img src="assets/logo_3.png?v=70.3.89" alt="CME Lausanne Logo">
+                <img src="assets/logo_3.png?v=70.3.91" alt="CME Lausanne Logo">
                 <span class="portal-brand-text">CME Lausanne</span>
             </div>
             <div class="avatar-circle">
-                <img src="assets/logo_3.png?v=70.3.89" alt="Logo avatar">
+                <img src="assets/logo_3.png?v=70.3.91" alt="Logo avatar">
             </div>
         </div>
 
@@ -534,7 +534,7 @@
     <!-- APP NAVIGATION SHELL -->
     <header class="app-header" id="app-header">
         <div style="display:flex; align-items:center; gap:12px;">
-            <img src="assets/logo_3.png?v=70.3.89" style="height:34px; width:auto;">
+            <img src="assets/logo_3.png?v=70.3.91" style="height:34px; width:auto;">
             <span style="font-family: var(--font-heading); font-size: 0.85rem; font-weight: 700; color: #E2E8F0; letter-spacing: 1.5px;">CME LAUSANNE</span>
         </div>
         <i class="fas fa-power-off" style="color:#EF4444; font-size: 1.2rem; cursor:pointer;" onclick="logout()"></i>
@@ -762,7 +762,7 @@
                 const iframe = document.createElement('iframe');
                 iframe.id = 'iframe-' + moduleName;
                 const authRole = moduleName === 'admin' ? 'admin' : 'integracao';
-                iframe.src = srcFile + "?v=70.3.89&role=" + authRole;
+                iframe.src = srcFile + "?v=70.3.91&role=" + authRole;
                 
                 wrapper.appendChild(iframe);
                 container.appendChild(wrapper);

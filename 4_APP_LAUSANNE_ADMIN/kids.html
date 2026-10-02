@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CME Lausanne Kids</title>
+    <title>KIDS</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="js/firebase-config.js?v=70.3.87"></script>
+    <script src="js/firebase-config.js?v=70.3.90"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -177,38 +177,38 @@
             waiting.forEach(d => {
                 const item = document.createElement('div');
                 item.className = 'kid-card';
-                item.innerHTML = 
+                item.innerHTML = `
                     <div class="kid-info-row">
                         <div>
-                            <div class="kid-name"></div>
-                            <div class="kid-parent">Responsável: </div>
+                            <div class="kid-name">${d.name}</div>
+                            <div class="kid-parent">Responsável: ${d.parent_name || 'N/A'}</div>
                         </div>
-                        <div class="kid-age"></div>
+                        <div class="kid-age">${d.age_group || ''}</div>
                     </div>
                     <div class="actions-row">
-                        <button class="btn-confirm" onclick="updateStatus('', 'confirmed')">Confirmar</button>
+                        <button class="btn-confirm" onclick="updateStatus('${d.id}', 'confirmed')">Confirmar</button>
                     </div>
-                ;
+                `;
                 listWaiting.appendChild(item);
             });
 
-            document.getElementById('presence-header-title').innerHTML = PRESENÇAS HOJE &middot; ;
+            document.getElementById('presence-header-title').innerHTML = `PRESENÇAS HOJE &middot; ${active.length}`;
             active.forEach((d, i) => {
                 const item = document.createElement('div');
                 item.className = 'kid-card';
-                item.innerHTML = 
+                item.innerHTML = `
                     <div class="kid-info-row">
                         <div>
-                            <div class="kid-name"></div>
-                            <div class="kid-parent">Responsável: </div>
+                            <div class="kid-name">${d.name}</div>
+                            <div class="kid-parent">Responsável: ${d.parent_name || 'N/A'}</div>
                         </div>
-                        <div class="kid-age"></div>
+                        <div class="kid-age">${d.age_group || ''}</div>
                     </div>
                     <div class="actions-row">
                         <div class="presence-status">Sala ativa</div>
-                        <button class="btn-checkout" onclick="checkoutKid('', '')">Encerrar</button>
+                        <button class="btn-checkout" onclick="checkoutKid('${d.id}', '${d.name}')">Encerrar</button>
                     </div>
-                ;
+                `;
                 listActive.appendChild(item);
             });
         }
@@ -218,7 +218,7 @@
         }
         
         function checkoutKid(id, name) {
-            if(confirm(Deseja encerrar a presença de ?)) {
+            if(confirm(`Deseja encerrar a presença de ${name}?`)) {
                 updateStatus(id, 'finished');
             }
         }
