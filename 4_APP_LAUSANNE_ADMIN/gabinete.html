@@ -284,38 +284,24 @@
 
             <nav class="sidebar-nav">
                 <div style="font-size: 0.65rem; color: var(--text-dim); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin: 15px 0 10px 15px;">Operação</div>
-                <div class="nav-item active" onclick="switchPage('dashboard')" id="nav-dashboard">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Escalas</span>
+                <div class="nav-item active" onclick="switchPage('dashboard')" id="nav-dashboard"><span>Escalas</span>
                 </div>
                 
                 <div style="font-size: 0.65rem; color: var(--text-dim); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin: 25px 0 10px 15px;">Registros</div>
-                <div class="nav-item" onclick="switchPage('ata')" id="nav-ata">
-                    <i class="fas fa-history"></i>
-                    <span>Ata Digital</span>
+                <div class="nav-item" onclick="switchPage('ata')" id="nav-ata"><span>Ata Digital</span>
                 </div>
                 
 
                 <div style="font-size: 0.65rem; color: var(--text-dim); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin: 25px 0 10px 15px;">Gestão</div>
-                <div class="nav-item" onclick="switchPage('lideres')" id="nav-lideres">
-                    <i class="fas fa-users"></i>
-                    <span>Líderes</span>
+                <div class="nav-item" onclick="switchPage('lideres')" id="nav-lideres"><span>Líderes</span>
                 </div>
-                <div class="nav-item" onclick="switchPage('ministerios')" id="nav-ministerios">
-                    <i class="fas fa-sitemap"></i>
-                    <span>Ministérios</span>
+                <div class="nav-item" onclick="switchPage('ministerios')" id="nav-ministerios"><span>Ministérios</span>
                 </div>
-                <div class="nav-item" onclick="switchPage('ordens')" id="nav-ordens">
-                    <i class="fas fa-tasks"></i>
-                    <span>Ordens</span>
+                <div class="nav-item" onclick="switchPage('ordens')" id="nav-ordens"><span>Ordens</span>
                 </div>
-                <div class="nav-item" onclick="switchPage('diretrizes')" id="nav-diretrizes">
-                    <i class="fas fa-book"></i>
-                    <span>Diretrizes</span>
+                <div class="nav-item" onclick="switchPage('diretrizes')" id="nav-diretrizes"><span>Diretrizes</span>
                 </div>
-                <div class="nav-item" onclick="switchPage('settings')" id="nav-settings">
-                    <i class="fas fa-cog"></i>
-                    <span>Configurações</span>
+                <div class="nav-item" onclick="switchPage('settings')" id="nav-settings"><span>Configurações</span>
                 </div>
             </nav>
 
@@ -341,7 +327,7 @@
                 <div id="page-dashboard" class="page-content active">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                         <h2 style="font-size: 1.4rem; font-weight: 800; color: #fff; margin:0;">Escalas</h2>
-                        <button class="btn-gold" style="width:auto; padding:8px 16px; font-size:0.85rem;" onclick="openNovaEscala()"><i class="fas fa-plus"></i> CRIAR</button>
+                        <button class="btn-gold" style="width:auto; padding:8px 16px; font-size:0.85rem;" onclick="openNovaEscala()">Criar</button>
                     </div>
 
                     <div class="dashboard-grid" style="padding:0; grid-template-columns: 1fr 1fr;">
@@ -397,10 +383,10 @@
                 <div class="glass-card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:15px;">
                         <div>
-                            <h3 style="margin:0; color:var(--gold); font-size:1.5rem;"><i class="fas fa-calendar-alt"></i> Gerenciamento de Escalas</h3>
+                            <h3 style="margin:0; color:var(--gold); font-size:1.5rem;">Gerenciamento de Escalas</h3>
                             <p style="margin:5px 0 0 0; color:var(--text-dim); font-size:0.9rem;">Histórico completo e agendamentos de escalas de culto.</p>
                         </div>
-                        <button class="btn-gold" style="width:auto; padding:10px 20px;" onclick="openNovaEscala()"><i class="fas fa-plus"></i> Criar Nova Escala</button>
+                        <button class="btn-gold" style="width:auto; padding:10px 20px;" onclick="openNovaEscala()">Criar Nova Escala</button>
                     </div>
 
                     <div style="overflow-x:auto;">
@@ -592,8 +578,7 @@
             <!-- OTHER PAGES PLACEHOLDERS -->
             <div id="page-lideres" class="page-content">
                 <div class="glass-card">
-                    <h3 style="color:var(--gold); border-bottom:1px solid var(--border); padding-bottom:10px;"><i class="fas fa-users"></i> Gestão de Líderes</h3>
-                    <p style="color:var(--text-dim); margin-top:10px;">Aqui estão listados os líderes ativos em nossa base de dados.</p>
+                    <h3 style="color:var(--gold); border-bottom:1px solid var(--border); padding-bottom:10px;">Líderes</h3>
                     <div style="overflow-x:auto; margin-top:20px;">
                         <table class="premium-table">
                             <thead>
@@ -614,8 +599,7 @@
 
             <div id="page-ministerios" class="page-content">
                 <div class="glass-card">
-                    <h3 style="color:var(--gold); border-bottom:1px solid var(--border); padding-bottom:10px;"><i class="fas fa-sitemap"></i> Ministérios Lausanne</h3>
-                    <p style="color:var(--text-dim); margin-top:10px;">Estrutura organizacional dos departamentos e ministérios cadastrados.</p>
+                    <h3 style="color:var(--gold); border-bottom:1px solid var(--border); padding-bottom:10px;">Ministérios</h3>
                     <div style="overflow-x:auto; margin-top:20px;">
                         <table class="premium-table">
                             <thead>
@@ -636,16 +620,14 @@
 
             <div id="page-ordens" class="page-content">
                 <div class="glass-card">
-                    <h3 style="color:var(--gold); border-bottom:1px solid var(--border); padding-bottom:10px;"><i class="fas fa-tasks"></i> Ordens Pastorais</h3>
-                    <p style="color:var(--text-dim); margin-top:10px;">Acompanhamento das tarefas e diretrizes encaminhadas à Secretaria.</p>
+                    <h3 style="color:var(--gold); border-bottom:1px solid var(--border); padding-bottom:10px;">Ordens</h3>
                     <div id="ordens-gabinete-list" style="margin-top:20px;"></div>
                 </div>
             </div>
 
             <div id="page-ata" class="page-content">
                 <div class="glass-card">
-                    <h3 style="color:var(--gold); border-bottom:1px solid var(--border); padding-bottom:10px;"><i class="fas fa-clipboard-list"></i> Ata Digital Completa</h3>
-                    <p style="color:var(--text-dim); margin-top:10px;">Registro das atividades realizadas no sistema.</p>
+                    <h3 style="color:var(--gold); border-bottom:1px solid var(--border); padding-bottom:10px;">Ata Digital Completa</h3>
                     <div id="ata-digital-feed-completa" style="margin-top:20px; overflow-y:auto; max-height:600px;"></div>
                 </div>
             </div>
@@ -653,7 +635,7 @@
             <div id="page-diretrizes" class="page-content">
                 <div class="glass-card">
                     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:20px;">
-                        <h3 style="margin:0; color:var(--gold);"><i class="fas fa-scroll"></i> Despacho de Diretrizes</h3>
+                        <h3 style="margin:0; color:var(--gold);">Diretrizes</h3>
                         <button class="btn-gold" style="width:auto; padding:8px 20px;" onclick="document.getElementById('modal-nova-diretriz').style.display='flex'"><i class="fas fa-plus"></i> Despachar Diretriz</button>
                     </div>
                     <p style="color:var(--text-dim);">Envie ordens e instruções diretamente ao painel da secretaria e acompanhe a resolução.</p>
@@ -672,16 +654,10 @@
             </div>
 
             <div id="page-settings" class="page-content">
-                <div class="glass-card">
-                    <h3 style="color:var(--gold); border-bottom:1px solid var(--border); padding-bottom:10px;"><i class="fas fa-cog"></i> Configurações do Gabinete</h3>
-                    <p style="color:var(--text-dim); margin-top:10px;">Gerencie as chaves de acesso, PINs de autenticação e opções da conta pastoral.</p>
-                    <div style="display:flex; align-items:center; justify-content:center; padding:100px 0; border:1px dashed var(--border); border-radius:15px; margin-top:20px;">
-                        <div style="text-align:center; color:var(--text-dim);">
-                            <i class="fas fa-user-shield" style="font-size:3rem; color:var(--gold); margin-bottom:15px;"></i>
-                            <h4>Configurações de Segurança e Acesso</h4>
-                            <p style="font-size:0.85rem; margin-top:5px;">Para alterar chaves master ou dados cadastrais, acesse o painel master do servidor.</p>
-                        </div>
-                    </div>
+                <div style="padding-top:10px;">
+                    <h3 style="color:var(--gold); border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px; margin-bottom:20px; font-size:1.1rem;">Configurações</h3>
+                    <div style="margin-bottom:10px; font-weight:700; color:#fff;">Acesso e segurança</div>
+                    <div style="color:var(--text-dim); font-size:0.9rem;">Para alterar chaves de acesso ou dados cadastrais, utilize o painel administrativo.</div>
                 </div>
             </div>
         </main>
@@ -690,7 +666,7 @@
     <!-- MODAL NOVA DIRETRIZ -->
     <div id="modal-nova-diretriz" class="modal">
         <div class="modal-content">
-            <h3 style="margin-top:0; color:var(--gold);"><i class="fas fa-paper-plane"></i> Despachar Diretriz</h3>
+            <h3 style="margin-top:0; color:var(--gold);">Despachar Diretriz</h3>
             <label style="color:#94a3b8; font-size:0.8rem;">Tipo de Ordem</label>
             <select id="gabinete-tipo">
                 <option value="Escala de Culto">Escala de Culto</option>
@@ -1530,15 +1506,12 @@
                             const d = doc.data();
                             const dateObj = d.criado_em ? d.criado_em.toDate() : new Date();
                             html += `
-                                <div style="background:#1e293b; border:1px solid #3b82f6; border-left:4px solid #3b82f6; border-radius:12px; padding:15px; margin-bottom:12px;">
-                                    <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#94a3b8; margin-bottom:5px;">
-                                        <span style="color:#60a5fa; font-weight:800;">${d.tipo}</span>
-                                        <span>${dateObj.toLocaleDateString('pt-BR')}</span>
-                                    </div>
+                                <div style="padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.05); margin-bottom:12px;">
                                     <div style="font-size:1rem; font-weight:800; color:#f8fafc; margin-bottom:5px;">${d.titulo}</div>
                                     <div style="font-size:0.85rem; color:#cbd5e1; margin-bottom:10px;">${d.descricao}</div>
-                                    <div style="display:flex; justify-content:flex-end;">
-                                        <button onclick="concluirDiretriz('${doc.id}')" style="background:#10b981; border:none; color:#000; padding:6px 12px; border-radius:6px; font-weight:800; font-size:0.8rem; cursor:pointer;"><i class="fas fa-check"></i> Marcar Concluída</button>
+                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                        <span style="font-size:0.75rem; color:var(--text-dim);">${d.tipo} &middot; ${dateObj.toLocaleDateString('pt-BR')}</span>
+                                        <button onclick="concluirDiretriz('${doc.id}')" style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:#f8fafc; padding:6px 12px; border-radius:4px; font-weight:600; font-size:0.8rem; cursor:pointer;">Concluir</button>
                                     </div>
                                 </div>
                             `;
@@ -1599,16 +1572,12 @@
                     const badgeColor = d.status === 'pendente' ? '#3b82f6' : '#10b981';
                     
                     html += `
-                        <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border); border-left:4px solid ${badgeColor}; border-radius:12px; padding:15px; margin-bottom:12px;">
-                            <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#94a3b8; margin-bottom:5px;">
-                                <span style="font-weight:800; color:${badgeColor};">${d.tipo}</span>
-                                <span>${dateObj.toLocaleDateString('pt-BR')}</span>
-                            </div>
+                        <div style="padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.05); margin-bottom:12px;">
                             <div style="font-size:1rem; font-weight:800; color:#f8fafc; margin-bottom:5px;">${d.titulo}</div>
-                            <div style="font-size:0.85rem; color:#cbd5e1;">${d.descricao}</div>
+                            <div style="font-size:0.85rem; color:#cbd5e1; margin-bottom:10px;">${d.descricao}</div>
                             <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:var(--text-dim);">
-                                <span>Status: <strong style="color:${badgeColor};">${d.status.toUpperCase()}</strong></span>
-                                ${d.status === 'pendente' ? `<button onclick="concluirDiretriz('${doc.id}')" style="background:#10b981; border:none; color:#000; padding:4px 10px; border-radius:4px; font-weight:800; font-size:0.7rem; cursor:pointer;"><i class="fas fa-check"></i> Concluir</button>` : ''}
+                                <span>${d.tipo} &middot; ${dateObj.toLocaleDateString('pt-BR')} &middot; Status: <strong>${d.status}</strong></span>
+                                ${d.status === 'pendente' ? `<button onclick="concluirDiretriz('${doc.id}')" style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:#f8fafc; padding:6px 12px; border-radius:4px; font-weight:600; font-size:0.8rem; cursor:pointer;">Concluir</button>` : ''}
                             </div>
                         </div>
                     `;
