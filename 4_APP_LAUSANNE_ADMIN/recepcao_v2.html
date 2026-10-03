@@ -1627,24 +1627,19 @@
 
     <!-- RECEPTION BOTTOM NAV -->
     <nav class="bottom-nav">
-        <div class="nav-item active" id="nav-checkin" onclick="setTab('checkin')">
-            
-            <span>Check-in</span>
+        <div class="nav-item active" onclick="switchCheckinMode('mural')">
+            <span>Mural</span>
         </div>
-        <div class="nav-item" id="nav-live" onclick="setTab('live')">
-            
-            <span>Ao Vivo</span>
+        <div class="nav-item" onclick="switchCheckinMode('visitor')">
+            <span>Visitantes</span>
         </div>
-        <div class="nav-item" id="nav-schedule" onclick="setTab('schedule')">
-            
-            <span>Agendar</span>
+        <div class="nav-item" onclick="switchCheckinMode('child')">
+            <span>Crianças</span>
         </div>
-        <div class="nav-item" id="nav-services" onclick="setTab('services')">
-            
-            <span>Servir</span>
+        <div class="nav-item" onclick="setTab('schedule')">
+            <span>Agenda</span>
         </div>
-        <div class="nav-item" id="nav-events" onclick="setTab('events')">
-            
+        <div class="nav-item" onclick="setTab('events')">
             <span>Eventos</span>
         </div>
     </nav>
@@ -1654,21 +1649,21 @@
             <h2 class="brand-title">CME LAUSANNE</h2>
             <div class="brand-sub">RECEPÇÃO</div>
         </div>
-        <div onclick="window.parent.postMessage('go_home', '*');" style="font-size: 0.85rem; font-weight: 600; color: var(--gold); letter-spacing: 0.5px; cursor: pointer;">&larr; INÍCIO</div>
+        
     </div>
     <div class="app-layout">
         <aside class="pc-sidebar">
         <div class="sidebar-brand" style="position: relative;">
             <h2>CME<br>LAUSANNE</h2>
             <div class="sub-brand">RECEPÇÃO</div>
-            <div onclick="window.parent.postMessage('go_home', '*');" style="cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--gold); margin-top: 15px; letter-spacing: 0.5px;">&larr; INÍCIO</div>
+            
         </div>
         <div class="sidebar-nav">
-            <div class="nav-link active" onclick="switchCheckinMode('visitor', this)">Visitante</div>
-            <div class="nav-link" onclick="switchCheckinMode('child', this)">Criança</div>
+            <div class="nav-link active" onclick="switchCheckinMode('mural', this)">Página principal</div>
+            <div class="nav-link" onclick="switchCheckinMode('visitor', this)">Visitantes</div>
+            <div class="nav-link" onclick="switchCheckinMode('child', this)">Crianças</div>
+            <div class="nav-link" onclick="setTab('schedule')">Agenda</div>
             <div class="nav-link" onclick="setTab('events')">Eventos</div>
-            <div class="nav-link" onclick="switchCheckinMode('online', this)">Online / QR</div>
-            <div class="nav-link" onclick="switchCheckinMode('mural', this)">Mural</div>
         </div>
         <div class="sidebar-bottom">
             <div class="logout-link" onclick="if(typeof AuthManager!=='undefined')AuthManager.logout();">Sair</div>
@@ -1707,7 +1702,7 @@
             
 
             <!-- SEGMENTED CONTROL -->
-            <div class="segmented-control" style="margin-bottom: 25px;">
+            <div class="segmented-control" style="display:none; margin-bottom: 25px;">
                 <button class="segment-btn active" onclick="switchCheckinMode('visitor', this)">VISITANTE</button>
                 <button class="segment-btn" onclick="switchCheckinMode('child', this)">CRIANÇA</button>
                 <button class="segment-btn" onclick="switchCheckinMode('online', this)">
@@ -1780,6 +1775,10 @@
                     <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px; line-height:1.4;">
                         Lista de todas as criancas que ja foram <b>recebidas e confirmadas</b> pela equipe da Sala das Criancas hoje.
                     </p>
+<div style="display:flex; gap:10px; margin-bottom: 20px;">
+                        <button onclick="setTab('live')" style="flex:1; padding:10px; border-radius:8px; border:1px solid var(--border-dark); background:var(--navy-main); color:var(--text-light); font-weight:600; cursor:pointer;"><i class="fas fa-bolt" style="color:var(--gold); margin-right:8px;"></i>Ações do Culto</button>
+                        <button onclick="switchCheckinMode('online')" style="flex:1; padding:10px; border-radius:8px; border:1px solid var(--border-dark); background:var(--navy-main); color:var(--text-light); font-weight:600; cursor:pointer;"><i class="fas fa-qrcode" style="color:var(--gold); margin-right:8px;"></i>QR / Links</button>
+                    </div>
 
                     <div id="mural-kids-container" style="display:flex; flex-direction:column; gap:10px;">
                         <div style="text-align:center; color:var(--text-muted); font-style:italic; padding:20px;">
