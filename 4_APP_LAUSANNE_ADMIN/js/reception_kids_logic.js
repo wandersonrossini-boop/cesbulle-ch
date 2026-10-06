@@ -748,7 +748,7 @@ window.submitVisitor = async function () {
         if (isNewPerson && phone && phone.trim() !== '') {
             const cleanPhone = phone.replace(/\D/g, '');
             if (cleanPhone.length >= 8) {
-                const linkCartao = "https://catedral-connect-6c55e.web.app/register_visitor.html?id=" + encodeURIComponent(personId);
+                const linkCartao = "https://catedral-connect-6c55e.web.app/connect.html?id=" + encodeURIComponent(personId);
                 const mensagem = "Olá " + name.trim() + "! Que alegria receber você hoje no CME Lausanne. Para nos conhecermos melhor, por favor preencha rapidamente o seu Cartão de Conexão clicando neste link: " + linkCartao;
                 const whatsappUrl = "https://wa.me/" + cleanPhone + "?text=" + encodeURIComponent(mensagem);
                 window.open(whatsappUrl, '_blank');
