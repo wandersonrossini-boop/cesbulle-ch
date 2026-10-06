@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Auto-Cadastro KIDS | Lausanne</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="js/firebase-config.js?v=70.3.79"></script>
+
+    <style>
+        :root {
+            --navy-main: #0B1626;
+            --navy-card: #0F172A;
+            --gold-main: #C9A96A;
+            --text-light: #F8FAFC;
+            --text-muted: #94A3B8;
+            --border-dark: #1E293B;
+            --font-main: 'Inter', sans-serif;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+        }
+
+        body {
+            background-color: var(--navy-main);
+            color: var(--text-light);
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: var(--navy-card);
+            border: 1px solid var(--border-dark);
+            border-radius: var(--radius-md);
+            padding: 30px 20px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            height: fit-content;
+            margin-top: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            color: var(--gold-main);
+            margin: 0 0 5px 0;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-light);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            background: var(--navy-main);
+            border: 1px solid var(--border-dark);
+            color: var(--text-light);
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            font-family: var(--font-main);
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--gold-main);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: var(--gold-main);
+            color: var(--navy-main);
+            border: none;
+            padding: 14px;
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-submit:active {
+            opacity: 0.8;
+        }
+
+        #success-msg {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        #success-msg i {
+            font-size: 3rem;
+            color: #10B981;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="form-container">
+        <div class="header">
+            <h1>Auto-Cadastro KIDS</h1>
+            <p>Registre sua criança rapidamente para o check-in</p>
+        </div>
+
+        <div class="form-group">
+            <label>Nome do Responsável *</label>
+            <input type="text" id="parent-name" placeholder="Seu nome completo" required>
+        </div>
+
+        <div class="form-group">
+            <label>WhatsApp do Responsável *</label>
+            <input type="tel" id="parent-phone" placeholder="Ex: 76 123 45 67" required>
+        </div>
+
+        <div class="form-group">
+            <label>Nome da Criança *</label>
+            <input type="text" id="child-name" placeholder="Nome da criança" required>
+        </div>
+
+        <div class="form-group">
+            <label>Idade da Criança *</label>
+            <input type="number" id="child-age" placeholder="Ex: 5" required>
+        </div>
+
+        <div class="form-group">
+            <label>Alergias ou Observações Médicas?</label>
+            <input type="text" id="child-notes" placeholder="Nenhuma">
+        </div>
+
+        <button class="btn-submit" onclick="submitKids()">CADASTRAR CRIANÇA</button>
+    </div>
+
+    <div class="container" id="success-msg">
+        <i class="fas fa-check-circle"></i>
+        <h2 style="color:var(--text-light); margin-bottom: 10px;">Cadastro Concluído!</h2>
+        <p style="color:var(--text-muted); font-size:0.9rem;">Dirija-se ao balcão KIDS para retirar a etiqueta de segurança.</p>
+    </div>
+
+    <script>
+        const db = firebase.firestore();
+
+        async function submitKids() {
+            const parentName = document.getElementById('parent-name').value.trim();
+            const parentPhone = document.getElementById('parent-phone').value.trim();
+            const childName = document.getElementById('child-name').value.trim();
+            const childAge = document.getElementById('child-age').value.trim();
+            const childNotes = document.getElementById('child-notes').value.trim();
+
+            if (!parentName || !parentPhone || !childName || !childAge) {
+                alert("Por favor, preencha todos os campos obrigatórios (*).");
+                return;
+            }
+
+            const btn = document.querySelector('.btn-submit');
+            btn.innerText = 'Salvando...';
+            btn.disabled = true;
+
+            try {
+                // Find or create parent
+                let parentId = null;
+                const parentQuery = await db.collection('people').where('contact', '==', parentPhone).limit(1).get();
+                
+                const batch = db.batch();
+
+                if (!parentQuery.empty) {
+                    parentId = parentQuery.docs[0].id;
+                } else {
+                    const newParentRef = db.collection('people').doc();
+                    parentId = newParentRef.id;
+                    batch.set(newParentRef, {
+                        name: parentName,
+                        contact: parentPhone,
+                        type: 'visitante',
+                        created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                        origin: 'auto_cadastro_kids'
+                    });
+                }
+
+                // Create child
+                const newChildRef = db.collection('kids_registry').doc();
+                batch.set(newChildRef, {
+                    name: childName,
+                    age: parseInt(childAge),
+                    parent_id: parentId,
+                    parent_name: parentName,
+                    parent_contact: parentPhone,
+                    special_conditions: childNotes || 'Nenhuma',
+                    is_presentation: false,
+                    created_at: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                await batch.commit();
+
+                document.getElementById('form-container').style.display = 'none';
+                document.getElementById('success-msg').style.display = 'block';
+
+            } catch (error) {
+                console.error("Erro ao salvar cadastro KIDS:", error);
+                alert("Ocorreu um erro. Tente novamente.");
+                btn.innerText = 'CADASTRAR CRIANÇA';
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

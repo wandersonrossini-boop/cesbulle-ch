@@ -839,7 +839,7 @@ window.searchReturningVisitor = function () {
                     const isCong = (p.type || '').toLowerCase().includes('congrega');
                     const badgeStr = isCong ? `<span style="background:#f3e8ff; color:#7e22ce; padding:4px 10px; border-radius:8px; font-size:0.75rem; font-weight:800; border:1px solid #e9d5ff;">Congregado</span>` : `<span style="background:#fefce8; color:#a16207; padding:4px 10px; border-radius:8px; font-size:0.75rem; font-weight:800; border:1px solid #fef08a;">Visita #${count}</span>`;
 
-                    div.innerHTML = `<div style="flex:1;"><strong style="font-size:1.1rem; display:block; margin-bottom:2px;">${p.name}</strong> <span style='font-size:0.85rem; color:var(--text-muted);'>${p.contact || p.phone || p.whatsapp || 'Sem Contato'}</span></div> <div style="margin-left:10px;">${badgeStr}</div>`;
+                    div.innerHTML = `<div style="flex:1;"><strong style="font-size:1.1rem; display:block; margin-bottom:2px;">${p.name}</strong> <span style='font-size:0.85rem; color:var(--text-muted);'>${p.contact || p.phone || p.whatsapp || 'Sem Contato'}</span></div> <div style="margin-left:10px; display:flex; flex-direction:column; gap:5px; align-items:flex-end;">${badgeStr}<button onclick="event.stopPropagation(); window.resendCartaoConexao('${id}')" style="background:#25D366; color:white; border:none; border-radius:4px; padding:4px 8px; font-size:0.75rem; cursor:pointer; font-weight:bold;"><i class="fab fa-whatsapp"></i> Link</button></div>`;
 
                     div.onclick = () => window.submitReturningVisitor(id, p);
                     results.appendChild(div);
@@ -1371,3 +1371,24 @@ window.registrarAtaDigital = async function(tipo, descricao, responsavel = 'Secr
     }
 };
 
+
+
+window.resendCartaoConexao = async function(personId) {
+    if (!personId) return alert('ID não encontrado.');
+    try {
+        const doc = await db.collection('people').doc(personId).get();
+        if (!doc.exists) return alert('Visitante não encontrado no banco de dados.');
+        const p = doc.data();
+        const contact = p.contact || p.phone || p.whatsapp || '';
+        const cleanPhone = contact.replace(/\D/g, '');
+        if (cleanPhone.length < 8) return alert('O visitante não tem um número válido de WhatsApp cadastrado.');
+        
+        const linkCartao = "https://catedral-connect-6c55e.web.app/connect.html?id=" + encodeURIComponent(personId);
+        const mensagem = "Olá " + (p.name || '').trim() + "! Para nos conhecermos melhor, por favor preencha rapidamente o seu Cartão de Conexão clicando neste link: " + linkCartao;
+        const whatsappUrl = "https://wa.me/" + cleanPhone + "?text=" + encodeURIComponent(mensagem);
+        window.open(whatsappUrl, '_blank');
+    } catch(err) {
+        console.error(err);
+        alert('Erro ao reenviar o link.');
+    }
+}

@@ -1718,7 +1718,7 @@
                             style="font-size:0.75rem; color:#999 !important; margin:0 0 4px; text-transform:uppercase; font-weight:700; letter-spacing:0.5px;">
                             Link Direto</p>
                         <p style="font-size:0.85rem; color:#ec4899 !important; font-weight:700; word-break:break-all; margin:0;">
-                            catedral-connect-bf717.web.app/register_kids.html</p>
+                            catedral-connect-6c55e.web.app/register_kids.html</p>
                     </div>
                 </div>
                 <script>
@@ -1729,7 +1729,7 @@
                             if (typeof QRCode !== 'undefined') {
                                 el.innerHTML = '';
                                 new QRCode(el, {
-                                    text: 'https://catedral-connect-bf717.web.app/register_kids.html',
+                                    text: 'https://catedral-connect-6c55e.web.app/register_kids.html',
                                     width: 180,
                                     height: 180,
                                     colorDark: '#1a1a1a',
@@ -2001,8 +2001,9 @@
                                           <div style="font-weight: 600; color: var(--text-light); font-size: 0.95rem;">${d.name}</div>
                                           <div style="color: var(--text-muted); font-size: 0.75rem;">${d.detail || 'Visitante'}</div>
                                       </div>
-                                      <div style="font-size: 0.75rem; color: #94a3b8; white-space: nowrap;">
+                                      <div style="font-size: 0.75rem; color: #94a3b8; white-space: nowrap; display:flex; flex-direction:column; align-items:flex-end; gap:5px;">
                                           ${d.timestamp ? new Date(d.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Agora'}
+                                          ${d.person_id ? `<button onclick="event.stopPropagation(); window.resendCartaoConexao('${d.person_id}')" style="background:#25D366; color:white; border:none; border-radius:4px; padding:4px 8px; font-size:0.7rem; cursor:pointer; font-weight:bold;"><i class="fab fa-whatsapp"></i> Link</button>` : ''}
                                       </div>
                                   </div>
                               `).join('');
