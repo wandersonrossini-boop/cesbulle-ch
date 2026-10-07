@@ -745,11 +745,13 @@ window.submitVisitor = async function () {
 
         alert("Check-in de " + name + " registrado com sucesso!");
         // --- WHATSAPP CARTÃO DE CONEXÃO LOGIC ---
-        if (isNewPerson && phone && phone.trim() !== '') {
+        
+        const wantsWhatsApp = document.getElementById('vis-send-wa') ? document.getElementById('vis-send-wa').checked : true;
+        if (isNewPerson && phone && phone.trim() !== '' && wantsWhatsApp) {
             const cleanPhone = phone.replace(/\D/g, '');
             if (cleanPhone.length >= 8) {
                 const linkCartao = "https://catedral-connect-6c55e.web.app/connect.html?id=" + encodeURIComponent(personId);
-                const mensagem = "Olá " + name.trim() + "! Que alegria receber você hoje no CME Lausanne. Para nos conhecermos melhor, por favor preencha rapidamente o seu Cartão de Conexão clicando neste link: " + linkCartao;
+                const mensagem = "Olá " + name.trim() + "! Que alegria receber você hoje no CME Lausanne. Aqui você encontra os horários dos cultos, tem acesso ao pastor ou os cadastros que precisar. Acesse o seu Cartão de Conexão clicando neste link: " + linkCartao;
                 const whatsappUrl = "https://wa.me/" + cleanPhone + "?text=" + encodeURIComponent(mensagem);
                 window.open(whatsappUrl, '_blank');
             }
@@ -1384,7 +1386,7 @@ window.resendCartaoConexao = async function(personId) {
         if (cleanPhone.length < 8) return alert('O visitante não tem um número válido de WhatsApp cadastrado.');
         
         const linkCartao = "https://catedral-connect-6c55e.web.app/connect.html?id=" + encodeURIComponent(personId);
-        const mensagem = "Olá " + (p.name || '').trim() + "! Para nos conhecermos melhor, por favor preencha rapidamente o seu Cartão de Conexão clicando neste link: " + linkCartao;
+        const mensagem = "Olá " + (p.name || '').trim() + "! Que alegria receber você hoje no CME Lausanne. Aqui você encontra os horários dos cultos, tem acesso ao pastor ou os cadastros que precisar. Acesse o seu Cartão de Conexão clicando neste link: " + linkCartao;
         const whatsappUrl = "https://wa.me/" + cleanPhone + "?text=" + encodeURIComponent(mensagem);
         window.open(whatsappUrl, '_blank');
     } catch(err) {

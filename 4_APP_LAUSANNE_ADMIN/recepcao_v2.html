@@ -1877,6 +1877,13 @@
                                     <label style="color:var(--text-light); font-size:0.85rem; font-weight:700; display:block; margin-bottom:8px;">Nome <span style="color:var(--text-light);">*</span></label>
                                     <input type="text" id="vis-name" placeholder="Digite o nome do visitante" autofocus onkeydown="if(event.key==='Enter'){event.preventDefault();submitVisitor();}" style="font-size:1.05rem; padding:14px 16px; border: 1px solid var(--border-dark); border-radius:8px; width:100%; box-sizing:border-box; margin-bottom:20px; font-weight:500; background:var(--navy-main);">
 
+                                    <!-- Checkbox Opcional WhatsApp -->
+                                    <div style="margin-bottom: 20px;">
+                                        <label style="display:flex; align-items:center; gap:8px; color:var(--text-light); font-size:0.8rem; cursor:pointer;">
+                                            <input type="checkbox" id="vis-send-wa" checked style="width:16px; height:16px; cursor:pointer; accent-color:var(--gold-main);">
+                                            <span>Enviar <b>WhatsApp</b> de boas-vindas após registrar</span>
+                                        </label>
+                                    </div>
                                     <!-- Campo Telefone (Opcional) -->
                                     <label style="color:var(--text-light); font-size:0.85rem; font-weight:700; display:block; margin-bottom:8px;">WhatsApp (opcional)</label>
                                     <div style="display: flex; gap: 10px; margin-bottom: 24px;">
