@@ -18,17 +18,22 @@
     <script src="js/firebase-config.js?v=70.3.79"></script>
 
     <style>
-        :root {
-            --gold: #d4af37;
-            --gold-glow: rgba(212, 175, 55, 0.15);
-            --gold-gradient: linear-gradient(to right, #cfaf5d 0%, #fcf6ba 30%, #d4af37 50%, #fcf6ba 70%, #cfaf5d 100%);
-            --bg-dark: #050508;
-            --card-bg: #0c0c12;
-            --border-color: rgba(212, 175, 55, 0.12);
-            --text-color: #ffffff;
-            --text-muted: rgba(255, 255, 255, 0.55);
-            --font-main: 'Outfit', sans-serif;
-            --font-serif: 'Playfair Display', serif;
+                :root {
+            --gold: #0B1626; 
+            --gold-glow: rgba(11, 22, 38, 0.1);
+            --gold-gradient: none;
+            --bg-dark: #FFFFFF; 
+            --card-bg: #F8FAFC;
+            --border-color: #E2E8F0;
+            --text-color: #0B1626;
+            --text-muted: #64748B;
+            --font-main: 'Inter', sans-serif;
+            --font-serif: 'Inter', sans-serif;
+            
+            --blue-light: #F0F5FA;
+            --blue-accent: #3B82F6;
+            --green-light: #F0FDF4;
+            --green-accent: #10B981;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -40,10 +45,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        body {
-            background-image:
-                radial-gradient(circle at 10% 10%, rgba(212, 175, 55, 0.07) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(212, 175, 55, 0.03) 0%, transparent 50%);
+                body {
             display: flex;
             justify-content: center;
         }
@@ -293,11 +295,10 @@
         .bottom-nav {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
             width: 100%; max-width: 480px;
-            background: rgba(5, 5, 8, 0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid #E2E8F0;
             display: flex; justify-content: space-around;
             padding: 10px 10px 22px; z-index: 500;
-            box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.5);
         }
         .nav-item {
             flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;
@@ -732,22 +733,23 @@
     </div>
 
     <!-- ── BOTTOM NAVIGATION BAR ── -->
+        <!-- BOTTOM NAVIGATION BAR -->
     <nav class="bottom-nav">
         <div class="nav-item active" id="nav-inicio" onclick="switchTab('inicio')">
             <i class="fas fa-home"></i>
             <span>Início</span>
         </div>
-        <div class="nav-item" id="nav-agenda" onclick="switchTab('agenda')">
-            <i class="fas fa-calendar-alt"></i>
-            <span>Agenda</span>
+        <div class="nav-item" id="nav-quemsomos" onclick="switchTab('agenda')">
+            <i class="fas fa-building"></i>
+            <span>Quem somos</span>
+        </div>
+        <div class="nav-item" id="nav-comochegar" onclick="switchTab('agenda')">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>Como chegar</span>
         </div>
         <div class="nav-item" id="nav-membros" onclick="switchTab('membros')">
-            <i class="fas fa-users"></i>
-            <span>Membros</span>
-        </div>
-        <div class="nav-item" id="nav-mais" onclick="switchTab('mais')">
-            <i class="fas fa-ellipsis-h"></i>
-            <span>Mais</span>
+            <i class="fas fa-user-circle"></i>
+            <span>Área do membro</span>
         </div>
     </nav>
 
