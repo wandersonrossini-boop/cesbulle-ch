@@ -470,72 +470,126 @@
 
     <!-- ═══ SCREEN 1: INÍCIO (ACOLHIMENTO) ═══ -->
     <div id="screen-inicio" class="app-screen active">
-        <h2 class="screen-title-serif">Que alegria<br>ter você aqui!</h2>
-        <p class="screen-subtitle">Queremos que você se sinta em casa. Conte com a gente!</p>
+        <h2 style="font-family: 'Inter', sans-serif; font-size: 2.2rem; font-weight: 700; color: #0B1626; margin-bottom: 5px; line-height: 1.1;">
+            Olá<span id="welcome-name"></span>.
+        </h2>
+        <h2 style="font-family: 'Inter', sans-serif; font-size: 2.2rem; font-weight: 400; color: #0B1626; margin-top: 0; line-height: 1.1;">
+            Como você está?
+        </h2>
+        <p style="font-size: 1rem; color: #94A3B8; margin-top: 10px; margin-bottom: 40px; margin-left: 2px;">Estamos aqui.</p>
 
-        <!-- Actions -->
-        <div class="app-card" onclick="switchTab('oracao')">
-            <div class="app-card-content">
-                <h3 class="app-card-title">Pedido de Oração</h3>
-                <p class="app-card-desc">Compartilhe seu pedido. Nossa equipe vai orar por você.</p>
+        <h3 style="font-size: 1.15rem; color: #0B1626; margin-bottom: 15px; font-weight: 700; margin-left: 2px;">Como podemos ajudar?</h3>
+
+        <div class="app-card" onclick="switchTab('espiritual')" style="background: var(--blue-light); border:none; border-left: 5px solid var(--blue-accent); border-radius: 12px; padding: 22px 20px; margin-bottom: 15px; cursor: pointer; box-shadow:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <h3 style="margin:0; font-size: 1.15rem; color: #0B1626; font-weight: 700; margin-bottom:5px;">Área espiritual</h3>
+                    <p style="margin:0; font-size: 0.95rem; color: #475569; padding-right:10px;">Oração, uma palavra ou visita da nossa equipe.</p>
+                </div>
+                <i class="fas fa-chevron-right" style="color: #0B1626;"></i>
             </div>
-            <i class="fas fa-chevron-right app-card-arrow"></i>
         </div>
 
-        <div class="app-card" onclick="switchTab('visita')">
-            <div class="app-card-content">
-                <h3 class="app-card-title">Falar com a Equipe</h3>
-                <p class="app-card-desc">Estamos aqui para te ouvir, ajudar e servir.</p>
+        <div class="app-card" onclick="switchTab('social')" style="background: var(--green-light); border:none; border-left: 5px solid var(--green-accent); border-radius: 12px; padding: 22px 20px; margin-bottom: 30px; cursor: pointer; box-shadow:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <h3 style="margin:0; font-size: 1.15rem; color: #0B1626; font-weight: 700; margin-bottom:5px;">Área social</h3>
+                    <p style="margin:0; font-size: 0.95rem; color: #475569; padding-right:10px;">Integração no país, preciso de ajuda ou agendar um horário.</p>
+                </div>
+                <i class="fas fa-chevron-right" style="color: #0B1626;"></i>
             </div>
-            <i class="fas fa-chevron-right app-card-arrow"></i>
         </div>
+    </div>
+    
+<!-- ═══ SCREEN 2: AGENDA ═══ -->
+    
 
-        <div class="app-card" onclick="switchTab('agenda')">
-            <div class="app-card-content">
-                <h3 class="app-card-title">Nossos Cultos</h3>
-                <p class="app-card-desc">Confira horários e informações dos nossos cultos.</p>
+    <!-- SCREEN: ESPIRITUAL -->
+    <div id="screen-espiritual" class="app-screen">
+        <div style="display:flex; align-items:center; margin-bottom: 25px;">
+            <i class="fas fa-chevron-left" onclick="switchTab('inicio')" style="font-size: 1.2rem; cursor: pointer; color: #0B1626; margin-right: 15px;"></i>
+            <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #0B1626;">Área espiritual</h2>
+        </div>
+        <p style="font-size: 0.95rem; color: #475569; margin-bottom: 20px; font-family:'Inter', sans-serif;">Como podemos te ajudar na área espiritual?</p>
+        
+        <div class="app-card" onclick="switchTab('oracao')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
+            <i class="fas fa-praying-hands" style="font-size: 1.5rem; color: #0B1626; margin-right: 15px; width: 30px; text-align:center;"></i>
+            <div style="flex:1;">
+                <h3 style="margin:0; font-size: 1.05rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Oração</h3>
+                <p style="margin:0; font-size: 0.85rem; color: #64748B;">Envie seu pedido de oração.</p>
             </div>
-            <i class="fas fa-chevron-right app-card-arrow"></i>
+            <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
         </div>
 
-        <!-- Social Media Section -->
-        <div class="section-divider">
-            <span>Siga nossas redes</span>
-        </div>
-        <div class="social-container">
-            <a href="https://www.instagram.com/catedraldaesperancasuica/" target="_blank" class="social-circle-btn" title="Instagram"><i class="fab fa-instagram"></i></a>
-            <a href="https://www.facebook.com/catedraldaesperancasuica" target="_blank" class="social-circle-btn" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-            <a href="https://www.youtube.com/c/CatedraldaEsperan%C3%A7aSu%C3%AD%C3%A7a" target="_blank" class="social-circle-btn" title="YouTube"><i class="fab fa-youtube"></i></a>
-        </div>
-
-        <div class="app-card app-card-blue" onclick="switchTab('membros')">
-            <div class="app-card-content">
-                <h3 class="app-card-title">Entrar na área do membro</h3>
+        <div class="app-card" onclick="switchTab('visita')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
+            <i class="fas fa-book-open" style="font-size: 1.5rem; color: #0B1626; margin-right: 15px; width: 30px; text-align:center;"></i>
+            <div style="flex:1;">
+                <h3 style="margin:0; font-size: 1.05rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Uma palavra</h3>
+                <p style="margin:0; font-size: 0.85rem; color: #64748B;">Converse com um ministro.</p>
             </div>
-            <i class="fas fa-chevron-right app-card-arrow"></i>
+            <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
         </div>
 
-        <!-- Location Card -->
-        <div class="location-card" onclick="window.open('https://maps.google.com/?q=Rue+de+l%27Industrie+39,+1023+Crissier', '_blank')">
-            <div class="location-pin-wrap">
-                <i class="fas fa-map-marker-alt"></i>
+        <div class="app-card" onclick="switchTab('visita')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin-bottom: 30px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
+            <i class="fas fa-users" style="font-size: 1.5rem; color: #0B1626; margin-right: 15px; width: 30px; text-align:center;"></i>
+            <div style="flex:1;">
+                <h3 style="margin:0; font-size: 1.05rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Visita</h3>
+                <p style="margin:0; font-size: 0.85rem; color: #64748B;">Solicite uma visita da nossa equipe.</p>
             </div>
-            <div class="location-text">
-                <h4>Catedral Lausanne</h4>
-                <p>Rue de l'Industrie 39<br>1023 Crissier</p>
-            </div>
-            <button class="location-btn">
-                COMO CHEGAR <i class="fas fa-paper-plane"></i>
-            </button>
+            <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
         </div>
 
-        <div class="system-online-badge">
-            <span class="system-dot"></span>Sistema online · Lausanne v70.3.78
+        <div style="padding: 15px; background: #F8FAFC; border-radius: 10px; border: 1px solid #E2E8F0; display:flex; align-items:center;">
+            <i class="fas fa-lock" style="color: #94A3B8; margin-right: 12px; font-size: 1.1rem;"></i>
+            <p style="margin:0; font-size: 0.8rem; color: #64748B; line-height:1.4;">
+                As solicitações são tratadas com a maior discrição possível.
+            </p>
         </div>
     </div>
 
-    <!-- ═══ SCREEN 2: AGENDA ═══ -->
-    <div id="screen-agenda" class="app-screen">
+    <!-- SCREEN: SOCIAL -->
+    <div id="screen-social" class="app-screen">
+        <div style="display:flex; align-items:center; margin-bottom: 25px;">
+            <i class="fas fa-chevron-left" onclick="switchTab('inicio')" style="font-size: 1.2rem; cursor: pointer; color: #0B1626; margin-right: 15px;"></i>
+            <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #0B1626;">Área social</h2>
+        </div>
+        <p style="font-size: 0.95rem; color: #475569; margin-bottom: 20px; font-family:'Inter', sans-serif;">Como podemos te ajudar na área social?</p>
+        
+        <div class="app-card" onclick="switchTab('visita')" style="background: var(--green-light); border:none; border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
+            <i class="fas fa-user-friends" style="font-size: 1.5rem; color: var(--green-accent); margin-right: 15px; width: 30px; text-align:center;"></i>
+            <div style="flex:1;">
+                <h3 style="margin:0; font-size: 1.05rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Integração no país</h3>
+                <p style="margin:0; font-size: 0.85rem; color: #64748B;">Orientação e apoio para sua adaptação.</p>
+            </div>
+            <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
+        </div>
+
+        <div class="app-card" onclick="switchTab('visita')" style="background: var(--green-light); border:none; border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
+            <i class="fas fa-life-ring" style="font-size: 1.5rem; color: var(--green-accent); margin-right: 15px; width: 30px; text-align:center;"></i>
+            <div style="flex:1;">
+                <h3 style="margin:0; font-size: 1.05rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Preciso de ajuda</h3>
+                <p style="margin:0; font-size: 0.85rem; color: #64748B;">Solicite apoio para uma necessidade.</p>
+            </div>
+            <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
+        </div>
+
+        <div class="app-card" onclick="switchTab('visita')" style="background: var(--green-light); border:none; border-radius: 12px; padding: 20px; margin-bottom: 30px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
+            <i class="fas fa-calendar-check" style="font-size: 1.5rem; color: var(--green-accent); margin-right: 15px; width: 30px; text-align:center;"></i>
+            <div style="flex:1;">
+                <h3 style="margin:0; font-size: 1.05rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Agendar horário</h3>
+                <p style="margin:0; font-size: 0.85rem; color: #64748B;">Fale com a área social e agende atendimento.</p>
+            </div>
+            <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
+        </div>
+
+        <div style="padding: 15px; background: #F8FAFC; border-radius: 10px; border: 1px solid #E2E8F0; display:flex; align-items:center;">
+            <i class="fas fa-lock" style="color: #94A3B8; margin-right: 12px; font-size: 1.1rem;"></i>
+            <p style="margin:0; font-size: 0.8rem; color: #64748B; line-height:1.4;">
+                As solicitações são tratadas com a maior discrição possível.
+            </p>
+        </div>
+    </div>
+<div id="screen-agenda" class="app-screen">
         <h2 class="screen-title-serif">Nossos Cultos</h2>
         <p class="screen-subtitle">Abaixo estão os dias e horários de nossas programações semanais.</p>
 
