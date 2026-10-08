@@ -903,58 +903,230 @@
             </div>
 
             <!-- PAGE: SETTINGS (Configurações) -->
-            <div id="page-settings" class="page-content" style="display:none;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <h2 style="margin:0; font-size:1.2rem; color:#2c3e50;"><i class="fas fa-cog"
-                            style="color:var(--gold-accent); margin-right:8px;"></i> Configurações do Sistema</h2>
-                </div>
-
-                <!-- MANUAL DO USUÁRIO -->
-                <div class="panel-card" style="background:#fff !important; margin-bottom:30px; border: 1px solid #e2e8f0;">
-                    <div class="panel-title" style="color:#1a1a1a; font-weight:800; font-size:1.1rem; margin-bottom:20px;">
-                        <span><i class="fas fa-book" style="color:var(--gold-accent); margin-right:10px;"></i>Manual do Usuário</span>
+            
+            <!-- PAGE: SETTINGS (ADMIN CONFIGURATIONS) -->
+            <div id="page-settings" class="page-content" style="display:none; max-width: 500px; margin: 0 auto;">
+                
+                <!-- MAIN MENU -->
+                <div id="settings-main-menu">
+                    <div style="display:flex; align-items:center; margin-bottom: 25px;">
+                        <i class="fas fa-arrow-left" onclick="showPage('painel')" style="font-size: 1.2rem; cursor: pointer; color: #0B1626; margin-right: 15px;"></i>
+                        <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #0B1626;">Configurações (Admin)</h2>
                     </div>
-                    
-                    <div style="background:#f8fafc; border-radius:14px; padding:20px; border:1px solid #e2e8f0;">
-                        <p style="font-size:0.9rem; color:#475569; margin-bottom:20px; line-height:1.6;">
-                            Acesse o guia completo de operação do sistema, incluindo senhas oficiais, fluxos de cada setor e resoluções de problemas comuns.
-                        </p>
+
+                    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow:hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
                         
-                        <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                            <button onclick="openUserManualModal()" style="background:#111827; color:var(--gold-accent); border:none; border-radius:12px; padding:12px 24px; font-weight:800; cursor:pointer; font-family:'Outfit'; display:flex; align-items:center; gap:8px;">
-                                <i class="fas fa-eye"></i> Visualizar Manual
-                            </button>
+                        <div onclick="openAdminSettingsTab('emails')" style="padding: 20px; border-bottom: 1px solid #E2E8F0; display:flex; align-items:center; cursor:pointer;">
+                            <div style="background: #F8FAFC; width: 45px; height: 45px; border-radius: 8px; display:flex; justify-content:center; align-items:center; margin-right: 15px; border: 1px solid #E2E8F0;">
+                                <i class="fas fa-envelope" style="color: #0B1626; font-size: 1.1rem;"></i>
+                            </div>
+                            <div style="flex:1;">
+                                <h3 style="margin:0; font-size: 1.05rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">E-mails de recebimento</h3>
+                                <p style="margin:0; font-size: 0.85rem; color: #64748B;">Definir para onde as mensagens serão enviadas.</p>
+                            </div>
+                            <i class="fas fa-chevron-right" style="color: #94A3B8;"></i>
+                        </div>
+
+                        <div onclick="openAdminSettingsTab('horarios')" style="padding: 20px; border-bottom: 1px solid #E2E8F0; display:flex; align-items:center; cursor:pointer;">
+                            <div style="background: #F8FAFC; width: 45px; height: 45px; border-radius: 8px; display:flex; justify-content:center; align-items:center; margin-right: 15px; border: 1px solid #E2E8F0;">
+                                <i class="fas fa-clock" style="color: #0B1626; font-size: 1.1rem;"></i>
+                            </div>
+                            <div style="flex:1;">
+                                <h3 style="margin:0; font-size: 1.05rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Horários de atendimento</h3>
+                                <p style="margin:0; font-size: 0.85rem; color: #64748B;">Configurar horários exibidos no app.</p>
+                            </div>
+                            <i class="fas fa-chevron-right" style="color: #94A3B8;"></i>
+                        </div>
+
+                        <div onclick="openAdminSettingsTab('mensagens')" style="padding: 20px; border-bottom: 1px solid #E2E8F0; display:flex; align-items:center; cursor:pointer;">
+                            <div style="background: #F8FAFC; width: 45px; height: 45px; border-radius: 8px; display:flex; justify-content:center; align-items:center; margin-right: 15px; border: 1px solid #E2E8F0;">
+                                <i class="fas fa-comment-dots" style="color: #0B1626; font-size: 1.1rem;"></i>
+                            </div>
+                            <div style="flex:1;">
+                                <h3 style="margin:0; font-size: 1.05rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Mensagens padrão</h3>
+                                <p style="margin:0; font-size: 0.85rem; color: #64748B;">Editar textos de orientações.</p>
+                            </div>
+                            <i class="fas fa-chevron-right" style="color: #94A3B8;"></i>
+                        </div>
+
+                        <div onclick="openAdminSettingsTab('areas')" style="padding: 20px; border-bottom: 1px solid #E2E8F0; display:flex; align-items:center; cursor:pointer;">
+                            <div style="background: #F8FAFC; width: 45px; height: 45px; border-radius: 8px; display:flex; justify-content:center; align-items:center; margin-right: 15px; border: 1px solid #E2E8F0;">
+                                <i class="fas fa-user-tag" style="color: #0B1626; font-size: 1.1rem;"></i>
+                            </div>
+                            <div style="flex:1;">
+                                <h3 style="margin:0; font-size: 1.05rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Áreas de servir</h3>
+                                <p style="margin:0; font-size: 0.85rem; color: #64748B;">Gerenciar lista de áreas disponíveis.</p>
+                            </div>
+                            <i class="fas fa-chevron-right" style="color: #94A3B8;"></i>
+                        </div>
+
+                        <div onclick="openAdminSettingsTab('status')" style="padding: 20px; display:flex; align-items:center; cursor:pointer;">
+                            <div style="background: #F8FAFC; width: 45px; height: 45px; border-radius: 8px; display:flex; justify-content:center; align-items:center; margin-right: 15px; border: 1px solid #E2E8F0;">
+                                <i class="fas fa-info-circle" style="color: #0B1626; font-size: 1.1rem;"></i>
+                            </div>
+                            <div style="flex:1;">
+                                <h3 style="margin:0; font-size: 1.05rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Status do sistema</h3>
+                                <p style="margin:0; font-size: 0.85rem; color: #64748B;">Ferramentas e informações operacionais.</p>
+                            </div>
+                            <i class="fas fa-chevron-right" style="color: #94A3B8;"></i>
                         </div>
                     </div>
                 </div>
 
-                <!-- CONFIGURACOES PANEL -->
-                <div class="panel-card"
-                    style="background:#fff !important; margin-bottom:30px;">
-                    <div class="panel-title"
-                        style="color:#1a1a1a; font-weight:800; font-size:1.1rem; margin-bottom:20px;">
-                        <span><i class="fas fa-tools"
-                                style="color:var(--gold-accent); margin-right:10px;"></i>Ferramentas do Sistema</span>
+                <!-- SUBTABS INJECTED HERE VIA JS OR HTML -->
+                <div id="settings-tab-emails" style="display:none;">
+                    <div style="display:flex; align-items:center; margin-bottom: 25px;">
+                        <i class="fas fa-arrow-left" onclick="openAdminSettingsTab('main')" style="font-size: 1.2rem; cursor: pointer; color: #0B1626; margin-right: 15px;"></i>
+                        <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #0B1626;">E-mails de recebimento</h2>
                     </div>
                     
-                    <button onclick="runGlobalReclassification()"
-                        style="background:#1e293b; color:white; font-weight:800; padding:12px 20px; border-radius:10px; border:none; cursor:pointer; width:100%; margin-bottom:10px;">
-                        <i class="fas fa-sync"></i> Reclassificar Base Global
-                    </button>
+                    <div style="background:#FFF; padding:20px; border-radius:12px; border:1px solid #E2E8F0; margin-bottom:20px;">
+                        <div style="display:flex; align-items:flex-start; margin-bottom:15px;">
+                            <i class="fas fa-envelope" style="color:#0B1626; font-size:1.2rem; margin-right:12px; margin-top:2px;"></i>
+                            <div>
+                                <h4 style="margin:0; font-size:1rem; color:#0B1626; font-weight:700; margin-bottom:3px;">Agendamentos</h4>
+                                <p style="margin:0; font-size:0.85rem; color:#475569;">E-mail que recebe as novas inscrições de batismo, apresentação de bebê e células.</p>
+                            </div>
+                        </div>
+                        <label style="display:block; font-size:0.85rem; color:#64748B; margin-bottom:5px;">E-mail</label>
+                        <input type="text" id="config-email-agendamentos" value="agendamentos@cmelausanne.ch" style="width:100%; padding:12px; border:1px solid #E2E8F0; border-radius:8px; font-size:1rem;">
+                    </div>
                     
-                    <button onclick="runIntegrationHousekeeping()"
-                        style="background:#f1f5f9; color:#475569; font-weight:800; padding:12px 20px; border-radius:10px; border:none; cursor:pointer; width:100%; margin-bottom:10px;">
-                        <i class="fas fa-broom"></i> Limpeza de Registros Antigos
-                    </button>
-
-                    <button onclick="nukeDatabase()"
-                        style="background:#fee2e2; color:#ef4444; font-weight:800; padding:12px 20px; border-radius:10px; border:none; cursor:pointer; width:100%;">
-                        <i class="fas fa-radiation"></i> NUKE DATABASE (Cuidado!)
-                    </button>
+                    <div style="background:#FFF; padding:20px; border-radius:12px; border:1px solid #E2E8F0; margin-bottom:20px;">
+                        <div style="display:flex; align-items:flex-start; margin-bottom:15px;">
+                            <i class="fas fa-envelope" style="color:#0B1626; font-size:1.2rem; margin-right:12px; margin-top:2px;"></i>
+                            <div>
+                                <h4 style="margin:0; font-size:1rem; color:#0B1626; font-weight:700; margin-bottom:3px;">Servir</h4>
+                                <p style="margin:0; font-size:0.85rem; color:#475569;">E-mail que recebe os formulários de interesse para servir.</p>
+                            </div>
+                        </div>
+                        <label style="display:block; font-size:0.85rem; color:#64748B; margin-bottom:5px;">E-mail</label>
+                        <input type="text" id="config-email-servir" value="servir@cmelausanne.ch" style="width:100%; padding:12px; border:1px solid #E2E8F0; border-radius:8px; font-size:1rem;">
+                    </div>
+                    
+                    <button onclick="saveAdminSettings()" style="width:100%; background:#0B1626; color:#FFF; border:none; padding:15px; border-radius:8px; font-weight:600; cursor:pointer;">Salvar E-mails</button>
                 </div>
-            </div>
+                
+                <div id="settings-tab-horarios" style="display:none;">
+                    <div style="display:flex; align-items:center; margin-bottom: 25px;">
+                        <i class="fas fa-arrow-left" onclick="openAdminSettingsTab('main')" style="font-size: 1.2rem; cursor: pointer; color: #0B1626; margin-right: 15px;"></i>
+                        <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #0B1626;">Horários de atendimento</h2>
+                    </div>
+                    <p style="color:#475569; font-size:0.95rem; margin-bottom:20px;">Defina os horários que serão exibidos no aplicativo.</p>
+                    
+                    <div style="background:#FFF; padding:20px; border-radius:12px; border:1px solid #E2E8F0; margin-bottom:20px;">
+                        <!-- Mockup example with just simple fields for now -->
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                            <span style="font-size:0.95rem; color:#0B1626;">Segunda-feira</span>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <input type="time" value="09:00" style="padding:8px; border:1px solid #E2E8F0; border-radius:6px; background:#FFF; color:#0B1626;">
+                                <span style="color:#64748B; font-size:0.9rem;">às</span>
+                                <input type="time" value="17:00" style="padding:8px; border:1px solid #E2E8F0; border-radius:6px; background:#FFF; color:#0B1626;">
+                            </div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                            <span style="font-size:0.95rem; color:#0B1626;">Terça-feira</span>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <input type="time" value="09:00" style="padding:8px; border:1px solid #E2E8F0; border-radius:6px; background:#FFF; color:#0B1626;">
+                                <span style="color:#64748B; font-size:0.9rem;">às</span>
+                                <input type="time" value="17:00" style="padding:8px; border:1px solid #E2E8F0; border-radius:6px; background:#FFF; color:#0B1626;">
+                            </div>
+                        </div>
+                        <!-- ... other days simplified ... -->
+                    </div>
+                    <button onclick="saveAdminSettings()" style="width:100%; background:#0B1626; color:#FFF; border:none; padding:15px; border-radius:8px; font-weight:600; cursor:pointer;">Salvar Horários</button>
+                </div>
+                
+                <div id="settings-tab-mensagens" style="display:none;">
+                    <div style="display:flex; align-items:center; margin-bottom: 25px;">
+                        <i class="fas fa-arrow-left" onclick="openAdminSettingsTab('main')" style="font-size: 1.2rem; cursor: pointer; color: #0B1626; margin-right: 15px;"></i>
+                        <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #0B1626;">Mensagens padrão</h2>
+                    </div>
+                    
+                    <div style="margin-bottom:20px;">
+                        <label style="display:block; font-weight:700; color:#0B1626; margin-bottom:8px;">Confirmação de agendamento</label>
+                        <textarea rows="3" style="width:100%; padding:15px; border:1px solid #E2E8F0; border-radius:8px; font-size:0.95rem;">Sua inscrição foi enviada. Nossa equipe analisará as informações e entrará em contato em breve.</textarea>
+                    </div>
+                    <div style="margin-bottom:20px;">
+                        <label style="display:block; font-weight:700; color:#0B1626; margin-bottom:8px;">Confirmação de interesse em servir</label>
+                        <textarea rows="3" style="width:100%; padding:15px; border:1px solid #E2E8F0; border-radius:8px; font-size:0.95rem;">Recebemos seu interesse. Nossa equipe analisará suas informações e entrará em contato.</textarea>
+                    </div>
+                    
+                    <button onclick="saveAdminSettings()" style="width:100%; background:#0B1626; color:#FFF; border:none; padding:15px; border-radius:8px; font-weight:600; cursor:pointer;">Salvar Mensagens</button>
+                </div>
+                
+                <div id="settings-tab-areas" style="display:none;">
+                    <div style="display:flex; align-items:center; margin-bottom: 25px;">
+                        <i class="fas fa-arrow-left" onclick="openAdminSettingsTab('main')" style="font-size: 1.2rem; cursor: pointer; color: #0B1626; margin-right: 15px;"></i>
+                        <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #0B1626;">Áreas de servir</h2>
+                    </div>
+                    <p style="color:#475569; font-size:0.95rem; margin-bottom:20px;">Gerencie as áreas disponíveis no formulário.</p>
+                    
+                    <div style="background:#FFF; padding:20px; border-radius:12px; border:1px solid #E2E8F0; margin-bottom:20px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #E2E8F0; padding:12px 0;">
+                            <span style="color:#0B1626; font-weight:500;"><i class="fas fa-bars" style="color:#94A3B8; margin-right:12px;"></i> Recepção</span>
+                            <i class="fas fa-trash-alt" style="color:#EF4444; cursor:pointer;"></i>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #E2E8F0; padding:12px 0;">
+                            <span style="color:#0B1626; font-weight:500;"><i class="fas fa-bars" style="color:#94A3B8; margin-right:12px;"></i> Louvor</span>
+                            <i class="fas fa-trash-alt" style="color:#EF4444; cursor:pointer;"></i>
+                        </div>
+                        <!-- ... more mock areas ... -->
+                        <button style="width:100%; background:#FFF; border:1px solid #0B1626; color:#0B1626; border-radius:8px; padding:12px; margin-top:20px; font-weight:600; cursor:pointer;"><i class="fas fa-plus"></i> Adicionar área</button>
+                    </div>
+                </div>
 
-            <!-- PAGE: LIDERANCAS -->
+                <div id="settings-tab-status" style="display:none;">
+                    <div style="display:flex; align-items:center; margin-bottom: 25px;">
+                        <i class="fas fa-arrow-left" onclick="openAdminSettingsTab('main')" style="font-size: 1.2rem; cursor: pointer; color: #0B1626; margin-right: 15px;"></i>
+                        <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #0B1626;">Status do Sistema</h2>
+                    </div>
+                    <!-- OLD TOOLS MOVED HERE -->
+                    <div class="panel-card" style="background:#fff !important; margin-bottom:30px; border:1px solid #e2e8f0;">
+                        <div class="panel-title" style="color:#1a1a1a; font-weight:800; font-size:1.1rem; margin-bottom:20px;">
+                            <span><i class="fas fa-book" style="color:var(--gold-accent); margin-right:10px;"></i>Manual do Usuário</span>
+                        </div>
+                        <button onclick="openUserManualModal()" style="background:#111827; color:var(--gold-accent); border:none; border-radius:12px; padding:12px 24px; font-weight:800; cursor:pointer; font-family:'Outfit'; display:flex; align-items:center; gap:8px;">
+                            <i class="fas fa-eye"></i> Visualizar Manual
+                        </button>
+                    </div>
+                    
+                    <div class="panel-card" style="background:#fff !important; margin-bottom:30px; border:1px solid #e2e8f0;">
+                        <div class="panel-title" style="color:#1a1a1a; font-weight:800; font-size:1.1rem; margin-bottom:20px;">
+                            <span><i class="fas fa-tools" style="color:var(--gold-accent); margin-right:10px;"></i>Ferramentas Técnicas</span>
+                        </div>
+                        <button onclick="runGlobalReclassification()" style="background:#1e293b; color:white; font-weight:800; padding:12px 20px; border-radius:10px; border:none; cursor:pointer; width:100%; margin-bottom:10px;">
+                            <i class="fas fa-sync"></i> Reclassificar Base Global
+                        </button>
+                        <button onclick="runIntegrationHousekeeping()" style="background:#f1f5f9; color:#475569; font-weight:800; padding:12px 20px; border-radius:10px; border:none; cursor:pointer; width:100%; margin-bottom:10px;">
+                            <i class="fas fa-broom"></i> Limpeza de Registros
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+            
+            <script>
+            function openAdminSettingsTab(tab) {
+                document.getElementById('settings-main-menu').style.display = 'none';
+                document.getElementById('settings-tab-emails').style.display = 'none';
+                document.getElementById('settings-tab-horarios').style.display = 'none';
+                document.getElementById('settings-tab-mensagens').style.display = 'none';
+                document.getElementById('settings-tab-areas').style.display = 'none';
+                document.getElementById('settings-tab-status').style.display = 'none';
+                
+                if (tab === 'main') {
+                    document.getElementById('settings-main-menu').style.display = 'block';
+                } else {
+                    document.getElementById('settings-tab-' + tab).style.display = 'block';
+                }
+            }
+            function saveAdminSettings() {
+                alert('Configurações salvas (mock). A integração com Firestore ocorrerá no próximo passo.');
+            }
+            </script>
+
+<!-- PAGE: LIDERANCAS -->
             <div id="page-liderancas" class="page-content" style="display:none;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                     <h2 style="margin:0; font-size:1.2rem; color:#2c3e50;"><i class="fas fa-medal"
