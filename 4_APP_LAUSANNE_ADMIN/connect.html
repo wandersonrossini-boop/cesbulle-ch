@@ -18,17 +18,21 @@
     <script src="js/firebase-config.js?v=70.3.79"></script>
 
     <style>
-                :root {
-            --gold: #0B1626; 
-            --gold-glow: rgba(11, 22, 38, 0.1);
-            --gold-gradient: none;
-            --bg-dark: #FFFFFF; 
-            --card-bg: #F8FAFC;
+                        :root {
+            --cme-teal: #3B7C84;
+            --cme-dark-teal: #173F63;
+            --cme-gray-blue: #64748B;
+            --cme-light-gray: #F8FAFC;
+            --cme-white: #FFFFFF;
+            --cme-gold: #C9A050;
+            
+            --gold: var(--cme-gold);
+            --bg-dark: var(--cme-white); 
+            --card-bg: var(--cme-white);
             --border-color: #E2E8F0;
-            --text-color: #0B1626;
-            --text-muted: #64748B;
+            --text-color: var(--cme-dark-teal);
+            --text-muted: var(--cme-gray-blue);
             --font-main: 'Inter', sans-serif;
-            --font-serif: 'Inter', sans-serif;
             
             --blue-light: #F0F5FA;
             --blue-accent: #3B82F6;
@@ -470,33 +474,33 @@
 
     <!-- ═══ SCREEN 1: INÍCIO (ACOLHIMENTO) ═══ -->
     <div id="screen-inicio" class="app-screen active">
-        <h2 style="font-family: 'Inter', sans-serif; font-size: 2.2rem; font-weight: 700; color: #0B1626; margin-bottom: 5px; line-height: 1.1;">
+        <h2 style="font-family: 'Inter', sans-serif; font-size: 2.2rem; font-weight: 700; color: #173F63; margin-bottom: 5px; line-height: 1.1;">
             Olá<span id="welcome-name"></span>.
         </h2>
-        <h2 style="font-family: 'Inter', sans-serif; font-size: 2.2rem; font-weight: 400; color: #0B1626; margin-top: 0; line-height: 1.1;">
+        <h2 style="font-family: 'Inter', sans-serif; font-size: 2.2rem; font-weight: 400; color: #173F63; margin-top: 0; line-height: 1.1;">
             Como você está?
         </h2>
-        <p style="font-size: 1rem; color: #94A3B8; margin-top: 10px; margin-bottom: 40px; margin-left: 2px;">Estamos aqui.</p>
+        <p style="font-size: 1rem; color: #94A3B8; margin-top: 10px; margin-bottom: 40px; margin-left: 2px;">Estamos aqui para servir você.<div style="width: 30px; height: 3px; background: #C9A050; margin-top: 10px; border-radius: 2px;"></div></p>
 
-        <h3 style="font-size: 1.15rem; color: #0B1626; margin-bottom: 15px; font-weight: 700; margin-left: 2px;">Como podemos ajudar?</h3>
+        <h3 style="font-size: 1.15rem; color: #173F63; margin-bottom: 15px; font-weight: 700; margin-left: 2px;">Como podemos ajudar?</h3>
 
         <div class="app-card" onclick="switchTab('espiritual')" style="background: var(--blue-light); border:none; border-left: 5px solid var(--blue-accent); border-radius: 12px; padding: 22px 20px; margin-bottom: 15px; cursor: pointer; box-shadow:none;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div>
-                    <h3 style="margin:0; font-size: 1.15rem; color: #0B1626; font-weight: 700; margin-bottom:5px;">Área espiritual</h3>
-                    <p style="margin:0; font-size: 0.95rem; color: #475569; padding-right:10px;">Oração, uma palavra ou visita da nossa equipe.</p>
+                    <h3 style="margin:0; font-size: 1.15rem; color: #173F63; font-weight: 700; margin-bottom:5px;">Área espiritual</h3>
+                    <p style="margin:0; font-size: 0.95rem; color: #475569; padding-right:10px;">Pedido de oração, uma palavra ou visita da nossa equipe.</p>
                 </div>
-                <i class="fas fa-chevron-right" style="color: #0B1626;"></i>
+                <i class="fas fa-chevron-right" style="color: #173F63;"></i>
             </div>
         </div>
 
         <div class="app-card" onclick="switchTab('social')" style="background: var(--green-light); border:none; border-left: 5px solid var(--green-accent); border-radius: 12px; padding: 22px 20px; margin-bottom: 30px; cursor: pointer; box-shadow:none;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div>
-                    <h3 style="margin:0; font-size: 1.15rem; color: #0B1626; font-weight: 700; margin-bottom:5px;">Área social</h3>
-                    <p style="margin:0; font-size: 0.95rem; color: #475569; padding-right:10px;">Integração no país, preciso de ajuda ou agendar um horário.</p>
+                    <h3 style="margin:0; font-size: 1.15rem; color: #173F63; font-weight: 700; margin-bottom:5px;">Área social</h3>
+                    <p style="margin:0; font-size: 0.95rem; color: #475569; padding-right:10px;">Apoio no país, ajuda em necessidades e agendamento de horário.</p>
                 </div>
-                <i class="fas fa-chevron-right" style="color: #0B1626;"></i>
+                <i class="fas fa-chevron-right" style="color: #173F63;"></i>
             </div>
         </div>
     </div>
@@ -507,33 +511,33 @@
     <!-- SCREEN: ESPIRITUAL -->
     <div id="screen-espiritual" class="app-screen">
         <div style="display:flex; align-items:center; margin-bottom: 25px;">
-            <i class="fas fa-chevron-left" onclick="switchTab('inicio')" style="font-size: 1.2rem; cursor: pointer; color: #0B1626; margin-right: 15px;"></i>
-            <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #0B1626;">Área espiritual</h2>
+            <i class="fas fa-chevron-left" onclick="switchTab('inicio')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
+            <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Área espiritual</h2>
         </div>
         <p style="font-size: 0.95rem; color: #475569; margin-bottom: 20px; font-family:'Inter', sans-serif;">Como podemos te ajudar na área espiritual?</p>
         
         <div class="app-card" onclick="switchTab('oracao')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
-            <i class="fas fa-praying-hands" style="font-size: 1.5rem; color: #0B1626; margin-right: 15px; width: 30px; text-align:center;"></i>
+            <i class="fas fa-praying-hands" style="font-size: 1.5rem; color: #173F63; margin-right: 15px; width: 30px; text-align:center;"></i>
             <div style="flex:1;">
-                <h3 style="margin:0; font-size: 1.05rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Oração</h3>
+                <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Oração</h3>
                 <p style="margin:0; font-size: 0.85rem; color: #64748B;">Envie seu pedido de oração.</p>
             </div>
             <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
         </div>
 
         <div class="app-card" onclick="switchTab('visita')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
-            <i class="fas fa-book-open" style="font-size: 1.5rem; color: #0B1626; margin-right: 15px; width: 30px; text-align:center;"></i>
+            <i class="fas fa-book-open" style="font-size: 1.5rem; color: #173F63; margin-right: 15px; width: 30px; text-align:center;"></i>
             <div style="flex:1;">
-                <h3 style="margin:0; font-size: 1.05rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Uma palavra</h3>
+                <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Uma palavra</h3>
                 <p style="margin:0; font-size: 0.85rem; color: #64748B;">Converse com um ministro.</p>
             </div>
             <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
         </div>
 
         <div class="app-card" onclick="switchTab('visita')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin-bottom: 30px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
-            <i class="fas fa-users" style="font-size: 1.5rem; color: #0B1626; margin-right: 15px; width: 30px; text-align:center;"></i>
+            <i class="fas fa-users" style="font-size: 1.5rem; color: #173F63; margin-right: 15px; width: 30px; text-align:center;"></i>
             <div style="flex:1;">
-                <h3 style="margin:0; font-size: 1.05rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Visita</h3>
+                <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Visita</h3>
                 <p style="margin:0; font-size: 0.85rem; color: #64748B;">Solicite uma visita da nossa equipe.</p>
             </div>
             <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
@@ -550,15 +554,15 @@
     <!-- SCREEN: SOCIAL -->
     <div id="screen-social" class="app-screen">
         <div style="display:flex; align-items:center; margin-bottom: 25px;">
-            <i class="fas fa-chevron-left" onclick="switchTab('inicio')" style="font-size: 1.2rem; cursor: pointer; color: #0B1626; margin-right: 15px;"></i>
-            <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #0B1626;">Área social</h2>
+            <i class="fas fa-chevron-left" onclick="switchTab('inicio')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
+            <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Área social</h2>
         </div>
         <p style="font-size: 0.95rem; color: #475569; margin-bottom: 20px; font-family:'Inter', sans-serif;">Como podemos te ajudar na área social?</p>
         
         <div class="app-card" onclick="switchTab('visita')" style="background: var(--green-light); border:none; border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
             <i class="fas fa-user-friends" style="font-size: 1.5rem; color: var(--green-accent); margin-right: 15px; width: 30px; text-align:center;"></i>
             <div style="flex:1;">
-                <h3 style="margin:0; font-size: 1.05rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Integração no país</h3>
+                <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Integração no país</h3>
                 <p style="margin:0; font-size: 0.85rem; color: #64748B;">Orientação e apoio para sua adaptação.</p>
             </div>
             <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
@@ -567,7 +571,7 @@
         <div class="app-card" onclick="switchTab('visita')" style="background: var(--green-light); border:none; border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
             <i class="fas fa-life-ring" style="font-size: 1.5rem; color: var(--green-accent); margin-right: 15px; width: 30px; text-align:center;"></i>
             <div style="flex:1;">
-                <h3 style="margin:0; font-size: 1.05rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Preciso de ajuda</h3>
+                <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Preciso de ajuda</h3>
                 <p style="margin:0; font-size: 0.85rem; color: #64748B;">Solicite apoio para uma necessidade.</p>
             </div>
             <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
@@ -576,7 +580,7 @@
         <div class="app-card" onclick="switchTab('visita')" style="background: var(--green-light); border:none; border-radius: 12px; padding: 20px; margin-bottom: 30px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
             <i class="fas fa-calendar-check" style="font-size: 1.5rem; color: var(--green-accent); margin-right: 15px; width: 30px; text-align:center;"></i>
             <div style="flex:1;">
-                <h3 style="margin:0; font-size: 1.05rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Agendar horário</h3>
+                <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Agendar horário</h3>
                 <p style="margin:0; font-size: 0.85rem; color: #64748B;">Fale com a área social e agende atendimento.</p>
             </div>
             <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
@@ -593,8 +597,8 @@
     <!-- SCREEN: AGENDAMENTOS -->
     <div id="screen-agendamentos" class="app-screen">
         <div style="display:flex; align-items:center; margin-bottom: 25px;">
-            <i class="fas fa-arrow-left" onclick="switchTab('membros')" style="font-size: 1.2rem; cursor: pointer; color: #0B1626; margin-right: 15px;"></i>
-            <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #0B1626;">Agendamentos</h2>
+            <i class="fas fa-arrow-left" onclick="switchTab('membros')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
+            <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Agendamentos</h2>
         </div>
         <p style="font-size: 0.95rem; color: #475569; margin-bottom: 20px; font-family:'Inter', sans-serif;">Escolha o que deseja agendar.</p>
         
@@ -603,10 +607,10 @@
                 <i class="fas fa-water" style="color: #0284C7; font-size: 1.2rem;"></i>
             </div>
             <div style="flex:1;">
-                <h3 style="margin:0; font-size: 1.05rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Batismo nas Águas</h3>
+                <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Batismo nas Águas</h3>
                 <p style="margin:0; font-size: 0.85rem; color: #64748B;">Inscreva-se para dar seu passo de fé.</p>
             </div>
-            <i class="fas fa-chevron-right" style="color: #0B1626; font-size:0.9rem;"></i>
+            <i class="fas fa-chevron-right" style="color: #173F63; font-size:0.9rem;"></i>
         </div>
 
         <div class="app-card" onclick="openModal('modal-bebe')" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
@@ -614,10 +618,10 @@
                 <i class="fas fa-baby" style="color: #D97706; font-size: 1.2rem;"></i>
             </div>
             <div style="flex:1;">
-                <h3 style="margin:0; font-size: 1.05rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Apresentação de Bebê</h3>
+                <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Apresentação de Bebê</h3>
                 <p style="margin:0; font-size: 0.85rem; color: #64748B;">Consagração do seu bebê na igreja.</p>
             </div>
-            <i class="fas fa-chevron-right" style="color: #0B1626; font-size:0.9rem;"></i>
+            <i class="fas fa-chevron-right" style="color: #173F63; font-size:0.9rem;"></i>
         </div>
 
         <div class="app-card" onclick="switchTab('visita')" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
@@ -625,10 +629,10 @@
                 <i class="fas fa-users" style="color: #16A34A; font-size: 1.2rem;"></i>
             </div>
             <div style="flex:1;">
-                <h3 style="margin:0; font-size: 1.05rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Pequenos Grupos / Células</h3>
+                <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Pequenos Grupos / Células</h3>
                 <p style="margin:0; font-size: 0.85rem; color: #64748B;">Participe de um grupo em sua região.</p>
             </div>
-            <i class="fas fa-chevron-right" style="color: #0B1626; font-size:0.9rem;"></i>
+            <i class="fas fa-chevron-right" style="color: #173F63; font-size:0.9rem;"></i>
         </div>
     </div>
 <div id="screen-agenda" class="app-screen">
@@ -681,9 +685,9 @@
     </div>
 
     <!-- ═══ SCREEN 3: MEMBROS CES ═══ -->
-        <div id="screen-membros" class="app-screen" style="padding-top: 0; background: #0B1626; min-height: 100vh;">
+        <div id="screen-membros" class="app-screen" style="padding-top: 0; background: #173F63; min-height: 100vh;">
         <!-- Header Navy -->
-        <div style="background: #0B1626; padding: 40px 20px 30px; position: relative;">
+        <div style="background: #FFFFFF; padding: 30px 20px 20px; position: relative; border-bottom: 1px solid #E2E8F0;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 30px;">
                 <img src="assets/logo_3.png" style="height: 40px; filter: brightness(0) invert(1);" alt="CME Logo">
                 <div style="display:flex; align-items:center; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; color: #FFF; font-weight: 500; font-size: 0.9rem;">
@@ -692,22 +696,22 @@
                     <i class="fas fa-chevron-down" style="margin-left: 8px; font-size: 0.7rem;"></i>
                 </div>
             </div>
-            <h2 style="color: #FFFFFF; font-size: 2.2rem; font-weight: 700; margin-bottom: 5px; font-family: 'Inter', sans-serif; letter-spacing:-0.5px;">Área do Membro</h2>
-            <p style="color: #E2E8F0; font-size: 1.05rem; font-weight: 400; line-height: 1.4; font-family: 'Inter', sans-serif;">Participe e se conecte com<br>a vida da CME.</p>
+            <h2 style="color: #173F63; font-size: 2.2rem; font-weight: 700; margin-bottom: 5px; font-family: 'Inter', sans-serif; letter-spacing:-0.5px;">Área do Membro</h2>
+            <p style="color: #64748B; font-size: 1.05rem; font-weight: 400; line-height: 1.4; font-family: 'Inter', sans-serif;">Participe e se conecte com<br>a vida da CME.</p>
         </div>
 
         <!-- Body Area (Cards over a slight gradient or straight white) -->
-        <div style="background: linear-gradient(180deg, rgba(11,22,38,1) 0%, #F8FAFC 20%, #F8FAFC 100%); padding: 0 20px 40px; min-height: 60vh;">
+        <div style="background: #F8FAFC; padding: 0 20px 40px; min-height: 60vh;">
             
             <div class="app-card" onclick="switchTab('agendamentos')" style="background: #FFFFFF; border: 1px solid rgba(255,255,255,0.8); border-radius: 16px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display:flex; align-items:center;">
                 <div style="background: #FEF3C7; width: 50px; height: 50px; border-radius: 12px; display:flex; justify-content:center; align-items:center; margin-right: 15px; flex-shrink: 0;">
                     <i class="fas fa-calendar-alt" style="color: #D97706; font-size: 1.4rem;"></i>
                 </div>
                 <div style="flex:1;">
-                    <h3 style="margin:0; font-size: 1.1rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Agendamentos</h3>
+                    <h3 style="margin:0; font-size: 1.1rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Agendamentos</h3>
                     <p style="margin:0; font-size: 0.85rem; color: #475569; line-height: 1.3;">Batismo, Apresentação de Bebê<br>e Células.</p>
                 </div>
-                <i class="fas fa-chevron-right" style="color: #0B1626; font-size: 1rem;"></i>
+                <i class="fas fa-chevron-right" style="color: #173F63; font-size: 1rem;"></i>
             </div>
 
             <div class="app-card" onclick="switchTab('ficha')" style="background: #FFFFFF; border: 1px solid rgba(255,255,255,0.8); border-radius: 16px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display:flex; align-items:center;">
@@ -715,10 +719,10 @@
                     <i class="fas fa-user" style="color: #0284C7; font-size: 1.4rem;"></i>
                 </div>
                 <div style="flex:1;">
-                    <h3 style="margin:0; font-size: 1.1rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Meu cadastro</h3>
+                    <h3 style="margin:0; font-size: 1.1rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Meu cadastro</h3>
                     <p style="margin:0; font-size: 0.85rem; color: #475569; line-height: 1.3;">Consulte e atualize seus dados.</p>
                 </div>
-                <i class="fas fa-chevron-right" style="color: #0B1626; font-size: 1rem;"></i>
+                <i class="fas fa-chevron-right" style="color: #173F63; font-size: 1rem;"></i>
             </div>
 
             <div class="app-card" onclick="switchTab('servir')" style="background: #FFFFFF; border: 1px solid rgba(255,255,255,0.8); border-radius: 16px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display:flex; align-items:center;">
@@ -726,10 +730,10 @@
                     <i class="fas fa-users" style="color: #16A34A; font-size: 1.4rem;"></i>
                 </div>
                 <div style="flex:1;">
-                    <h3 style="margin:0; font-size: 1.1rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Servir</h3>
+                    <h3 style="margin:0; font-size: 1.1rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Servir</h3>
                     <p style="margin:0; font-size: 0.85rem; color: #475569; line-height: 1.3;">Encontre um lugar para servir.</p>
                 </div>
-                <i class="fas fa-chevron-right" style="color: #0B1626; font-size: 1rem;"></i>
+                <i class="fas fa-chevron-right" style="color: #173F63; font-size: 1rem;"></i>
             </div>
             
             <div class="app-card" onclick="openModal('modal-dizimos')" style="background: #FFFFFF; border: 1px solid rgba(255,255,255,0.8); border-radius: 16px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display:flex; align-items:center;">
@@ -737,10 +741,10 @@
                     <i class="fas fa-hand-holding-heart" style="color: #9333EA; font-size: 1.4rem;"></i>
                 </div>
                 <div style="flex:1;">
-                    <h3 style="margin:0; font-size: 1.1rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Dízimos e Ofertas</h3>
+                    <h3 style="margin:0; font-size: 1.1rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Dízimos e Ofertas</h3>
                     <p style="margin:0; font-size: 0.85rem; color: #475569; line-height: 1.3;">Veja os dados bancários.</p>
                 </div>
-                <i class="fas fa-chevron-right" style="color: #0B1626; font-size: 1rem;"></i>
+                <i class="fas fa-chevron-right" style="color: #173F63; font-size: 1rem;"></i>
             </div>
             
             <div class="app-card" onclick="switchTab('visita')" style="background: #FFFFFF; border: 1px solid rgba(255,255,255,0.8); border-radius: 16px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display:flex; align-items:center;">
@@ -748,10 +752,10 @@
                     <i class="fas fa-life-ring" style="color: #DC2626; font-size: 1.4rem;"></i>
                 </div>
                 <div style="flex:1;">
-                    <h3 style="margin:0; font-size: 1.1rem; color: #0B1626; font-weight: 700; margin-bottom:3px;">Precisa de ajuda?</h3>
+                    <h3 style="margin:0; font-size: 1.1rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Precisa de ajuda?</h3>
                     <p style="margin:0; font-size: 0.85rem; color: #475569; line-height: 1.3;">Fale com nossa equipe.</p>
                 </div>
-                <i class="fas fa-chevron-right" style="color: #0B1626; font-size: 1rem;"></i>
+                <i class="fas fa-chevron-right" style="color: #173F63; font-size: 1rem;"></i>
             </div>
 
         </div>
@@ -771,8 +775,8 @@
     <!-- SCREEN: FICHA (READ ONLY) -->
 <div id="screen-ficha" class="app-screen">
     <div style="display:flex; align-items:center; margin-bottom: 25px;">
-        <i class="fas fa-arrow-left" onclick="switchTab('membros')" style="font-size: 1.2rem; cursor: pointer; color: #0B1626; margin-right: 15px;"></i>
-        <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #0B1626;">Meu cadastro</h2>
+        <i class="fas fa-arrow-left" onclick="switchTab('membros')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
+        <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Meu cadastro</h2>
     </div>
 
     <div style="background: #F0F5FA; border-radius: 12px; padding: 20px; display:flex; align-items:flex-start; margin-bottom: 25px;">
@@ -786,7 +790,7 @@
         <div style="padding: 15px 20px; border-bottom: 1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
             <div>
                 <p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">Nome completo</p>
-                <p style="margin:0; font-size: 1rem; color: #0B1626; font-weight: 500;" id="ro-nome">Visualizar...</p>
+                <p style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;" id="ro-nome">Visualizar...</p>
             </div>
             <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
         </div>
@@ -794,7 +798,7 @@
         <div style="padding: 15px 20px; border-bottom: 1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
             <div>
                 <p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">E-mail</p>
-                <p style="margin:0; font-size: 1rem; color: #0B1626; font-weight: 500;" id="ro-email">Visualizar...</p>
+                <p style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;" id="ro-email">Visualizar...</p>
             </div>
             <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
         </div>
@@ -802,7 +806,7 @@
         <div style="padding: 15px 20px; border-bottom: 1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
             <div>
                 <p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">Telefone / WhatsApp</p>
-                <p style="margin:0; font-size: 1rem; color: #0B1626; font-weight: 500;" id="ro-telefone">Visualizar...</p>
+                <p style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;" id="ro-telefone">Visualizar...</p>
             </div>
             <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
         </div>
@@ -810,7 +814,7 @@
         <div style="padding: 15px 20px; border-bottom: 1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
             <div>
                 <p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">Data de nascimento</p>
-                <p style="margin:0; font-size: 1rem; color: #0B1626; font-weight: 500;" id="ro-nasc">Visualizar...</p>
+                <p style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;" id="ro-nasc">Visualizar...</p>
             </div>
             <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
         </div>
@@ -818,7 +822,7 @@
         <div style="padding: 15px 20px; border-bottom: 1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
             <div>
                 <p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">Estado civil</p>
-                <p style="margin:0; font-size: 1rem; color: #0B1626; font-weight: 500;" id="ro-civil">Visualizar...</p>
+                <p style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;" id="ro-civil">Visualizar...</p>
             </div>
             <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
         </div>
@@ -826,7 +830,7 @@
         <div style="padding: 15px 20px; border-bottom: 1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
             <div>
                 <p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">Endereço</p>
-                <p style="margin:0; font-size: 1rem; color: #0B1626; font-weight: 500;" id="ro-endereco">Visualizar...</p>
+                <p style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;" id="ro-endereco">Visualizar...</p>
             </div>
             <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
         </div>
@@ -834,13 +838,13 @@
         <div style="padding: 15px 20px; display:flex; justify-content:space-between; align-items:center;">
             <div>
                 <p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">Profissão</p>
-                <p style="margin:0; font-size: 1rem; color: #0B1626; font-weight: 500;" id="ro-profissao">Visualizar...</p>
+                <p style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;" id="ro-profissao">Visualizar...</p>
             </div>
             <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
         </div>
     </div>
 
-    <button onclick="openModal('modal-ficha-old')" style="width: 100%; background: #0B1626; color: #FFFFFF; border: none; border-radius: 8px; padding: 18px; font-size: 1.1rem; font-weight: 600; cursor: pointer; font-family:'Inter', sans-serif;">
+    <button onclick="openModal('modal-ficha-old')" style="width: 100%; background: #173F63; color: #FFFFFF; border: none; border-radius: 8px; padding: 18px; font-size: 1.1rem; font-weight: 600; cursor: pointer; font-family:'Inter', sans-serif;">
         Editar meus dados
     </button>
 </div>
@@ -1121,8 +1125,8 @@
 <!-- SCREEN: SERVIR -->
 <div id="screen-servir" class="app-screen">
     <div style="display:flex; align-items:center; margin-bottom: 25px;">
-        <i class="fas fa-arrow-left" onclick="switchTab('membros')" style="font-size: 1.2rem; cursor: pointer; color: #0B1626; margin-right: 15px;"></i>
-        <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #0B1626;">Servir no Reino</h2>
+        <i class="fas fa-arrow-left" onclick="switchTab('membros')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
+        <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Servir no Reino</h2>
     </div>
     
     <p style="font-size: 0.95rem; color: #475569; margin-bottom: 25px; line-height: 1.5; font-family:'Inter', sans-serif;">
@@ -1132,17 +1136,17 @@
     <div id="servir-form">
         <div style="margin-bottom: 20px;">
             <label style="display:block; font-size: 0.9rem; color: #475569; margin-bottom: 8px;">Seu nome</label>
-            <input type="text" id="servir-nome" placeholder="João da Silva" style="width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1rem; color: #0B1626; font-family:'Inter', sans-serif;">
+            <input type="text" id="servir-nome" placeholder="João da Silva" style="width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1rem; color: #173F63; font-family:'Inter', sans-serif;">
         </div>
         
         <div style="margin-bottom: 20px;">
             <label style="display:block; font-size: 0.9rem; color: #475569; margin-bottom: 8px;">WhatsApp</label>
-            <input type="tel" id="servir-fone" placeholder="+41 79 123 45 67" style="width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1rem; color: #0B1626; font-family:'Inter', sans-serif;">
+            <input type="tel" id="servir-fone" placeholder="+41 79 123 45 67" style="width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1rem; color: #173F63; font-family:'Inter', sans-serif;">
         </div>
         
         <div style="margin-bottom: 20px;">
             <label style="display:block; font-size: 0.9rem; color: #475569; margin-bottom: 8px;">Em qual área você gostaria de servir?</label>
-            <select id="servir-area" style="width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1rem; color: #0B1626; font-family:'Inter', sans-serif; background: #FFFFFF; appearance: none;">
+            <select id="servir-area" style="width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1rem; color: #173F63; font-family:'Inter', sans-serif; background: #FFFFFF; appearance: none;">
                 <option value="">Selecione uma área...</option>
                 <option value="KIDS">KIDS</option>
                 <option value="RECEPÇÃO">RECEPÇÃO</option>
@@ -1156,19 +1160,19 @@
         
         <div style="margin-bottom: 25px;">
             <label style="display:block; font-size: 0.9rem; color: #475569; margin-bottom: 8px;">Conte-nos um pouco sobre você e sua disponibilidade.</label>
-            <textarea id="servir-mensagem" rows="3" placeholder="Escreva aqui..." style="width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1rem; color: #0B1626; font-family:'Inter', sans-serif;"></textarea>
+            <textarea id="servir-mensagem" rows="3" placeholder="Escreva aqui..." style="width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1rem; color: #173F63; font-family:'Inter', sans-serif;"></textarea>
         </div>
 
-        <button onclick="submitForm('servir', this)" style="width: 100%; background: #0B1626; color: #FFFFFF; border: none; border-radius: 8px; padding: 18px; font-size: 1.1rem; font-weight: 600; cursor: pointer; font-family:'Inter', sans-serif;">
+        <button onclick="submitForm('servir', this)" style="width: 100%; background: #173F63; color: #FFFFFF; border: none; border-radius: 8px; padding: 18px; font-size: 1.1rem; font-weight: 600; cursor: pointer; font-family:'Inter', sans-serif;">
             Enviar interesse
         </button>
     </div>
 
     <div class="success-state" id="servir-success" style="display:none; text-align:center; padding-top: 40px;">
-        <div style="background: #0B1626; width: 80px; height: 80px; border-radius: 50%; display:flex; justify-content:center; align-items:center; margin: 0 auto 20px;">
+        <div style="background: #173F63; width: 80px; height: 80px; border-radius: 50%; display:flex; justify-content:center; align-items:center; margin: 0 auto 20px;">
             <i class="fas fa-check" style="color: #FFFFFF; font-size: 2.5rem;"></i>
         </div>
-        <h3 style="font-size: 1.5rem; color: #0B1626; font-weight: 700; margin-bottom: 15px;">Seu interesse foi enviado!</h3>
+        <h3 style="font-size: 1.5rem; color: #173F63; font-weight: 700; margin-bottom: 15px;">Seu interesse foi enviado!</h3>
         <p style="font-size: 1.05rem; color: #475569; line-height: 1.5; margin-bottom: 30px;">
             Nossa equipe irá analisar suas informações e entrará em contato em breve.
         </p>
