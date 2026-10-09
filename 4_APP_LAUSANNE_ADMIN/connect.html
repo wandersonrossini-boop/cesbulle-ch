@@ -303,7 +303,7 @@
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border-top: 1px solid #E2E8F0;
             display: flex; justify-content: space-around;
-            padding: 10px 10px 20px; z-index: 500;
+            padding: 10px 10px 22px; z-index: 500;
         }
         .nav-item {
             flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;
@@ -312,7 +312,8 @@
         }
         .nav-item i { font-size: 1.25rem; }
         .nav-item span { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2px; }
-        .nav-item.active { color: var(--cme-teal); border-bottom: 2px solid var(--cme-teal); padding-bottom: 3px; }
+        .nav-item.active { color: var(--cme-teal); position: relative; }
+        .nav-item.active::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 25px; height: 3px; background: var(--cme-teal); border-radius: 2px; }
 
         /* ── CALENDAR SCHEDULE VIEW ── */
         .schedule-card {
@@ -470,20 +471,32 @@
 
     <!-- HEADER (Persistent logo on all screens) -->
     <header class="app-header">
-        <img class="app-logo" src="assets/logo_3.png" alt="Logo Catedral Lausanne">
+        <img class="app-logo" src="assets/logo.png" alt="Logo Catedral Lausanne">
     </header>
 
     <!-- ═══ SCREEN 1: INÍCIO (ACOLHIMENTO) ═══ -->
     <div id="screen-inicio" class="app-screen active">
-        <h2 style="font-family: 'Inter', sans-serif; font-size: 2.2rem; font-weight: 700; color: #173F63; margin-bottom: 5px; line-height: 1.1;">
+        <!-- HEADER HOME -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 30px;">
+            <img src="assets/logo.png" style="height: 45px; object-fit: contain;" alt="CME Lausanne">
+            <div style="display:flex; align-items:center; background: #F8FAFC; padding: 6px 14px; border-radius: 20px; border: 1px solid #E2E8F0; color: #173F63; font-weight: 600; font-size: 0.9rem;">
+                <i class="fas fa-user" style="margin-right: 8px; color: #3B7C84;"></i>
+                <span id="welcome-name-top">Visitante</span>
+            </div>
+        </div>
+
+        <h2 style="font-family: 'Inter', sans-serif; font-size: 2.4rem; font-weight: 700; color: #173F63; margin-bottom: 2px; line-height: 1.1; letter-spacing: -0.5px;">
             Olá<span id="welcome-name"></span>.
         </h2>
-        <h2 style="font-family: 'Inter', sans-serif; font-size: 2.2rem; font-weight: 400; color: #173F63; margin-top: 0; line-height: 1.1;">
+        <h2 style="font-family: 'Inter', sans-serif; font-size: 2.2rem; font-weight: 400; color: #173F63; margin-top: 0; margin-bottom: 12px; line-height: 1.1; letter-spacing: -0.5px;">
             Como você está?
         </h2>
-        <p style="font-size: 1rem; color: #94A3B8; margin-top: 10px; margin-bottom: 40px; margin-left: 2px;">Estamos aqui para servir você.<div style="width: 30px; height: 3px; background: #C9A050; margin-top: 10px; border-radius: 2px;"></div></p>
+        <div style="margin-bottom: 35px;">
+            <p style="font-size: 1.05rem; color: #64748B; margin: 0; font-family: 'Inter', sans-serif;">Estamos aqui para servir você.</p>
+        </div>
 
-        <h3 style="font-size: 1.15rem; color: #173F63; margin-bottom: 15px; font-weight: 700; margin-left: 2px;">Como podemos ajudar?</h3>
+        <div style="width: 35px; height: 3px; background: var(--cme-gold); margin-bottom: 15px; border-radius: 2px;"></div>
+        <h3 style="font-size: 1.15rem; color: #173F63; margin-bottom: 20px; font-weight: 700; font-family: 'Inter', sans-serif;">Como podemos ajudar?</h3>
 
         <div class="app-card" onclick="switchTab('espiritual')" style="background: var(--blue-light); border:none; border-left: 5px solid var(--blue-accent); border-radius: 12px; padding: 22px 20px; margin-bottom: 15px; cursor: pointer; box-shadow:none;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -690,7 +703,7 @@
         <!-- Header Navy -->
         <div style="background: #FFFFFF; padding: 30px 20px 20px; position: relative; border-bottom: 1px solid #E2E8F0;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 30px;">
-                <img src="assets/logo_3.png" style="height: 40px; filter: brightness(0) invert(1);" alt="CME Logo">
+                <img src="assets/logo.png" style="height: 40px; filter: brightness(0) invert(1);" alt="CME Logo">
                 <div style="display:flex; align-items:center; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; color: #FFF; font-weight: 500; font-size: 0.9rem;">
                     <i class="fas fa-user" style="margin-right: 8px;"></i>
                     <span id="member-header-name">João</span>
@@ -759,16 +772,6 @@
                 <i class="fas fa-chevron-right" style="color: #173F63; font-size: 1rem;"></i>
             </div>
 
-        </div>
-    </div><!-- Help Banner -->
-        <div class="help-banner-card">
-            <div class="help-banner-text">
-                <h4>Precisa de ajuda?</h4>
-                <p>Fale com nossa equipe.</p>
-            </div>
-            <a href="https://wa.me/41000000000" target="_blank" class="help-banner-btn">
-                Entrar em contato <i class="fas fa-chevron-right"></i>
-            </a>
         </div>
     </div>
 
@@ -1330,9 +1333,14 @@
     // ── GREETING ──
     (function() {
         const name = localStorage.getItem('visitor_first_name');
+        const el = document.getElementById('welcome-name');
+        const elTop = document.getElementById('welcome-name-top');
         if (name) {
-            const el = document.getElementById('welcome-name');
             if (el) el.textContent = ', ' + name;
+            if (elTop) elTop.textContent = name;
+        } else {
+            if (el) el.textContent = '';
+            if (elTop) elTop.parentElement.style.display = 'none';
         }
         const ref = new URLSearchParams(window.location.search).get('ref');
         if (ref) localStorage.setItem('acolhedor_origem', ref);
