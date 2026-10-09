@@ -99,7 +99,7 @@
         .screen-title-serif {
             font-family: var(--font-serif);
             font-size: 2.1rem; font-weight: 600;
-            color: #f7f5f0; line-height: 1.25;
+            color: #173F63; line-height: 1.25;
             text-align: center; margin: 8px 0 2px;
         }
         .screen-subtitle {
@@ -372,14 +372,14 @@
 
         .btn-submit {
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            background: var(--gold-gradient); color: #000000;
+            background: #3B7C84; color: #FFFFFF;
             border: none; padding: 14px 22px; border-radius: 12px;
             font-weight: 800; font-size: 0.85rem; width: 100%;
             text-transform: uppercase; letter-spacing: 1px;
             cursor: pointer; transition: all 0.3s ease;
-            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.25);
+            box-shadow: none;
         }
-        .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(212, 175, 55, 0.35); }
+        .btn-submit:hover { transform: translateY(-1px); background: #2f656b; box-shadow: none; }
 
         .success-state { display: none; text-align: center; padding: 15px 0; }
         .success-state i { font-size: 3.2rem; margin-bottom: 12px; }
@@ -1079,7 +1079,7 @@
                 <textarea id="oracao-pedido" rows="4" placeholder="Escreva aqui pelo que devemos orar..."></textarea>
             </div>
             <button class="btn-submit" onclick="submitForm('oracao', this)">
-                <i class="fas fa-paper-plane"></i> Enviar ao Altar
+                ENVIAR AO ALTAR
             </button>
         </div>
         <div class="success-state" id="oracao-success">
@@ -1114,7 +1114,7 @@
                 <input type="text" id="visita-assunto" placeholder="Descreva brevemente...">
             </div>
             <button class="btn-submit btn-blue" onclick="submitForm('visita', this)">
-                <i class="fas fa-headset"></i> Solicitar Suporte
+                SOLICITAR SUPORTE
             </button>
         </div>
         <div class="success-state" id="visita-success">
@@ -1541,7 +1541,7 @@
                 if (ped) ped.value = '';
                 const btn = document.querySelector('#oracao-form button');
                 if (btn) {
-                    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar ao Altar';
+                    btn.innerHTML = 'ENVIAR AO ALTAR';
                     btn.style.opacity = '1';
                     btn.style.pointerEvents = 'auto';
                 }
@@ -1554,7 +1554,7 @@
                 if (a) a.value = '';
                 const btn = document.querySelector('#visita-form button');
                 if (btn) {
-                    btn.innerHTML = '<i class="fas fa-headset"></i> Solicitar Suporte';
+                    btn.innerHTML = 'SOLICITAR SUPORTE';
                     btn.style.opacity = '1';
                     btn.style.pointerEvents = 'auto';
                 }
