@@ -302,7 +302,7 @@
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border-top: 1px solid #E2E8F0;
             display: flex; justify-content: space-around;
-            padding: 10px 10px 22px; z-index: 500;
+            padding: 10px 10px 20px; z-index: 500;
         }
         .nav-item {
             flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;
@@ -311,7 +311,7 @@
         }
         .nav-item i { font-size: 1.25rem; }
         .nav-item span { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2px; }
-        .nav-item.active { color: var(--gold); }
+        .nav-item.active { color: var(--cme-teal); border-bottom: 2px solid var(--cme-teal); padding-bottom: 3px; }
 
         /* ── CALENDAR SCHEDULE VIEW ── */
         .schedule-card {
@@ -704,8 +704,8 @@
         <div style="background: #F8FAFC; padding: 0 20px 40px; min-height: 60vh;">
             
             <div class="app-card" onclick="switchTab('agendamentos')" style="background: #FFFFFF; border: 1px solid rgba(255,255,255,0.8); border-radius: 16px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display:flex; align-items:center;">
-                <div style="background: #FEF3C7; width: 50px; height: 50px; border-radius: 12px; display:flex; justify-content:center; align-items:center; margin-right: 15px; flex-shrink: 0;">
-                    <i class="fas fa-calendar-alt" style="color: #D97706; font-size: 1.4rem;"></i>
+                <div style="width: 40px; height: 40px; display:flex; justify-content:center; align-items:center; margin-right: 15px; flex-shrink: 0;">
+                    <i class="far fa-calendar-alt" style="color: var(--cme-dark-teal); font-size: 1.6rem;"></i>
                 </div>
                 <div style="flex:1;">
                     <h3 style="margin:0; font-size: 1.1rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Agendamentos</h3>
@@ -715,8 +715,8 @@
             </div>
 
             <div class="app-card" onclick="switchTab('ficha')" style="background: #FFFFFF; border: 1px solid rgba(255,255,255,0.8); border-radius: 16px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display:flex; align-items:center;">
-                <div style="background: #E0F2FE; width: 50px; height: 50px; border-radius: 12px; display:flex; justify-content:center; align-items:center; margin-right: 15px; flex-shrink: 0;">
-                    <i class="fas fa-user" style="color: #0284C7; font-size: 1.4rem;"></i>
+                <div style="width: 40px; height: 40px; display:flex; justify-content:center; align-items:center; margin-right: 15px; flex-shrink: 0;">
+                    <i class="far fa-user" style="color: var(--cme-dark-teal); font-size: 1.6rem;"></i>
                 </div>
                 <div style="flex:1;">
                     <h3 style="margin:0; font-size: 1.1rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Meu cadastro</h3>
@@ -726,8 +726,8 @@
             </div>
 
             <div class="app-card" onclick="switchTab('servir')" style="background: #FFFFFF; border: 1px solid rgba(255,255,255,0.8); border-radius: 16px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display:flex; align-items:center;">
-                <div style="background: #DCFCE7; width: 50px; height: 50px; border-radius: 12px; display:flex; justify-content:center; align-items:center; margin-right: 15px; flex-shrink: 0;">
-                    <i class="fas fa-users" style="color: #16A34A; font-size: 1.4rem;"></i>
+                <div style="width: 40px; height: 40px; display:flex; justify-content:center; align-items:center; margin-right: 15px; flex-shrink: 0;">
+                    <i class="far fa-id-badge" style="color: var(--cme-dark-teal); font-size: 1.6rem;"></i>
                 </div>
                 <div style="flex:1;">
                     <h3 style="margin:0; font-size: 1.1rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Servir</h3>
@@ -737,8 +737,8 @@
             </div>
             
             <div class="app-card" onclick="openModal('modal-dizimos')" style="background: #FFFFFF; border: 1px solid rgba(255,255,255,0.8); border-radius: 16px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display:flex; align-items:center;">
-                <div style="background: #F3E8FF; width: 50px; height: 50px; border-radius: 12px; display:flex; justify-content:center; align-items:center; margin-right: 15px; flex-shrink: 0;">
-                    <i class="fas fa-hand-holding-heart" style="color: #9333EA; font-size: 1.4rem;"></i>
+                <div style="width: 40px; height: 40px; display:flex; justify-content:center; align-items:center; margin-right: 15px; flex-shrink: 0;">
+                    <i class="fas fa-hand-holding-heart" style="color: var(--cme-dark-teal); font-size: 1.6rem;"></i>
                 </div>
                 <div style="flex:1;">
                     <h3 style="margin:0; font-size: 1.1rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Dízimos e Ofertas</h3>
@@ -748,8 +748,8 @@
             </div>
             
             <div class="app-card" onclick="switchTab('visita')" style="background: #FFFFFF; border: 1px solid rgba(255,255,255,0.8); border-radius: 16px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display:flex; align-items:center;">
-                <div style="background: #FEE2E2; width: 50px; height: 50px; border-radius: 12px; display:flex; justify-content:center; align-items:center; margin-right: 15px; flex-shrink: 0;">
-                    <i class="fas fa-life-ring" style="color: #DC2626; font-size: 1.4rem;"></i>
+                <div style="width: 40px; height: 40px; display:flex; justify-content:center; align-items:center; margin-right: 15px; flex-shrink: 0;">
+                    <i class="far fa-life-ring" style="color: var(--cme-dark-teal); font-size: 1.6rem;"></i>
                 </div>
                 <div style="flex:1;">
                     <h3 style="margin:0; font-size: 1.1rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Precisa de ajuda?</h3>
@@ -849,9 +849,10 @@
     </button>
 </div>
 
-<div id="screen-mais" class="app-screen">
-        <h3 class="screen-section-title">Sobre Nós</h3>
-        <p class="screen-section-subtitle">Mais informações e links da Catedral Lausanne.</p>
+<div id="screen-comochegar" class="app-screen" style="padding: 0; background: #F8FAFC;">
+        <div style="background: #FFFFFF; padding: 25px 20px 15px; border-bottom: 1px solid #E2E8F0; margin-bottom: 20px;">
+        <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Como chegar</h2>
+    </div>
 
         <div class="app-card" onclick="window.open('https://maps.google.com/?q=Rue+de+l%27Industrie+39,+1023+Crissier', '_blank')">
             <div class="app-card-icon"><i class="fas fa-location-dot"></i></div>
@@ -954,11 +955,11 @@
             <i class="fas fa-home"></i>
             <span>Início</span>
         </div>
-        <div class="nav-item" id="nav-quemsomos" onclick="switchTab('agenda')">
+        <div class="nav-item" id="nav-quemsomos" onclick="switchTab('quemsomos')">
             <i class="fas fa-building"></i>
             <span>Quem somos</span>
         </div>
-        <div class="nav-item" id="nav-comochegar" onclick="switchTab('agenda')">
+        <div class="nav-item" id="nav-comochegar" onclick="switchTab('comochegar')">
             <i class="fas fa-map-marker-alt"></i>
             <span>Como chegar</span>
         </div>
