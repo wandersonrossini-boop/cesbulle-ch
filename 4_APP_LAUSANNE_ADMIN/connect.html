@@ -469,16 +469,13 @@
 
 <div class="app-container">
 
-    <!-- HEADER (Persistent logo on all screens) -->
-    <header class="app-header">
-        <img class="app-logo" src="assets/logo.png" alt="Logo Catedral Lausanne">
-    </header>
+    
 
     <!-- ═══ SCREEN 1: INÍCIO (ACOLHIMENTO) ═══ -->
     <div id="screen-inicio" class="app-screen active">
         <!-- HEADER HOME -->
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 30px;">
-            <img src="assets/logo.png" style="height: 45px; object-fit: contain;" alt="CME Lausanne">
+            <img src="assets/logo_3.png" style="height: 45px; object-fit: contain; filter: brightness(0) invert(20%) sepia(21%) saturate(3015%) hue-rotate(175deg) brightness(94%) contrast(89%);" alt="CME Lausanne">
             <div style="display:flex; align-items:center; background: #F8FAFC; padding: 6px 14px; border-radius: 20px; border: 1px solid #E2E8F0; color: #173F63; font-weight: 600; font-size: 0.9rem;">
                 <i class="fas fa-user" style="margin-right: 8px; color: #3B7C84;"></i>
                 <span id="welcome-name-top">Visitante</span>
@@ -699,21 +696,15 @@
     </div>
 
     <!-- ═══ SCREEN 3: MEMBROS CES ═══ -->
-        <div id="screen-membros" class="app-screen" style="padding-top: 0; background: #173F63; min-height: 100vh;">
-        <!-- Header Navy -->
-        <div style="background: #FFFFFF; padding: 30px 20px 20px; position: relative; border-bottom: 1px solid #E2E8F0;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 30px;">
-                <img src="assets/logo.png" style="height: 40px; filter: brightness(0) invert(1);" alt="CME Logo">
-                <div style="display:flex; align-items:center; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; color: #FFF; font-weight: 500; font-size: 0.9rem;">
-                    <i class="fas fa-user" style="margin-right: 8px;"></i>
-                    <span id="member-header-name">João</span>
-                    <i class="fas fa-chevron-down" style="margin-left: 8px; font-size: 0.7rem;"></i>
-                </div>
+        <div id="screen-membros" class="app-screen" style="padding: 0; background: #F8FAFC; min-height: 100vh;">
+        <div style="background: #FFFFFF; padding: 25px 20px 15px; border-bottom: 1px solid #E2E8F0; margin-bottom: 20px;">
+            <div style="display:flex; align-items:center; margin-bottom: 15px;">
+                <i class="fas fa-chevron-left" onclick="switchTab('inicio')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
+                <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Área do membro</h2>
             </div>
-            <h2 style="color: #173F63; font-size: 2.2rem; font-weight: 700; margin-bottom: 5px; font-family: 'Inter', sans-serif; letter-spacing:-0.5px;">Área do Membro</h2>
-            <p style="color: #64748B; font-size: 1.05rem; font-weight: 400; line-height: 1.4; font-family: 'Inter', sans-serif;">Participe e se conecte com<br>a vida da CME.</p>
+            <p style="color: #64748B; font-size: 0.95rem; font-weight: 400; line-height: 1.4; font-family: 'Inter', sans-serif; margin:0;">Participe e se conecte com a vida da CME.</p>
         </div>
-
+        
         <!-- Body Area (Cards over a slight gradient or straight white) -->
         <div style="background: #F8FAFC; padding: 0 20px 40px; min-height: 60vh;">
             
