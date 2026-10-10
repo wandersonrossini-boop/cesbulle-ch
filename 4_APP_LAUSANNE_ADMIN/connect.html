@@ -1,24 +1,21 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Catedral Lausanne | Connect</title>
-    <meta name="description" content="Bem-vindo à Catedral Lausanne. Conecte-se, faça pedidos de oração, registre-se e explore nossa comunidade.">
-
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="js/firebase-config.js?v=70.3.79"></script>
-
-    <style>
+<meta charset="utf-8"/>
+<meta content="yes" name="mobile-web-app-capable"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Catedral Lausanne | Connect</title>
+<meta content="Bem-vindo à Catedral Lausanne. Conecte-se, faça pedidos de oração, registre-se e explore nossa comunidade." name="description"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="js/firebase-config.js?v=70.3.79"></script>
+<style>
         :root {
             --cme-teal: #3B7C84;
             --cme-dark-teal: #173F63;
@@ -961,885 +958,797 @@
         }
     </style>
 </head>
-
 <body>
-
-    <div class="app-container">
-
-
-
-        <!-- ═══ SCREEN 1: INÍCIO (ACOLHIMENTO) ═══ -->
-        <div id="screen-inicio" class="app-screen active">
-            <!-- HEADER HOME -->
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 45px;">
-                <img src="assets/logo_cme_transparent.png" style="height: 50px; object-fit: contain;" alt="CME Lausanne">
-                <div style="display:flex; align-items:center; background: #F8FAFC; padding: 6px 14px; border-radius: 20px; border: 1px solid #E2E8F0; color: #173F63; font-weight: 600; font-size: 0.9rem;">
-                    <i class="fas fa-user" style="margin-right: 8px; color: #3B7C84;"></i>
-                    <span id="welcome-name-top">Visitante</span>
-                </div>
-            </div>
-
-            <h2 style="font-family: 'Inter', sans-serif; font-size: 2.4rem; font-weight: 700; color: #173F63; margin-bottom: 2px; line-height: 1.1; letter-spacing: -0.5px;">
+<div class="app-container">
+<!-- ═══ SCREEN 1: INÍCIO (ACOLHIMENTO) ═══ -->
+<div class="app-screen active" id="screen-inicio">
+<!-- HEADER HOME -->
+<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 45px;">
+<img alt="CME Lausanne" src="assets/logo_cme_transparent.png" style="height: 50px; object-fit: contain;"/>
+<div style="display:flex; align-items:center; background: #F8FAFC; padding: 6px 14px; border-radius: 20px; border: 1px solid #E2E8F0; color: #173F63; font-weight: 600; font-size: 0.9rem;">
+<i class="fas fa-user" style="margin-right: 8px; color: #3B7C84;"></i>
+<span id="welcome-name-top">Visitante</span>
+</div>
+</div>
+<h2 style="font-family: 'Inter', sans-serif; font-size: 2.4rem; font-weight: 700; color: #173F63; margin-bottom: 2px; line-height: 1.1; letter-spacing: -0.5px;">
                 Olá<span id="welcome-name"></span>.
             </h2>
-            <h2 style="font-family: 'Inter', sans-serif; font-size: 2.2rem; font-weight: 400; color: #173F63; margin-top: 0; margin-bottom: 12px; line-height: 1.1; letter-spacing: -0.5px;">
+<h2 style="font-family: 'Inter', sans-serif; font-size: 2.2rem; font-weight: 400; color: #173F63; margin-top: 0; margin-bottom: 12px; line-height: 1.1; letter-spacing: -0.5px;">
                 Como você está?
             </h2>
-            <div style="margin-bottom: 45px;">
-
-            </div>
-
-            <div style="width: 35px; height: 3px; background: var(--cme-gold); margin-bottom: 15px; border-radius: 2px;"></div>
-            <h3 style="font-size: 1.15rem; color: #173F63; margin-bottom: 20px; font-weight: 700; font-family: 'Inter', sans-serif;">Como podemos ajudar?</h3>
-
-            <div onclick="switchTab('espiritual')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 15px; cursor: pointer;">
-                <h3 style="margin:0; font-size: 1.15rem; color: #173F63; font-weight: 700; margin-bottom:5px;">Área espiritual</h3>
-                <p style="margin:0; font-size: 0.95rem; color: #475569;">Pedido de oração, uma palavra ou visita da nossa equipe.</p>
-            </div>
-
-            <div onclick="switchTab('social')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 30px; cursor: pointer;">
-                <h3 style="margin:0; font-size: 1.15rem; color: #173F63; font-weight: 700; margin-bottom:5px;">Área social</h3>
-                <p style="margin:0; font-size: 0.95rem; color: #475569;">Apoio no país, ajuda em necessidades e agendamento de horário.</p>
-            </div>
-        </div>
-        <!-- SCREEN: QUEM SOMOS -->
-        <div id="screen-quemsomos" class="app-screen" style="padding: 0; background: #FFFFFF; min-height: 100vh;">
-            <div style="background: #FFFFFF; padding: 25px 20px 15px;">
-                <div style="display:flex; align-items:center;">
-                    <i class="fas fa-arrow-left" onclick="switchTab('inicio')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
-                    <h2 style="margin:0; font-size: 1.2rem; font-weight:700; color: #173F63;">Quem somos</h2>
-                </div>
-            </div>
-
-            <!-- Banner Principal Institucional -->
-            <div style="width: 100%; height: 220px; background: linear-gradient(135deg, #173F63 0%, #3B7C84 100%); display:flex; justify-content:center; align-items:center;">
-                <img src="assets/logo_cme_transparent.png" style="height: 90px; filter: brightness(0) invert(1); opacity: 0.9;" alt="CME Logo">
-            </div>
-
-            <div style="padding: 25px 20px 120px;">
-                <h2 style="font-size: 1.6rem; color: #173F63; font-weight: 700; margin-bottom: 5px; font-family:'Inter', sans-serif;">CME Lausanne</h2>
-                <p style="font-size: 1rem; color: #64748B; line-height: 1.5; margin-bottom: 30px; font-family:'Inter', sans-serif;">
+<div style="margin-bottom: 45px;">
+</div>
+<div style="width: 35px; height: 3px; background: var(--cme-gold); margin-bottom: 15px; border-radius: 2px;"></div>
+<h3 style="font-size: 1.15rem; color: #173F63; margin-bottom: 20px; font-weight: 700; font-family: 'Inter', sans-serif;">Como podemos ajudar?</h3>
+<div onclick="switchTab('espiritual')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<h3 style="margin:0; font-size: 1.15rem; color: #173F63; font-weight: 700; margin-bottom:5px;">Área espiritual</h3>
+<p style="margin:0; font-size: 0.95rem; color: #475569;">Pedido de oração, uma palavra ou visita da nossa equipe.</p>
+</div>
+<div onclick="switchTab('social')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 30px; cursor: pointer;">
+<h3 style="margin:0; font-size: 1.15rem; color: #173F63; font-weight: 700; margin-bottom:5px;">Área social</h3>
+<p style="margin:0; font-size: 0.95rem; color: #475569;">Apoio no país, ajuda em necessidades e agendamento de horário.</p>
+</div>
+</div>
+<!-- SCREEN: QUEM SOMOS -->
+<div class="app-screen" id="screen-quemsomos" style="padding: 0; background: #FFFFFF; min-height: 100vh;">
+<div style="background: #FFFFFF; padding: 25px 20px 15px;">
+<div style="display:flex; align-items:center;">
+<i class="fas fa-arrow-left" onclick="switchTab('inicio')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
+<h2 style="margin:0; font-size: 1.2rem; font-weight:700; color: #173F63;">Quem somos</h2>
+</div>
+</div>
+<!-- Banner Principal Institucional -->
+<div style="width: 100%; height: 220px; background: linear-gradient(135deg, #173F63 0%, #3B7C84 100%); display:flex; justify-content:center; align-items:center;">
+<img alt="CME Logo" src="assets/logo_cme_transparent.png" style="height: 90px; filter: brightness(0) invert(1); opacity: 0.9;"/>
+</div>
+<div style="padding: 25px 20px 120px;">
+<h2 style="font-size: 1.6rem; color: #173F63; font-weight: 700; margin-bottom: 5px; font-family:'Inter', sans-serif;">CME Lausanne</h2>
+<p style="font-size: 1rem; color: #64748B; line-height: 1.5; margin-bottom: 30px; font-family:'Inter', sans-serif;">
                     Uma comunidade de fé, cuidado e relacionamento, há 15 anos na região de Lausanne.
                 </p>
-
-                <!-- Lista de navegação -->
-                <div onclick="switchTab('historia')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 10px; cursor: pointer;">
-                    <h3 style="margin:0; font-size: 1.1rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Nossa história</h3>
-                    <p style="margin:0; font-size: 0.9rem; color: #64748B;">CME Mundial e CME Lausanne.</p>
-                </div>
-
-                <div onclick="switchTab('principios')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 10px; cursor: pointer;">
-                    <h3 style="margin:0; font-size: 1.1rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Nossa maneira de viver</h3>
-                    <p style="margin:0; font-size: 0.9rem; color: #64748B;">Fé, comunidade e serviço.</p>
-                </div>
-
-                <div onclick="switchTab('agenda')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 10px; cursor: pointer;">
-                    <h3 style="margin:0; font-size: 1.1rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Agenda e horários</h3>
-                    <p style="margin:0; font-size: 0.9rem; color: #64748B;">Nossos cultos e encontros.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- SCREEN: HISTORIA -->
-        <div id="screen-historia" class="app-screen" style="padding: 0; background: #FFFFFF; min-height: 100vh;">
-            <div style="background: #FFFFFF; padding: 25px 20px 15px;">
-                <div style="display:flex; align-items:center;">
-                    <i class="fas fa-arrow-left" onclick="switchTab('quemsomos')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
-                    <h2 style="margin:0; font-size: 1.2rem; font-weight:700; color: #173F63;">Nossa história</h2>
-                </div>
-            </div>
-            <div style="width: 100%; height: 160px; background: #F0F5FA; display:flex; justify-content:center; align-items:center;"><i class="fas fa-book-open" style="font-size: 4rem; color: #3B7C84; opacity: 0.5;"></i></div>
-
-            <div style="padding: 25px 20px 120px;">
-                <h2 style="font-size: 1.6rem; color: #173F63; font-weight: 700; margin-bottom: 5px; font-family:'Inter', sans-serif;">Nossa história</h2>
-                <div style="width: 35px; height: 3px; background: var(--cme-gold); margin-bottom: 20px; border-radius: 2px;"></div>
-
-                <p style="font-size: 0.95rem; color: #475569; line-height: 1.6; margin-bottom: 15px; font-family:'Inter', sans-serif;">
+<!-- Lista de navegação -->
+<div onclick="switchTab('historia')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<h3 style="margin:0; font-size: 1.1rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Nossa história</h3>
+<p style="margin:0; font-size: 0.9rem; color: #64748B;">CME Mundial e CME Lausanne.</p>
+</div>
+<div onclick="switchTab('principios')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<h3 style="margin:0; font-size: 1.1rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Nossa maneira de viver</h3>
+<p style="margin:0; font-size: 0.9rem; color: #64748B;">Fé, comunidade e serviço.</p>
+</div>
+<div onclick="switchTab('agenda')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<h3 style="margin:0; font-size: 1.1rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Agenda e horários</h3>
+<p style="margin:0; font-size: 0.9rem; color: #64748B;">Nossos cultos e encontros.</p>
+</div>
+</div>
+</div>
+<!-- SCREEN: HISTORIA -->
+<div class="app-screen" id="screen-historia" style="padding: 0; background: #FFFFFF; min-height: 100vh;">
+<div style="background: #FFFFFF; padding: 25px 20px 15px;">
+<div style="display:flex; align-items:center;">
+<i class="fas fa-arrow-left" onclick="switchTab('quemsomos')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
+<h2 style="margin:0; font-size: 1.2rem; font-weight:700; color: #173F63;">Nossa história</h2>
+</div>
+</div>
+<div style="width: 100%; height: 160px; background: #F0F5FA; display:flex; justify-content:center; align-items:center;"><i class="fas fa-book-open" style="font-size: 4rem; color: #3B7C84; opacity: 0.5;"></i></div>
+<div style="padding: 25px 20px 120px;">
+<h2 style="font-size: 1.6rem; color: #173F63; font-weight: 700; margin-bottom: 5px; font-family:'Inter', sans-serif;">Nossa história</h2>
+<div style="width: 35px; height: 3px; background: var(--cme-gold); margin-bottom: 20px; border-radius: 2px;"></div>
+<p style="font-size: 0.95rem; color: #475569; line-height: 1.6; margin-bottom: 15px; font-family:'Inter', sans-serif;">
                     A CME Lausanne faz parte da Catedral Mundial da Esperança, com sede em Portugal, e está presente na região de Lausanne para servir a comunidade, compartilhando o evangelho e vivendo os valores do Reino de Deus.
                 </p>
-                <p style="font-size: 0.95rem; color: #475569; line-height: 1.6; margin-bottom: 30px; font-family:'Inter', sans-serif;">
+<p style="font-size: 0.95rem; color: #475569; line-height: 1.6; margin-bottom: 30px; font-family:'Inter', sans-serif;">
                     Ao longo dos anos, temos visto a mão de Deus conduzindo pessoas, famílias e projetos, fortalecendo uma comunidade de fé, cuidado e relacionamento.
                 </p>
-            </div>
-        </div>
-
-        <!-- SCREEN: PRINCIPIOS -->
-        <div id="screen-principios" class="app-screen" style="padding: 0; background: #FFFFFF; min-height: 100vh;">
-            <div style="background: #FFFFFF; padding: 25px 20px 15px;">
-                <div style="display:flex; align-items:center;">
-                    <i class="fas fa-arrow-left" onclick="switchTab('quemsomos')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
-                    <h2 style="margin:0; font-size: 1.2rem; font-weight:700; color: #173F63;">Nossa maneira de viver</h2>
-                </div>
-            </div>
-            <div style="width: 100%; height: 160px; background: #F0F5FA; display:flex; justify-content:center; align-items:center;"><i class="fas fa-hands-helping" style="font-size: 4rem; color: #3B7C84; opacity: 0.5;"></i></div>
-
-            <div style="padding: 25px 20px 120px;">
-                <h2 style="font-size: 1.6rem; color: #173F63; font-weight: 700; margin-bottom: 5px; font-family:'Inter', sans-serif;">Nossa maneira de viver</h2>
-                <div style="width: 35px; height: 3px; background: var(--cme-gold); margin-bottom: 20px; border-radius: 2px;"></div>
-
-                <p style="font-size: 0.95rem; color: #475569; line-height: 1.6; margin-bottom: 25px; font-family:'Inter', sans-serif;">
+</div>
+</div>
+<!-- SCREEN: PRINCIPIOS -->
+<div class="app-screen" id="screen-principios" style="padding: 0; background: #FFFFFF; min-height: 100vh;">
+<div style="background: #FFFFFF; padding: 25px 20px 15px;">
+<div style="display:flex; align-items:center;">
+<i class="fas fa-arrow-left" onclick="switchTab('quemsomos')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
+<h2 style="margin:0; font-size: 1.2rem; font-weight:700; color: #173F63;">Nossa maneira de viver</h2>
+</div>
+</div>
+<div style="width: 100%; height: 160px; background: #F0F5FA; display:flex; justify-content:center; align-items:center;"><i class="fas fa-hands-helping" style="font-size: 4rem; color: #3B7C84; opacity: 0.5;"></i></div>
+<div style="padding: 25px 20px 120px;">
+<h2 style="font-size: 1.6rem; color: #173F63; font-weight: 700; margin-bottom: 5px; font-family:'Inter', sans-serif;">Nossa maneira de viver</h2>
+<div style="width: 35px; height: 3px; background: var(--cme-gold); margin-bottom: 20px; border-radius: 2px;"></div>
+<p style="font-size: 0.95rem; color: #475569; line-height: 1.6; margin-bottom: 25px; font-family:'Inter', sans-serif;">
                     Na CME Lausanne buscamos viver uma fé autêntica, que se expressa em comunidade e serviço.
                 </p>
-
-                <!-- Princípios -->
-                <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 10px;">
-                    <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Fé</h3>
-                    <p style="margin:0; font-size: 0.9rem; color: #64748B; line-height:1.4;">Centralidade em Cristo, na Palavra de Deus e na ação do Espírito Santo.</p>
-                </div>
-
-                <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 10px;">
-                    <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Comunidade</h3>
-                    <p style="margin:0; font-size: 0.9rem; color: #64748B; line-height:1.4;">Relacionamento, comunhão e cuidado mútuo.</p>
-                </div>
-
-                <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 10px;">
-                    <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Serviço</h3>
-                    <p style="margin:0; font-size: 0.9rem; color: #64748B; line-height:1.4;">Colocando nossa fé em prática através do amor ao próximo.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- SCREEN: AGENDA -->
-        <div id="screen-agenda" class="app-screen" style="padding: 0; background: #FFFFFF; min-height: 100vh;">
-            <div style="background: #FFFFFF; padding: 25px 20px 15px;">
-                <div style="display:flex; align-items:center;">
-                    <i class="fas fa-arrow-left" onclick="switchTab('quemsomos')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
-                    <h2 style="margin:0; font-size: 1.2rem; font-weight:700; color: #173F63;">Agenda e horários</h2>
-                </div>
-            </div>
-            <div style="width: 100%; height: 160px; background: #F0F5FA; display:flex; justify-content:center; align-items:center;"><i class="far fa-calendar-alt" style="font-size: 4rem; color: #3B7C84; opacity: 0.5;"></i></div>
-
-            <div style="padding: 25px 20px 120px;">
-                <h2 style="font-size: 1.6rem; color: #173F63; font-weight: 700; margin-bottom: 5px; font-family:'Inter', sans-serif;">Agenda e horários</h2>
-                <div style="width: 35px; height: 3px; background: var(--cme-gold); margin-bottom: 20px; border-radius: 2px;"></div>
-
-                <p style="font-size: 1.05rem; color: #173F63; font-weight: 500; line-height: 1.6; margin-bottom: 25px; font-family:'Inter', sans-serif;">
+<!-- Princípios -->
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 10px;">
+<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Fé</h3>
+<p style="margin:0; font-size: 0.9rem; color: #64748B; line-height:1.4;">Centralidade em Cristo, na Palavra de Deus e na ação do Espírito Santo.</p>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 10px;">
+<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Comunidade</h3>
+<p style="margin:0; font-size: 0.9rem; color: #64748B; line-height:1.4;">Relacionamento, comunhão e cuidado mútuo.</p>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 10px;">
+<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Serviço</h3>
+<p style="margin:0; font-size: 0.9rem; color: #64748B; line-height:1.4;">Colocando nossa fé em prática através do amor ao próximo.</p>
+</div>
+</div>
+</div>
+<!-- SCREEN: AGENDA -->
+<div class="app-screen" id="screen-agenda" style="padding: 0; background: #FFFFFF; min-height: 100vh;">
+<div style="background: #FFFFFF; padding: 25px 20px 15px;">
+<div style="display:flex; align-items:center;">
+<i class="fas fa-arrow-left" onclick="switchTab('quemsomos')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
+<h2 style="margin:0; font-size: 1.2rem; font-weight:700; color: #173F63;">Agenda e horários</h2>
+</div>
+</div>
+<div style="width: 100%; height: 160px; background: #F0F5FA; display:flex; justify-content:center; align-items:center;"><i class="far fa-calendar-alt" style="font-size: 4rem; color: #3B7C84; opacity: 0.5;"></i></div>
+<div style="padding: 25px 20px 120px;">
+<h2 style="font-size: 1.6rem; color: #173F63; font-weight: 700; margin-bottom: 5px; font-family:'Inter', sans-serif;">Agenda e horários</h2>
+<div style="width: 35px; height: 3px; background: var(--cme-gold); margin-bottom: 20px; border-radius: 2px;"></div>
+<p style="font-size: 1.05rem; color: #173F63; font-weight: 500; line-height: 1.6; margin-bottom: 25px; font-family:'Inter', sans-serif;">
                     Nossos cultos e encontros.
                 </p>
-
-
-                <!-- Cards de Agenda -->
-                <div style="display:flex; align-items:center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 12px; overflow: hidden; padding: 15px;">
-                    <div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1px solid #E2E8F0;">
-                        <span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Domingo</span>
-                        <span style="display:block; font-size: 1.2rem; color: #173F63; font-weight: 700;">10:00</span>
-                    </div>
-                    <div style="padding-left: 15px; flex:1;">
-                        <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700;">Celebração Principal</h3>
-                    </div>
-                </div>
-
-                <div style="display:flex; align-items:center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 12px; overflow: hidden; padding: 15px;">
-                    <div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1px solid #E2E8F0;">
-                        <span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Terça</span>
-                        <span style="display:block; font-size: 1.2rem; color: #173F63; font-weight: 700;">19:30</span>
-                    </div>
-                    <div style="padding-left: 15px; flex:1;">
-                        <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700;">Culto "Alicerce"</h3>
-                    </div>
-                </div>
-
-                <div style="display:flex; align-items:center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 12px; overflow: hidden; padding: 15px;">
-                    <div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1px solid #E2E8F0;">
-                        <span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Quarta</span>
-                        <span style="display:block; font-size: 1.2rem; color: #173F63; font-weight: 700;">09:00</span>
-                    </div>
-                    <div style="padding-left: 15px; flex:1;">
-                        <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700;">Momento de Intercessão</h3>
-                    </div>
-                </div>
-
-                <div style="display:flex; align-items:center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 12px; overflow: hidden; padding: 15px;">
-                    <div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1px solid #E2E8F0;">
-                        <span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Sexta</span>
-                        <span style="display:block; font-size: 1.2rem; color: #173F63; font-weight: 700;">19:30</span>
-                    </div>
-                    <div style="padding-left: 15px; flex:1;">
-                        <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700;">Encontro de Mulheres "Conectadas"</h3>
-                    </div>
-                </div>
-
-                <div style="display:flex; align-items:center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 12px; overflow: hidden; padding: 15px;">
-                    <div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1px solid #E2E8F0;">
-                        <span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Sábado</span>
-                        <span style="display:block; font-size: 1.2rem; color: #173F63; font-weight: 700;">15:00</span>
-                    </div>
-                    <div style="padding-left: 15px; flex:1;">
-                        <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700;">Célula Jovem "Frame"</h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SCREEN: ESPIRITUAL -->
-    <div id="screen-espiritual" class="app-screen" style="padding: 25px 20px 120px; background: #FFFFFF; min-height: 100vh;">
-        <div style="display:flex; align-items:center; margin-bottom: 25px;">
-            <i class="fas fa-chevron-left" onclick="switchTab('inicio')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
-            <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Área espiritual</h2>
-        </div>
-
-        <div onclick="switchTab('oracao')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 10px; cursor: pointer;">
-            <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Oração</h3>
-            <p style="margin:0; font-size: 0.85rem; color: #64748B;">Envie seu pedido de oração.</p>
-        </div>
-
-        <div onclick="switchTab('visita')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 10px; cursor: pointer;">
-            <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Uma palavra</h3>
-            <p style="margin:0; font-size: 0.85rem; color: #64748B;">Converse com um ministro.</p>
-        </div>
-
-        <div onclick="switchTab('visita')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 10px; cursor: pointer;">
-            <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Visita</h3>
-            <p style="margin:0; font-size: 0.85rem; color: #64748B;">Solicite uma visita da nossa equipe.</p>
-        </div>
-
-        <div style="padding: 15px 0; display:flex; align-items:center; margin-top: 10px;">
-            <p style="margin:0; font-size: 0.8rem; color: #64748B; line-height:1.4;">
+<!-- Cards de Agenda -->
+<div style="display:flex; align-items:center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 12px; overflow: hidden; padding: 15px;">
+<div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1px solid #E2E8F0;">
+<span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Domingo</span>
+<span style="display:block; font-size: 1.2rem; color: #173F63; font-weight: 700;">10:00</span>
+</div>
+<div style="padding-left: 15px; flex:1;">
+<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700;">Celebração Principal</h3>
+</div>
+</div>
+<div style="display:flex; align-items:center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 12px; overflow: hidden; padding: 15px;">
+<div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1px solid #E2E8F0;">
+<span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Terça</span>
+<span style="display:block; font-size: 1.2rem; color: #173F63; font-weight: 700;">19:30</span>
+</div>
+<div style="padding-left: 15px; flex:1;">
+<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700;">Culto "Alicerce"</h3>
+</div>
+</div>
+<div style="display:flex; align-items:center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 12px; overflow: hidden; padding: 15px;">
+<div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1px solid #E2E8F0;">
+<span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Quarta</span>
+<span style="display:block; font-size: 1.2rem; color: #173F63; font-weight: 700;">09:00</span>
+</div>
+<div style="padding-left: 15px; flex:1;">
+<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700;">Momento de Intercessão</h3>
+</div>
+</div>
+<div style="display:flex; align-items:center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 12px; overflow: hidden; padding: 15px;">
+<div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1px solid #E2E8F0;">
+<span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Sexta</span>
+<span style="display:block; font-size: 1.2rem; color: #173F63; font-weight: 700;">19:30</span>
+</div>
+<div style="padding-left: 15px; flex:1;">
+<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700;">Encontro de Mulheres "Conectadas"</h3>
+</div>
+</div>
+<div style="display:flex; align-items:center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 12px; overflow: hidden; padding: 15px;">
+<div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1px solid #E2E8F0;">
+<span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Sábado</span>
+<span style="display:block; font-size: 1.2rem; color: #173F63; font-weight: 700;">15:00</span>
+</div>
+<div style="padding-left: 15px; flex:1;">
+<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700;">Célula Jovem "Frame"</h3>
+</div>
+</div>
+</div>
+</div>
+<!-- SCREEN: ESPIRITUAL -->
+<div class="app-screen" id="screen-espiritual" style="padding: 25px 20px 120px; background: #FFFFFF; min-height: 100vh;">
+<div style="display:flex; align-items:center; margin-bottom: 25px;">
+<i class="fas fa-chevron-left" onclick="switchTab('inicio')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
+<h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Área espiritual</h2>
+</div>
+<div onclick="switchTab('oracao')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Oração</h3>
+<p style="margin:0; font-size: 0.85rem; color: #64748B;">Envie seu pedido de oração.</p>
+</div>
+<div onclick="switchTab('visita')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Uma palavra</h3>
+<p style="margin:0; font-size: 0.85rem; color: #64748B;">Converse com um ministro.</p>
+</div>
+<div onclick="switchTab('visita')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Visita</h3>
+<p style="margin:0; font-size: 0.85rem; color: #64748B;">Solicite uma visita da nossa equipe.</p>
+</div>
+<div style="padding: 15px 0; display:flex; align-items:center; margin-top: 10px;">
+<p style="margin:0; font-size: 0.8rem; color: #64748B; line-height:1.4;">
                 As solicitações são tratadas com a maior discrição possível.
             </p>
-        </div>
-    </div>
-
-    <!-- SCREEN: SOCIAL -->
-    <div id="screen-social" class="app-screen" style="padding: 25px 20px 120px; background: #FFFFFF; min-height: 100vh;">
-        <div style="display:flex; align-items:center; margin-bottom: 25px;">
-            <i class="fas fa-chevron-left" onclick="switchTab('inicio')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
-            <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Área social</h2>
-        </div>
-
-        <div onclick="switchTab('visita')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 10px; cursor: pointer;">
-            <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Integração no país</h3>
-            <p style="margin:0; font-size: 0.85rem; color: #64748B;">Apoio e orientação local.</p>
-        </div>
-
-        <div onclick="switchTab('visita')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 10px; cursor: pointer;">
-            <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Preciso de ajuda</h3>
-            <p style="margin:0; font-size: 0.85rem; color: #64748B;">Auxílio em necessidades básicas.</p>
-        </div>
-
-        <div onclick="switchTab('visita')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 10px; cursor: pointer;">
-            <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Agendar horário</h3>
-            <p style="margin:0; font-size: 0.85rem; color: #64748B;">Fale com a área social.</p>
-        </div>
-    </div>
-
-    <!-- SCREEN: AGENDAMENTOS -->
-    <div id="screen-agendamentos" class="app-screen">
-        <div style="display:flex; align-items:center; margin-bottom: 25px;">
-            <i class="fas fa-arrow-left" onclick="switchTab('membros')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
-            <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Agendamentos</h2>
-        </div>
-        <p style="font-size: 0.95rem; color: #475569; margin-bottom: 20px; font-family:'Inter', sans-serif;">Escolha o que deseja agendar.</p>
-
-        <div class="app-card" onclick="openModal('modal-batismo')" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
-            <div style="background: #E0F2FE; width: 45px; height: 45px; border-radius: 10px; display:flex; justify-content:center; align-items:center; margin-right: 15px; flex-shrink: 0;">
-                <i class="fas fa-water" style="color: #0284C7; font-size: 1.2rem;"></i>
-            </div>
-            <div style="flex:1;">
-                <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Batismo nas Águas</h3>
-                <p style="margin:0; font-size: 0.85rem; color: #64748B;">Inscreva-se para dar seu passo de fé.</p>
-            </div>
-            <i class="fas fa-chevron-right" style="color: #173F63; font-size:0.9rem;"></i>
-        </div>
-
-        <div class="app-card" onclick="openModal('modal-bebe')" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
-            <div style="background: #FEF3C7; width: 45px; height: 45px; border-radius: 10px; display:flex; justify-content:center; align-items:center; margin-right: 15px; flex-shrink: 0;">
-                <i class="fas fa-baby" style="color: #D97706; font-size: 1.2rem;"></i>
-            </div>
-            <div style="flex:1;">
-                <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Apresentação de Bebê</h3>
-                <p style="margin:0; font-size: 0.85rem; color: #64748B;">Consagração do seu bebê na igreja.</p>
-            </div>
-            <i class="fas fa-chevron-right" style="color: #173F63; font-size:0.9rem;"></i>
-        </div>
-
-        <div class="app-card" onclick="switchTab('visita')" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
-            <div style="background: #DCFCE7; width: 45px; height: 45px; border-radius: 10px; display:flex; justify-content:center; align-items:center; margin-right: 15px; flex-shrink: 0;">
-                <i class="fas fa-users" style="color: #16A34A; font-size: 1.2rem;"></i>
-            </div>
-            <div style="flex:1;">
-                <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Pequenos Grupos / Células</h3>
-                <p style="margin:0; font-size: 0.85rem; color: #64748B;">Participe de um grupo em sua região.</p>
-            </div>
-            <i class="fas fa-chevron-right" style="color: #173F63; font-size:0.9rem;"></i>
-        </div>
-    </div>
-    <!-- SCREEN: FICHA (READ ONLY) -->
-    <div id="screen-ficha" class="app-screen">
-        <div style="display:flex; align-items:center; margin-bottom: 25px;">
-            <i class="fas fa-arrow-left" onclick="switchTab('membros')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
-            <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Meu cadastro</h2>
-        </div>
-
-        <div style="background: #F0F5FA; border-radius: 12px; padding: 20px; display:flex; align-items:flex-start; margin-bottom: 25px;">
-            <i class="fas fa-info-circle" style="color: #3B82F6; font-size: 1.5rem; margin-right: 15px; margin-top:2px;"></i>
-            <p style="margin:0; font-size: 0.95rem; color: #475569; line-height: 1.4;">
+</div>
+</div>
+<!-- SCREEN: SOCIAL -->
+<div class="app-screen" id="screen-social" style="padding: 25px 20px 120px; background: #FFFFFF; min-height: 100vh;">
+<div style="display:flex; align-items:center; margin-bottom: 25px;">
+<i class="fas fa-chevron-left" onclick="switchTab('inicio')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
+<h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Área social</h2>
+</div>
+<div onclick="switchTab('visita')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Integração no país</h3>
+<p style="margin:0; font-size: 0.85rem; color: #64748B;">Apoio e orientação local.</p>
+</div>
+<div onclick="switchTab('visita')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Preciso de ajuda</h3>
+<p style="margin:0; font-size: 0.85rem; color: #64748B;">Auxílio em necessidades básicas.</p>
+</div>
+<div onclick="switchTab('visita')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Agendar horário</h3>
+<p style="margin:0; font-size: 0.85rem; color: #64748B;">Fale com a área social.</p>
+</div>
+</div>
+<!-- SCREEN: AGENDAMENTOS -->
+<div class="app-screen" id="screen-agendamentos">
+<div style="display:flex; align-items:center; margin-bottom: 25px;">
+<i class="fas fa-arrow-left" onclick="switchTab('membros')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
+<h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Agendamentos</h2>
+</div>
+<p style="font-size: 0.95rem; color: #475569; margin-bottom: 20px; font-family:'Inter', sans-serif;">Escolha o que deseja agendar.</p>
+<div class="app-card" onclick="openModal('modal-batismo')" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
+<div style="background: #E0F2FE; width: 45px; height: 45px; border-radius: 10px; display:flex; justify-content:center; align-items:center; margin-right: 15px; flex-shrink: 0;">
+<i class="fas fa-water" style="color: #0284C7; font-size: 1.2rem;"></i>
+</div>
+<div style="flex:1;">
+<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Batismo nas Águas</h3>
+<p style="margin:0; font-size: 0.85rem; color: #64748B;">Inscreva-se para dar seu passo de fé.</p>
+</div>
+<i class="fas fa-chevron-right" style="color: #173F63; font-size:0.9rem;"></i>
+</div>
+<div class="app-card" onclick="openModal('modal-bebe')" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
+<div style="background: #FEF3C7; width: 45px; height: 45px; border-radius: 10px; display:flex; justify-content:center; align-items:center; margin-right: 15px; flex-shrink: 0;">
+<i class="fas fa-baby" style="color: #D97706; font-size: 1.2rem;"></i>
+</div>
+<div style="flex:1;">
+<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Apresentação de Bebê</h3>
+<p style="margin:0; font-size: 0.85rem; color: #64748B;">Consagração do seu bebê na igreja.</p>
+</div>
+<i class="fas fa-chevron-right" style="color: #173F63; font-size:0.9rem;"></i>
+</div>
+<div class="app-card" onclick="switchTab('visita')" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
+<div style="background: #DCFCE7; width: 45px; height: 45px; border-radius: 10px; display:flex; justify-content:center; align-items:center; margin-right: 15px; flex-shrink: 0;">
+<i class="fas fa-users" style="color: #16A34A; font-size: 1.2rem;"></i>
+</div>
+<div style="flex:1;">
+<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Pequenos Grupos / Células</h3>
+<p style="margin:0; font-size: 0.85rem; color: #64748B;">Participe de um grupo em sua região.</p>
+</div>
+<i class="fas fa-chevron-right" style="color: #173F63; font-size:0.9rem;"></i>
+</div>
+</div>
+<!-- SCREEN: FICHA (READ ONLY) -->
+<div class="app-screen" id="screen-ficha">
+<div style="display:flex; align-items:center; margin-bottom: 25px;">
+<i class="fas fa-arrow-left" onclick="switchTab('membros')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
+<h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Meu cadastro</h2>
+</div>
+<div style="background: #F0F5FA; border-radius: 12px; padding: 20px; display:flex; align-items:flex-start; margin-bottom: 25px;">
+<i class="fas fa-info-circle" style="color: #3B82F6; font-size: 1.5rem; margin-right: 15px; margin-top:2px;"></i>
+<p style="margin:0; font-size: 0.95rem; color: #475569; line-height: 1.4;">
                 Mantenha seus dados atualizados para uma melhor comunicação com a igreja.
             </p>
-        </div>
-
-        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow:hidden; margin-bottom: 30px;">
-            <div style="padding: 15px 20px; border-bottom: 1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">Nome completo</p>
-                    <p style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;" id="ro-nome">Visualizar...</p>
-                </div>
-                <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
-            </div>
-
-            <div style="padding: 15px 20px; border-bottom: 1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">E-mail</p>
-                    <p style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;" id="ro-email">Visualizar...</p>
-                </div>
-                <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
-            </div>
-
-            <div style="padding: 15px 20px; border-bottom: 1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">Telefone / WhatsApp</p>
-                    <p style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;" id="ro-telefone">Visualizar...</p>
-                </div>
-                <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
-            </div>
-
-            <div style="padding: 15px 20px; border-bottom: 1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">Data de nascimento</p>
-                    <p style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;" id="ro-nasc">Visualizar...</p>
-                </div>
-                <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
-            </div>
-
-            <div style="padding: 15px 20px; border-bottom: 1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">Estado civil</p>
-                    <p style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;" id="ro-civil">Visualizar...</p>
-                </div>
-                <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
-            </div>
-
-            <div style="padding: 15px 20px; border-bottom: 1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">Endereço</p>
-                    <p style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;" id="ro-endereco">Visualizar...</p>
-                </div>
-                <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
-            </div>
-
-            <div style="padding: 15px 20px; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">Profissão</p>
-                    <p style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;" id="ro-profissao">Visualizar...</p>
-                </div>
-                <i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
-            </div>
-        </div>
-
-        <button onclick="openModal('modal-ficha-old')" style="width: 100%; background: #173F63; color: #FFFFFF; border: none; border-radius: 8px; padding: 18px; font-size: 1.1rem; font-weight: 600; cursor: pointer; font-family:'Inter', sans-serif;">
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow:hidden; margin-bottom: 30px;">
+<div style="padding: 15px 20px; border-bottom: 1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
+<div>
+<p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">Nome completo</p>
+<p id="ro-nome" style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;">Visualizar...</p>
+</div>
+<i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
+</div>
+<div style="padding: 15px 20px; border-bottom: 1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
+<div>
+<p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">E-mail</p>
+<p id="ro-email" style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;">Visualizar...</p>
+</div>
+<i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
+</div>
+<div style="padding: 15px 20px; border-bottom: 1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
+<div>
+<p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">Telefone / WhatsApp</p>
+<p id="ro-telefone" style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;">Visualizar...</p>
+</div>
+<i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
+</div>
+<div style="padding: 15px 20px; border-bottom: 1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
+<div>
+<p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">Data de nascimento</p>
+<p id="ro-nasc" style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;">Visualizar...</p>
+</div>
+<i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
+</div>
+<div style="padding: 15px 20px; border-bottom: 1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
+<div>
+<p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">Estado civil</p>
+<p id="ro-civil" style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;">Visualizar...</p>
+</div>
+<i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
+</div>
+<div style="padding: 15px 20px; border-bottom: 1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
+<div>
+<p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">Endereço</p>
+<p id="ro-endereco" style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;">Visualizar...</p>
+</div>
+<i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
+</div>
+<div style="padding: 15px 20px; display:flex; justify-content:space-between; align-items:center;">
+<div>
+<p style="margin:0; font-size: 0.8rem; color: #64748B; margin-bottom: 4px;">Profissão</p>
+<p id="ro-profissao" style="margin:0; font-size: 1rem; color: #173F63; font-weight: 500;">Visualizar...</p>
+</div>
+<i class="fas fa-chevron-right" style="color: #94A3B8; font-size:0.9rem;"></i>
+</div>
+</div>
+<button onclick="openModal('modal-ficha-old')" style="width: 100%; background: #173F63; color: #FFFFFF; border: none; border-radius: 8px; padding: 18px; font-size: 1.1rem; font-weight: 600; cursor: pointer; font-family:'Inter', sans-serif;">
             Editar meus dados
         </button>
-    </div>
-
-    <div id="screen-comochegar" class="app-screen" style="padding: 0; background: #F8FAFC;">
-        <div style="background: #FFFFFF; padding: 25px 20px 15px; border-bottom: 1px solid #E2E8F0; margin-bottom: 20px;">
-            <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Como chegar</h2>
-        </div>
-
-        <div onclick="window.open('https://maps.google.com/?q=Rue+de+l%27Industrie+39,+1023+Crissier', '_blank')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 10px; cursor: pointer;">
-            <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Endereço da Igreja</h3>
-            <p style="margin:0; font-size: 0.85rem; color: #64748B;">Rue de l'Industrie 39, 1023 Crissier, Suíça.</p>
-        </div>
-
-        <div onclick="window.open('https://l.instagram.com/?u=https%3A%2F%2Flinktr.ee%2Fcmelausanne%3Futm_source%3Dig%26utm_medium%3Dsocial%26utm_content%3Dlink_in_bio%26fbclid%3DPAZXh0bgNhZW0CMTEAcGRvZgJzcnRjBmFwcF9pZA85MzY2MTk3NDMzOTI0NTkAAafxOf22pBLllim8xPjCpy0XFH3PqIlECrqDtmtNSCga0NwqzipjU7l8lf44zA_aem_dxu9J7_mfOiS5n9P2s59PQ&e=AUAftGJUrb01ifxvMztIGfiHuN9kshuHptaR_1KKyy3rsWG327KNNlsqrjiVDYJG1hqSdmdzHIsgChAgi_Tw_HOOniC6wU_nJdX0YSopdYd8cwV3CFTQAnwhBuMEM7M0iOk-FGI80q9Om_zBdZUEJc8', '_blank')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 10px; cursor: pointer;">
-            <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Siga no Instagram</h3>
-            <p style="margin:0; font-size: 0.85rem; color: #64748B;">Acompanhe nossas novidades.</p>
-        </div>
-        <div onclick="window.open('https://www.youtube.com/c/CatedraldaEsperançaSuíça/streams', '_blank')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 10px; cursor: pointer;">
-            <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Canal do YouTube</h3>
-            <p style="margin:0; font-size: 0.85rem; color: #64748B;">Assista aos nossos cultos.</p>
-        </div>
-
-        <div class="app-card" onclick="window.open('https://wa.me/41000000000', '_blank')">
-            <div class="app-card-icon"><i class="fab fa-whatsapp"></i></div>
-            <div class="app-card-content">
-                <h3 class="app-card-title">Secretaria (WhatsApp)</h3>
-                <p class="app-card-desc">Fale conosco para mais informações ou dúvidas.</p>
-            </div>
-            <i class="fas fa-chevron-right app-card-arrow"></i>
-        </div>
-    </div>
-
-    <!-- ═══ SCREEN: PEDIDO DE ORAÇÃO ═══ -->
-    <div id="screen-oracao" class="app-screen">
-        <div class="screen-back-header">
-            <button class="btn-back" onclick="switchTab('inicio')"><i class="fas fa-chevron-left"></i> Voltar</button>
-        </div>
-        <h2 class="screen-title-serif">Pedido de Oração</h2>
-        <p class="screen-subtitle">Compartilhe seu pedido. Nossa equipe vai orar por você.</p>
-
-        <div id="oracao-form">
-            <div class="field-group">
-                <label>Seu Nome (opcional)</label>
-                <input type="text" id="oracao-nome" placeholder="Nome em segredo se preferir...">
-            </div>
-            <div class="field-group">
-                <label>Seu Pedido *</label>
-                <textarea id="oracao-pedido" rows="4" placeholder="Escreva aqui pelo que devemos orar..."></textarea>
-            </div>
-            <button class="btn-submit" onclick="submitForm('oracao', this)">
+</div>
+<div class="app-screen" id="screen-comochegar" style="padding: 0; background: #F8FAFC;">
+<div style="background: #FFFFFF; padding: 25px 20px 15px; border-bottom: 1px solid #E2E8F0; margin-bottom: 20px;">
+<h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Como chegar</h2>
+</div>
+<div onclick="window.open('https://maps.google.com/?q=Rue+de+l%27Industrie+39,+1023+Crissier', '_blank')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Endereço da Igreja</h3>
+<p style="margin:0; font-size: 0.85rem; color: #64748B;">Rue de l'Industrie 39, 1023 Crissier, Suíça.</p>
+</div>
+<div onclick="window.open('https://l.instagram.com/?u=https%3A%2F%2Flinktr.ee%2Fcmelausanne%3Futm_source%3Dig%26utm_medium%3Dsocial%26utm_content%3Dlink_in_bio%26fbclid%3DPAZXh0bgNhZW0CMTEAcGRvZgJzcnRjBmFwcF9pZA85MzY2MTk3NDMzOTI0NTkAAafxOf22pBLllim8xPjCpy0XFH3PqIlECrqDtmtNSCga0NwqzipjU7l8lf44zA_aem_dxu9J7_mfOiS5n9P2s59PQ&amp;e=AUAftGJUrb01ifxvMztIGfiHuN9kshuHptaR_1KKyy3rsWG327KNNlsqrjiVDYJG1hqSdmdzHIsgChAgi_Tw_HOOniC6wU_nJdX0YSopdYd8cwV3CFTQAnwhBuMEM7M0iOk-FGI80q9Om_zBdZUEJc8', '_blank')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Siga no Instagram</h3>
+<p style="margin:0; font-size: 0.85rem; color: #64748B;">Acompanhe nossas novidades.</p>
+</div>
+<div onclick="window.open('https://www.youtube.com/c/CatedraldaEsperançaSuíça/streams', '_blank')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Canal do YouTube</h3>
+<p style="margin:0; font-size: 0.85rem; color: #64748B;">Assista aos nossos cultos.</p>
+</div>
+<div class="app-card" onclick="window.open('https://wa.me/41000000000', '_blank')">
+<div class="app-card-icon"><i class="fab fa-whatsapp"></i></div>
+<div class="app-card-content">
+<h3 class="app-card-title">Secretaria (WhatsApp)</h3>
+<p class="app-card-desc">Fale conosco para mais informações ou dúvidas.</p>
+</div>
+<i class="fas fa-chevron-right app-card-arrow"></i>
+</div>
+</div>
+<!-- ═══ SCREEN: PEDIDO DE ORAÇÃO ═══ -->
+<div class="app-screen" id="screen-oracao">
+<div class="screen-back-header">
+<button class="btn-back" onclick="switchTab('inicio')"><i class="fas fa-chevron-left"></i> Voltar</button>
+</div>
+<h2 class="screen-title-serif">Pedido de Oração</h2>
+<p class="screen-subtitle">Compartilhe seu pedido. Nossa equipe vai orar por você.</p>
+<div id="oracao-form">
+<div class="field-group">
+<label>Seu Nome (opcional)</label>
+<input id="oracao-nome" placeholder="Nome em segredo se preferir..." type="text"/>
+</div>
+<div class="field-group">
+<label>Seu Pedido *</label>
+<textarea id="oracao-pedido" placeholder="Escreva aqui pelo que devemos orar..." rows="4"></textarea>
+</div>
+<button class="btn-submit" onclick="submitForm('oracao', this)">
                 ENVIAR AO ALTAR
             </button>
+</div>
+<div class="success-state" id="oracao-success">
+<i class="fas fa-check-circle" style="color:#10b981;"></i>
+<h3>Pedido Entregue!</h3>
+<p>Estaremos orando por você. Deus te abençoe poderosamente!</p>
+</div>
+<div class="system-online-badge">
+<span class="system-dot"></span>Sistema online · Lausanne v70.3.78
         </div>
-        <div class="success-state" id="oracao-success">
-            <i class="fas fa-check-circle" style="color:#10b981;"></i>
-            <h3>Pedido Entregue!</h3>
-            <p>Estaremos orando por você. Deus te abençoe poderosamente!</p>
-        </div>
-        <div class="system-online-badge">
-            <span class="system-dot"></span>Sistema online · Lausanne v70.3.78
-        </div>
-    </div>
-
-    <!-- ═══ SCREEN: FALAR COM A EQUIPE ═══ -->
-    <div id="screen-visita" class="app-screen">
-        <div class="screen-back-header">
-            <button class="btn-back" onclick="switchTab('inicio')"><i class="fas fa-chevron-left"></i> Voltar</button>
-        </div>
-        <h2 class="screen-title-serif">Falar com a Equipe</h2>
-        <p class="screen-subtitle">Estamos aqui para te ouvir, ajudar e servir.</p>
-
-        <div id="visita-form">
-            <div class="field-group">
-                <label>Nome Completo *</label>
-                <input type="text" id="visita-nome" placeholder="Seu nome...">
-            </div>
-            <div class="field-group">
-                <label>WhatsApp / Telefone *</label>
-                <input type="tel" id="visita-fone" placeholder="+41 79 000 00 00">
-            </div>
-            <div class="field-group">
-                <label>Como podemos te ajudar?</label>
-                <input type="text" id="visita-assunto" placeholder="Descreva brevemente...">
-            </div>
-            <button class="btn-submit btn-blue" onclick="submitForm('visita', this)">
+</div>
+<!-- ═══ SCREEN: FALAR COM A EQUIPE ═══ -->
+<div class="app-screen" id="screen-visita">
+<div class="screen-back-header">
+<button class="btn-back" onclick="switchTab('inicio')"><i class="fas fa-chevron-left"></i> Voltar</button>
+</div>
+<h2 class="screen-title-serif">Falar com a Equipe</h2>
+<p class="screen-subtitle">Estamos aqui para te ouvir, ajudar e servir.</p>
+<div id="visita-form">
+<div class="field-group">
+<label>Nome Completo *</label>
+<input id="visita-nome" placeholder="Seu nome..." type="text"/>
+</div>
+<div class="field-group">
+<label>WhatsApp / Telefone *</label>
+<input id="visita-fone" placeholder="+41 79 000 00 00" type="tel"/>
+</div>
+<div class="field-group">
+<label>Como podemos te ajudar?</label>
+<input id="visita-assunto" placeholder="Descreva brevemente..." type="text"/>
+</div>
+<button class="btn-submit btn-blue" onclick="submitForm('visita', this)">
                 SOLICITAR SUPORTE
             </button>
+</div>
+<div class="success-state" id="visita-success">
+<i class="fas fa-check-circle" style="color:#3b82f6;"></i>
+<h3>Solicitação Enviada!</h3>
+<p>Nossa equipe de acolhimento entrará em contato em breve. Estamos aqui!</p>
+</div>
+<div class="system-online-badge">
+<span class="system-dot"></span>Sistema online · Lausanne v70.3.78
         </div>
-        <div class="success-state" id="visita-success">
-            <i class="fas fa-check-circle" style="color:#3b82f6;"></i>
-            <h3>Solicitação Enviada!</h3>
-            <p>Nossa equipe de acolhimento entrará em contato em breve. Estamos aqui!</p>
-        </div>
-        <div class="system-online-badge">
-            <span class="system-dot"></span>Sistema online · Lausanne v70.3.78
-        </div>
-    </div>
+</div>
+<!-- ── BOTTOM NAVIGATION BAR ── -->
+<!-- BOTTOM NAVIGATION BAR -->
+<nav class="bottom-nav">
+<div class="nav-item active" id="nav-inicio" onclick="switchTab('inicio')">
+<i class="fas fa-home"></i>
+<span>Início</span>
+</div>
+<div class="nav-item" id="nav-quemsomos" onclick="switchTab('quemsomos')">
+<i class="fas fa-building"></i>
+<span>Quem somos</span>
+</div>
+<div class="nav-item" id="nav-comochegar" onclick="switchTab('comochegar')">
+<i class="fas fa-map-marker-alt"></i>
+<span>Como chegar</span>
+</div>
+<div class="nav-item" id="nav-membros" onclick="switchTab('membros')">
+<i class="fas fa-user-circle"></i>
+<span>Área do membro</span>
+</div>
+</nav>
+</div>
 
-    <!-- ── BOTTOM NAVIGATION BAR ── -->
-    <!-- BOTTOM NAVIGATION BAR -->
-    <nav class="bottom-nav">
-        <div class="nav-item active" id="nav-inicio" onclick="switchTab('inicio')">
-            <i class="fas fa-home"></i>
-            <span>Início</span>
-        </div>
-        <div class="nav-item" id="nav-quemsomos" onclick="switchTab('quemsomos')">
-            <i class="fas fa-building"></i>
-            <span>Quem somos</span>
-        </div>
-        <div class="nav-item" id="nav-comochegar" onclick="switchTab('comochegar')">
-            <i class="fas fa-map-marker-alt"></i>
-            <span>Como chegar</span>
-        </div>
-        <div class="nav-item" id="nav-membros" onclick="switchTab('membros')">
-            <i class="fas fa-user-circle"></i>
-            <span>Área do membro</span>
-        </div>
-    </nav>
 
-    </div>
-
-    <!-- ═══════════════ MODAIS SYSTEM ═══════════════ -->
-
-    <!-- Modals for Membros/Agenda screens -->
-
-    <!-- MODAL: Agendamentos Hub -->
-    <div id="modal-agendamentos" class="modal-overlay" onclick="closeOuter(event)">
-        <div class="modal-card">
-            <div class="modal-handle"></div>
-            <div class="modal-header">
-                <h2>Escolha o Agendamento</h2>
-                <button class="modal-close" onclick="closeModals()"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="app-card" onclick="openModal('modal-batismo')">
-                <div class="app-card-icon"><i class="fas fa-water"></i></div>
-                <div class="app-card-content">
-                    <h3 class="app-card-title">Batismo nas Águas</h3>
-                    <p class="app-card-desc">Inscreva-se para dar seu passo de fé pública.</p>
-                </div>
-                <i class="fas fa-chevron-right app-card-arrow"></i>
-            </div>
-            <div class="app-card" onclick="openModal('modal-bebe')">
-                <div class="app-card-icon"><i class="fas fa-baby"></i></div>
-                <div class="app-card-content">
-                    <h3 class="app-card-title">Apresentação de Bebê</h3>
-                    <p class="app-card-desc">Consagração solene do seu bebê na igreja.</p>
-                </div>
-                <i class="fas fa-chevron-right app-card-arrow"></i>
-            </div>
-            <div class="app-card" onclick="openModal('modal-grupo')">
-                <div class="app-card-icon"><i class="fas fa-users"></i></div>
-                <div class="app-card-content">
-                    <h3 class="app-card-title">Pequenos Grupos / Células</h3>
-                    <p class="app-card-desc">Participe de um grupo em sua região.</p>
-                </div>
-                <i class="fas fa-chevron-right app-card-arrow"></i>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: Batismo -->
-    <div id="modal-batismo" class="modal-overlay" onclick="closeOuter(event)">
-        <div class="modal-card">
-            <div class="modal-handle"></div>
-            <div class="modal-header">
-                <h2>Batismo nas Águas</h2>
-                <button class="modal-close" onclick="closeModals()"><i class="fas fa-times"></i></button>
-            </div>
-            <div id="batismo-form">
-                <div class="field-group">
-                    <label>Nome do Candidato *</label>
-                    <input type="text" id="batismo-nome" placeholder="Nome Completo...">
-                </div>
-                <div class="field-group">
-                    <label>WhatsApp *</label>
-                    <input type="tel" id="batismo-fone" placeholder="+41 79 000 00 00">
-                </div>
-                <button class="btn-submit btn-blue" onclick="submitForm('batismo', this)">
-                    <i class="fas fa-droplet"></i> Quero me Batizar
+<!-- ═══════════════ MODAIS SYSTEM ═══════════════ -->
+<!-- Modals for Membros/Agenda screens -->
+<!-- MODAL: Agendamentos Hub -->
+<div class="modal-overlay" id="modal-agendamentos" onclick="closeOuter(event)">
+<div class="modal-card">
+<div class="modal-handle"></div>
+<div class="modal-header">
+<h2>Escolha o Agendamento</h2>
+<button class="modal-close" onclick="closeModals()"><i class="fas fa-times"></i></button>
+</div>
+<div class="app-card" onclick="openModal('modal-batismo')">
+<div class="app-card-icon"><i class="fas fa-water"></i></div>
+<div class="app-card-content">
+<h3 class="app-card-title">Batismo nas Águas</h3>
+<p class="app-card-desc">Inscreva-se para dar seu passo de fé pública.</p>
+</div>
+<i class="fas fa-chevron-right app-card-arrow"></i>
+</div>
+<div class="app-card" onclick="openModal('modal-bebe')">
+<div class="app-card-icon"><i class="fas fa-baby"></i></div>
+<div class="app-card-content">
+<h3 class="app-card-title">Apresentação de Bebê</h3>
+<p class="app-card-desc">Consagração solene do seu bebê na igreja.</p>
+</div>
+<i class="fas fa-chevron-right app-card-arrow"></i>
+</div>
+<div class="app-card" onclick="openModal('modal-grupo')">
+<div class="app-card-icon"><i class="fas fa-users"></i></div>
+<div class="app-card-content">
+<h3 class="app-card-title">Pequenos Grupos / Células</h3>
+<p class="app-card-desc">Participe de um grupo em sua região.</p>
+</div>
+<i class="fas fa-chevron-right app-card-arrow"></i>
+</div>
+</div>
+</div>
+<!-- MODAL: Batismo -->
+<div class="modal-overlay" id="modal-batismo" onclick="closeOuter(event)">
+<div class="modal-card">
+<div class="modal-handle"></div>
+<div class="modal-header">
+<h2>Batismo nas Águas</h2>
+<button class="modal-close" onclick="closeModals()"><i class="fas fa-times"></i></button>
+</div>
+<div id="batismo-form">
+<div class="field-group">
+<label>Nome do Candidato *</label>
+<input id="batismo-nome" placeholder="Nome Completo..." type="text"/>
+</div>
+<div class="field-group">
+<label>WhatsApp *</label>
+<input id="batismo-fone" placeholder="+41 79 000 00 00" type="tel"/>
+</div>
+<button class="btn-submit btn-blue" onclick="submitForm('batismo', this)">
+<i class="fas fa-droplet"></i> Quero me Batizar
                 </button>
-            </div>
-            <div class="success-state" id="batismo-success">
-                <i class="fas fa-check-circle" style="color:#3b82f6;"></i>
-                <h3>Inscrição Realizada!</h3>
-                <p>Glória a Deus por este passo! Entraremos em contato com os detalhes do próximo batismo.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: Apresentação Bebê -->
-    <div id="modal-bebe" class="modal-overlay" onclick="closeOuter(event)">
-        <div class="modal-card">
-            <div class="modal-handle"></div>
-            <div class="modal-header">
-                <h2>Apresentação de Bebê</h2>
-                <button class="modal-close" onclick="closeModals()"><i class="fas fa-times"></i></button>
-            </div>
-            <div id="bebe-form">
-                <div class="field-group">
-                    <label>Nome da Criança *</label>
-                    <input type="text" id="bebe-nome" placeholder="Nome Completo da criança...">
-                </div>
-                <div class="field-row">
-                    <div class="field-group">
-                        <label>Data de Nascimento</label>
-                        <input type="date" id="bebe-nasc">
-                    </div>
-                </div>
-                <div class="field-group">
-                    <label>Nome do Pai</label>
-                    <input type="text" id="bebe-pai">
-                </div>
-                <div class="field-group">
-                    <label>Nome da Mãe</label>
-                    <input type="text" id="bebe-mae">
-                </div>
-                <div class="field-group">
-                    <label>WhatsApp de Contacto *</label>
-                    <input type="tel" id="bebe-fone" placeholder="+41 79 000 00 00">
-                </div>
-                <button class="btn-submit btn-pink" onclick="submitForm('bebe', this)">
-                    <i class="fas fa-heart"></i> Solicitar Agendamento
+</div>
+<div class="success-state" id="batismo-success">
+<i class="fas fa-check-circle" style="color:#3b82f6;"></i>
+<h3>Inscrição Realizada!</h3>
+<p>Glória a Deus por este passo! Entraremos em contato com os detalhes do próximo batismo.</p>
+</div>
+</div>
+</div>
+<!-- MODAL: Apresentação Bebê -->
+<div class="modal-overlay" id="modal-bebe" onclick="closeOuter(event)">
+<div class="modal-card">
+<div class="modal-handle"></div>
+<div class="modal-header">
+<h2>Apresentação de Bebê</h2>
+<button class="modal-close" onclick="closeModals()"><i class="fas fa-times"></i></button>
+</div>
+<div id="bebe-form">
+<div class="field-group">
+<label>Nome da Criança *</label>
+<input id="bebe-nome" placeholder="Nome Completo da criança..." type="text"/>
+</div>
+<div class="field-row">
+<div class="field-group">
+<label>Data de Nascimento</label>
+<input id="bebe-nasc" type="date"/>
+</div>
+</div>
+<div class="field-group">
+<label>Nome do Pai</label>
+<input id="bebe-pai" type="text"/>
+</div>
+<div class="field-group">
+<label>Nome da Mãe</label>
+<input id="bebe-mae" type="text"/>
+</div>
+<div class="field-group">
+<label>WhatsApp de Contacto *</label>
+<input id="bebe-fone" placeholder="+41 79 000 00 00" type="tel"/>
+</div>
+<button class="btn-submit btn-pink" onclick="submitForm('bebe', this)">
+<i class="fas fa-heart"></i> Solicitar Agendamento
                 </button>
-            </div>
-            <div class="success-state" id="bebe-success">
-                <i class="fas fa-baby" style="color:#ec4899;"></i>
-                <h3>Pedido Enviado!</h3>
-                <p>A secretaria entrará em contato para confirmar a data da apresentação. Que alegria!</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: Grupo -->
-    <div id="modal-grupo" class="modal-overlay" onclick="closeOuter(event)">
-        <div class="modal-card">
-            <div class="modal-handle"></div>
-            <div class="modal-header">
-                <h2>Pequenos Grupos</h2>
-                <button class="modal-close" onclick="closeModals()"><i class="fas fa-times"></i></button>
-            </div>
-            <div id="grupo-form">
-                <div class="field-group">
-                    <label>Seu Nome *</label>
-                    <input type="text" id="grupo-nome" placeholder="Nome Completo...">
-                </div>
-                <div class="field-group">
-                    <label>WhatsApp *</label>
-                    <input type="tel" id="grupo-fone" placeholder="+41 79 000 00 00">
-                </div>
-                <div class="field-group">
-                    <label>Área de Interesse</label>
-                    <select id="grupo-tipo">
-                        <option value="Jovens">Rede de Jovens</option>
-                        <option value="Homens">Rede de Homens</option>
-                        <option value="Mulheres">Rede de Mulheres</option>
-                        <option value="Familia">Casais / Família</option>
-                        <option value="Kids">Ministério Infantil</option>
-                        <option value="Nao Sei">Quero me envolver, mas não sei onde</option>
-                    </select>
-                </div>
-                <button class="btn-submit" onclick="submitForm('grupo', this)">
-                    <i class="fas fa-search-location"></i> Quero Participar
+</div>
+<div class="success-state" id="bebe-success">
+<i class="fas fa-baby" style="color:#ec4899;"></i>
+<h3>Pedido Enviado!</h3>
+<p>A secretaria entrará em contato para confirmar a data da apresentação. Que alegria!</p>
+</div>
+</div>
+</div>
+<!-- MODAL: Grupo -->
+<div class="modal-overlay" id="modal-grupo" onclick="closeOuter(event)">
+<div class="modal-card">
+<div class="modal-handle"></div>
+<div class="modal-header">
+<h2>Pequenos Grupos</h2>
+<button class="modal-close" onclick="closeModals()"><i class="fas fa-times"></i></button>
+</div>
+<div id="grupo-form">
+<div class="field-group">
+<label>Seu Nome *</label>
+<input id="grupo-nome" placeholder="Nome Completo..." type="text"/>
+</div>
+<div class="field-group">
+<label>WhatsApp *</label>
+<input id="grupo-fone" placeholder="+41 79 000 00 00" type="tel"/>
+</div>
+<div class="field-group">
+<label>Área de Interesse</label>
+<select id="grupo-tipo">
+<option value="Jovens">Rede de Jovens</option>
+<option value="Homens">Rede de Homens</option>
+<option value="Mulheres">Rede de Mulheres</option>
+<option value="Familia">Casais / Família</option>
+<option value="Kids">Ministério Infantil</option>
+<option value="Nao Sei">Quero me envolver, mas não sei onde</option>
+</select>
+</div>
+<button class="btn-submit" onclick="submitForm('grupo', this)">
+<i class="fas fa-search-location"></i> Quero Participar
                 </button>
-            </div>
-            <div class="success-state" id="grupo-success">
-                <i class="fas fa-check-circle" style="color:#f59e0b;"></i>
-                <h3>Inscrição Realizada!</h3>
-                <p>O líder responsável pela rede falará com você em breve. Bem-vindo à família!</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: Servir -->
-    <!-- SCREEN: SERVIR -->
-    <div id="screen-servir" class="app-screen">
-        <div style="display:flex; align-items:center; margin-bottom: 25px;">
-            <i class="fas fa-arrow-left" onclick="switchTab('membros')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
-            <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Servir no Reino</h2>
-        </div>
-
-        <p style="font-size: 0.95rem; color: #475569; margin-bottom: 25px; line-height: 1.5; font-family:'Inter', sans-serif;">
+</div>
+<div class="success-state" id="grupo-success">
+<i class="fas fa-check-circle" style="color:#f59e0b;"></i>
+<h3>Inscrição Realizada!</h3>
+<p>O líder responsável pela rede falará com você em breve. Bem-vindo à família!</p>
+</div>
+</div>
+</div>
+<!-- MODAL: Servir -->
+<!-- SCREEN: SERVIR -->
+<div class="app-screen" id="screen-servir">
+<div style="display:flex; align-items:center; margin-bottom: 25px;">
+<i class="fas fa-arrow-left" onclick="switchTab('membros')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
+<h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Servir no Reino</h2>
+</div>
+<p style="font-size: 0.95rem; color: #475569; margin-bottom: 25px; line-height: 1.5; font-family:'Inter', sans-serif;">
             Cada membro tem um lugar no corpo de Cristo. Informe suas áreas de interesse e nossa equipe entrará em contato.
         </p>
-
-        <div id="servir-form">
-            <div style="margin-bottom: 20px;">
-                <label style="display:block; font-size: 0.9rem; color: #475569; margin-bottom: 8px;">Seu nome</label>
-                <input type="text" id="servir-nome" placeholder="João da Silva" style="width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1rem; color: #173F63; font-family:'Inter', sans-serif;">
-            </div>
-
-            <div style="margin-bottom: 20px;">
-                <label style="display:block; font-size: 0.9rem; color: #475569; margin-bottom: 8px;">WhatsApp</label>
-                <input type="tel" id="servir-fone" placeholder="+41 79 123 45 67" style="width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1rem; color: #173F63; font-family:'Inter', sans-serif;">
-            </div>
-
-            <div style="margin-bottom: 20px;">
-                <label style="display:block; font-size: 0.9rem; color: #475569; margin-bottom: 8px;">Em qual área você gostaria de servir?</label>
-                <select id="servir-area" style="width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1rem; color: #173F63; font-family:'Inter', sans-serif; background: #FFFFFF; appearance: none;">
-                    <option value="">Selecione uma área...</option>
-                    <option value="KIDS">KIDS</option>
-                    <option value="RECEPÇÃO">RECEPÇÃO</option>
-                    <option value="LOUVOR">LOUVOR</option>
-                    <option value="MÍDIA">MÍDIA / TRANSMISSÃO</option>
-                    <option value="INFRAESTRUTURA">INFRAESTRUTURA / LIMPEZA</option>
-                    <option value="ACOLHIMENTO">EQUIPE ACOLHER</option>
-                    <option value="OUTROS">OUTRAS ÁREAS</option>
-                </select>
-            </div>
-
-            <div style="margin-bottom: 25px;">
-                <label style="display:block; font-size: 0.9rem; color: #475569; margin-bottom: 8px;">Conte-nos um pouco sobre você e sua disponibilidade.</label>
-                <textarea id="servir-mensagem" rows="3" placeholder="Escreva aqui..." style="width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1rem; color: #173F63; font-family:'Inter', sans-serif;"></textarea>
-            </div>
-
-            <button onclick="submitForm('servir', this)" style="width: 100%; background: #173F63; color: #FFFFFF; border: none; border-radius: 8px; padding: 18px; font-size: 1.1rem; font-weight: 600; cursor: pointer; font-family:'Inter', sans-serif;">
+<div id="servir-form">
+<div style="margin-bottom: 20px;">
+<label style="display:block; font-size: 0.9rem; color: #475569; margin-bottom: 8px;">Seu nome</label>
+<input id="servir-nome" placeholder="João da Silva" style="width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1rem; color: #173F63; font-family:'Inter', sans-serif;" type="text"/>
+</div>
+<div style="margin-bottom: 20px;">
+<label style="display:block; font-size: 0.9rem; color: #475569; margin-bottom: 8px;">WhatsApp</label>
+<input id="servir-fone" placeholder="+41 79 123 45 67" style="width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1rem; color: #173F63; font-family:'Inter', sans-serif;" type="tel"/>
+</div>
+<div style="margin-bottom: 20px;">
+<label style="display:block; font-size: 0.9rem; color: #475569; margin-bottom: 8px;">Em qual área você gostaria de servir?</label>
+<select id="servir-area" style="width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1rem; color: #173F63; font-family:'Inter', sans-serif; background: #FFFFFF; appearance: none;">
+<option value="">Selecione uma área...</option>
+<option value="KIDS">KIDS</option>
+<option value="RECEPÇÃO">RECEPÇÃO</option>
+<option value="LOUVOR">LOUVOR</option>
+<option value="MÍDIA">MÍDIA / TRANSMISSÃO</option>
+<option value="INFRAESTRUTURA">INFRAESTRUTURA / LIMPEZA</option>
+<option value="ACOLHIMENTO">EQUIPE ACOLHER</option>
+<option value="OUTROS">OUTRAS ÁREAS</option>
+</select>
+</div>
+<div style="margin-bottom: 25px;">
+<label style="display:block; font-size: 0.9rem; color: #475569; margin-bottom: 8px;">Conte-nos um pouco sobre você e sua disponibilidade.</label>
+<textarea id="servir-mensagem" placeholder="Escreva aqui..." rows="3" style="width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1rem; color: #173F63; font-family:'Inter', sans-serif;"></textarea>
+</div>
+<button onclick="submitForm('servir', this)" style="width: 100%; background: #173F63; color: #FFFFFF; border: none; border-radius: 8px; padding: 18px; font-size: 1.1rem; font-weight: 600; cursor: pointer; font-family:'Inter', sans-serif;">
                 Enviar interesse
             </button>
-        </div>
-
-        <div class="success-state" id="servir-success" style="display:none; text-align:center; padding-top: 40px;">
-            <div style="background: #173F63; width: 80px; height: 80px; border-radius: 50%; display:flex; justify-content:center; align-items:center; margin: 0 auto 20px;">
-                <i class="fas fa-check" style="color: #FFFFFF; font-size: 2.5rem;"></i>
-            </div>
-            <h3 style="font-size: 1.5rem; color: #173F63; font-weight: 700; margin-bottom: 15px;">Seu interesse foi enviado!</h3>
-            <p style="font-size: 1.05rem; color: #475569; line-height: 1.5; margin-bottom: 30px;">
+</div>
+<div class="success-state" id="servir-success" style="display:none; text-align:center; padding-top: 40px;">
+<div style="background: #173F63; width: 80px; height: 80px; border-radius: 50%; display:flex; justify-content:center; align-items:center; margin: 0 auto 20px;">
+<i class="fas fa-check" style="color: #FFFFFF; font-size: 2.5rem;"></i>
+</div>
+<h3 style="font-size: 1.5rem; color: #173F63; font-weight: 700; margin-bottom: 15px;">Seu interesse foi enviado!</h3>
+<p style="font-size: 1.05rem; color: #475569; line-height: 1.5; margin-bottom: 30px;">
                 Nossa equipe irá analisar suas informações e entrará em contato em breve.
             </p>
-            <div style="background: #F0F5FA; border-radius: 12px; padding: 20px; display:flex; align-items:flex-start; text-align:left;">
-                <i class="fas fa-info-circle" style="color: #3B82F6; font-size: 1.5rem; margin-right: 15px; margin-top:2px;"></i>
-                <p style="margin:0; font-size: 0.95rem; color: #475569; line-height: 1.4;">
+<div style="background: #F0F5FA; border-radius: 12px; padding: 20px; display:flex; align-items:flex-start; text-align:left;">
+<i class="fas fa-info-circle" style="color: #3B82F6; font-size: 1.5rem; margin-right: 15px; margin-top:2px;"></i>
+<p style="margin:0; font-size: 0.95rem; color: #475569; line-height: 1.4;">
                     Se precisar, você pode entrar em contato com a Secretaria pelos canais oficiais da igreja.
                 </p>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- MODAL: Dízimos e Ofertas -->
-    <div id="modal-dizimos" class="modal-overlay" onclick="closeOuter(event)">
-        <div class="modal-card">
-            <div class="modal-handle"></div>
-            <div class="modal-header">
-                <h2>Dízimos e Ofertas</h2>
-                <button class="modal-close" onclick="closeModals()"><i class="fas fa-times"></i></button>
-            </div>
-            <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.4; margin-bottom:15px;">
+</div>
+</div>
+</div>
+<!-- MODAL: Dízimos e Ofertas -->
+<div class="modal-overlay" id="modal-dizimos" onclick="closeOuter(event)">
+<div class="modal-card">
+<div class="modal-handle"></div>
+<div class="modal-header">
+<h2>Dízimos e Ofertas</h2>
+<button class="modal-close" onclick="closeModals()"><i class="fas fa-times"></i></button>
+</div>
+<p style="font-size:0.85rem; color:var(--text-muted); line-height:1.4; margin-bottom:15px;">
                 "Trazei todos os dízimos à casa do tesouro, para que haja mantimento na minha casa..." — Malaquias 3:10
             </p>
-            <div class="bank-details">
-                <div class="bank-row">
-                    <strong>Beneficiário:</strong>
-                    <span>Catedral da Esperança Lausanne</span>
-                </div>
-                <div class="bank-row">
-                    <strong>Banco:</strong>
-                    <span>PostFinance AG</span>
-                </div>
-                <div class="bank-row">
-                    <strong>IBAN:</strong>
-                    <span id="church-iban">CH76 0900 0000 1234 5678 9</span>
-                </div>
-            </div>
-            <button class="c-copy-btn" onclick="copyIban()"><i class="fas fa-copy"></i> Copiar IBAN</button>
-        </div>
-    </div>
-
-    <!-- MODAL: Ficha Completa -->
-    <div id="modal-ficha-old" class="modal-overlay" onclick="closeOuter(event)">
-        <div class="modal-card">
-            <div class="modal-handle"></div>
-            <div class="modal-header">
-                <h2>Ficha de Membro</h2>
-                <button class="modal-close" onclick="closeModals()"><i class="fas fa-times"></i></button>
-            </div>
-
-            <div id="ficha-form">
-                <div class="wizard-dots">
-                    <div class="wizard-dot active" id="wd-1">1</div>
-                    <div class="wizard-dot" id="wd-2">2</div>
-                    <div class="wizard-dot" id="wd-3">3</div>
-                    <div class="wizard-dot" id="wd-4">4</div>
-                </div>
-
-                <!-- STEP 1 -->
-                <div class="wizard-step active" id="ws-1">
-                    <div class="field-group"><label>1. Nome Completo *</label><input type="text" id="f-1" placeholder="Seu nome completo"></div>
-                    <div class="field-group"><label>2. Igreja</label><input type="text" id="f-2" value="CATEDRAL-LAUSANNE"></div>
-                    <div class="field-group">
-                        <label>3. Gênero *</label>
-                        <select id="f-3">
-                            <option value="">Selecione...</option>
-                            <option>Masculino</option>
-                            <option>Feminino</option>
-                        </select>
-                    </div>
-                    <div class="field-row">
-                        <div class="field-group"><label>4. Nome do Pai</label><input type="text" id="f-4"></div>
-                        <div class="field-group"><label>5. Nome da Mãe</label><input type="text" id="f-5"></div>
-                    </div>
-                    <div class="field-row">
-                        <div class="field-group"><label>6. Nascimento *</label><input type="date" id="f-6"></div>
-                        <div class="field-group">
-                            <label>7. Estado Civil</label>
-                            <select id="f-7">
-                                <option>Solteiro(a)</option>
-                                <option>Casado(a)</option>
-                                <option>Divorciado(a)</option>
-                                <option>Viúvo(a)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="field-group"><label>12. Profissão</label><input type="text" id="f-12"></div>
-                    <div class="field-group">
-                        <label>11. Grau Académico</label>
-                        <select id="f-11">
-                            <option value="Superior">Superior</option>
-                            <option value="Médio">Médio</option>
-                            <option value="Fundamental">Fundamental</option>
-                            <option value="Pós">Pós-Graduação</option>
-                        </select>
-                    </div>
-                    <div class="wizard-footer">
-                        <button class="btn-submit btn-next" onclick="goStep(2)">Próximo <i class="fas fa-arrow-right"></i></button>
-                    </div>
-                </div>
-
-                <!-- STEP 2 -->
-                <div class="wizard-step" id="ws-2">
-                    <div class="field-group"><label>18. Endereço Completo *</label><textarea id="f-18" rows="2" placeholder="Rua, número, andar..."></textarea></div>
-                    <div class="field-row">
-                        <div class="field-group"><label>19. Cód. Postal</label><input type="text" id="f-19" placeholder="1007"></div>
-                        <div class="field-group"><label>20. Cidade *</label><input type="text" id="f-20" placeholder="Lausanne"></div>
-                    </div>
-                    <div class="field-group"><label>21. WhatsApp *</label><input type="tel" id="f-21" placeholder="+41 79 000 00 00"></div>
-                    <div class="field-group"><label>22. Email</label><input type="email" id="f-22" placeholder="seu@email.com"></div>
-                    <input type="hidden" id="f-8"><input type="hidden" id="f-9"><input type="hidden" id="f-10">
-                    <input type="hidden" id="f-13"><input type="hidden" id="f-14"><input type="hidden" id="f-15">
-                    <input type="hidden" id="f-16"><input type="hidden" id="f-17">
-                    <div class="wizard-footer">
-                        <button class="btn-prev" onclick="goStep(1)"><i class="fas fa-arrow-left"></i></button>
-                        <button class="btn-submit btn-next" onclick="goStep(3)">Próximo <i class="fas fa-arrow-right"></i></button>
-                    </div>
-                </div>
-
-                <!-- STEP 3 -->
-                <div class="wizard-step" id="ws-3">
-                    <div class="field-group"><label>23. Data da 1ª Visita</label><input type="date" id="f-23"></div>
-                    <div class="field-group"><label>24. Igreja Anterior</label><input type="text" id="f-24" placeholder="Nome da igreja anterior..."></div>
-                    <div class="field-group"><label>27. Data de Batismo</label><input type="date" id="f-27"></div>
-                    <div class="field-group"><label>28. Local do Batismo</label><input type="text" id="f-28" placeholder="Nome da igreja onde foi batizado(a)..."></div>
-                    <div class="field-group"><label>29. Função / Ministério</label><input type="text" id="f-29" placeholder="Ex: Membro, Diácono, Líder..."></div>
-                    <div class="field-group"><label>30. Tem filhos?</label><select id="f-30">
-                            <option value="">Selecione...</option>
-                            <option value="Não">Não</option>
-                            <option value="Sim">Sim</option>
-                        </select></div>
-                    <input type="hidden" id="f-25"><input type="hidden" id="f-26"><input type="hidden" id="f-31">
-                    <div class="wizard-footer">
-                        <button class="btn-prev" onclick="goStep(2)"><i class="fas fa-arrow-left"></i></button>
-                        <button class="btn-submit btn-next" onclick="goStep(4)">Próximo <i class="fas fa-arrow-right"></i></button>
-                    </div>
-                </div>
-
-                <!-- STEP 4 -->
-                <div class="wizard-step" id="ws-4">
-                    <div class="field-group"><label>33. Membro CES desde</label><input type="date" id="f-33"></div>
-                    <div class="field-group">
-                        <label>34. Como soube da Catedral?</label>
-                        <select id="f-34">
-                            <option value="">Selecione...</option>
-                            <option value="Amigo">Convite de amigo</option>
-                            <option value="Redes Sociais">Redes Sociais</option>
-                            <option value="Internet">Busca na Internet</option>
-                            <option value="Passei em frente">Passei em frente</option>
-                            <option value="Outro">Outro</option>
-                        </select>
-                    </div>
-                    <div class="field-group"><label>35. Nacionalidade</label><input type="text" id="f-35" placeholder="Ex: Brasileira, Portuguesa..."></div>
-                    <div class="field-group"><label>36. Idiomas Falados</label><input type="text" id="f-36" placeholder="Ex: Português, Francês, Inglês..."></div>
-                    <div class="field-group"><label>Observações</label><textarea id="f-42" rows="3" placeholder="Algo mais que gostaria de nos contar?"></textarea></div>
-                    <input type="hidden" id="f-32"><input type="hidden" id="f-37"><input type="hidden" id="f-38">
-                    <input type="hidden" id="f-39"><input type="hidden" id="f-40"><input type="hidden" id="f-41">
-                    <div id="draft-status"><i class="fas fa-check-circle"></i> Rascunho salvo</div>
-                    <div class="wizard-footer">
-                        <button class="btn-prev" onclick="goStep(3)"><i class="fas fa-arrow-left"></i></button>
-                        <button class="btn-submit" onclick="submitForm('ficha', this)">
-                            <i class="fas fa-certificate"></i> Finalizar Cadastro
+<div class="bank-details">
+<div class="bank-row">
+<strong>Beneficiário:</strong>
+<span>Catedral da Esperança Lausanne</span>
+</div>
+<div class="bank-row">
+<strong>Banco:</strong>
+<span>PostFinance AG</span>
+</div>
+<div class="bank-row">
+<strong>IBAN:</strong>
+<span id="church-iban">CH76 0900 0000 1234 5678 9</span>
+</div>
+</div>
+<button class="c-copy-btn" onclick="copyIban()"><i class="fas fa-copy"></i> Copiar IBAN</button>
+</div>
+</div>
+<!-- MODAL: Ficha Completa -->
+<div class="modal-overlay" id="modal-ficha-old" onclick="closeOuter(event)">
+<div class="modal-card">
+<div class="modal-handle"></div>
+<div class="modal-header">
+<h2>Ficha de Membro</h2>
+<button class="modal-close" onclick="closeModals()"><i class="fas fa-times"></i></button>
+</div>
+<div id="ficha-form">
+<div class="wizard-dots">
+<div class="wizard-dot active" id="wd-1">1</div>
+<div class="wizard-dot" id="wd-2">2</div>
+<div class="wizard-dot" id="wd-3">3</div>
+<div class="wizard-dot" id="wd-4">4</div>
+</div>
+<!-- STEP 1 -->
+<div class="wizard-step active" id="ws-1">
+<div class="field-group"><label>1. Nome Completo *</label><input id="f-1" placeholder="Seu nome completo" type="text"/></div>
+<div class="field-group"><label>2. Igreja</label><input id="f-2" type="text" value="CATEDRAL-LAUSANNE"/></div>
+<div class="field-group">
+<label>3. Gênero *</label>
+<select id="f-3">
+<option value="">Selecione...</option>
+<option>Masculino</option>
+<option>Feminino</option>
+</select>
+</div>
+<div class="field-row">
+<div class="field-group"><label>4. Nome do Pai</label><input id="f-4" type="text"/></div>
+<div class="field-group"><label>5. Nome da Mãe</label><input id="f-5" type="text"/></div>
+</div>
+<div class="field-row">
+<div class="field-group"><label>6. Nascimento *</label><input id="f-6" type="date"/></div>
+<div class="field-group">
+<label>7. Estado Civil</label>
+<select id="f-7">
+<option>Solteiro(a)</option>
+<option>Casado(a)</option>
+<option>Divorciado(a)</option>
+<option>Viúvo(a)</option>
+</select>
+</div>
+</div>
+<div class="field-group"><label>12. Profissão</label><input id="f-12" type="text"/></div>
+<div class="field-group">
+<label>11. Grau Académico</label>
+<select id="f-11">
+<option value="Superior">Superior</option>
+<option value="Médio">Médio</option>
+<option value="Fundamental">Fundamental</option>
+<option value="Pós">Pós-Graduação</option>
+</select>
+</div>
+<div class="wizard-footer">
+<button class="btn-submit btn-next" onclick="goStep(2)">Próximo <i class="fas fa-arrow-right"></i></button>
+</div>
+</div>
+<!-- STEP 2 -->
+<div class="wizard-step" id="ws-2">
+<div class="field-group"><label>18. Endereço Completo *</label><textarea id="f-18" placeholder="Rua, número, andar..." rows="2"></textarea></div>
+<div class="field-row">
+<div class="field-group"><label>19. Cód. Postal</label><input id="f-19" placeholder="1007" type="text"/></div>
+<div class="field-group"><label>20. Cidade *</label><input id="f-20" placeholder="Lausanne" type="text"/></div>
+</div>
+<div class="field-group"><label>21. WhatsApp *</label><input id="f-21" placeholder="+41 79 000 00 00" type="tel"/></div>
+<div class="field-group"><label>22. Email</label><input id="f-22" placeholder="seu@email.com" type="email"/></div>
+<input id="f-8" type="hidden"/><input id="f-9" type="hidden"/><input id="f-10" type="hidden"/>
+<input id="f-13" type="hidden"/><input id="f-14" type="hidden"/><input id="f-15" type="hidden"/>
+<input id="f-16" type="hidden"/><input id="f-17" type="hidden"/>
+<div class="wizard-footer">
+<button class="btn-prev" onclick="goStep(1)"><i class="fas fa-arrow-left"></i></button>
+<button class="btn-submit btn-next" onclick="goStep(3)">Próximo <i class="fas fa-arrow-right"></i></button>
+</div>
+</div>
+<!-- STEP 3 -->
+<div class="wizard-step" id="ws-3">
+<div class="field-group"><label>23. Data da 1ª Visita</label><input id="f-23" type="date"/></div>
+<div class="field-group"><label>24. Igreja Anterior</label><input id="f-24" placeholder="Nome da igreja anterior..." type="text"/></div>
+<div class="field-group"><label>27. Data de Batismo</label><input id="f-27" type="date"/></div>
+<div class="field-group"><label>28. Local do Batismo</label><input id="f-28" placeholder="Nome da igreja onde foi batizado(a)..." type="text"/></div>
+<div class="field-group"><label>29. Função / Ministério</label><input id="f-29" placeholder="Ex: Membro, Diácono, Líder..." type="text"/></div>
+<div class="field-group"><label>30. Tem filhos?</label><select id="f-30">
+<option value="">Selecione...</option>
+<option value="Não">Não</option>
+<option value="Sim">Sim</option>
+</select></div>
+<input id="f-25" type="hidden"/><input id="f-26" type="hidden"/><input id="f-31" type="hidden"/>
+<div class="wizard-footer">
+<button class="btn-prev" onclick="goStep(2)"><i class="fas fa-arrow-left"></i></button>
+<button class="btn-submit btn-next" onclick="goStep(4)">Próximo <i class="fas fa-arrow-right"></i></button>
+</div>
+</div>
+<!-- STEP 4 -->
+<div class="wizard-step" id="ws-4">
+<div class="field-group"><label>33. Membro CES desde</label><input id="f-33" type="date"/></div>
+<div class="field-group">
+<label>34. Como soube da Catedral?</label>
+<select id="f-34">
+<option value="">Selecione...</option>
+<option value="Amigo">Convite de amigo</option>
+<option value="Redes Sociais">Redes Sociais</option>
+<option value="Internet">Busca na Internet</option>
+<option value="Passei em frente">Passei em frente</option>
+<option value="Outro">Outro</option>
+</select>
+</div>
+<div class="field-group"><label>35. Nacionalidade</label><input id="f-35" placeholder="Ex: Brasileira, Portuguesa..." type="text"/></div>
+<div class="field-group"><label>36. Idiomas Falados</label><input id="f-36" placeholder="Ex: Português, Francês, Inglês..." type="text"/></div>
+<div class="field-group"><label>Observações</label><textarea id="f-42" placeholder="Algo mais que gostaria de nos contar?" rows="3"></textarea></div>
+<input id="f-32" type="hidden"/><input id="f-37" type="hidden"/><input id="f-38" type="hidden"/>
+<input id="f-39" type="hidden"/><input id="f-40" type="hidden"/><input id="f-41" type="hidden"/>
+<div id="draft-status"><i class="fas fa-check-circle"></i> Rascunho salvo</div>
+<div class="wizard-footer">
+<button class="btn-prev" onclick="goStep(3)"><i class="fas fa-arrow-left"></i></button>
+<button class="btn-submit" onclick="submitForm('ficha', this)">
+<i class="fas fa-certificate"></i> Finalizar Cadastro
                         </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="success-state" id="ficha-success">
-                <i class="fas fa-certificate" style="color:var(--gold);"></i>
-                <h3>Ficha Recebida!</h3>
-                <p>Sua ficha está em análise pela secretaria. Em breve você receberá a confirmação. Bem-vindo(a) à família Lausanne!</p>
-            </div>
-        </div>
-    </div>
-
-    <script>
+</div>
+</div>
+</div>
+<div class="success-state" id="ficha-success">
+<i class="fas fa-certificate" style="color:var(--gold);"></i>
+<h3>Ficha Recebida!</h3>
+<p>Sua ficha está em análise pela secretaria. Em breve você receberá a confirmação. Bem-vindo(a) à família Lausanne!</p>
+</div>
+</div>
+</div>
+<script>
         // ── GREETING ──
         (function() {
             const name = localStorage.getItem('visitor_first_name');
@@ -2186,5 +2095,4 @@
         }
     </script>
 </body>
-
 </html>
