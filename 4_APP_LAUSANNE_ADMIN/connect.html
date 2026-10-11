@@ -965,6 +965,78 @@
             box-shadow: 0 0 6px #22c55e;
             vertical-align: middle;
         }
+    
+        /* ══ MEMBROS EXCLUSIVE PALETTE ══ */
+        .member-theme {
+            --member-dark: #004043;
+            --member-teal: #087F83;
+            --member-soft: #E6F3F3;
+            --member-border: #B2D8D8;
+            --member-text-muted: #52797B;
+        }
+
+        #nav-membros.active {
+            color: #087F83 !important;
+        }
+        #nav-membros.active::after {
+            background: #087F83 !important;
+        }
+
+        .member-card {
+            background: #FFFFFF;
+            border: 1.5px solid #CBD5E1;
+            border-left: 4px solid #087F83;
+            border-radius: 10px;
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0, 64, 67, 0.04);
+            transition: all 0.2s ease;
+        }
+        .member-card:hover,
+        .member-card:active {
+            border-color: #087F83;
+            background: #F4F9F9;
+        }
+        .member-card h3 {
+            margin: 0;
+            font-size: 1.05rem;
+            color: #004043;
+            font-weight: 700;
+            margin-bottom: 4px;
+            font-family: 'Inter', sans-serif;
+        }
+        .member-card p {
+            margin: 0;
+            font-size: 0.88rem;
+            color: #52797B;
+            line-height: 1.35;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-member {
+            background: #004043 !important;
+            color: #FFFFFF !important;
+            border: none !important;
+            border-radius: 8px !important;
+            padding: 14px 22px !important;
+            font-weight: 700 !important;
+            font-size: 0.95rem !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            width: 100% !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-family: 'Inter', sans-serif !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+        }
+        .btn-member:hover,
+        .btn-member:active {
+            background: #087F83 !important;
+        }
+
     </style>
 </head>
 <body>
@@ -1185,70 +1257,58 @@
 </div>
 </div>
 <!-- SCREEN: AGENDAMENTOS -->
-<div class="app-screen" id="screen-agendamentos">
+<div class="app-screen" id="screen-agendamentos" style="padding: 25px 20px 120px; background: #FFFFFF; min-height: 100vh;">
 <div style="display:flex; align-items:center; margin-bottom: 25px;">
-<i class="fas fa-arrow-left" onclick="switchTab('membros')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
-<h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Agendamentos</h2>
+<i class="fas fa-arrow-left" onclick="switchTab('membros')" style="font-size: 1.2rem; cursor: pointer; color: #004043; margin-right: 15px;"></i>
+<div>
+    <div style="display:inline-block; background: #E6F3F3; color: #004043; border: 1px solid #B2D8D8; padding: 2px 8px; border-radius: 12px; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px;">Área Exclusiva de Membros</div>
+    <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #004043;">Agendamentos</h2>
 </div>
-<p style="font-size: 0.95rem; color: #475569; margin-bottom: 20px; font-family:'Inter', sans-serif;">Escolha o que deseja agendar.</p>
-<div class="app-card" onclick="openModal('modal-batismo')" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
-<div style="background: #E0F2FE; width: 45px; height: 45px; border-radius: 10px; display:flex; justify-content:center; align-items:center; margin-right: 15px; flex-shrink: 0;">
-<i class="fas fa-water" style="color: #0284C7; font-size: 1.2rem;"></i>
 </div>
-<div style="flex:1;">
-<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Batismo nas Águas</h3>
-<p style="margin:0; font-size: 0.85rem; color: #64748B;">Inscreva-se para dar seu passo de fé.</p>
+<p style="font-size: 0.95rem; color: #52797B; margin-bottom: 20px; font-family:'Inter', sans-serif;">Escolha o que deseja agendar.</p>
+<div onclick="openModal('modal-batismo')" class="member-card">
+<h3>Batismo nas Águas</h3>
+<p>Inscreva-se para dar seu passo de fé pública.</p>
 </div>
-<i class="fas fa-chevron-right" style="color: #173F63; font-size:0.9rem;"></i>
+<div onclick="openModal('modal-bebe')" class="member-card">
+<h3>Apresentação de Bebê</h3>
+<p>Consagração e bênção do seu bebê na igreja.</p>
 </div>
-<div class="app-card" onclick="openModal('modal-bebe')" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
-<div style="background: #FEF3C7; width: 45px; height: 45px; border-radius: 10px; display:flex; justify-content:center; align-items:center; margin-right: 15px; flex-shrink: 0;">
-<i class="fas fa-baby" style="color: #D97706; font-size: 1.2rem;"></i>
-</div>
-<div style="flex:1;">
-<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Apresentação de Bebê</h3>
-<p style="margin:0; font-size: 0.85rem; color: #64748B;">Consagração do seu bebê na igreja.</p>
-</div>
-<i class="fas fa-chevron-right" style="color: #173F63; font-size:0.9rem;"></i>
-</div>
-<div class="app-card" onclick="switchTab('visita')" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; box-shadow:none; display:flex; align-items:center;">
-<div style="background: #DCFCE7; width: 45px; height: 45px; border-radius: 10px; display:flex; justify-content:center; align-items:center; margin-right: 15px; flex-shrink: 0;">
-<i class="fas fa-users" style="color: #16A34A; font-size: 1.2rem;"></i>
-</div>
-<div style="flex:1;">
-<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Pequenos Grupos / Células</h3>
-<p style="margin:0; font-size: 0.85rem; color: #64748B;">Participe de um grupo em sua região.</p>
-</div>
-<i class="fas fa-chevron-right" style="color: #173F63; font-size:0.9rem;"></i>
+<div onclick="openModal('modal-grupo')" class="member-card">
+<h3>Pequenos Grupos / Células</h3>
+<p>Participe de um pequeno grupo em sua região.</p>
 </div>
 </div>
 
 <!-- SCREEN: MEMBROS -->
 <div id="screen-membros" class="app-screen" style="padding: 25px 20px 120px; background: #FFFFFF; min-height: 100vh;">
-    <div style="display:flex; align-items:center; margin-bottom: 25px;">
-        <i class="fas fa-chevron-left" onclick="switchTab('inicio')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
-        <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Área do membro</h2>
+    <div style="display:flex; align-items:center; margin-bottom: 16px;">
+        <i class="fas fa-arrow-left" onclick="switchTab('inicio')" style="font-size: 1.2rem; cursor: pointer; color: #004043; margin-right: 15px;"></i>
+        <div>
+            <div style="display:inline-block; background: #E6F3F3; color: #004043; border: 1px solid #B2D8D8; padding: 2px 8px; border-radius: 12px; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px;">Área Exclusiva de Membros</div>
+            <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #004043;">Área do membro</h2>
+        </div>
     </div>
-    <p style="color: #64748B; font-size: 0.95rem; font-weight: 400; line-height: 1.4; font-family: 'Inter', sans-serif; margin:0 0 25px 0;">Participe e se conecte com a vida da CME.</p>
+    <p style="color: #52797B; font-size: 0.95rem; font-weight: 400; line-height: 1.4; font-family: 'Inter', sans-serif; margin:0 0 25px 0;">Participe e se conecte com a vida da CME Lausanne.</p>
     
-    <div onclick="switchTab('agendamentos')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
-        <h3 style="margin:0; font-size: 1.15rem; color: #173F63; font-weight: 700; margin-bottom:5px;">Agendamentos</h3>
-        <p style="margin:0; font-size: 0.95rem; color: #475569;">Batismo, Apresentação de Bebê e Células.</p>
+    <div onclick="switchTab('agendamentos')" class="member-card">
+        <h3>Agendamentos</h3>
+        <p>Batismo, Apresentação de Bebê e Células.</p>
     </div>
 
-    <div onclick="switchTab('ficha')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
-        <h3 style="margin:0; font-size: 1.15rem; color: #173F63; font-weight: 700; margin-bottom:5px;">Meu cadastro</h3>
-        <p style="margin:0; font-size: 0.95rem; color: #475569;">Consulte e atualize seus dados.</p>
+    <div onclick="switchTab('ficha')" class="member-card">
+        <h3>Meu cadastro</h3>
+        <p>Consulte e atualize seus dados de membro.</p>
     </div>
 
-    <div onclick="switchTab('servir')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
-        <h3 style="margin:0; font-size: 1.15rem; color: #173F63; font-weight: 700; margin-bottom:5px;">Servir</h3>
-        <p style="margin:0; font-size: 0.95rem; color: #475569;">Junte-se à nossa equipe de voluntários.</p>
+    <div onclick="switchTab('servir')" class="member-card">
+        <h3>Servir no Reino</h3>
+        <p>Junte-se à nossa equipe de voluntários.</p>
     </div>
 
-    <div onclick="openModal('modal-dizimos')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
-        <h3 style="margin:0; font-size: 1.15rem; color: #173F63; font-weight: 700; margin-bottom:5px;">Dízimos e Ofertas</h3>
-        <p style="margin:0; font-size: 0.95rem; color: #475569;">Informações para contribuições.</p>
+    <div onclick="openModal('modal-dizimos')" class="member-card">
+        <h3>Dízimos e Ofertas</h3>
+        <p>Informações bancárias para contribuições.</p>
     </div>
 </div>
 <!-- SCREEN: FICHA (READ ONLY) -->
@@ -1481,9 +1541,7 @@
 <label>WhatsApp *</label>
 <input id="batismo-fone" placeholder="+41 79 000 00 00" type="tel"/>
 </div>
-<button class="btn-submit btn-blue" onclick="submitForm('batismo', this)">
-<i class="fas fa-droplet"></i> Quero me Batizar
-                </button>
+<button class="btn-member" onclick="submitForm('batismo', this)">Quero me Batizar</button>
 </div>
 <div class="success-state" id="batismo-success">
 <i class="fas fa-check-circle" style="color:#3b82f6;"></i>
@@ -1524,7 +1582,7 @@
 <input id="bebe-fone" placeholder="+41 79 000 00 00" type="tel"/>
 </div>
 <button class="btn-submit btn-pink" onclick="submitForm('bebe', this)">
-<i class="fas fa-heart"></i> Solicitar Agendamento
+ Solicitar Agendamento
                 </button>
 </div>
 <div class="success-state" id="bebe-success">
@@ -1539,7 +1597,7 @@
 <div class="modal-card">
 <div class="modal-handle"></div>
 <div class="modal-header">
-<h2>Pequenos Grupos</h2>
+<h2 style="color:#004043;">Pequenos Grupos</h2>
 <button class="modal-close" onclick="closeModals()"><i class="fas fa-times"></i></button>
 </div>
 <div id="grupo-form">
@@ -1563,7 +1621,7 @@
 </select>
 </div>
 <button class="btn-submit" onclick="submitForm('grupo', this)">
-<i class="fas fa-search-location"></i> Quero Participar
+ Quero Participar
                 </button>
 </div>
 <div class="success-state" id="grupo-success">
@@ -1575,26 +1633,29 @@
 </div>
 <!-- MODAL: Servir -->
 <!-- SCREEN: SERVIR -->
-<div class="app-screen" id="screen-servir">
+<div class="app-screen" id="screen-servir" style="padding: 25px 20px 120px; background: #FFFFFF; min-height: 100vh;">
 <div style="display:flex; align-items:center; margin-bottom: 25px;">
-<i class="fas fa-arrow-left" onclick="switchTab('membros')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
-<h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Servir no Reino</h2>
+<i class="fas fa-arrow-left" onclick="switchTab('membros')" style="font-size: 1.2rem; cursor: pointer; color: #004043; margin-right: 15px;"></i>
+<div>
+    <div style="display:inline-block; background: #E6F3F3; color: #004043; border: 1px solid #B2D8D8; padding: 2px 8px; border-radius: 12px; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px;">Área Exclusiva de Membros</div>
+    <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #004043;">Servir no Reino</h2>
 </div>
-<p style="font-size: 0.95rem; color: #475569; margin-bottom: 25px; line-height: 1.5; font-family:'Inter', sans-serif;">
-            Cada membro tem um lugar no corpo de Cristo. Informe suas áreas de interesse e nossa equipe entrará em contato.
-        </p>
+</div>
+<p style="font-size: 0.95rem; color: #52797B; margin-bottom: 25px; line-height: 1.5; font-family:'Inter', sans-serif;">
+Cada membro tem um lugar no corpo de Cristo. Informe suas áreas de interesse e nossa equipe entrará em contato.
+</p>
 <div id="servir-form">
-<div style="margin-bottom: 20px;">
-<label style="display:block; font-size: 0.9rem; color: #475569; margin-bottom: 8px;">Seu nome</label>
-<input id="servir-nome" placeholder="João da Silva" style="width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1rem; color: #173F63; font-family:'Inter', sans-serif;" type="text"/>
+<div class="field-group">
+<label style="color: #004043;">Seu nome</label>
+<input id="servir-nome" placeholder="Nome completo..." type="text"/>
 </div>
-<div style="margin-bottom: 20px;">
-<label style="display:block; font-size: 0.9rem; color: #475569; margin-bottom: 8px;">WhatsApp</label>
-<input id="servir-fone" placeholder="+41 79 123 45 67" style="width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1rem; color: #173F63; font-family:'Inter', sans-serif;" type="tel"/>
+<div class="field-group">
+<label style="color: #004043;">WhatsApp</label>
+<input id="servir-fone" placeholder="+41 79 123 45 67" type="tel"/>
 </div>
-<div style="margin-bottom: 20px;">
-<label style="display:block; font-size: 0.9rem; color: #475569; margin-bottom: 8px;">Em qual área você gostaria de servir?</label>
-<select id="servir-area" style="width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1rem; color: #173F63; font-family:'Inter', sans-serif; background: #FFFFFF; appearance: none;">
+<div class="field-group">
+<label style="color: #004043;">Em qual área você gostaria de servir?</label>
+<select id="servir-area">
 <option value="">Selecione uma área...</option>
 <option value="KIDS">KIDS</option>
 <option value="RECEPÇÃO">RECEPÇÃO</option>
@@ -1605,28 +1666,20 @@
 <option value="OUTROS">OUTRAS ÁREAS</option>
 </select>
 </div>
-<div style="margin-bottom: 25px;">
-<label style="display:block; font-size: 0.9rem; color: #475569; margin-bottom: 8px;">Conte-nos um pouco sobre você e sua disponibilidade.</label>
-<textarea id="servir-mensagem" placeholder="Escreva aqui..." rows="3" style="width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1rem; color: #173F63; font-family:'Inter', sans-serif;"></textarea>
+<div class="field-group">
+<label style="color: #004043;">Conte-nos um pouco sobre você e sua disponibilidade</label>
+<textarea id="servir-mensagem" placeholder="Escreva aqui..." rows="3"></textarea>
 </div>
-<button onclick="submitForm('servir', this)" style="width: 100%; background: #173F63; color: #FFFFFF; border: none; border-radius: 8px; padding: 18px; font-size: 1.1rem; font-weight: 600; cursor: pointer; font-family:'Inter', sans-serif;">
-                Enviar interesse
-            </button>
+<button onclick="submitForm('servir', this)" class="btn-member">
+Enviar interesse
+</button>
 </div>
-<div class="success-state" id="servir-success" style="display:none; text-align:center; padding-top: 40px;">
-<div style="background: #173F63; width: 80px; height: 80px; border-radius: 50%; display:flex; justify-content:center; align-items:center; margin: 0 auto 20px;">
-<i class="fas fa-check" style="color: #FFFFFF; font-size: 2.5rem;"></i>
-</div>
-<h3 style="font-size: 1.5rem; color: #173F63; font-weight: 700; margin-bottom: 15px;">Seu interesse foi enviado!</h3>
-<p style="font-size: 1.05rem; color: #475569; line-height: 1.5; margin-bottom: 30px;">
-                Nossa equipe irá analisar suas informações e entrará em contato em breve.
-            </p>
-<div style="background: #F0F5FA; border-radius: 12px; padding: 20px; display:flex; align-items:flex-start; text-align:left;">
-<i class="fas fa-info-circle" style="color: #3B82F6; font-size: 1.5rem; margin-right: 15px; margin-top:2px;"></i>
-<p style="margin:0; font-size: 0.95rem; color: #475569; line-height: 1.4;">
-                    Se precisar, você pode entrar em contato com a Secretaria pelos canais oficiais da igreja.
-                </p>
-</div>
+<div class="success-state" id="servir-success" style="display:none; text-align:center; padding: 40px 20px;">
+<h3 style="font-size: 1.4rem; color: #004043; font-weight: 700; margin-bottom: 12px;">Seu interesse foi enviado!</h3>
+<p style="font-size: 1rem; color: #52797B; line-height: 1.5; margin-bottom: 25px;">
+Nossa equipe entrará em contato em breve para os próximos passos no serviço voluntário.
+</p>
+<button onclick="switchTab('membros')" class="btn-member" style="max-width: 200px; margin: 0 auto;">Voltar</button>
 </div>
 </div>
 <!-- MODAL: Dízimos e Ofertas -->
@@ -1654,7 +1707,7 @@
 <span id="church-iban">CH76 0900 0000 1234 5678 9</span>
 </div>
 </div>
-<button class="c-copy-btn" onclick="copyIban()"><i class="fas fa-copy"></i> Copiar IBAN</button>
+<button class="c-copy-btn" onclick="copyIban()"> Copiar IBAN</button>
 </div>
 </div>
 <!-- MODAL: Ficha Completa -->
