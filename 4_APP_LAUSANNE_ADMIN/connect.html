@@ -648,12 +648,12 @@
 
         .field-group label {
             display: block;
-            font-size: 0.72rem;
-            font-weight: 800;
-            color: var(--gold);
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #173F63;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 6px;
+            margin-bottom: 7px;
         }
 
         .field-group input,
@@ -661,27 +661,35 @@
         .field-group select {
             width: 100%;
             padding: 13px 15px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(255, 255, 255, 0.03);
-            color: var(--text-color);
+            border-radius: 8px;
+            border: 1.5px solid #CBD5E1;
+            background: #FFFFFF;
+            color: #173F63;
             font-family: var(--font-main);
-            font-size: 0.92rem;
-            transition: all 0.3s;
+            font-size: 0.95rem;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+            transition: all 0.2s ease;
             -webkit-appearance: none;
+            box-sizing: border-box;
+        }
+
+        .field-group input::placeholder,
+        .field-group textarea::placeholder {
+            color: #94A3B8;
         }
 
         .field-group input:focus,
         .field-group textarea:focus,
         .field-group select:focus {
             outline: none;
-            border-color: rgba(212, 175, 55, 0.45);
-            background: rgba(212, 175, 55, 0.03);
+            border-color: #3B7C84;
+            box-shadow: 0 0 0 3px rgba(59, 124, 132, 0.15);
+            background: #FFFFFF;
         }
 
         .field-group select option {
-            background: #13131c;
-            color: #fff;
+            background: #FFFFFF;
+            color: #173F63;
         }
 
         .field-row {
@@ -918,25 +926,26 @@
         }
 
         .btn-back {
-            background: transparent;
-            border: 1px solid var(--gold);
+            background: #FFFFFF;
+            border: 1.5px solid #CBD5E1;
             border-radius: 8px;
-            padding: 6px 12px;
-            font-size: 0.72rem;
-            font-weight: 800;
-            color: var(--gold);
+            padding: 7px 14px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #173F63;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 6px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            transition: all 0.3s;
+            transition: all 0.2s ease;
         }
 
         .btn-back:hover {
-            background: var(--gold);
-            color: #000000;
+            border-color: #3B7C84;
+            color: #3B7C84;
+            background: #F8FAFC;
         }
 
         .system-online-badge {
@@ -980,11 +989,11 @@
 </div>
 <div style="width: 35px; height: 3px; background: var(--cme-gold); margin-bottom: 15px; border-radius: 2px;"></div>
 <h3 style="font-size: 1.15rem; color: #173F63; margin-bottom: 20px; font-weight: 700; font-family: 'Inter', sans-serif;">Como podemos ajudar?</h3>
-<div onclick="switchTab('espiritual')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<div onclick="switchTab('espiritual')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
 <h3 style="margin:0; font-size: 1.15rem; color: #173F63; font-weight: 700; margin-bottom:5px;">Área espiritual</h3>
 <p style="margin:0; font-size: 0.95rem; color: #475569;">Pedido de oração, uma palavra ou visita da nossa equipe.</p>
 </div>
-<div onclick="switchTab('social')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 15px; margin-bottom: 30px; cursor: pointer;">
+<div onclick="switchTab('social')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
 <h3 style="margin:0; font-size: 1.15rem; color: #173F63; font-weight: 700; margin-bottom:5px;">Área social</h3>
 <p style="margin:0; font-size: 0.95rem; color: #475569;">Apoio no país, ajuda em necessidades e agendamento de horário.</p>
 </div>
@@ -1007,15 +1016,15 @@
                     Uma comunidade de fé, cuidado e relacionamento, há 15 anos na região de Lausanne.
                 </p>
 <!-- Lista de navegação -->
-<div onclick="switchTab('historia')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<div onclick="switchTab('historia')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
 <h3 style="margin:0; font-size: 1.1rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Nossa história</h3>
 <p style="margin:0; font-size: 0.9rem; color: #64748B;">CME Mundial e CME Lausanne.</p>
 </div>
-<div onclick="switchTab('principios')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<div onclick="switchTab('principios')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
 <h3 style="margin:0; font-size: 1.1rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Nossa maneira de viver</h3>
 <p style="margin:0; font-size: 0.9rem; color: #64748B;">Fé, comunidade e serviço.</p>
 </div>
-<div onclick="switchTab('agenda')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<div onclick="switchTab('agenda')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
 <h3 style="margin:0; font-size: 1.1rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Agenda e horários</h3>
 <p style="margin:0; font-size: 0.9rem; color: #64748B;">Nossos cultos e encontros.</p>
 </div>
@@ -1087,8 +1096,8 @@
                     Nossos cultos e encontros.
                 </p>
 <!-- Cards de Agenda -->
-<div style="display:flex; align-items:center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 12px; overflow: hidden; padding: 15px;">
-<div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1px solid #E2E8F0;">
+<div style="display:flex; align-items:center; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; margin-bottom: 12px; overflow: hidden; padding: 16px 18px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
+<div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1.5px solid #CBD5E1;">
 <span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Domingo</span>
 <span style="display:block; font-size: 1.2rem; color: #173F63; font-weight: 700;">10:00</span>
 </div>
@@ -1096,8 +1105,8 @@
 <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700;">Celebração Principal</h3>
 </div>
 </div>
-<div style="display:flex; align-items:center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 12px; overflow: hidden; padding: 15px;">
-<div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1px solid #E2E8F0;">
+<div style="display:flex; align-items:center; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; margin-bottom: 12px; overflow: hidden; padding: 16px 18px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
+<div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1.5px solid #CBD5E1;">
 <span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Terça</span>
 <span style="display:block; font-size: 1.2rem; color: #173F63; font-weight: 700;">19:30</span>
 </div>
@@ -1105,8 +1114,8 @@
 <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700;">Culto "Alicerce"</h3>
 </div>
 </div>
-<div style="display:flex; align-items:center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 12px; overflow: hidden; padding: 15px;">
-<div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1px solid #E2E8F0;">
+<div style="display:flex; align-items:center; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; margin-bottom: 12px; overflow: hidden; padding: 16px 18px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
+<div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1.5px solid #CBD5E1;">
 <span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Quarta</span>
 <span style="display:block; font-size: 1.2rem; color: #173F63; font-weight: 700;">09:00</span>
 </div>
@@ -1114,8 +1123,8 @@
 <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700;">Momento de Intercessão</h3>
 </div>
 </div>
-<div style="display:flex; align-items:center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 12px; overflow: hidden; padding: 15px;">
-<div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1px solid #E2E8F0;">
+<div style="display:flex; align-items:center; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; margin-bottom: 12px; overflow: hidden; padding: 16px 18px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
+<div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1.5px solid #CBD5E1;">
 <span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Sexta</span>
 <span style="display:block; font-size: 1.2rem; color: #173F63; font-weight: 700;">19:30</span>
 </div>
@@ -1123,8 +1132,8 @@
 <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700;">Encontro de Mulheres "Conectadas"</h3>
 </div>
 </div>
-<div style="display:flex; align-items:center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 12px; overflow: hidden; padding: 15px;">
-<div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1px solid #E2E8F0;">
+<div style="display:flex; align-items:center; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; margin-bottom: 12px; overflow: hidden; padding: 16px 18px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
+<div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1.5px solid #CBD5E1;">
 <span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Sábado</span>
 <span style="display:block; font-size: 1.2rem; color: #173F63; font-weight: 700;">15:00</span>
 </div>
@@ -1140,15 +1149,15 @@
 <i class="fas fa-chevron-left" onclick="switchTab('inicio')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
 <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Área espiritual</h2>
 </div>
-<div onclick="switchTab('oracao')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<div onclick="switchTab('oracao')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
 <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Oração</h3>
 <p style="margin:0; font-size: 0.85rem; color: #64748B;">Envie seu pedido de oração.</p>
 </div>
-<div onclick="switchTab('visita')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<div onclick="switchTab('visita')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
 <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Uma palavra</h3>
 <p style="margin:0; font-size: 0.85rem; color: #64748B;">Converse com um ministro.</p>
 </div>
-<div onclick="switchTab('visita')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<div onclick="switchTab('visita')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
 <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Visita</h3>
 <p style="margin:0; font-size: 0.85rem; color: #64748B;">Solicite uma visita da nossa equipe.</p>
 </div>
@@ -1164,15 +1173,15 @@
 <i class="fas fa-chevron-left" onclick="switchTab('inicio')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
 <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Área social</h2>
 </div>
-<div onclick="switchTab('visita')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<div onclick="switchTab('visita')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
 <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Integração no país</h3>
 <p style="margin:0; font-size: 0.85rem; color: #64748B;">Apoio e orientação local.</p>
 </div>
-<div onclick="switchTab('visita')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<div onclick="switchTab('visita')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
 <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Preciso de ajuda</h3>
 <p style="margin:0; font-size: 0.85rem; color: #64748B;">Auxílio em necessidades básicas.</p>
 </div>
-<div onclick="switchTab('visita')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<div onclick="switchTab('visita')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
 <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Agendar horário</h3>
 <p style="margin:0; font-size: 0.85rem; color: #64748B;">Fale com a área social.</p>
 </div>
@@ -1224,22 +1233,22 @@
     </div>
     <p style="color: #64748B; font-size: 0.95rem; font-weight: 400; line-height: 1.4; font-family: 'Inter', sans-serif; margin:0 0 25px 0;">Participe e se conecte com a vida da CME.</p>
     
-    <div onclick="switchTab('agendamentos')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+    <div onclick="switchTab('agendamentos')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
         <h3 style="margin:0; font-size: 1.15rem; color: #173F63; font-weight: 700; margin-bottom:5px;">Agendamentos</h3>
         <p style="margin:0; font-size: 0.95rem; color: #475569;">Batismo, Apresentação de Bebê e Células.</p>
     </div>
 
-    <div onclick="switchTab('ficha')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+    <div onclick="switchTab('ficha')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
         <h3 style="margin:0; font-size: 1.15rem; color: #173F63; font-weight: 700; margin-bottom:5px;">Meu cadastro</h3>
         <p style="margin:0; font-size: 0.95rem; color: #475569;">Consulte e atualize seus dados.</p>
     </div>
 
-    <div onclick="switchTab('servir')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+    <div onclick="switchTab('servir')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
         <h3 style="margin:0; font-size: 1.15rem; color: #173F63; font-weight: 700; margin-bottom:5px;">Servir</h3>
         <p style="margin:0; font-size: 0.95rem; color: #475569;">Junte-se à nossa equipe de voluntários.</p>
     </div>
 
-    <div onclick="openModal('modal-dizimos')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+    <div onclick="openModal('modal-dizimos')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
         <h3 style="margin:0; font-size: 1.15rem; color: #173F63; font-weight: 700; margin-bottom:5px;">Dízimos e Ofertas</h3>
         <p style="margin:0; font-size: 0.95rem; color: #475569;">Informações para contribuições.</p>
     </div>
@@ -1315,15 +1324,15 @@
 <div style="background: #FFFFFF; padding: 25px 20px 15px; border-bottom: 1px solid #E2E8F0; margin-bottom: 20px;">
 <h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Como chegar</h2>
 </div>
-<div onclick="window.open('https://maps.google.com/?q=Rue+de+l%27Industrie+39,+1023+Crissier', '_blank')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<div onclick="window.open('https://maps.google.com/?q=Rue+de+l%27Industrie+39,+1023+Crissier', '_blank')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
 <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Endereço da Igreja</h3>
 <p style="margin:0; font-size: 0.85rem; color: #64748B;">Rue de l'Industrie 39, 1023 Crissier, Suíça.</p>
 </div>
-<div onclick="window.open('https://l.instagram.com/?u=https%3A%2F%2Flinktr.ee%2Fcmelausanne%3Futm_source%3Dig%26utm_medium%3Dsocial%26utm_content%3Dlink_in_bio%26fbclid%3DPAZXh0bgNhZW0CMTEAcGRvZgJzcnRjBmFwcF9pZA85MzY2MTk3NDMzOTI0NTkAAafxOf22pBLllim8xPjCpy0XFH3PqIlECrqDtmtNSCga0NwqzipjU7l8lf44zA_aem_dxu9J7_mfOiS5n9P2s59PQ&amp;e=AUAftGJUrb01ifxvMztIGfiHuN9kshuHptaR_1KKyy3rsWG327KNNlsqrjiVDYJG1hqSdmdzHIsgChAgi_Tw_HOOniC6wU_nJdX0YSopdYd8cwV3CFTQAnwhBuMEM7M0iOk-FGI80q9Om_zBdZUEJc8', '_blank')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<div onclick="window.open('https://www.instagram.com/cmelausanne/', '_blank')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
 <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Siga no Instagram</h3>
 <p style="margin:0; font-size: 0.85rem; color: #64748B;">Acompanhe nossas novidades.</p>
 </div>
-<div onclick="window.open('https://www.youtube.com/c/CatedraldaEsperançaSuíça/streams', '_blank')" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 15px 5px; margin-bottom: 5px; cursor: pointer;">
+<div onclick="window.open('https://www.youtube.com/c/CatedraldaEsperan%C3%A7aSu%C3%AD%C3%A7a/streams', '_blank')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
 <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Canal do YouTube</h3>
 <p style="margin:0; font-size: 0.85rem; color: #64748B;">Assista aos nossos cultos.</p>
 </div>
