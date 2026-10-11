@@ -645,6 +645,131 @@
             opacity: 1;
         }
 
+    
+        /* ══ RECEPTION LOGOUT ACTION ══ */
+        .btn-header-logout {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(8, 127, 131, 0.15);
+            border: 1px solid rgba(8, 127, 131, 0.4);
+            color: #E2E8F0;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: var(--font-sans, 'Inter', sans-serif);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn-header-logout:hover,
+        .btn-header-logout:active {
+            background: #087F83;
+            border-color: #087F83;
+            color: #FFFFFF;
+            box-shadow: 0 2px 8px rgba(8, 127, 131, 0.3);
+        }
+        .btn-header-logout i {
+            color: var(--gold-main, #C9A96A);
+            font-size: 0.9rem;
+        }
+
+        /* Logout Confirmation Modal */
+        #logout-modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(10, 19, 31, 0.85);
+            backdrop-filter: blur(6px);
+            z-index: 999999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #logout-modal-backdrop.active {
+            display: flex;
+        }
+        .logout-modal-box {
+            background: #0F172A;
+            border: 1px solid rgba(8, 127, 131, 0.4);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 360px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+            box-sizing: border-box;
+        }
+        .logout-modal-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(8, 127, 131, 0.2);
+            border: 1px solid #087F83;
+            color: var(--gold-main, #C9A96A);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin: 0 auto 16px;
+        }
+        .logout-modal-title {
+            color: #FFFFFF;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+            font-family: var(--font-sans, 'Inter', sans-serif);
+        }
+        .logout-modal-desc {
+            color: #94A3B8;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin: 0 0 24px 0;
+            font-family: var(--font-sans, 'Inter', sans-serif);
+        }
+        .logout-modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+        .logout-btn-cancel {
+            flex: 1;
+            background: transparent;
+            border: 1px solid #334155;
+            color: #94A3B8;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .logout-btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #FFFFFF;
+        }
+        .logout-btn-confirm {
+            flex: 1;
+            background: #087F83;
+            border: 1px solid #087F83;
+            color: #FFFFFF;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .logout-btn-confirm:hover {
+            background: #066568;
+            border-color: #066568;
+        }
+
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -1637,7 +1762,11 @@
             <h2 class="brand-title">CME LAUSANNE</h2>
             <div class="brand-sub">RECEPÇÃO</div>
         </div>
-        
+        <div>
+            <button class="btn-header-logout" onclick="handleReceptionLogout()" title="Sair da Recepção">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </button>
+        </div>
     </div>
     <div class="app-layout">
         <aside class="pc-sidebar">
@@ -3620,6 +3749,59 @@
         <i class="fas fa-check-circle" style="color: var(--gold);"></i>
         <span id="toast-message">Mensagem enviada com sucesso</span>
     </div>
+
+
+    <!-- LOGOUT CONFIRMATION MODAL -->
+    <div id="logout-modal-backdrop" onclick="if(event.target===this)closeLogoutModal();">
+        <div class="logout-modal-box">
+            <div class="logout-modal-icon">
+                <i class="fas fa-sign-out-alt"></i>
+            </div>
+            <h3 class="logout-modal-title">Deseja sair da Recepção?</h3>
+            <p class="logout-modal-desc">Sua sessão será encerrada e você será redirecionado para a tela de login.</p>
+            <div class="logout-modal-actions">
+                <button class="logout-btn-cancel" onclick="closeLogoutModal()">Cancelar</button>
+                <button class="logout-btn-confirm" onclick="confirmReceptionLogout()">Sim, Sair</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleReceptionLogout() {
+            const modal = document.getElementById('logout-modal-backdrop');
+            if (modal) {
+                modal.classList.add('active');
+            } else {
+                if (confirm('Deseja sair da Recepção?')) {
+                    confirmReceptionLogout();
+                }
+            }
+        }
+
+        function closeLogoutModal() {
+            const modal = document.getElementById('logout-modal-backdrop');
+            if (modal) modal.classList.remove('active');
+        }
+
+        async function confirmReceptionLogout() {
+            closeLogoutModal();
+            try {
+                if (typeof AuthManager !== 'undefined' && typeof AuthManager.logout === 'function') {
+                    await AuthManager.logout();
+                } else if (typeof firebase !== 'undefined' && firebase.auth) {
+                    await firebase.auth().signOut();
+                    localStorage.removeItem('session_role');
+                    sessionStorage.clear();
+                    window.top.location.href = 'index.html';
+                } else {
+                    window.top.location.href = 'index.html';
+                }
+            } catch (err) {
+                console.error('Logout error:', err);
+                window.top.location.href = 'index.html';
+            }
+        }
+    </script>
 
 </body>
 
