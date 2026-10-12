@@ -770,6 +770,179 @@
             border-color: #066568;
         }
 
+    
+        /* ══ CME LAUSANNE RECEPÇÃO - PALETA INSTITUCIONAL APROVADA ══ */
+        :root {
+            --cme-teal-active: #087F83 !important;
+            --cme-gold-action: #C9A96A !important;
+            --navy-base: #0A131F !important;
+            --navy-surface: #0E1A29 !important;
+            --navy-field: #07101B !important;
+            --border-discrete: #172A3E !important;
+        }
+
+        body, .app-layout, .app-main {
+            background-color: var(--navy-base) !important;
+            color: var(--text-light) !important;
+        }
+
+        /* 1. Sub-abas (NOVO VISITANTE / JÁ VISITOU) */
+        .visitor-subtabs {
+            background: var(--navy-field) !important;
+            border: 1px solid var(--border-discrete) !important;
+            gap: 4px !important;
+            padding: 4px !important;
+            border-radius: 8px !important;
+            margin-bottom: 24px !important;
+            display: flex !important;
+        }
+        .visitor-subtabs .subtab-btn {
+            flex: 1 !important;
+            color: #8CA0B3 !important;
+            background: transparent !important;
+            padding: 12px 16px !important;
+            font-size: 0.85rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.5px !important;
+            text-transform: uppercase !important;
+            border: none !important;
+            border-radius: 6px !important;
+            cursor: pointer !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 8px !important;
+            transition: all 0.2s ease !important;
+        }
+        .visitor-subtabs .subtab-btn i {
+            font-size: 0.95rem !important;
+            color: inherit !important;
+        }
+        .visitor-subtabs .subtab-btn.active {
+            background: #087F83 !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 2px 8px rgba(8, 127, 131, 0.3) !important;
+        }
+        .visitor-subtabs .subtab-btn.active::after {
+            display: none !important;
+        }
+
+        /* 2. Campos de Texto / Formulário */
+        input[type="text"], input[type="tel"], input[type="email"], input[type="password"], select, textarea {
+            background: var(--navy-field) !important;
+            border: 1.5px solid var(--border-discrete) !important;
+            color: #FFFFFF !important;
+            border-radius: 8px !important;
+            box-sizing: border-box !important;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none !important;
+            border-color: #087F83 !important;
+            box-shadow: 0 0 0 3px rgba(8, 127, 131, 0.2) !important;
+        }
+        input[type="checkbox"] {
+            accent-color: #087F83 !important;
+        }
+
+        /* Gaveta "Mais informações" retrátil */
+        details {
+            border: 1.5px solid var(--border-discrete) !important;
+            border-radius: 8px !important;
+            background: var(--navy-field) !important;
+        }
+
+        /* 3. Botão Principal: REGISTRAR ENTRADA (Dourado institucional) */
+        .submit-btn-container, .btn-gold, #btn-submit-visitor {
+            background: #C9A96A !important;
+            color: #1A1407 !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-weight: 800 !important;
+            font-size: 0.95rem !important;
+            letter-spacing: 0.6px !important;
+            text-transform: uppercase !important;
+            padding: 16px 20px !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            box-shadow: 0 2px 10px rgba(201, 169, 106, 0.2) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 10px !important;
+        }
+        .submit-btn-container:hover, .btn-gold:hover, #btn-submit-visitor:hover {
+            background: #D8B97C !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 14px rgba(201, 169, 106, 0.3) !important;
+        }
+        .submit-btn-container .enter-badge {
+            display: none !important;
+        }
+
+        /* 4. Barra Inferior de Navegação (Teal nos elementos ativos) */
+        .bottom-nav {
+            display: flex !important;
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            background: #09121D !important;
+            border-top: 1px solid var(--border-discrete) !important;
+            z-index: 1000 !important;
+            margin: 0 !important;
+            padding: 6px 0 8px 0 !important;
+            height: 64px !important;
+            box-sizing: border-box !important;
+            justify-content: space-around !important;
+            align-items: center !important;
+        }
+        .bottom-nav .nav-item {
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 4px 0 !important;
+            border: none !important;
+            color: #64748B !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            position: relative !important;
+        }
+        .bottom-nav .nav-item i {
+            font-size: 1.15rem !important;
+            margin-bottom: 4px !important;
+            color: inherit !important;
+            background: transparent !important;
+            border: none !important;
+            width: auto !important;
+            height: auto !important;
+        }
+        .bottom-nav .nav-item span {
+            font-size: 0.72rem !important;
+            font-weight: 500 !important;
+            color: inherit !important;
+        }
+        .bottom-nav .nav-item.active {
+            color: #087F83 !important;
+        }
+        .bottom-nav .nav-item.active span {
+            font-weight: 700 !important;
+        }
+        .bottom-nav .nav-item.active::after {
+            content: '' !important;
+            position: absolute !important;
+            bottom: -4px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: 24px !important;
+            height: 2.5px !important;
+            background: #087F83 !important;
+            border-radius: 2px !important;
+        }
+
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -1740,19 +1913,24 @@
 
     <!-- RECEPTION BOTTOM NAV -->
     <nav class="bottom-nav">
-        <div class="nav-item active" onclick="switchCheckinMode('mural')">
+        <div class="nav-item active" id="bnav-mural" onclick="switchCheckinMode('mural')">
+            <i class="fas fa-tv"></i>
             <span>Mural</span>
         </div>
-        <div class="nav-item" onclick="switchCheckinMode('visitor')">
+        <div class="nav-item" id="bnav-visitor" onclick="switchCheckinMode('visitor')">
+            <i class="fas fa-user-friends"></i>
             <span>Visitantes</span>
         </div>
-        <div class="nav-item" onclick="switchCheckinMode('child')">
+        <div class="nav-item" id="bnav-child" onclick="switchCheckinMode('child')">
+            <i class="fas fa-child"></i>
             <span>Crianças</span>
         </div>
-        <div class="nav-item" onclick="setTab('schedule')">
+        <div class="nav-item" id="bnav-schedule" onclick="setTab('schedule')">
+            <i class="far fa-calendar-alt"></i>
             <span>Agenda</span>
         </div>
-        <div class="nav-item" onclick="setTab('events')">
+        <div class="nav-item" id="bnav-events" onclick="setTab('events')">
+            <i class="far fa-calendar-check"></i>
             <span>Eventos</span>
         </div>
     </nav>
@@ -1989,9 +2167,9 @@
                         <div class="pc-column-left">
                             <!-- INNER SEGMENTED CONTROL (MOBILE VIEW) -->
                     
-    <div class="visitor-subtabs">
-        <button class="subtab-btn active" id="btn-subtab-new" onclick="switchVisitorSubMode('new', this)">Novo visitante</button>
-        <button class="subtab-btn" id="btn-subtab-exist" onclick="switchVisitorSubMode('exist', this)">Já visitou</button>
+        <div class="visitor-subtabs">
+        <button class="subtab-btn active" id="btn-subtab-new" onclick="switchVisitorSubMode('new', this)"><i class="fas fa-user-plus"></i> Novo visitante</button>
+        <button class="subtab-btn" id="btn-subtab-exist" onclick="switchVisitorSubMode('exist', this)"><i class="fas fa-users"></i> Já visitou</button>
     </div>
     
                             <!-- SUB-MODE: NEW REGISTRATION (RAPID CAPTURE) -->
@@ -2058,8 +2236,8 @@
                                     <!-- Botão Principal de Registro -->
                                     
     <button onclick="submitVisitor()" class="submit-btn-container" id="btn-submit-visitor">
+        <i class="fas fa-user-plus" style="font-size:1.05rem;"></i>
         <span class="btn-text">Registrar entrada</span>
-        <span class="enter-badge">Enter</span>
     </button>
     
 
