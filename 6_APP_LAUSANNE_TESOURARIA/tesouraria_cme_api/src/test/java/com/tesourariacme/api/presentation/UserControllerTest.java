@@ -193,4 +193,26 @@ public class UserControllerTest {
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
         verify(userRepository, never()).findById(any());
     }
+
+    @Test
+    public void testCleanAreaExpensesSuccessForAdmin() {
+        ResponseEntity<?> response = userController.cleanArea(Map.of("area", "EXPENSES"), adminAuth);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(expenseAttachmentRepository).deleteAllInBatch();
+        verify(expenseRepository).deleteAllInBatch();
+    }
+
+    @Test
+    public void testCleanAreaClosingsSuccessForAdmin() {
+        ResponseEntity<?> response = userController.cleanArea(Map.of("area", "CLOSINGS"), adminAuth);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(serviceClosingRepository).deleteAllInBatch();
+    }
+
+    @Test
+    public void testCleanAreaForbiddenForTreasurer() {
+        ResponseEntity<?> response = userController.cleanArea(Map.of("area", "EXPENSES"), treasurerAuth);
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        verify(expenseRepository, never()).deleteAllInBatch();
+    }
 }

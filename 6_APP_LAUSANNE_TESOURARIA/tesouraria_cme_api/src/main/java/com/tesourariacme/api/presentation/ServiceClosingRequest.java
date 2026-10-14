@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class ServiceClosingRequest {
+    private Long sessionId;
     private LocalDate serviceDate;
     private String mainTreasurer;
     private String coTreasurer;

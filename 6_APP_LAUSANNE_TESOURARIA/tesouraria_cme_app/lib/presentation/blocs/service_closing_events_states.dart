@@ -42,17 +42,24 @@ class AnonymousEntry extends Equatable {
   final String id;
   final EnvelopeType type;
   final int amount;
+  final String? enteredBy;
 
-  const AnonymousEntry({required this.id, required this.type, required this.amount});
+  const AnonymousEntry({
+    required this.id,
+    required this.type,
+    required this.amount,
+    this.enteredBy,
+  });
 
   @override
-  List<Object?> get props => [id, type, amount];
+  List<Object?> get props => [id, type, amount, enteredBy];
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'type': type.name,
       'amount': amount,
+      if (enteredBy != null) 'enteredBy': enteredBy,
     };
   }
 
@@ -61,6 +68,7 @@ class AnonymousEntry extends Equatable {
       id: json['id'],
       type: EnvelopeType.values.firstWhere((e) => e.name == json['type']),
       amount: json['amount'],
+      enteredBy: json['enteredBy'] as String?,
     );
   }
 }
@@ -111,6 +119,22 @@ class UndoAddedEntryEvent extends ServiceClosingEvent {
   List<Object?> get props => [entryId];
 }
 
+class MergeSessionDraftEvent extends ServiceClosingEvent {
+  final ServiceClosingState serverDraft;
+  MergeSessionDraftEvent(this.serverDraft);
+
+  @override
+  List<Object?> get props => [serverDraft];
+}
+
+class SetConferenteReadyEvent extends ServiceClosingEvent {
+  final bool ready;
+  SetConferenteReadyEvent(this.ready);
+
+  @override
+  List<Object?> get props => [ready];
+}
+
 class ServiceClosingState extends Equatable {
   final int? sessionId;
   final DateTime? date;
@@ -128,6 +152,9 @@ class ServiceClosingState extends Equatable {
   final List<String> knownMembers;
   final bool isSubmitting;
   final bool isSuccess;
+  final String? conferente2;
+  final bool conferente1Ready;
+  final bool conferente2Ready;
 
   int get identifiedTotal => identifiedEntries.fold(0, (sum, item) => sum + item.amount);
   int get anonymousTotal => anonymousEntries.fold(0, (sum, item) => sum + item.amount);
@@ -154,6 +181,9 @@ class ServiceClosingState extends Equatable {
     this.knownMembers = const [],
     this.isSubmitting = false,
     this.isSuccess = false,
+    this.conferente2,
+    this.conferente1Ready = false,
+    this.conferente2Ready = false,
   });
 
   ServiceClosingState copyWith({
@@ -173,6 +203,9 @@ class ServiceClosingState extends Equatable {
     List<String>? knownMembers,
     bool? isSubmitting,
     bool? isSuccess,
+    String? conferente2,
+    bool? conferente1Ready,
+    bool? conferente2Ready,
   }) {
     return ServiceClosingState(
       sessionId: sessionId ?? this.sessionId,
@@ -191,6 +224,9 @@ class ServiceClosingState extends Equatable {
       knownMembers: knownMembers ?? this.knownMembers,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       isSuccess: isSuccess ?? this.isSuccess,
+      conferente2: conferente2 ?? this.conferente2,
+      conferente1Ready: conferente1Ready ?? this.conferente1Ready,
+      conferente2Ready: conferente2Ready ?? this.conferente2Ready,
     );
   }
 
@@ -199,7 +235,7 @@ class ServiceClosingState extends Equatable {
     sessionId, date, serviceTime, serviceEndTime, serviceType,
     mainTreasurer, coTreasurer, verifierName, verifierType,
     identifiedEntries, anonymousEntries, physicalTotal, error, knownMembers,
-    isSubmitting, isSuccess
+    isSubmitting, isSuccess, conferente2, conferente1Ready, conferente2Ready
   ];
 
   Map<String, dynamic> toJson() {
@@ -220,6 +256,9 @@ class ServiceClosingState extends Equatable {
       'knownMembers': knownMembers,
       'isSubmitting': isSubmitting,
       'isSuccess': isSuccess,
+      'conferente2': conferente2,
+      'conferente1Ready': conferente1Ready,
+      'conferente2Ready': conferente2Ready,
     };
   }
 
@@ -250,6 +289,9 @@ class ServiceClosingState extends Equatable {
           const [],
       isSubmitting: json['isSubmitting'] ?? false,
       isSuccess: json['isSuccess'] ?? false,
+      conferente2: json['conferente2'] as String?,
+      conferente1Ready: json['conferente1Ready'] ?? false,
+      conferente2Ready: json['conferente2Ready'] ?? false,
     );
   }
 }

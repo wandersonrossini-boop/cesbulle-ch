@@ -30,6 +30,20 @@ public class UserController {
     private final ServiceClosingRepository serviceClosingRepository;
     private final MemberRepository memberRepository;
 
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private com.tesourariacme.api.infrastructure.ContributorRepository contributorRepository;
+
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private com.tesourariacme.api.infrastructure.ServiceClosingSessionRepository sessionRepository;
+
+    public void setContributorRepository(com.tesourariacme.api.infrastructure.ContributorRepository contributorRepository) {
+        this.contributorRepository = contributorRepository;
+    }
+
+    public void setSessionRepository(com.tesourariacme.api.infrastructure.ServiceClosingSessionRepository sessionRepository) {
+        this.sessionRepository = sessionRepository;
+    }
+
     public UserController(
             AppUserRepository userRepository, 
             PasswordEncoder passwordEncoder,
@@ -48,6 +62,44 @@ public class UserController {
     // ----------------------------------------------------
     // ADMIN ENDPOINTS
     // ----------------------------------------------------
+
+    @PostMapping("/clean-area")
+    @Transactional
+    public ResponseEntity<?> cleanArea(@RequestBody(required = false) java.util.Map<String, String> body, Authentication authentication) {
+        if (!isAdmin(authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado. Apenas administradores.");
+        }
+        String area = body != null ? body.get("area") : null;
+        if (area == null || area.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Área não informada.");
+        }
+
+        switch (area.trim().toUpperCase()) {
+            case "DRAFTS":
+                if (sessionRepository != null) {
+                    sessionRepository.findAll().forEach(s -> {
+                        s.setDraftJson(null);
+                        sessionRepository.save(s);
+                    });
+                }
+                return ResponseEntity.ok("Rascunhos de fechamento e sessões pendentes limpos com sucesso.");
+            case "EXPENSES":
+                expenseAttachmentRepository.deleteAllInBatch();
+                expenseRepository.deleteAllInBatch();
+                return ResponseEntity.ok("Despesas e comprovantes limpos com sucesso.");
+            case "CLOSINGS":
+                serviceClosingRepository.deleteAllInBatch();
+                return ResponseEntity.ok("Histórico de fechamentos de cultos limpo com sucesso.");
+            case "MEMBERS":
+                memberRepository.deleteAllInBatch();
+                if (contributorRepository != null) {
+                    contributorRepository.deleteAllInBatch();
+                }
+                return ResponseEntity.ok("Membros e contribuintes limpos com sucesso.");
+            default:
+                return ResponseEntity.badRequest().body("Área desconhecida: " + area);
+        }
+    }
 
     @org.springframework.beans.factory.annotation.Value("${app.allow-database-reset:false}")
     private boolean allowDatabaseReset;

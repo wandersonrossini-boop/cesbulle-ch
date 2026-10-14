@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../domain/envelope.dart';
 import 'service_closing_events_states.dart';
 import '../../services/fechamento_api_service.dart';
 import '../../services/draft_service.dart';
@@ -106,6 +107,56 @@ class ServiceClosingBloc extends Bloc<ServiceClosingEvent, ServiceClosingState> 
       }
       emit(state.copyWith(knownMembers: updatedList));
     });
+
+    on<MergeSessionDraftEvent>((event, emit) {
+      final server = event.serverDraft;
+
+      // Merge identified entries by id to avoid duplicating entries
+      final Map<String, Envelope> idMap = {};
+      for (final e in state.identifiedEntries) {
+        idMap[e.id] = e;
+      }
+      for (final e in server.identifiedEntries) {
+        idMap[e.id] = e;
+      }
+
+      // Merge anonymous entries by id
+      final Map<String, AnonymousEntry> anonMap = {};
+      for (final a in state.anonymousEntries) {
+        anonMap[a.id] = a;
+      }
+      for (final a in server.anonymousEntries) {
+        anonMap[a.id] = a;
+      }
+
+      emit(state.copyWith(
+        identifiedEntries: idMap.values.toList(),
+        anonymousEntries: anonMap.values.toList(),
+        physicalTotal: server.physicalTotal > 0 ? server.physicalTotal : state.physicalTotal,
+        coTreasurer: server.coTreasurer ?? state.coTreasurer,
+        verifierName: server.verifierName ?? state.verifierName,
+        verifierType: server.verifierType ?? state.verifierType,
+        conferente2: server.conferente2 ?? state.conferente2,
+        conferente1Ready: server.conferente1Ready,
+        conferente2Ready: server.conferente2Ready,
+      ));
+    });
+
+    on<SetConferenteReadyEvent>((event, emit) async {
+      final sessionId = state.sessionId;
+      if (sessionId == null) return;
+      try {
+        final apiService = FechamentoApiService();
+        final updatedSession = await apiService.setSessionReady(sessionId, event.ready);
+        emit(state.copyWith(
+          conferente1Ready: updatedSession['conferente1Ready'] ?? false,
+          conferente2Ready: updatedSession['conferente2Ready'] ?? false,
+          conferente2: updatedSession['conferente2'] as String? ?? state.conferente2,
+        ));
+      } catch (e) {
+        emit(state.copyWith(error: e.toString()));
+      }
+    });
   }
 
   @override
@@ -141,11 +192,7 @@ class ServiceClosingBloc extends Bloc<ServiceClosingEvent, ServiceClosingState> 
 
     try {
       final apiService = FechamentoApiService();
-      final serverDraft = await apiService.getSessionDraftFromServer(sessionId);
-      // Só publica no servidor se não houver sessão ativa lá ou se formos o dono dela
-      if (serverDraft == null || serverDraft.mainTreasurer == state.mainTreasurer) {
-        await apiService.saveSessionDraftToServer(sessionId, state);
-      }
+      await apiService.saveSessionDraftToServer(sessionId, state);
     } catch (_) {}
   }
 }

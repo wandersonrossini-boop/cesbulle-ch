@@ -98,4 +98,15 @@ class UserApiService {
     );
     if (response.statusCode != 200) throw Exception('Falha ao redefinir senha.');
   }
+
+  Future<void> cleanArea(String area) async {
+    final response = await http.post(
+      Uri.parse('$_baseUrl/users/clean-area'),
+      headers: await _getHeaders(),
+      body: jsonEncode({'area': area}),
+    );
+    if (response.statusCode != 200) {
+      throw Exception(response.body.isNotEmpty ? response.body : 'Falha ao limpar área.');
+    }
+  }
 }

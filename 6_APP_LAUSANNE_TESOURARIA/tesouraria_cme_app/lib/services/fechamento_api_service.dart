@@ -11,6 +11,7 @@ class FechamentoApiService {
 
   Future<void> submitClosing(ServiceClosingState state) async {
     final Map<String, dynamic> payload = {
+      if (state.sessionId != null) "sessionId": state.sessionId,
       "serviceDate": state.date != null ? "${state.date!.year.toString().padLeft(4, '0')}-${state.date!.month.toString().padLeft(2, '0')}-${state.date!.day.toString().padLeft(2, '0')}" : null,
       "mainTreasurer": state.mainTreasurer,
       "coTreasurer": state.coTreasurer,
@@ -41,7 +42,14 @@ class FechamentoApiService {
     );
 
     if (response.statusCode != 200 && response.statusCode != 201) {
-      throw Exception('Falha ao sincronizar o fechamento: ${response.body}');
+      String msg = utf8.decode(response.bodyBytes);
+      try {
+        final parsed = jsonDecode(msg);
+        if (parsed is Map && parsed.containsKey('message')) {
+          msg = parsed['message'];
+        }
+      } catch (_) {}
+      throw Exception(msg);
     }
   }
 
@@ -89,6 +97,28 @@ class FechamentoApiService {
       }
     } catch (e) {
       throw Exception('Falha de rede: $e');
+    }
+  }
+
+  Future<List<Map<String, String>>> fetchConferentes() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('jwt_token');
+      final response = await http.get(
+        Uri.parse('$_baseUrl/fechamento-culto/conferentes'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+        return body.map((e) => Map<String, String>.from(e as Map)).toList();
+      }
+      return [];
+    } catch (_) {
+      return [];
     }
   }
 
@@ -282,6 +312,48 @@ class FechamentoApiService {
         },
       );
     } catch (_) {}
+  }
+
+  Future<Map<String, dynamic>> setSessionReady(int sessionId, bool ready) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/fechamento-culto/session/$sessionId/ready'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'ready': ready}),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(utf8.decode(response.bodyBytes));
+    } else {
+      String msg = utf8.decode(response.bodyBytes);
+      throw Exception(msg);
+    }
+  }
+
+  Future<Map<String, dynamic>> joinSession(int sessionId, String username) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/fechamento-culto/session/$sessionId/join'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'username': username}),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(utf8.decode(response.bodyBytes));
+    } else {
+      String msg = utf8.decode(response.bodyBytes);
+      throw Exception(msg);
+    }
   }
 
   Future<Map<String, dynamic>> getCurrentSessionStatus() async {

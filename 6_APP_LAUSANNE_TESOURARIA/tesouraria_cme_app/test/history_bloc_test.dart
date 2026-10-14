@@ -18,6 +18,14 @@ class FakeFechamentoApiService implements FechamentoApiService {
   }
 
   @override
+  Future<List<Map<String, String>>> fetchConferentes() async {
+    return [
+      {'username': 'pastor', 'name': 'Pastor', 'role': 'ADMIN'},
+      {'username': 'admilson', 'name': 'Admilson', 'role': 'TREASURER'},
+    ];
+  }
+
+  @override
   Future<ServiceClosingDetail> fetchClosingDetail(int id) async {
     return ServiceClosingDetail(
       id: id,
@@ -93,6 +101,16 @@ class FakeFechamentoApiService implements FechamentoApiService {
   @override
   Future<Map<String, dynamic>> createLateSession(int scheduleId, String date) async {
     return {};
+  }
+
+  @override
+  Future<Map<String, dynamic>> setSessionReady(int sessionId, bool ready) async {
+    return {'conferente1Ready': ready, 'conferente2Ready': ready};
+  }
+
+  @override
+  Future<Map<String, dynamic>> joinSession(int sessionId, String username) async {
+    return {'id': sessionId, 'conferente2': username};
   }
 }
 

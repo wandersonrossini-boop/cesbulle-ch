@@ -33,6 +33,8 @@ public class ServiceClosingController {
     private ServiceClosingAttachmentRepository attachmentRepository;
     @Autowired
     private com.tesourariacme.api.infrastructure.StorageService storageService;
+    @Autowired
+    private com.tesourariacme.api.infrastructure.AppUserRepository userRepository;
 
     @PostMapping("/{closingId}/attachments")
     public ResponseEntity<?> uploadAttachment(
@@ -166,6 +168,10 @@ public class ServiceClosingController {
     @PostMapping
     public ResponseEntity<?> submitClosing(@RequestBody ServiceClosingRequest request) {
         try {
+            if (request.getSessionId() != null) {
+                sessionService.validateSessionCanFinalize(request.getSessionId(), request.getVerifierType());
+            }
+
             ServiceClosing closing = new ServiceClosing();
             closing.setServiceDate(request.getServiceDate());
             closing.setMainTreasurer(request.getMainTreasurer());
@@ -199,6 +205,24 @@ public class ServiceClosingController {
     @GetMapping
     public ResponseEntity<?> getHistory() {
         return ResponseEntity.ok(useCase.getHistory());
+    }
+
+    @GetMapping("/conferentes")
+    public ResponseEntity<?> getConferentes() {
+        if (userRepository == null) {
+            return ResponseEntity.ok(java.util.Collections.emptyList());
+        }
+        java.util.List<java.util.Map<String, String>> list = userRepository.findAll().stream()
+                .filter(u -> u.isAuthorized())
+                .map(u -> {
+                    java.util.Map<String, String> map = new java.util.HashMap<>();
+                    map.put("username", u.getUsername());
+                    map.put("name", u.getName() != null && !u.getName().trim().isEmpty() ? u.getName().trim() : u.getUsername());
+                    map.put("role", u.getRole());
+                    return map;
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(list);
     }
 
     @GetMapping("/{id}")
@@ -324,10 +348,18 @@ public class ServiceClosingController {
     }
 
     @PostMapping("/session/{id}/draft")
-    public ResponseEntity<?> saveSessionDraft(@PathVariable Long id, @RequestBody Object draft) {
+    public ResponseEntity<?> saveSessionDraft(
+            @PathVariable Long id,
+            @RequestBody Object draft,
+            Authentication authentication) {
         try {
+            String author = authentication != null ? authentication.getName() : null;
             String jsonStr = objectMapper.writeValueAsString(draft);
-            sessionService.saveDraft(id, jsonStr);
+            if (author != null) {
+                sessionService.mergeAndSaveDraft(id, jsonStr, author);
+            } else {
+                sessionService.saveDraft(id, jsonStr);
+            }
             return ResponseEntity.ok().build();
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -335,6 +367,39 @@ public class ServiceClosingController {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Erro ao processar o rascunho: " + e.getMessage());
+        }
+    }
+
+    public ResponseEntity<?> saveSessionDraft(Long id, Object draft) {
+        return saveSessionDraft(id, draft, null);
+    }
+
+    @PostMapping("/session/{id}/ready")
+    public ResponseEntity<?> setSessionReady(
+            @PathVariable Long id,
+            @RequestBody(required = false) Map<String, Boolean> body,
+            Authentication authentication) {
+        try {
+            String user = authentication != null ? authentication.getName() : "anonymous";
+            boolean ready = (body != null && body.containsKey("ready")) ? body.get("ready") : true;
+            ServiceClosingSession session = sessionService.setConferenteReady(id, user, ready);
+            return ResponseEntity.ok(ServiceClosingSessionResponse.fromEntity(session));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/session/{id}/join")
+    public ResponseEntity<?> joinSession(
+            @PathVariable Long id,
+            @RequestBody(required = false) Map<String, String> body,
+            Authentication authentication) {
+        try {
+            String user = (body != null && body.containsKey("username")) ? body.get("username") : (authentication != null ? authentication.getName() : "anonymous");
+            ServiceClosingSession session = sessionService.registerSecondConferente(id, user);
+            return ResponseEntity.ok(ServiceClosingSessionResponse.fromEntity(session));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -388,6 +453,9 @@ public class ServiceClosingController {
         private String serviceType;
         private String status;
         private String startedBy;
+        private String conferente2;
+        private boolean conferente1Ready;
+        private boolean conferente2Ready;
         private LocalDateTime startedAt;
         private LocalDateTime expiresAt;
         private boolean lateOpening;
@@ -401,6 +469,9 @@ public class ServiceClosingController {
             resp.setServiceType(session.getServiceType());
             resp.setStatus(session.getStatus().name());
             resp.setStartedBy(session.getStartedBy());
+            resp.setConferente2(session.getConferente2());
+            resp.setConferente1Ready(session.isConferente1Ready());
+            resp.setConferente2Ready(session.isConferente2Ready());
             resp.setStartedAt(session.getStartedAt());
             resp.setExpiresAt(session.getExpiresAt());
             resp.setLateOpening(session.isLateOpening());

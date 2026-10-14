@@ -36,6 +36,133 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
   }
 
   
+  Future<void> _showResetPasswordDialog(AppUser user) async {
+    final controller = TextEditingController();
+    bool obscure = true;
+    final formKey = GlobalKey<FormState>();
+
+    await showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: Row(
+            children: [
+              const Icon(Icons.lock_reset, color: AppTheme.institutionalBlue),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text('Alterar Senha de ${user.name}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Defina uma nova senha para o utilizador @${user.username}:', style: const TextStyle(fontSize: 13, color: Color(0xFF64748B))),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: controller,
+                  obscureText: obscure,
+                  decoration: InputDecoration(
+                    labelText: 'Nova Senha',
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
+                      onPressed: () => setDialogState(() => obscure = !obscure),
+                    ),
+                  ),
+                  validator: (val) {
+                    if (val == null || val.trim().length < 4) {
+                      return 'A senha deve ter no mínimo 4 caracteres.';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancelar', style: TextStyle(color: Color(0xFF64748B))),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (formKey.currentState?.validate() ?? false) {
+                  Navigator.pop(ctx);
+                  try {
+                    await _apiService.resetPassword(user.id, controller.text.trim());
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Senha de ${user.name} alterada com sucesso!')),
+                      );
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Erro ao alterar senha: $e'), backgroundColor: Colors.red),
+                      );
+                    }
+                  }
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.institutionalBlue,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Salvar Nova Senha'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _confirmDeleteUser(AppUser user) async {
+    if (user.username.toLowerCase() == 'pastor' || user.role.toUpperCase() == 'ADMIN') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('A conta administrativa principal não pode ser excluída.')),
+      );
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: AppTheme.excludeRed),
+            SizedBox(width: 8),
+            Text('Excluir Conta', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          ],
+        ),
+        content: Text(
+          'Deseja realmente excluir permanentemente a conta de ${user.name} (@${user.username})?\nEsta ação não poderá ser desfeita.',
+          style: const TextStyle(fontSize: 13, color: Color(0xFF475569)),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar', style: TextStyle(color: Color(0xFF64748B))),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.excludeRed, foregroundColor: Colors.white),
+            child: const Text('Sim, Excluir'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await _deleteUser(user);
+    }
+  }
+
   Future<void> _deleteUser(AppUser user) async {
     if (user.username.toLowerCase() == 'pastor' || user.role.toUpperCase() == 'ADMIN') {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('A conta administrativa principal não pode ser excluída.')));
@@ -44,7 +171,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
     try {
       await _apiService.deleteUser(user.id);
       _loadUsers();
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Solicitação de ${user.name} rejeitada.')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Conta de ${user.name} removida com sucesso.')));
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro: $e')));
     }
@@ -216,10 +343,25 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                           ),
                         ),
                       )
-                    : TextButton.icon(
-                        icon: const Icon(Icons.block, color: AppTheme.excludeRed, size: 18),
-                        label: const Text('Desativar acesso', style: TextStyle(color: AppTheme.excludeRed)),
-                        onPressed: () => _revokeUser(u),
+                    : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.lock_reset, color: AppTheme.institutionalBlue, size: 20),
+                            tooltip: 'Alterar senha',
+                            onPressed: () => _showResetPasswordDialog(u),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.block, color: Color(0xFFEA580C), size: 20),
+                            tooltip: 'Desativar acesso',
+                            onPressed: () => _revokeUser(u),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline, color: AppTheme.excludeRed, size: 20),
+                            tooltip: 'Excluir conta',
+                            onPressed: () => _confirmDeleteUser(u),
+                          ),
+                        ],
                       )),
           ),
         );

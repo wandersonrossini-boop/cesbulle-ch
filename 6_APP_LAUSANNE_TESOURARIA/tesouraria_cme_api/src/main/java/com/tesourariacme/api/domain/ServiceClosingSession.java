@@ -51,4 +51,12 @@ public class ServiceClosingSession {
 
     @Column(columnDefinition = "TEXT")
     private String draftJson;
+
+    private String conferente2;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean conferente1Ready = false;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean conferente2Ready = false;
 }

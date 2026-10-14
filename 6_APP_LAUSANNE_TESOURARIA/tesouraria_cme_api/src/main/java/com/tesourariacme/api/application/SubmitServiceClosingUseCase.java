@@ -40,9 +40,6 @@ public class SubmitServiceClosingUseCase {
             if (serviceClosing.getVerifierType() == null) {
                 throw new IllegalArgumentException("Tipo de conferente deve ser informado se o nome for preenchido.");
             }
-            if (serviceClosing.getVerifierType() == com.tesourariacme.api.domain.VerifierType.AUTHENTICATED) {
-                throw new IllegalArgumentException("Tipo de conferente AUTHENTICATED não é suportado nesta fase.");
-            }
             if (serviceClosing.getMainTreasurer() != null && serviceClosing.getVerifierName().trim().equalsIgnoreCase(serviceClosing.getMainTreasurer().trim())) {
                 throw new IllegalArgumentException("O conferente deve ser uma pessoa diferente do responsável pela contagem.");
             }

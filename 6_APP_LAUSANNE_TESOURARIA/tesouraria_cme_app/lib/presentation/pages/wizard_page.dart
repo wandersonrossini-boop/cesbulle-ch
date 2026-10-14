@@ -37,6 +37,10 @@ class _WizardPageState extends State<WizardPage> {
   final ContributorApiService _contributorApiService = ContributorApiService();
   List<ContributorModel> _contributors = [];
   int? _selectedContributorId;
+  List<Map<String, String>> _availableConferentes = [];
+  bool _useManualVerifier = false;
+  String? _selectedVerifierName;
+  String _loggedInUserName = "";
 
   bool _isTextFieldFocused() {
     final primaryFocus = FocusManager.instance.primaryFocus;
@@ -107,8 +111,30 @@ class _WizardPageState extends State<WizardPage> {
   void initState() {
     super.initState();
     _bloc = ServiceClosingBloc()..add(LoadMembersEvent());
+    _initCurrentUser();
     _checkCurrentStatus();
     _loadContributorsForSelection();
+    _loadAvailableConferentes();
+  }
+
+  Future<void> _initCurrentUser() async {
+    final name = await _getCurrentUserName();
+    if (mounted) {
+      setState(() {
+        _loggedInUserName = name;
+      });
+    }
+  }
+
+  Future<void> _loadAvailableConferentes() async {
+    try {
+      final list = await FechamentoApiService().fetchConferentes();
+      if (mounted) {
+        setState(() {
+          _availableConferentes = list;
+        });
+      }
+    } catch (_) {}
   }
 
   Future<void> _loadContributorsForSelection() async {
@@ -350,11 +376,14 @@ class _WizardPageState extends State<WizardPage> {
 
   void _startSyncTimer() {
     _syncTimer?.cancel();
-    _syncTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+    _syncTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
       try {
-        final serverDraft = await FechamentoApiService().getDraftFromServer();
-        if (serverDraft != null && mounted && _phase == ClosingPhase.counting) {
-          // Sync check ok
+        final sessId = _bloc.state.sessionId;
+        if (sessId != null && mounted && _phase == ClosingPhase.counting) {
+          final serverDraft = await FechamentoApiService().getSessionDraftFromServer(sessId);
+          if (serverDraft != null && mounted) {
+            _bloc.add(MergeSessionDraftEvent(serverDraft));
+          }
         }
         // Save local draft
         final state = _bloc.state;
@@ -2081,57 +2110,488 @@ class _WizardPageState extends State<WizardPage> {
           ),
         ),
         const SizedBox(height: 24),
-        TextField(
-          controller: _verifierNameController,
-          decoration: InputDecoration(
-            labelText: "Conferente da contagem",
-            hintText: "Digite o nome de quem conferiu",
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        const Text("Dupla Conferência do Caixa", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF111827))),
+        const SizedBox(height: 4),
+        const Text("O fechamento exige a conferência de duas pessoas distintas.", style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
+        const SizedBox(height: 12),
+        // 1º Conferente (Responsável da sessão - automático)
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
           ),
-          onChanged: (val) {
-            setState(() {});
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.institutionalBlue.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.person, color: AppTheme.institutionalBlue, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "1º CONFERENTE (RESPONSÁVEL)",
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF64748B), letterSpacing: 0.5),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      state.mainTreasurer.isNotEmpty ? state.mainTreasurer : "Tesoureiro Autenticado",
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFDCFCE7),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.lock_outline, size: 12, color: Color(0xFF166534)),
+                    SizedBox(width: 4),
+                    Text("Login Ativo", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF166534))),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        // 2º Conferente
+        Builder(
+          builder: (context) {
+            final bool isJointSession = state.coTreasurer != null &&
+                state.coTreasurer!.trim().isNotEmpty &&
+                state.coTreasurer!.trim().toLowerCase() != state.mainTreasurer.trim().toLowerCase();
+
+            if (isJointSession) {
+              final jointName = state.coTreasurer!.trim();
+              if (_verifierNameController.text != jointName) {
+                _verifierNameController.text = jointName;
+              }
+              final bool isUserMain = _loggedInUserName.trim().toLowerCase() == state.mainTreasurer.trim().toLowerCase();
+              final bool isMyReady = isUserMain ? state.conferente1Ready : state.conferente2Ready;
+              final String partnerName = isUserMain ? jointName : state.mainTreasurer;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEFF6FF),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFFBFDBFE)),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFDBEAFE),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.group, color: Color(0xFF1D4ED8), size: 20),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "2º CONFERENTE (CONTAGEM CONJUNTA)",
+                                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF1D4ED8), letterSpacing: 0.5),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    jointName,
+                                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFDBEAFE),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Text(
+                                "Autenticado no App",
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF1D4ED8)),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        const Divider(height: 1, color: Color(0xFFBFDBFE)),
+                        const SizedBox(height: 12),
+                        // Status badges for both conferentes
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: state.conferente1Ready ? const Color(0xFFDCFCE7) : const Color(0xFFFEF3C7),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: state.conferente1Ready ? const Color(0xFF86EFAC) : const Color(0xFFFDE68A)),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      state.mainTreasurer,
+                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          state.conferente1Ready ? Icons.check_circle : Icons.hourglass_top_rounded,
+                                          size: 14,
+                                          color: state.conferente1Ready ? const Color(0xFF166534) : const Color(0xFF92400E),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          state.conferente1Ready ? "CONCLUÍDO" : "A CONTAR...",
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                            color: state.conferente1Ready ? const Color(0xFF166534) : const Color(0xFF92400E),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: state.conferente2Ready ? const Color(0xFFDCFCE7) : const Color(0xFFFEF3C7),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: state.conferente2Ready ? const Color(0xFF86EFAC) : const Color(0xFFFDE68A)),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      jointName,
+                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          state.conferente2Ready ? Icons.check_circle : Icons.hourglass_top_rounded,
+                                          size: 14,
+                                          color: state.conferente2Ready ? const Color(0xFF166534) : const Color(0xFF92400E),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          state.conferente2Ready ? "CONCLUÍDO" : "A CONTAR...",
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                            color: state.conferente2Ready ? const Color(0xFF166534) : const Color(0xFF92400E),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  if (!state.conferente1Ready || !state.conferente2Ready) ...[
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFFBEB),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFFDE68A)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.lock_clock_outlined, color: Color(0xFFD97706), size: 20),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              !isMyReady
+                                  ? "Você ainda não concluiu sua contagem. Clique em 'Concluir minha contagem' para liberar."
+                                  : "O conferente $partnerName ainda está a contabilizar. O fechamento não pode ser finalizado sem que ambos concluam.",
+                              style: const TextStyle(fontSize: 12, color: Color(0xFF92400E), fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ] else ...[
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF0FDF4),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFBBF7D0)),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.check_circle_outline, color: Color(0xFF16A34A), size: 20),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              "Ambos os conferentes concluíram a contagem! O fechamento está liberado para finalização.",
+                              style: TextStyle(fontSize: 12, color: Color(0xFF166534), fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                ],
+              );
+            }
+
+            final Set<String> candidates = {};
+            for (final c in _availableConferentes) {
+              final n = c['name'] ?? c['username'] ?? '';
+              if (n.trim().isNotEmpty && n.trim().toLowerCase() != state.mainTreasurer.trim().toLowerCase()) {
+                candidates.add(n.trim());
+              }
+            }
+            for (final m in state.knownMembers) {
+              if (m.trim().isNotEmpty && m.trim().toLowerCase() != state.mainTreasurer.trim().toLowerCase()) {
+                candidates.add(m.trim());
+              }
+            }
+            final sortedCandidates = candidates.toList()..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "2º Conferente (Obrigatório)",
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1E293B)),
+                    ),
+                    if (sortedCandidates.isNotEmpty)
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            _useManualVerifier = !_useManualVerifier;
+                            if (!_useManualVerifier && _selectedVerifierName != null) {
+                              _verifierNameController.text = _selectedVerifierName!;
+                            }
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                          child: Text(
+                            _useManualVerifier ? "Escolher da lista" : "Digitar outro nome",
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.institutionalBlue),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                if (!_useManualVerifier && sortedCandidates.isNotEmpty)
+                  DropdownButtonFormField<String>(
+                    value: (sortedCandidates.contains(_verifierNameController.text.trim()))
+                        ? _verifierNameController.text.trim()
+                        : null,
+                    decoration: InputDecoration(
+                      labelText: "Selecionar 2º conferente",
+                      hintText: "Escolha um tesoureiro ou membro",
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    ),
+                    items: sortedCandidates.map((name) {
+                      return DropdownMenuItem<String>(
+                        value: name,
+                        child: Text(name, style: const TextStyle(fontSize: 14)),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      setState(() {
+                        _selectedVerifierName = val;
+                        _verifierNameController.text = val ?? '';
+                      });
+                    },
+                  )
+                else
+                  TextField(
+                    controller: _verifierNameController,
+                    decoration: InputDecoration(
+                      labelText: "Nome do 2º conferente",
+                      hintText: "Digite o nome de quem conferiu",
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    ),
+                    onChanged: (val) {
+                      setState(() {});
+                    },
+                  ),
+              ],
+            );
           },
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 12),
         if (_verifierNameController.text.trim().toLowerCase() == state.mainTreasurer.trim().toLowerCase() && _verifierNameController.text.trim().isNotEmpty)
-          const Padding(
-            padding: EdgeInsets.only(bottom: 16.0),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12.0),
             child: Text(
-              "O conferente deve ser uma pessoa diferente do responsável pela contagem.",
-              style: TextStyle(color: AppTheme.excludeRed, fontSize: 13),
+              "O 2º conferente deve ser uma pessoa diferente do 1º conferente (${state.mainTreasurer}).",
+              style: const TextStyle(color: AppTheme.excludeRed, fontSize: 13),
+            ),
+          )
+        else if (_verifierNameController.text.trim().isEmpty)
+          const Padding(
+            padding: EdgeInsets.only(bottom: 12.0),
+            child: Text(
+              "A indicação de um 2º conferente é obrigatória para finalizar o fechamento.",
+              style: TextStyle(color: Color(0xFF64748B), fontSize: 12),
             ),
           ),
-        ElevatedButton(
-          onPressed: (state.error == null &&
-                  !state.isSubmitting &&
-                  state.difference == 0 &&
-                  state.physicalTotal > 0 &&
-                  _verifierNameController.text.trim().isNotEmpty &&
-                  _verifierNameController.text.trim().toLowerCase() != state.mainTreasurer.trim().toLowerCase()) ? () {
-            _syncTimer?.cancel();
-            context.read<ServiceClosingBloc>().add(
-              SubmitClosingEvent(
-                verifierName: _verifierNameController.text.trim(),
-                verifierType: "MANUAL",
+        const SizedBox(height: 8),
+        Builder(
+          builder: (context) {
+            final bool isJointSession = state.coTreasurer != null &&
+                state.coTreasurer!.trim().isNotEmpty &&
+                state.coTreasurer!.trim().toLowerCase() != state.mainTreasurer.trim().toLowerCase();
+
+            if (isJointSession) {
+              final bool isUserMain = _loggedInUserName.trim().toLowerCase() == state.mainTreasurer.trim().toLowerCase();
+              final bool isMyReady = isUserMain ? state.conferente1Ready : state.conferente2Ready;
+              final bool isPartnerReady = isUserMain ? state.conferente2Ready : state.conferente1Ready;
+              final String partnerName = isUserMain ? state.coTreasurer!.trim() : state.mainTreasurer;
+
+              if (!isMyReady) {
+                return ElevatedButton(
+                  onPressed: (state.error == null &&
+                          !state.isSubmitting &&
+                          state.difference == 0 &&
+                          state.physicalTotal > 0) ? () {
+                    context.read<ServiceClosingBloc>().add(SetConferenteReadyEvent(true));
+                  } : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF16A34A),
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor: const Color(0xFFE5E7EB),
+                    disabledForegroundColor: const Color(0xFF9CA3AF),
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    elevation: 0,
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.check_circle_outline, size: 20),
+                      SizedBox(width: 8),
+                      Text("CONCLUIR MINHA CONTAGEM", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    ],
+                  ),
+                );
+              } else if (!isPartnerReady) {
+                return Column(
+                  children: [
+                    ElevatedButton(
+                      onPressed: null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFE5E7EB),
+                        foregroundColor: const Color(0xFF64748B),
+                        disabledBackgroundColor: const Color(0xFFE5E7EB),
+                        disabledForegroundColor: const Color(0xFF64748B),
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        elevation: 0,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF64748B))),
+                          const SizedBox(width: 10),
+                          Text("AGUARDANDO CONCLUSÃO DE ${partnerName.toUpperCase()}...", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextButton(
+                      onPressed: () {
+                        context.read<ServiceClosingBloc>().add(SetConferenteReadyEvent(false));
+                      },
+                      child: const Text("Reabrir minha contagem para ajustes", style: TextStyle(color: Color(0xFF64748B), fontSize: 13)),
+                    ),
+                  ],
+                );
+              }
+            }
+
+            // Both ready or non-joint session
+            return ElevatedButton(
+              onPressed: (state.error == null &&
+                      !state.isSubmitting &&
+                      state.difference == 0 &&
+                      state.physicalTotal > 0 &&
+                      _verifierNameController.text.trim().isNotEmpty &&
+                      _verifierNameController.text.trim().toLowerCase() != state.mainTreasurer.trim().toLowerCase()) ? () {
+                _syncTimer?.cancel();
+                final String vType = isJointSession ? "AUTHENTICATED" : (_useManualVerifier ? "MANUAL" : "SELECTED");
+                context.read<ServiceClosingBloc>().add(
+                  SubmitClosingEvent(
+                    verifierName: _verifierNameController.text.trim(),
+                    verifierType: vType,
+                  ),
+                );
+              } : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.institutionalBlue, 
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: const Color(0xFFE5E7EB),
+                disabledForegroundColor: const Color(0xFF9CA3AF),
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                elevation: 0,
               ),
+              child: state.isSubmitting
+                  ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  : const Text("Finalizar fechamento", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
             );
-          } : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppTheme.institutionalBlue, 
-            foregroundColor: Colors.white,
-            disabledBackgroundColor: const Color(0xFFE5E7EB),
-            disabledForegroundColor: const Color(0xFF9CA3AF),
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            elevation: 0,
-          ),
-          child: state.isSubmitting
-              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-              : const Text("Finalizar fechamento", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+          },
         ),
         if (state.error != null)
           Padding(

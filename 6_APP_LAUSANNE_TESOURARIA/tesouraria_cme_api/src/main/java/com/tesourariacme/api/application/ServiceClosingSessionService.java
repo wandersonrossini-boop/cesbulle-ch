@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -29,6 +31,7 @@ public class ServiceClosingSessionService {
     private final ServiceScheduleRepository scheduleRepository;
     private final ServiceClosingRepository closingRepository;
     private final AuditLogService auditLogService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public ServiceClosingSessionService(
             ServiceClosingSessionRepository repository,
@@ -114,6 +117,169 @@ public class ServiceClosingSessionService {
         }
         session.setDraftJson(draftJson);
         repository.saveAndFlush(session);
+    }
+
+    @Transactional
+    public void mergeAndSaveDraft(Long sessionId, String draftJson, String author) {
+        ServiceClosingSession session = repository.findById(sessionId)
+                .orElseThrow(() -> new IllegalArgumentException("Sessão não encontrada."));
+        if (session.getStatus() == ServiceClosingSessionStatus.FINISHED) {
+            throw new IllegalStateException("Não é permitido alterar o rascunho de uma sessão finalizada.");
+        }
+
+        if (draftJson == null || draftJson.trim().isEmpty()) {
+            session.setDraftJson(null);
+            repository.saveAndFlush(session);
+            return;
+        }
+
+        try {
+            Map<String, Object> incoming = objectMapper.readValue(draftJson, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
+            String existingJson = session.getDraftJson();
+            Map<String, Object> merged;
+            if (existingJson != null && !existingJson.trim().isEmpty()) {
+                merged = objectMapper.readValue(existingJson, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
+
+                mergeEntriesById(merged, incoming, "identifiedEntries", author);
+                mergeEntriesById(merged, incoming, "anonymousEntries", author);
+
+                if (incoming.containsKey("physicalTotal") && incoming.get("physicalTotal") != null) {
+                    merged.put("physicalTotal", incoming.get("physicalTotal"));
+                }
+                if (incoming.containsKey("coTreasurer") && incoming.get("coTreasurer") != null) {
+                    merged.put("coTreasurer", incoming.get("coTreasurer"));
+                }
+                if (incoming.containsKey("verifierName") && incoming.get("verifierName") != null) {
+                    merged.put("verifierName", incoming.get("verifierName"));
+                }
+                if (incoming.containsKey("verifierType") && incoming.get("verifierType") != null) {
+                    merged.put("verifierType", incoming.get("verifierType"));
+                }
+            } else {
+                merged = incoming;
+                tagEntriesWithAuthor(merged, "identifiedEntries", author);
+                tagEntriesWithAuthor(merged, "anonymousEntries", author);
+            }
+
+            merged.put("conferente1Ready", session.isConferente1Ready());
+            merged.put("conferente2Ready", session.isConferente2Ready());
+            merged.put("conferente2", session.getConferente2());
+
+            session.setDraftJson(objectMapper.writeValueAsString(merged));
+        } catch (Exception e) {
+            session.setDraftJson(draftJson);
+        }
+        repository.saveAndFlush(session);
+    }
+
+    @Transactional
+    public ServiceClosingSession setConferenteReady(Long sessionId, String username, boolean ready) {
+        ServiceClosingSession session = repository.findById(sessionId)
+                .orElseThrow(() -> new IllegalArgumentException("Sessão não encontrada."));
+        if (session.getStatus() == ServiceClosingSessionStatus.FINISHED) {
+            throw new IllegalStateException("Sessão já finalizada.");
+        }
+
+        String u = username != null ? username.trim() : "";
+        if (u.equalsIgnoreCase(session.getStartedBy())) {
+            session.setConferente1Ready(ready);
+        } else {
+            if (session.getConferente2() == null || session.getConferente2().trim().isEmpty()) {
+                session.setConferente2(u);
+            }
+            if (u.equalsIgnoreCase(session.getConferente2())) {
+                session.setConferente2Ready(ready);
+            }
+        }
+
+        if (session.isConferente1Ready() && session.isConferente2Ready()) {
+            session.setStatus(ServiceClosingSessionStatus.PENDING_CLOSE);
+        } else if (session.getStatus() == ServiceClosingSessionStatus.PENDING_CLOSE && (!session.isConferente1Ready() || !session.isConferente2Ready())) {
+            session.setStatus(ServiceClosingSessionStatus.ACTIVE);
+        }
+
+        return repository.saveAndFlush(session);
+    }
+
+    @Transactional
+    public ServiceClosingSession registerSecondConferente(Long sessionId, String username) {
+        ServiceClosingSession session = repository.findById(sessionId)
+                .orElseThrow(() -> new IllegalArgumentException("Sessão não encontrada."));
+        if (session.getStatus() == ServiceClosingSessionStatus.FINISHED) {
+            throw new IllegalStateException("Sessão já finalizada.");
+        }
+        if (username != null && !username.trim().isEmpty() && !username.equalsIgnoreCase(session.getStartedBy())) {
+            session.setConferente2(username.trim());
+        }
+        return repository.saveAndFlush(session);
+    }
+
+    @Transactional
+    public void validateSessionCanFinalize(Long sessionId, com.tesourariacme.api.domain.VerifierType verifierType) {
+        if (sessionId == null) return;
+        Optional<ServiceClosingSession> opt = repository.findById(sessionId);
+        if (opt.isEmpty()) return;
+        ServiceClosingSession session = opt.get();
+        if (session.getStatus() == ServiceClosingSessionStatus.FINISHED) {
+            throw new IllegalArgumentException("Esta sessão de fechamento já foi finalizada.");
+        }
+
+        if (verifierType == com.tesourariacme.api.domain.VerifierType.AUTHENTICATED) {
+            if (!session.isConferente1Ready()) {
+                String c1 = session.getStartedBy() != null ? session.getStartedBy() : "1º conferente";
+                throw new IllegalArgumentException("O 1º conferente (" + c1 + ") ainda não concluiu a contagem. O fechamento permanece pendente.");
+            }
+            if (!session.isConferente2Ready()) {
+                String c2 = session.getConferente2() != null ? session.getConferente2() : "2º conferente";
+                throw new IllegalArgumentException("O 2º conferente (" + c2 + ") ainda está a contabilizar. O fechamento permanece pendente e não pode ser finalizado.");
+            }
+        }
+
+        session.setStatus(ServiceClosingSessionStatus.FINISHED);
+        session.setDraftJson(null);
+        repository.saveAndFlush(session);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void mergeEntriesById(Map<String, Object> target, Map<String, Object> source, String key, String author) {
+        List<Map<String, Object>> targetList = (List<Map<String, Object>>) target.get(key);
+        List<Map<String, Object>> sourceList = (List<Map<String, Object>>) source.get(key);
+
+        Map<String, Map<String, Object>> map = new LinkedHashMap<>();
+        if (targetList != null) {
+            for (Map<String, Object> item : targetList) {
+                Object id = item.get("id");
+                if (id != null) {
+                    map.put(String.valueOf(id), new LinkedHashMap<>(item));
+                }
+            }
+        }
+        if (sourceList != null) {
+            for (Map<String, Object> item : sourceList) {
+                Object id = item.get("id");
+                if (id != null) {
+                    Map<String, Object> copy = new LinkedHashMap<>(item);
+                    if (!copy.containsKey("enteredBy") || copy.get("enteredBy") == null) {
+                        if (author != null) copy.put("enteredBy", author);
+                    }
+                    map.put(String.valueOf(id), copy);
+                }
+            }
+        }
+        target.put(key, new ArrayList<>(map.values()));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void tagEntriesWithAuthor(Map<String, Object> draft, String key, String author) {
+        if (author == null) return;
+        List<Map<String, Object>> list = (List<Map<String, Object>>) draft.get(key);
+        if (list != null) {
+            for (Map<String, Object> item : list) {
+                if (!item.containsKey("enteredBy") || item.get("enteredBy") == null) {
+                    item.put("enteredBy", author);
+                }
+            }
+        }
     }
 
     @Transactional

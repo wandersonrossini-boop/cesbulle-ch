@@ -8,6 +8,7 @@ class Envelope extends Equatable {
   final EnvelopeType type;
   final int amount;
   final int? contributorId;
+  final String? enteredBy;
 
   const Envelope({
     required this.id,
@@ -15,10 +16,11 @@ class Envelope extends Equatable {
     required this.type,
     required this.amount,
     this.contributorId,
+    this.enteredBy,
   });
 
   @override
-  List<Object?> get props => [id, memberName, type, amount, contributorId];
+  List<Object?> get props => [id, memberName, type, amount, contributorId, enteredBy];
 
   Map<String, dynamic> toJson() {
     return {
@@ -27,6 +29,7 @@ class Envelope extends Equatable {
       'type': type.name.toUpperCase(), // Map type name to upper case as expected by Spring enum
       'amount': amount,
       'contributorId': contributorId,
+      if (enteredBy != null) 'enteredBy': enteredBy,
     };
   }
 
@@ -40,6 +43,7 @@ class Envelope extends Equatable {
       ),
       amount: json['amount'] ?? 0,
       contributorId: json['contributorId'] != null ? int.tryParse(json['contributorId'].toString()) : null,
+      enteredBy: json['enteredBy'] as String?,
     );
   }
 }

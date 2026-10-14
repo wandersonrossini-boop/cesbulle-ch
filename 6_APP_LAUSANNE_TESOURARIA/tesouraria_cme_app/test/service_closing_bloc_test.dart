@@ -79,5 +79,72 @@ void main() {
       expect(bloc.state.error, null);
       expect(bloc.state.mainTreasurer, 'Admilson');
     });
+
+    test('InitializeClosingContextEvent registers authenticated mainTreasurer as 1st conferente', () async {
+      bloc.add(InitializeClosingContextEvent(
+        DateTime(2026, 10, 14),
+        'Pastor',
+        '',
+        sessionId: 10,
+        serviceTime: '19:00',
+        serviceEndTime: '21:00',
+        serviceType: 'Culto da Família',
+      ));
+      await Future.delayed(Duration.zero);
+
+      expect(bloc.state.mainTreasurer, 'Pastor');
+      expect(bloc.state.sessionId, 10);
+      expect(bloc.state.serviceTime, '19:00');
+    });
+
+    test('SubmitClosingEvent preserves verifierName and verifierType for dupla conferência', () {
+      final eventAuth = SubmitClosingEvent(verifierName: 'Admilson', verifierType: 'AUTHENTICATED');
+      expect(eventAuth.verifierName, 'Admilson');
+      expect(eventAuth.verifierType, 'AUTHENTICATED');
+
+      final eventSel = SubmitClosingEvent(verifierName: 'João Silva', verifierType: 'SELECTED');
+      expect(eventSel.verifierName, 'João Silva');
+      expect(eventSel.verifierType, 'SELECTED');
+
+      final eventMan = SubmitClosingEvent(verifierName: 'Conferente Manual', verifierType: 'MANUAL');
+      expect(eventMan.verifierName, 'Conferente Manual');
+      expect(eventMan.verifierType, 'MANUAL');
+    });
+
+    test('MergeSessionDraftEvent merges entries by ID without duplicates and sums totals', () async {
+      // 1st treasurer enters an envelope
+      bloc.add(AddEnvelopeEvent(const Envelope(id: 'env-1', memberName: 'Membro 1', type: EnvelopeType.dizimo, amount: 10000, enteredBy: 'Pastor')));
+      await Future.delayed(Duration.zero);
+
+      expect(bloc.state.identifiedEntries.length, 1);
+      expect(bloc.state.registeredTotal, 10000);
+
+      // 2nd treasurer on another device added another envelope and an offering in server draft
+      final serverState = ServiceClosingState(
+        identifiedEntries: const [
+          Envelope(id: 'env-1', memberName: 'Membro 1', type: EnvelopeType.dizimo, amount: 10000, enteredBy: 'Pastor'),
+          Envelope(id: 'env-2', memberName: 'Membro 2', type: EnvelopeType.oferta, amount: 20000, enteredBy: 'Admilson'),
+        ],
+        anonymousEntries: const [
+          AnonymousEntry(id: 'anon-1', type: EnvelopeType.oferta, amount: 5000, enteredBy: 'Admilson'),
+        ],
+        conferente1Ready: true,
+        conferente2Ready: false,
+        conferente2: 'Admilson',
+      );
+
+      bloc.add(MergeSessionDraftEvent(serverState));
+      await Future.delayed(Duration.zero);
+
+      // Verify no duplicates occurred on env-1 and totals correctly summed
+      expect(bloc.state.identifiedEntries.length, 2);
+      expect(bloc.state.anonymousEntries.length, 1);
+      expect(bloc.state.identifiedTotal, 30000);
+      expect(bloc.state.anonymousTotal, 5000);
+      expect(bloc.state.registeredTotal, 35000);
+      expect(bloc.state.conferente1Ready, true);
+      expect(bloc.state.conferente2Ready, false);
+      expect(bloc.state.conferente2, 'Admilson');
+    });
   });
 }

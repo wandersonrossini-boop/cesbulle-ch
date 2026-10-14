@@ -136,13 +136,16 @@ public class ServiceClosingTest {
         IllegalArgumentException ex6 = assertThrows(IllegalArgumentException.class, () -> useCase.execute(c6));
         assertTrue(ex6.getMessage().contains("Nome do conferente não pode ser vazio"));
 
-        // Case 7: AUTHENTICATED -> rejeitado nesta fase
+        // Case 7: AUTHENTICATED -> suportado com conferente válido diferente do main
         ServiceClosing c7 = new ServiceClosing();
         c7.setPhysicalTotal(BigDecimal.ZERO);
+        c7.setMainTreasurer("Pastor");
         c7.setVerifierType(VerifierType.AUTHENTICATED);
         c7.setVerifierName("Admilson");
-        IllegalArgumentException ex7 = assertThrows(IllegalArgumentException.class, () -> useCase.execute(c7));
-        assertTrue(ex7.getMessage().contains("Tipo de conferente AUTHENTICATED não é suportado nesta fase"));
+        ServiceClosing saved7 = useCase.execute(c7);
+        assertNotNull(saved7);
+        assertEquals(VerifierType.AUTHENTICATED, saved7.getVerifierType());
+        assertEquals("Admilson", saved7.getVerifierName());
     }
 
     @Test

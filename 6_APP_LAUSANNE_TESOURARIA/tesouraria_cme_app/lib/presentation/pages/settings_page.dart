@@ -121,6 +121,66 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  bool _isCleaningArea = false;
+
+  Future<void> _confirmCleanArea(String areaKey, String areaTitle, String description) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: AppTheme.excludeRed),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text('Limpar $areaTitle?', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            ),
+          ],
+        ),
+        content: Text(
+          '$description\n\nEsta ação é irreversível e excluirá permanentemente os dados desta área. Deseja prosseguir?',
+          style: const TextStyle(fontSize: 13, color: Color(0xFF475569)),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar', style: TextStyle(color: Color(0xFF64748B))),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.excludeRed,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Sim, Limpar Área'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      setState(() => _isCleaningArea = true);
+      try {
+        await _userApiService.cleanArea(areaKey);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('$areaTitle limpo(a) com sucesso!'), backgroundColor: AppTheme.primaryGreen),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erro ao limpar área: $e'), backgroundColor: Colors.red),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() => _isCleaningArea = false);
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -226,28 +286,63 @@ class _SettingsPageState extends State<SettingsPage> {
                         const SizedBox(height: 20),
                       ],
                       _buildSectionCard(
-                        title: 'Manutenção de Dados',
+                        title: _isAdmin ? 'Manutenção e Limpeza de Áreas (Administrador)' : 'Manutenção de Dados',
                         icon: Icons.cleaning_services_outlined,
                         children: [
-                          const Text(
-                            'Caso um fechamento em andamento fique travado ou com dados inconsistentes, você pode redefinir o rascunho.',
-                            style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
-                          ),
-                          const SizedBox(height: 16),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: OutlinedButton.icon(
-                              onPressed: _isClearingDraft ? null : _clearCurrentDraft,
-                              icon: _isClearingDraft
-                                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                                  : const Icon(Icons.delete_sweep_outlined, color: Colors.red),
-                              label: const Text('Limpar Rascunho de Fechamento', style: TextStyle(color: Colors.red)),
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: Colors.red),
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          if (_isAdmin) ...[
+                            const Text(
+                              'Como Administrador, pode redefinir áreas específicas do sistema de forma seletiva para testes ou manutenção.',
+                              style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                            ),
+                            const SizedBox(height: 16),
+                            _buildCleanAreaRow(
+                              icon: Icons.drafts_outlined,
+                              title: 'Rascunhos e Sessões Ativas',
+                              desc: 'Limpa rascunhos de fechamentos e reseta sessões travadas de cultos.',
+                              onClean: () => _confirmCleanArea('DRAFTS', 'Rascunhos e Sessões', 'Todos os rascunhos de fechamento em andamento serão apagados.'),
+                            ),
+                            const Divider(height: 24),
+                            _buildCleanAreaRow(
+                              icon: Icons.receipt_long_outlined,
+                              title: 'Despesas e Comprovantes',
+                              desc: 'Exclui todas as despesas lançadas e os seus respetivos anexos e recibos.',
+                              onClean: () => _confirmCleanArea('EXPENSES', 'Despesas e Comprovantes', 'Todas as despesas e recibos serão excluídos permanentemente.'),
+                            ),
+                            const Divider(height: 24),
+                            _buildCleanAreaRow(
+                              icon: Icons.event_available_outlined,
+                              title: 'Fechamentos de Cultos',
+                              desc: 'Limpa o histórico de atas e fechamentos de cultos finalizados e envelopes.',
+                              onClean: () => _confirmCleanArea('CLOSINGS', 'Fechamentos de Cultos', 'Todas as atas de fechamento e envelopes serão excluídos permanentemente.'),
+                            ),
+                            const Divider(height: 24),
+                            _buildCleanAreaRow(
+                              icon: Icons.people_outline,
+                              title: 'Membros e Contribuintes',
+                              desc: 'Limpa a lista de membros da igreja e cadastro de contribuintes.',
+                              onClean: () => _confirmCleanArea('MEMBERS', 'Membros e Contribuintes', 'Todos os membros e contribuintes registados serão excluídos permanentemente.'),
+                            ),
+                          ] else ...[
+                            const Text(
+                              'Caso um fechamento em andamento fique travado ou com dados inconsistentes, você pode redefinir o rascunho.',
+                              style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                            ),
+                            const SizedBox(height: 16),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: OutlinedButton.icon(
+                                onPressed: _isClearingDraft ? null : _clearCurrentDraft,
+                                icon: _isClearingDraft
+                                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                                    : const Icon(Icons.delete_sweep_outlined, color: Colors.red),
+                                label: const Text('Limpar Rascunho de Fechamento', style: TextStyle(color: Colors.red)),
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(color: Colors.red),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -575,6 +670,42 @@ class _SettingsPageState extends State<SettingsPage> {
           Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF0F172A))),
         ],
       ),
+    );
+  }
+
+  Widget _buildCleanAreaRow({
+    required IconData icon,
+    required String title,
+    required String desc,
+    required VoidCallback onClean,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 20, color: const Color(0xFF64748B)),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0F172A))),
+              const SizedBox(height: 2),
+              Text(desc, style: const TextStyle(fontSize: 12, color: Color(0xFF64748B))),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12),
+        OutlinedButton.icon(
+          onPressed: _isCleaningArea ? null : onClean,
+          icon: const Icon(Icons.delete_sweep_outlined, size: 16, color: AppTheme.excludeRed),
+          label: const Text('Limpar', style: TextStyle(color: AppTheme.excludeRed, fontSize: 13, fontWeight: FontWeight.w600)),
+          style: OutlinedButton.styleFrom(
+            side: const BorderSide(color: Color(0xFFFECACA)),
+            backgroundColor: const Color(0xFFFEF2F2),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -439,4 +439,54 @@ public class ServiceClosingSessionServiceTest {
         assertEquals(ServiceClosingSessionStatus.ACTIVE, result.getStatus());
         verify(auditLogService, times(1)).logAction(eq("LATE_OPENING"), eq("Admilson"), anyString(), anyString());
     }
+
+    @Test
+    public void testCollaborativeReadinessAndMutualCompletionLock() {
+        Long sessionId = 50L;
+        ServiceClosingSession session = new ServiceClosingSession();
+        session.setId(sessionId);
+        session.setStartedBy("Admilson");
+        session.setStatus(ServiceClosingSessionStatus.ACTIVE);
+
+        when(repository.findById(sessionId)).thenReturn(Optional.of(session));
+        when(repository.saveAndFlush(any(ServiceClosingSession.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        // 1. First conferente concludes
+        service.setConferenteReady(sessionId, "Admilson", true);
+        assertTrue(session.isConferente1Ready());
+        assertFalse(session.isConferente2Ready());
+
+        // 2. Attempting to finalize with AUTHENTICATED fails because 2nd conferente is still counting
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
+            service.validateSessionCanFinalize(sessionId, com.tesourariacme.api.domain.VerifierType.AUTHENTICATED);
+        });
+        assertTrue(ex.getMessage().contains("ainda está a contabilizar"));
+
+        // 3. Second conferente concludes
+        service.setConferenteReady(sessionId, "Carlos", true);
+        assertEquals("Carlos", session.getConferente2());
+        assertTrue(session.isConferente2Ready());
+        assertEquals(ServiceClosingSessionStatus.PENDING_CLOSE, session.getStatus());
+
+        // 4. Now finalizing with AUTHENTICATED succeeds
+        service.validateSessionCanFinalize(sessionId, com.tesourariacme.api.domain.VerifierType.AUTHENTICATED);
+        assertEquals(ServiceClosingSessionStatus.FINISHED, session.getStatus());
+        assertNull(session.getDraftJson());
+    }
+
+    @Test
+    public void testManualVerifierDoesNotRequireSecondAuthenticatedConferente() {
+        Long sessionId = 51L;
+        ServiceClosingSession session = new ServiceClosingSession();
+        session.setId(sessionId);
+        session.setStartedBy("Admilson");
+        session.setStatus(ServiceClosingSessionStatus.ACTIVE);
+
+        when(repository.findById(sessionId)).thenReturn(Optional.of(session));
+        when(repository.saveAndFlush(any(ServiceClosingSession.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        // Finalizing with MANUAL succeeds immediately without second ready check
+        service.validateSessionCanFinalize(sessionId, com.tesourariacme.api.domain.VerifierType.MANUAL);
+        assertEquals(ServiceClosingSessionStatus.FINISHED, session.getStatus());
+    }
 }
