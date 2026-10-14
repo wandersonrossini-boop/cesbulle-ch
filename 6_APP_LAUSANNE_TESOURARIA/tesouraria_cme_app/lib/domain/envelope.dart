@@ -39,7 +39,7 @@ class Envelope extends Equatable {
         orElse: () => EnvelopeType.dizimo,
       ),
       amount: json['amount'] ?? 0,
-      contributorId: json['contributorId'] as int?,
+      contributorId: json['contributorId'] != null ? int.tryParse(json['contributorId'].toString()) : null,
     );
   }
 }

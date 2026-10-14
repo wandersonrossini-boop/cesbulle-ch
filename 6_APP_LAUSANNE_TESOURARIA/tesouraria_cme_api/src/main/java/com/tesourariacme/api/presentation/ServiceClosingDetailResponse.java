@@ -60,6 +60,7 @@ public class ServiceClosingDetailResponse {
                 req.setMemberName(e.getMemberName());
                 req.setType(e.getType());
                 req.setAmount(e.getAmount());
+                req.setContributorId(e.getContributorId());
                 return req;
             }).collect(Collectors.toList()));
         }

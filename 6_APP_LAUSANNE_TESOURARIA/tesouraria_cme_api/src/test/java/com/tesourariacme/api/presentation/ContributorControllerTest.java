@@ -98,6 +98,28 @@ public class ContributorControllerTest {
     }
 
     @Test
+    public void testGetAttestationPdfBadRequestWhenValidationError() {
+        when(attestationService.generateAttestationPdf(1L, 2026))
+                .thenThrow(new IllegalArgumentException("Dados cadastrais incompletos"));
+
+        ResponseEntity<?> response = controller.getAttestationPdf(1L, 2026, treasurerAuth);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody() instanceof java.util.Map);
+        assertEquals("Dados cadastrais incompletos", ((java.util.Map<?, ?>) response.getBody()).get("message"));
+    }
+
+    @Test
+    public void testGetAttestationPdfBadRequestWhenZeroContributions() {
+        when(attestationService.generateAttestationPdf(1L, 2026))
+                .thenThrow(new IllegalStateException("O contribuinte não possui contribuições"));
+
+        ResponseEntity<?> response = controller.getAttestationPdf(1L, 2026, treasurerAuth);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody() instanceof java.util.Map);
+        assertEquals("O contribuinte não possui contribuições", ((java.util.Map<?, ?>) response.getBody()).get("message"));
+    }
+
+    @Test
     public void testCreateForbidden() {
         Contributor c = new Contributor();
         ResponseEntity<?> response = controller.create(c, readOnlyAuth);

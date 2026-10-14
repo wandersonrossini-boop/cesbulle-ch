@@ -101,6 +101,7 @@ class ServiceClosingDetail {
         amount: ((e['amount'] ?? 0) * 100).toInt(), 
         type: type,
         memberName: e['memberName'] ?? '',
+        contributorId: e['contributorId'] != null ? int.tryParse(e['contributorId'].toString()) : null,
       );
     }).toList().cast<Envelope>();
 

@@ -21,6 +21,7 @@ class FechamentoApiService {
         "memberName": e.memberName,
         "type": e.type.name.toUpperCase(),
         "amount": BigDecimalConverter.fromRappen(e.amount),
+        if (e.contributorId != null) "contributorId": e.contributorId,
       }).toList(),
       "unidentifiedDizimoTotal": BigDecimalConverter.fromRappen(state.anonymousTotalBy(EnvelopeType.dizimo)),
       "unidentifiedOfertaTotal": BigDecimalConverter.fromRappen(state.anonymousTotalBy(EnvelopeType.oferta)),

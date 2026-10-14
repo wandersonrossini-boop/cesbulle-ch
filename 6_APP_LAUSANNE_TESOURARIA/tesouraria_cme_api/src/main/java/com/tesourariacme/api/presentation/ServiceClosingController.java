@@ -183,6 +183,7 @@ public class ServiceClosingController {
                     env.setMemberName(req.getMemberName());
                     env.setType(req.getType());
                     env.setAmount(req.getAmount());
+                    env.setContributorId(req.getContributorId());
                     return env;
                 }).collect(Collectors.toList()));
             }

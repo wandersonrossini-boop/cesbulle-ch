@@ -9,4 +9,5 @@ public class EnvelopeRequest {
     private String memberName;
     private EnvelopeType type;
     private BigDecimal amount;
+    private Long contributorId;
 }

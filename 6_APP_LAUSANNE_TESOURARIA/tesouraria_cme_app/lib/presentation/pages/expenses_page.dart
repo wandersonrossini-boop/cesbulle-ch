@@ -6,6 +6,7 @@ import '../../services/expense_api_service.dart';
 import '../../services/auth_api_service.dart';
 import '../widgets/app_sidebar_drawer.dart';
 import 'login_page.dart';
+import 'dashboard_page.dart';
 
 class ExpensesPage extends StatefulWidget {
   const ExpensesPage({super.key});
@@ -1058,10 +1059,28 @@ class _ExpensesPageState extends State<ExpensesPage> {
               foregroundColor: const Color(0xFF0F172A),
               elevation: 0,
               shape: const Border(bottom: BorderSide(color: Color(0xFFE5E7EB), width: 1)),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                tooltip: 'Voltar ao Início',
+                onPressed: () {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (_) => const DashboardScreen()),
+                  );
+                },
+              ),
               title: const Text(
                 'Gestão de Despesas',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF0F172A)),
               ),
+              actions: [
+                Builder(
+                  builder: (ctx) => IconButton(
+                    icon: const Icon(Icons.menu),
+                    tooltip: 'Menu de Navegação',
+                    onPressed: () => Scaffold.of(ctx).openDrawer(),
+                  ),
+                ),
+              ],
             ),
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1076,7 +1095,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                         padding: EdgeInsets.all(isDesktop ? 32.0 : 16.0),
                         child: Center(
                           child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 800),
+                            constraints: BoxConstraints(maxWidth: isDesktop ? 1350 : 800),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
@@ -1124,57 +1143,83 @@ class _ExpensesPageState extends State<ExpensesPage> {
   }
 
   Widget _buildHeader(bool isDesktop) {
+    final buttons = Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        if (_isAuthorized)
+          OutlinedButton.icon(
+            onPressed: _showRecurringExpensesModal,
+            icon: const Icon(Icons.autorenew_outlined, size: 16, color: Color(0xFF1E3A8A)),
+            label: const Text('Despesas Fixas', style: TextStyle(color: Color(0xFF1E3A8A), fontSize: 13, fontWeight: FontWeight.w600)),
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: Color(0xFFBFDBFE)),
+              backgroundColor: const Color(0xFFEFF6FF),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+            ),
+          ),
+        OutlinedButton.icon(
+          onPressed: _showAddExpenseDialog,
+          icon: const Icon(Icons.add, size: 16, color: Color(0xFF0F172A)),
+          label: const Text('Nova Despesa', style: TextStyle(color: Color(0xFF0F172A), fontSize: 13, fontWeight: FontWeight.w600)),
+          style: OutlinedButton.styleFrom(
+            side: const BorderSide(color: Color(0xFFE2E8F0)),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          ),
+        ),
+      ],
+    );
+
+    if (!isDesktop) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Despesas da Congregação',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF0F172A),
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Acompanhamento e auditoria contábil de despesas da igreja.',
+            style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+          ),
+          const SizedBox(height: 14),
+          buttons,
+        ],
+      );
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Column(
+        const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Despesas da Congregação',
               style: TextStyle(
-                fontSize: isDesktop ? 22 : 18,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF0F172A),
+                color: Color(0xFF0F172A),
                 letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: 4),
-            const Text(
+            SizedBox(height: 4),
+            Text(
               'Acompanhamento e auditoria contábil de despesas da igreja.',
               style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
             ),
           ],
         ),
-        Row(
-          children: [
-            if (_isAuthorized) ...[
-              OutlinedButton.icon(
-                onPressed: _showRecurringExpensesModal,
-                icon: const Icon(Icons.autorenew_outlined, size: 16, color: Color(0xFF1E3A8A)),
-                label: const Text('Despesas Fixas', style: TextStyle(color: Color(0xFF1E3A8A), fontSize: 13, fontWeight: FontWeight.w600)),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Color(0xFFBFDBFE)),
-                  backgroundColor: const Color(0xFFEFF6FF),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                ),
-              ),
-              const SizedBox(width: 12),
-            ],
-            OutlinedButton.icon(
-              onPressed: _showAddExpenseDialog,
-              icon: const Icon(Icons.add, size: 16, color: Color(0xFF0F172A)),
-              label: const Text('Nova Despesa', style: TextStyle(color: Color(0xFF0F172A), fontSize: 13, fontWeight: FontWeight.w600)),
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Color(0xFFE2E8F0)),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-              ),
-            ),
-          ],
-        ),
+        buttons,
       ],
     );
   }

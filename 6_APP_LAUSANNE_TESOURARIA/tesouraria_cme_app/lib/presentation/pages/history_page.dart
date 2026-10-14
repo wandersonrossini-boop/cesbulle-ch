@@ -9,6 +9,7 @@ import '../blocs/history_bloc.dart';
 import '../widgets/app_sidebar_drawer.dart';
 import 'login_page.dart';
 import 'closing_detail_page.dart';
+import 'dashboard_page.dart';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({super.key});
@@ -40,10 +41,28 @@ class _HistoryView extends StatelessWidget {
               foregroundColor: const Color(0xFF0F172A),
               elevation: 0,
               shape: const Border(bottom: BorderSide(color: Color(0xFFE5E7EB), width: 1)),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                tooltip: 'Voltar ao Início',
+                onPressed: () {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (_) => const DashboardScreen()),
+                  );
+                },
+              ),
               title: const Text(
                 'Fechamentos',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF0F172A)),
               ),
+              actions: [
+                Builder(
+                  builder: (ctx) => IconButton(
+                    icon: const Icon(Icons.menu),
+                    tooltip: 'Menu de Navegação',
+                    onPressed: () => Scaffold.of(ctx).openDrawer(),
+                  ),
+                ),
+              ],
             ),
       body: BlocConsumer<HistoryBloc, HistoryState>(
         listener: (context, state) {

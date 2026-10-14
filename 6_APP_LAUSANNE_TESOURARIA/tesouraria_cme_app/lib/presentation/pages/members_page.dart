@@ -4,6 +4,7 @@ import '../../services/auth_api_service.dart';
 import '../../services/contributor_api_service.dart';
 import '../widgets/app_sidebar_drawer.dart';
 import 'login_page.dart';
+import 'dashboard_page.dart';
 import '../../utils/file_download_helper.dart';
 
 class MembersPage extends StatefulWidget {
@@ -257,6 +258,45 @@ class _MembersPageState extends State<MembersPage> {
   }
 
   Future<void> _showAttestationDialog(ContributorModel contributor) async {
+    final missingAddress = contributor.address.trim().isEmpty;
+    final missingPostal = contributor.postalCode.trim().isEmpty;
+    final missingCity = contributor.city.trim().isEmpty;
+
+    if (missingAddress || missingPostal || missingCity) {
+      await showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: const Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: AppTheme.excludeRed, size: 28),
+              SizedBox(width: 8),
+              Expanded(child: Text('Cadastro Incompleto', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18))),
+            ],
+          ),
+          content: Text(
+            'O contribuinte ${contributor.fullName} não possui endereço completo cadastrado (morada, código postal ou cidade ausentes).\n\nPara garantir a conformidade legal do atestado fiscal suíço, complete os dados cadastrais antes de gerar o documento.',
+            style: const TextStyle(fontSize: 14, height: 1.4),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('FECHAR'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                _showAddEditDialog(contributor);
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.institutionalBlue),
+              child: const Text('EDITAR CADASTRO', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
     int year = DateTime.now().year;
     bool isGenerating = false;
 
@@ -308,8 +348,13 @@ class _MembersPageState extends State<MembersPage> {
                           }
                         } catch (e) {
                           setDlgState(() => isGenerating = false);
+                          final cleanMessage = e.toString().replaceAll('Exception: ', '');
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Erro ao baixar PDF: $e'), backgroundColor: AppTheme.excludeRed),
+                            SnackBar(
+                              content: Text(cleanMessage),
+                              backgroundColor: AppTheme.excludeRed,
+                              duration: const Duration(seconds: 4),
+                            ),
                           );
                         }
                       },
@@ -420,6 +465,15 @@ class _MembersPageState extends State<MembersPage> {
               backgroundColor: AppTheme.institutionalBlue,
               foregroundColor: Colors.white,
               elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                tooltip: 'Voltar ao Início',
+                onPressed: () {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (_) => const DashboardScreen()),
+                  );
+                },
+              ),
               title: const Text(
                 'Contribuintes',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -429,6 +483,13 @@ class _MembersPageState extends State<MembersPage> {
                   icon: const Icon(Icons.person_add_alt_1_rounded),
                   tooltip: 'Novo Contribuinte',
                   onPressed: () => _showAddEditDialog(null),
+                ),
+                Builder(
+                  builder: (ctx) => IconButton(
+                    icon: const Icon(Icons.menu),
+                    tooltip: 'Menu de Navegação',
+                    onPressed: () => Scaffold.of(ctx).openDrawer(),
+                  ),
                 ),
               ],
             ),
@@ -483,7 +544,7 @@ class _MembersPageState extends State<MembersPage> {
       ),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 950),
+          constraints: BoxConstraints(maxWidth: isDesktop ? 1350 : 950),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [

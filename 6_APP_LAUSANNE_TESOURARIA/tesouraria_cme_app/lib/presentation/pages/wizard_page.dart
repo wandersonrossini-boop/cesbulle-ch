@@ -193,6 +193,161 @@ class _WizardPageState extends State<WizardPage> {
     }
   }
 
+  void _showManualClosingDialog() {
+    DateTime selectedDate = DateTime.now();
+    String selectedType = 'Culto de Domingo - Noite';
+    String startTime = '19:00';
+    String endTime = '21:00';
+
+    final types = [
+      'Culto de Domingo - Noite',
+      'Culto de Domingo - Manhã',
+      'Culto de Quarta-feira (Doutrina)',
+      'Culto de Santa Ceia',
+      'Reunião de Oração / Vigília',
+      'Culto de Jovens',
+      'Culto Avulso / Especial',
+    ];
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDlgState) {
+          final dateStr = DateFormat("dd/MM/yyyy", 'pt_BR').format(selectedDate);
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.institutionalBlue.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.history_edu_rounded, color: AppTheme.institutionalBlue, size: 24),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text(
+                    'Lançar Culto Passado / Avulso',
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Permite realizar a contagem física e registro de dízimos/ofertas de cultos passados ou reuniões não programadas na agenda.',
+                    style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text('Data do Culto / Evento', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF334155))),
+                  const SizedBox(height: 6),
+                  InkWell(
+                    onTap: () async {
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate,
+                        firstDate: DateTime(2025, 1, 1),
+                        lastDate: DateTime.now(),
+                      );
+                      if (picked != null) {
+                        setDlgState(() {
+                          selectedDate = picked;
+                        });
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color(0xFFCBD5E1)),
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.white,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.calendar_month_outlined, size: 20, color: Color(0xFF64748B)),
+                              const SizedBox(width: 10),
+                              Text(dateStr, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF0F172A))),
+                            ],
+                          ),
+                          const Text('Alterar Data', style: TextStyle(fontSize: 12, color: AppTheme.institutionalBlue, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text('Tipo do Culto', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF334155))),
+                  const SizedBox(height: 6),
+                  DropdownButtonFormField<String>(
+                    value: selectedType,
+                    isExpanded: true,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    items: types.map((t) => DropdownMenuItem(value: t, child: Text(t, style: const TextStyle(fontSize: 14)))).toList(),
+                    onChanged: (val) {
+                      if (val != null) {
+                        setDlgState(() {
+                          selectedType = val;
+                          if (val.contains('Manhã')) {
+                            startTime = '10:00';
+                            endTime = '12:00';
+                          } else if (val.contains('Doutrina') || val.contains('Quarta')) {
+                            startTime = '19:30';
+                            endTime = '21:30';
+                          } else {
+                            startTime = '19:00';
+                            endTime = '21:00';
+                          }
+                        });
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('CANCELAR', style: TextStyle(color: Color(0xFF64748B))),
+              ),
+              ElevatedButton.icon(
+                onPressed: () async {
+                  Navigator.pop(ctx);
+                  final currentUserName = await _getCurrentUserName();
+                  _initializeCleanSession(
+                    null,
+                    selectedDate,
+                    currentUserName,
+                    startTime,
+                    endTime,
+                    selectedType,
+                  );
+                },
+                icon: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 20),
+                label: const Text('INICIAR CONTAGEM', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.institutionalBlue,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
   void _startSyncTimer() {
     _syncTimer?.cancel();
     _syncTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
@@ -328,22 +483,35 @@ class _WizardPageState extends State<WizardPage> {
                       _getAppBarTitle(),
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
                     ),
-                    leading: _phase != ClosingPhase.setup
-                        ? IconButton(
-                            icon: const Icon(Icons.arrow_back),
-                            onPressed: () {
-                              setState(() {
-                                if (_phase == ClosingPhase.review) {
-                                  _phase = ClosingPhase.counting;
-                                  _startSyncTimer();
-                                } else if (_phase == ClosingPhase.counting) {
-                                  _syncTimer?.cancel();
-                                  _phase = ClosingPhase.setup;
-                                }
-                              });
-                            },
-                          )
-                        : null,
+                    leading: IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      tooltip: _phase == ClosingPhase.setup ? 'Voltar ao Painel' : 'Voltar',
+                      onPressed: () {
+                        if (_phase == ClosingPhase.review) {
+                          setState(() {
+                            _phase = ClosingPhase.counting;
+                            _startSyncTimer();
+                          });
+                        } else if (_phase == ClosingPhase.counting) {
+                          setState(() {
+                            _syncTimer?.cancel();
+                            _phase = ClosingPhase.setup;
+                          });
+                        } else {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(builder: (_) => const DashboardScreen()),
+                          );
+                        }
+                      },
+                    ),
+                    actions: [
+                      if (_phase == ClosingPhase.setup)
+                        IconButton(
+                          icon: const Icon(Icons.edit_calendar_rounded),
+                          tooltip: 'Lançar Culto Passado / Avulso',
+                          onPressed: _showManualClosingDialog,
+                        ),
+                    ],
                   ),
             drawer: (isDesktop || _phase != ClosingPhase.setup)
                 ? null
@@ -403,7 +571,7 @@ class _WizardPageState extends State<WizardPage> {
       stateIcon = Icons.event_busy_outlined;
       iconColor = const Color(0xFF64748B);
       titleText = "Nenhum Culto Programado";
-      descText = "A detecção automática não identificou nenhum culto ativo na agenda para o momento atual.";
+      descText = "Não há nenhum culto programado na agenda para o momento atual.";
       buttonText = "VERIFICAR NOVAMENTE";
       onActionButtonPressed = _isConnecting ? null : () => _checkCurrentStatus();
     } else if (!hasSession) {
@@ -701,24 +869,56 @@ class _WizardPageState extends State<WizardPage> {
                 textAlign: textAlign,
                 style: const TextStyle(fontSize: 13, color: Color(0xFF64748B), height: 1.4),
               ),
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: _showManualClosingDialog,
+                icon: const Icon(Icons.history_edu_rounded, size: 18),
+                label: const Text("LANÇAR CULTO PASSADO / AVULSO", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppTheme.institutionalBlue,
+                  side: const BorderSide(color: AppTheme.institutionalBlue),
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+              ),
             ] else ...[
               const SizedBox(height: 8),
               Text(
-                "As contagens são liberadas conforme a agenda de cultos.",
+                "As contagens são liberadas conforme a agenda de cultos ou por lançamento manual de data anterior.",
                 textAlign: textAlign,
                 style: const TextStyle(fontSize: 13, color: Color(0xFF64748B), height: 1.4),
               ),
               const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _isConnecting ? null : () => _checkCurrentStatus(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.institutionalBlue,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                child: const Text("VERIFICAR NOVAMENTE", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: _isConnecting ? null : () => _checkCurrentStatus(),
+                    icon: const Icon(Icons.refresh_rounded, size: 18),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF64748B),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    label: const Text("VERIFICAR NOVAMENTE", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: _showManualClosingDialog,
+                    icon: const Icon(Icons.history_edu_rounded, size: 18),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryGreen,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    label: const Text("LANÇAR CULTO PASSADO / AVULSO", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                  ),
+                ],
               ),
             ],
           ],
@@ -732,7 +932,7 @@ class _WizardPageState extends State<WizardPage> {
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 800),
+              constraints: BoxConstraints(maxWidth: isDesktop ? 1200 : 800),
               child: isDesktop && sortedOccurrences.isNotEmpty
                   // ── Desktop two-panel layout ──
                   ? Row(
@@ -822,7 +1022,7 @@ class _WizardPageState extends State<WizardPage> {
       child: Center(
         child: SingleChildScrollView(
           child: Container(
-            constraints: const BoxConstraints(maxWidth: 480),
+            constraints: BoxConstraints(maxWidth: isDesktop ? 600 : 480),
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
             child: Card(
               color: Colors.white,
@@ -898,6 +1098,15 @@ class _WizardPageState extends State<WizardPage> {
                               ),
                             ),
                     ),
+                    const SizedBox(height: 16),
+                    TextButton.icon(
+                      onPressed: _showManualClosingDialog,
+                      icon: const Icon(Icons.history_edu_rounded, size: 18),
+                      label: const Text('Lançar culto passado ou avulso'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFF64748B),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -971,7 +1180,7 @@ class _WizardPageState extends State<WizardPage> {
             ? SingleChildScrollView(
                 child: Center(
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 1000),
+                    constraints: BoxConstraints(maxWidth: isDesktop ? 1350 : 1000),
                     child: _buildDesktopCountingLayout(context, state),
                   ),
                 ),

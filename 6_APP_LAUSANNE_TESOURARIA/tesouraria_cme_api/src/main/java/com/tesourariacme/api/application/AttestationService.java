@@ -35,6 +35,14 @@ public class AttestationService {
         Contributor contributor = contributorRepository.findById(contributorId)
                 .orElseThrow(() -> new IllegalArgumentException("Contribuinte não encontrado."));
 
+        if (contributor.getAddress() == null || contributor.getAddress().trim().isEmpty() ||
+            contributor.getPostalCode() == null || contributor.getPostalCode().trim().isEmpty() ||
+            contributor.getCity() == null || contributor.getCity().trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                "Dados cadastrais incompletos (morada, código postal ou localidade ausentes). Atualize o cadastro do contribuinte antes de emitir a declaração fiscal."
+            );
+        }
+
         LocalDate startDate = LocalDate.of(year, 1, 1);
         LocalDate endDate = LocalDate.of(year, 12, 31);
 
@@ -47,7 +55,12 @@ public class AttestationService {
         for (ServiceClosing sc : closings) {
             if (sc.getIdentifiedEntries() != null) {
                 for (Envelope env : sc.getIdentifiedEntries()) {
-                    if (contributorId.equals(env.getContributorId())) {
+                    boolean matches = contributorId.equals(env.getContributorId()) ||
+                            (env.getContributorId() == null && env.getMemberName() != null &&
+                             (env.getMemberName().trim().equalsIgnoreCase(contributor.getFullName().trim()) ||
+                              env.getMemberName().trim().equals(contributor.getContributorNumber())));
+
+                    if (matches) {
                         BigDecimal amt = env.getAmount() != null ? env.getAmount() : BigDecimal.ZERO;
                         
                         AnnualSummaryDTO.EntryDetail detail = new AnnualSummaryDTO.EntryDetail(
@@ -69,13 +82,20 @@ public class AttestationService {
 
         BigDecimal totalConsolidated = totalTithes.add(totalVows);
 
+        if (totalConsolidated.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalStateException(
+                String.format("O contribuinte %s não possui contribuições registradas no exercício fiscal de %d (total CHF 0.00). O atestado fiscal não pode ser emitido.",
+                    contributor.getFullName(), year)
+            );
+        }
+
         return new AnnualSummaryDTO(
                 contributor.getId(),
                 contributor.getFullName(),
                 contributor.getContributorNumber(),
-                contributor.getAddress(),
-                contributor.getPostalCode(),
-                contributor.getCity(),
+                contributor.getAddress().trim(),
+                contributor.getPostalCode().trim(),
+                contributor.getCity().trim(),
                 year,
                 totalTithes,
                 totalVows,
@@ -125,9 +145,15 @@ public class AttestationService {
 
             // 4. Body Paragraph
             String bodyText = String.format(
-                    "Nous certifions par la presente que M./Mme %s (N° Contribuable: %s) a verse au Centre Missionnaire " +
-                    "Evangelique Lausanne, pour la periode du 01.01.%d au 31.12.%d, la somme de:\n\n",
-                    summary.getFullName(), summary.getContributorNumber(), year, year
+                    "Nous certifions par la presente que M./Mme %s (N° Contribuable: %s), demeurant a %s, %s %s, " +
+                    "a verse au Centre Missionnaire Evangelique Lausanne, pour l'exercice fiscal %d (du 01.01.%d au 31.12.%d), " +
+                    "la somme totale de:\n\n",
+                    summary.getFullName(),
+                    summary.getContributorNumber() != null ? summary.getContributorNumber() : "-",
+                    summary.getAddress() != null ? summary.getAddress() : "",
+                    summary.getPostalCode() != null ? summary.getPostalCode() : "",
+                    summary.getCity() != null ? summary.getCity() : "",
+                    year, year, year
             );
             com.lowagie.text.Paragraph body = new com.lowagie.text.Paragraph(bodyText, bodyFont);
             document.add(body);
@@ -156,8 +182,9 @@ public class AttestationService {
                 table.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph("TYPE DE DON", boldFont)));
                 table.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph("MONTANT", boldFont)));
 
+                java.time.format.DateTimeFormatter swissDateFmt = java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy");
                 for (AnnualSummaryDTO.EntryDetail detail : summary.getDetails()) {
-                    table.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph(detail.getDate().toString(), bodyFont)));
+                    table.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph(detail.getDate().format(swissDateFmt), bodyFont)));
                     table.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph(detail.getType(), bodyFont)));
                     table.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph("CHF " + detail.getAmount().toString(), bodyFont)));
                 }
@@ -166,7 +193,8 @@ public class AttestationService {
 
             // 6. Sign-off
             com.lowagie.text.Paragraph signOff = new com.lowagie.text.Paragraph();
-            signOff.add(new com.lowagie.text.Paragraph("Fait a Lausanne, le " + LocalDate.now().toString(), bodyFont));
+            String emissionDate = LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+            signOff.add(new com.lowagie.text.Paragraph("Fait a Lausanne, le " + emissionDate, bodyFont));
             signOff.add(new com.lowagie.text.Paragraph("\n\nLe Service de la Tresorerie\nCME Lausanne", boldFont));
             signOff.setSpacingBefore(20);
             document.add(signOff);

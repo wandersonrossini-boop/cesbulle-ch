@@ -121,8 +121,8 @@ public class ContributorController {
         }
         try {
             return ResponseEntity.ok(attestationService.generateAnnualSummary(id, year));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
 
@@ -141,8 +141,10 @@ public class ContributorController {
                     .header("Content-Type", "application/pdf")
                     .header("Content-Disposition", String.format("inline; filename=attestation_%d.pdf", year))
                     .body(pdfBytes);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Erro interno ao gerar o atestado fiscal: " + e.getMessage()));
         }
     }
 }

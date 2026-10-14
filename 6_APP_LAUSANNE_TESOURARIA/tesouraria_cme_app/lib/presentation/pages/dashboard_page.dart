@@ -159,7 +159,7 @@ class _DashboardViewState extends State<DashboardView> {
                       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
                       child: Center(
                         child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 1100),
+                          constraints: const BoxConstraints(maxWidth: 1400),
                           child: content,
                         ),
                       ),
@@ -270,34 +270,282 @@ class _DashboardViewState extends State<DashboardView> {
   }
 
   Widget _buildDesktopLayout(BuildContext context, List<ServiceClosingSummary> history, double totalEntradas) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Left Column (Hero Card & Quick Actions)
-        Expanded(
-          flex: 3,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildHeroCard(totalEntradas),
-              const SizedBox(height: 24),
-              _buildQuickActionsGrid(context),
-            ],
-          ),
-        ),
-        const SizedBox(width: 24),
+    final displayMonth = _summary?.periodLabel ?? '--/----';
+    final currentInputs = _summary?.currentMonthInputs ?? totalEntradas;
+    final isLocked = _summary?.periodLocked ?? false;
+    final saldo = currentInputs - _totalSaidas;
+    final isPositive = saldo >= 0;
 
-        // Right Column (Recent Activities)
-        Expanded(
-          flex: 2,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildMovimentosSection(context, history, isDesktop: true),
-            ],
-          ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // ── 1. Top KPI Row (4 Financial Metrics) ──
+        Row(
+          children: [
+            Expanded(
+              child: _buildKpiCard(
+                title: 'ENTRADAS DO MÊS',
+                badgeText: isLocked ? 'FECHADO' : 'ABERTO ($displayMonth)',
+                badgeColor: isLocked ? const Color(0xFFDC2626) : const Color(0xFF059669),
+                badgeBg: isLocked ? const Color(0xFFFEF2F2) : const Color(0xFFECFDF5),
+                value: 'CHF ${currentInputs.toStringAsFixed(2)}',
+                valueColor: const Color(0xFF0F172A),
+                icon: Icons.trending_up_rounded,
+                iconColor: const Color(0xFF16A34A),
+                subtitle: 'Dízimos e ofertas contadas',
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: _buildKpiCard(
+                title: 'SAÍDAS E DESPESAS',
+                badgeText: _summary != null && _summary!.pendingExpensesCount > 0
+                    ? '${_summary!.pendingExpensesCount} PENDENTES'
+                    : 'APROVADAS',
+                badgeColor: _summary != null && _summary!.pendingExpensesCount > 0
+                    ? const Color(0xFFEA580C)
+                    : const Color(0xFF475569),
+                badgeBg: _summary != null && _summary!.pendingExpensesCount > 0
+                    ? const Color(0xFFFFF7ED)
+                    : const Color(0xFFF1F5F9),
+                value: 'CHF ${_totalSaidas.toStringAsFixed(2)}',
+                valueColor: const Color(0xFF0F172A),
+                icon: Icons.trending_down_rounded,
+                iconColor: const Color(0xFFDC2626),
+                subtitle: 'Pagamentos do exercício',
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: _buildKpiCard(
+                title: 'SALDO LÍQUIDO',
+                badgeText: isPositive ? 'SUPERÁVIT' : 'DÉFICIT',
+                badgeColor: isPositive ? const Color(0xFF1E3A8A) : const Color(0xFFDC2626),
+                badgeBg: isPositive ? const Color(0xFFEFF6FF) : const Color(0xFFFEF2F2),
+                value: 'CHF ${saldo.toStringAsFixed(2)}',
+                valueColor: isPositive ? const Color(0xFF1E3A8A) : const Color(0xFFDC2626),
+                icon: Icons.account_balance_wallet_outlined,
+                iconColor: isPositive ? const Color(0xFF2563EB) : const Color(0xFFDC2626),
+                subtitle: 'Entradas menos despesas',
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: _buildKpiCard(
+                title: 'FECHAMENTOS',
+                badgeText: 'CONCLUÍDOS',
+                badgeColor: const Color(0xFF0369A1),
+                badgeBg: const Color(0xFFF0F9FF),
+                value: '${history.length}',
+                valueColor: const Color(0xFF0F172A),
+                icon: Icons.event_available_rounded,
+                iconColor: const Color(0xFF0284C7),
+                subtitle: 'Cultos registrados no app',
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 28),
+
+        // ── 2. Two-Column Dashboard Content ──
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Left Column (Quick Actions & Overview)
+            Expanded(
+              flex: 3,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildQuickActionsGrid(context),
+                  const SizedBox(height: 24),
+                  _buildTreasuryStatusCard(),
+                ],
+              ),
+            ),
+            const SizedBox(width: 24),
+
+            // Right Column (Recent Activities)
+            Expanded(
+              flex: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildMovimentosSection(context, history, isDesktop: true),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
+    );
+  }
+
+  Widget _buildKpiCard({
+    required String title,
+    required String badgeText,
+    required Color badgeColor,
+    required Color badgeBg,
+    required String value,
+    required Color valueColor,
+    required IconData icon,
+    required Color iconColor,
+    required String subtitle,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF64748B),
+                  letterSpacing: 0.8,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: badgeBg,
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: badgeColor.withValues(alpha: 0.3)),
+                ),
+                child: Text(
+                  badgeText,
+                  style: TextStyle(
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.bold,
+                    color: badgeColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, color: iconColor, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: valueColor,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            subtitle,
+            style: const TextStyle(fontSize: 11.5, color: Color(0xFF94A3B8)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTreasuryStatusCard() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.institutionalBlue.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.church_outlined, color: AppTheme.institutionalBlue, size: 20),
+              ),
+              const SizedBox(width: 12),
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'CME Lausanne — Tesouraria Geral',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    'Exercício Fiscal 2026 • Lausanne, Suíça',
+                    style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          const Divider(height: 1, color: Color(0xFFF1F5F9)),
+          const SizedBox(height: 14),
+          const Row(
+            children: [
+              Icon(Icons.check_circle_outline_rounded, size: 16, color: Color(0xFF16A34A)),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Atestados fiscais anuais calculados com dados oficiais e validação de morada suíça.',
+                  style: TextStyle(fontSize: 12, color: Color(0xFF475569)),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          const Row(
+            children: [
+              Icon(Icons.info_outline_rounded, size: 16, color: Color(0xFF0284C7)),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Cultos e ofertas passadas podem ser lançados em "Novo Fechamento > Lançar Culto Passado".',
+                  style: TextStyle(fontSize: 12, color: Color(0xFF475569)),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -318,7 +566,6 @@ class _DashboardViewState extends State<DashboardView> {
     final displayMonth = _summary?.periodLabel ?? '--/----';
     final currentInputs = _summary?.currentMonthInputs ?? totalEntradas;
     final isLocked = _summary?.periodLocked ?? false;
-    final isSurplus = currentInputs >= _totalSaidas;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -378,14 +625,26 @@ class _DashboardViewState extends State<DashboardView> {
   Widget _buildQuickActionsGrid(BuildContext context) {
     final List<Widget> actions = [
       _buildActionCard(
-          context: context,
-          icon: Icons.add_circle_outline_rounded,
-          title: 'Novo Fechamento',
-          subtitle: 'Iniciar ou participar da contagem',
-          color: AppTheme.institutionalBlue,
-          onTap: () {
+        context: context,
+        icon: Icons.add_circle_outline_rounded,
+        title: 'Novo Fechamento',
+        subtitle: 'Iniciar contagem ou culto retroativo',
+        color: AppTheme.institutionalBlue,
+        onTap: () {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => const WizardPage()),
+          );
+        },
+      ),
+      _buildActionCard(
+        context: context,
+        icon: Icons.receipt_long_rounded,
+        title: 'Despesas',
+        subtitle: 'Lançar faturas e gerir saídas',
+        color: const Color(0xFFDC2626),
+        onTap: () {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const ExpensesPage()),
           );
         },
       ),
@@ -568,17 +827,50 @@ class _DashboardViewState extends State<DashboardView> {
         const SizedBox(height: 12),
         if (recentItems.isEmpty)
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 24),
+            padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 20),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
-            child: const Center(
-              child: Text(
-                'Nenhum movimento registrado.',
-                style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
-              ),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: const Icon(Icons.receipt_long_outlined, size: 28, color: Color(0xFF94A3B8)),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Nenhum movimento registrado',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF334155)),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Inicie uma contagem física ou lance um culto passado para ver os lançamentos aqui.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11.5),
+                ),
+                const SizedBox(height: 16),
+                OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (_) => const WizardPage()),
+                    );
+                  },
+                  icon: const Icon(Icons.add_circle_outline_rounded, size: 16),
+                  label: const Text('Iniciar Fechamento', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppTheme.institutionalBlue,
+                    side: const BorderSide(color: AppTheme.institutionalBlue),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  ),
+                ),
+              ],
             ),
           )
         else
