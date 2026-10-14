@@ -19,25 +19,22 @@ public class DataInitializer implements CommandLineRunner {
 
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(DataInitializer.class);
 
+    @org.springframework.beans.factory.annotation.Value("${admin.initial-password:Pr.124578.}")
+    private String initialAdminPassword;
+
     @Override
     public void run(String... args) {
         if (userRepository.findByUsername("pastor").isEmpty()) {
             AppUser admin = userRepository.findByUsername("admin").orElse(new AppUser());
             admin.setUsername("pastor");
             admin.setName("Administrador do Sistema");
-            admin.setPasswordHash(passwordEncoder.encode("Pr.124578."));
+            admin.setPasswordHash(passwordEncoder.encode(initialAdminPassword));
             admin.setRole("ADMIN");
             admin.setAuthorized(true);
             userRepository.save(admin);
             logger.info(">>> Configured default admin user.");
         } else {
-            // Atualizar a senha do pastor caso já exista, para garantir o acesso neste momento
-            AppUser pastor = userRepository.findByUsername("pastor").get();
-            pastor.setPasswordHash(passwordEncoder.encode("Pr.124578."));
-            pastor.setAuthorized(true);
-            pastor.setRole("ADMIN");
-            userRepository.save(pastor);
-            logger.info(">>> Verified default admin user credentials.");
+            logger.info(">>> Admin user 'pastor' already exists. Preserving existing credentials.");
         }
     }
 }

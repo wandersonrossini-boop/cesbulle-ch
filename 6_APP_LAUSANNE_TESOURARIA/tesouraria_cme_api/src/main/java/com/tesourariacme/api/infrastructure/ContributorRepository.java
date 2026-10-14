@@ -13,6 +13,8 @@ public interface ContributorRepository extends JpaRepository<Contributor, Long> 
 
     Optional<Contributor> findByContributorNumber(String contributorNumber);
 
+    Optional<Contributor> findByContributorNumberIgnoreCase(String contributorNumber);
+
     List<Contributor> findAllByActiveTrue();
 
     @Query("SELECT c FROM Contributor c WHERE c.active = true AND " +

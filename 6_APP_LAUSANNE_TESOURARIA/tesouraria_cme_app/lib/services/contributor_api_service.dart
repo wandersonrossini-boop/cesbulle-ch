@@ -52,7 +52,7 @@ class ContributorModel {
       'city': city,
       'email': email,
       'phone': phone,
-      'contributorNumber': contributorNumber,
+      'contributorNumber': contributorNumber.trim().isEmpty ? null : contributorNumber.trim(),
       'active': active,
     };
   }
@@ -60,6 +60,37 @@ class ContributorModel {
 
 class ContributorApiService {
   static const String _baseUrl = String.fromEnvironment('API_BASE_URL', defaultValue: 'https://tesouraria-cme-api.onrender.com/api');
+  final http.Client _client;
+
+  ContributorApiService({http.Client? client}) : _client = client ?? http.Client();
+
+  String _parseErrorMessage(http.Response response, String fallbackMessage) {
+    if (response.statusCode == 401) {
+      return 'UNAUTHORIZED';
+    }
+    if (response.statusCode == 403) {
+      return 'Acesso negado. Apenas administradores ou tesoureiros têm permissão.';
+    }
+    try {
+      final decoded = jsonDecode(response.body);
+      if (decoded is Map<String, dynamic>) {
+        if (decoded.containsKey('message') && decoded['message'] is String && (decoded['message'] as String).isNotEmpty) {
+          return decoded['message'];
+        }
+        if (decoded.containsKey('error') && decoded['error'] is String && (decoded['error'] as String).isNotEmpty) {
+          return decoded['error'];
+        }
+      } else if (decoded is String && decoded.trim().isNotEmpty) {
+        return decoded;
+      }
+    } catch (_) {}
+
+    final raw = response.body.trim();
+    if (raw.isNotEmpty && raw.length < 120 && !raw.contains('<html') && !raw.contains('Exception') && !raw.contains('at com.')) {
+      return raw;
+    }
+    return fallbackMessage;
+  }
 
   Future<List<ContributorModel>> fetchContributors({String? search}) async {
     final prefs = await SharedPreferences.getInstance();
@@ -69,7 +100,7 @@ class ContributorApiService {
       queryParameters: search != null && search.isNotEmpty ? {'search': search} : null,
     );
 
-    final response = await http.get(
+    final response = await _client.get(
       uri,
       headers: {
         'Content-Type': 'application/json',
@@ -80,10 +111,8 @@ class ContributorApiService {
     if (response.statusCode == 200) {
       final List list = jsonDecode(response.body) as List;
       return list.map((item) => ContributorModel.fromJson(item)).toList();
-    } else if (response.statusCode == 401) {
-      throw Exception('UNAUTHORIZED');
     } else {
-      throw Exception('Falha ao obter contribuintes (${response.statusCode})');
+      throw Exception(_parseErrorMessage(response, 'Falha ao obter contribuintes (${response.statusCode})'));
     }
   }
 
@@ -91,7 +120,7 @@ class ContributorApiService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('jwt_token');
 
-    final response = await http.post(
+    final response = await _client.post(
       Uri.parse('$_baseUrl/contributors'),
       headers: {
         'Content-Type': 'application/json',
@@ -100,12 +129,10 @@ class ContributorApiService {
       body: jsonEncode(contributor.toJson()),
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       return ContributorModel.fromJson(jsonDecode(response.body));
-    } else if (response.statusCode == 401) {
-      throw Exception('UNAUTHORIZED');
     } else {
-      throw Exception('Falha ao cadastrar contribuinte: ${response.body}');
+      throw Exception(_parseErrorMessage(response, 'Falha ao cadastrar contribuinte.'));
     }
   }
 
@@ -113,7 +140,7 @@ class ContributorApiService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('jwt_token');
 
-    final response = await http.put(
+    final response = await _client.put(
       Uri.parse('$_baseUrl/contributors/$id'),
       headers: {
         'Content-Type': 'application/json',
@@ -124,10 +151,8 @@ class ContributorApiService {
 
     if (response.statusCode == 200) {
       return ContributorModel.fromJson(jsonDecode(response.body));
-    } else if (response.statusCode == 401) {
-      throw Exception('UNAUTHORIZED');
     } else {
-      throw Exception('Falha ao atualizar contribuinte: ${response.body}');
+      throw Exception(_parseErrorMessage(response, 'Falha ao atualizar contribuinte.'));
     }
   }
 
@@ -135,7 +160,7 @@ class ContributorApiService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('jwt_token');
 
-    final response = await http.get(
+    final response = await _client.get(
       Uri.parse('$_baseUrl/contributors/$id/attestation/pdf?year=$year'),
       headers: {
         if (token != null) 'Authorization': 'Bearer $token',
@@ -145,7 +170,7 @@ class ContributorApiService {
     if (response.statusCode == 200) {
       return response.bodyBytes;
     } else {
-      throw Exception('Falha ao baixar Attestation PDF (${response.statusCode})');
+      throw Exception(_parseErrorMessage(response, 'Falha ao baixar Attestation PDF (${response.statusCode})'));
     }
   }
 
@@ -153,18 +178,15 @@ class ContributorApiService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('jwt_token');
 
-    final response = await http.delete(
+    final response = await _client.delete(
       Uri.parse('$_baseUrl/contributors/$id'),
       headers: {
         if (token != null) 'Authorization': 'Bearer $token',
       },
     );
 
-    if (response.statusCode != 200) {
-      if (response.statusCode == 401) {
-        throw Exception('UNAUTHORIZED');
-      }
-      throw Exception('Falha ao excluir contribuinte: ${response.body}');
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception(_parseErrorMessage(response, 'Falha ao excluir contribuinte.'));
     }
   }
 }

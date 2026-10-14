@@ -49,10 +49,26 @@ public class UserController {
     // ADMIN ENDPOINTS
     // ----------------------------------------------------
 
+    @org.springframework.beans.factory.annotation.Value("${app.allow-database-reset:false}")
+    private boolean allowDatabaseReset;
+
     @PostMapping("/reset-database")
     @Transactional
-    public ResponseEntity<?> resetDatabase(Authentication authentication) {
-        if (!isAdmin(authentication)) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    public ResponseEntity<?> resetDatabase(@RequestBody(required = false) java.util.Map<String, String> body, Authentication authentication) {
+        if (!isAdmin(authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado. Apenas administradores.");
+        }
+
+        if (!allowDatabaseReset) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("O endpoint de reset do banco de dados está desativado para proteção da integridade dos dados.");
+        }
+
+        String confirmToken = body != null ? body.get("confirmToken") : null;
+        if (!"CONFIRMAR_RESET_TOTAL".equals(confirmToken)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Token de confirmação inválido ou ausente. Operação cancelada.");
+        }
 
         // 1. Delete all attachments
         expenseAttachmentRepository.deleteAllInBatch();

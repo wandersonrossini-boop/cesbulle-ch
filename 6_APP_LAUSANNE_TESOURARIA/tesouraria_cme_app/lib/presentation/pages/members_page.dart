@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../../core/theme.dart';
 import '../../services/auth_api_service.dart';
 import '../../services/contributor_api_service.dart';
@@ -118,7 +118,11 @@ class _MembersPageState extends State<MembersPage> {
                   const SizedBox(height: 12),
                   TextField(
                     controller: numberCtrl,
-                    decoration: const InputDecoration(labelText: 'Codigo do contribuinte (*)', border: OutlineInputBorder()),
+                    decoration: InputDecoration(
+                      labelText: isEdit ? 'Código do contribuinte' : 'Código do contribuinte (opcional)',
+                      hintText: isEdit ? null : 'Gerado automaticamente se vazio',
+                      border: const OutlineInputBorder(),
+                    ),
                     enabled: !isEdit,
                   ),
                   const SizedBox(height: 12),
@@ -189,7 +193,7 @@ class _MembersPageState extends State<MembersPage> {
                         final zip = zipCtrl.text.trim();
                         final city = cityCtrl.text.trim();
 
-                        if (name.isEmpty || numStr.isEmpty || address.isEmpty || zip.isEmpty || city.isEmpty) {
+                        if (name.isEmpty || address.isEmpty || zip.isEmpty || city.isEmpty) {
                           setModalState(() {
                             dlgError = 'Por favor, preencha todos os campos obrigatorios (*).';
                           });
@@ -420,6 +424,13 @@ class _MembersPageState extends State<MembersPage> {
                 'Contribuintes',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.person_add_alt_1_rounded),
+                  tooltip: 'Novo Contribuinte',
+                  onPressed: () => _showAddEditDialog(null),
+                ),
+              ],
             ),
       body: body,
       floatingActionButton: isDesktop ? null : FloatingActionButton.extended(

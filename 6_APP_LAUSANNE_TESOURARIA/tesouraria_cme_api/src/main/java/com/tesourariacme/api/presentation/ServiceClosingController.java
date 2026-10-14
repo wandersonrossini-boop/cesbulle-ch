@@ -210,13 +210,9 @@ public class ServiceClosingController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteClosing(@PathVariable Long id) {
-        try {
-            useCase.deleteById(id);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<?> deleteClosing(@PathVariable Long id, Authentication authentication) {
+        return ResponseEntity.status(org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED)
+                .body("A exclusão de fechamentos de culto finalizados não é permitida para garantir a rastreabilidade e integridade fiscal.");
     }
 
     @PostMapping("/session")

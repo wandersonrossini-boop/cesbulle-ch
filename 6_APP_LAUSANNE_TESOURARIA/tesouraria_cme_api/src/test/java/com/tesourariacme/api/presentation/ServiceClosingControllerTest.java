@@ -284,4 +284,11 @@ public class ServiceClosingControllerTest {
         assertEquals(500L, body.getId());
         assertTrue(body.isLateOpening());
     }
+
+    @Test
+    public void testDeleteClosingReturnsMethodNotAllowed() {
+        ResponseEntity<?> response = controller.deleteClosing(100L, authUser1);
+        assertEquals(HttpStatus.METHOD_NOT_ALLOWED, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("não é permitida"));
+    }
 }

@@ -40,7 +40,7 @@ public class ContributorController {
     @GetMapping
     public ResponseEntity<?> getAll(@RequestParam(value = "search", required = false) String search, Authentication authentication) {
         if (!isAuthorizedToManage(authentication)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Acesso negado."));
         }
         List<Contributor> list = contributorService.getAll(search);
         List<Map<String, Object>> result = list.stream().map(c -> {
@@ -63,38 +63,51 @@ public class ContributorController {
     @PostMapping
     public ResponseEntity<?> create(@RequestBody Contributor contributor, Authentication authentication) {
         if (!isAuthorizedToManage(authentication)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Acesso negado."));
         }
         try {
             return ResponseEntity.ok(contributorService.create(contributor));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Número de contribuinte já existente ou dados inválidos."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erro ao processar o cadastro do contribuinte."));
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id, Authentication authentication) {
         if (!isAuthorizedToManage(authentication)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Acesso negado."));
         }
         try {
             contributorService.delete(id);
             auditLogService.logAction("CONTRIBUTOR_DELETED", authentication.getName(), String.valueOf(id), "Contribuinte removido/desativado.");
             return ResponseEntity.ok().build();
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erro ao remover contribuinte."));
         }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Contributor contributor, Authentication authentication) {
         if (!isAuthorizedToManage(authentication)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Acesso negado."));
         }
         try {
             return ResponseEntity.ok(contributorService.update(id, contributor));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Número de contribuinte já existente ou dados inválidos."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erro ao atualizar o contribuinte."));
         }
     }
 

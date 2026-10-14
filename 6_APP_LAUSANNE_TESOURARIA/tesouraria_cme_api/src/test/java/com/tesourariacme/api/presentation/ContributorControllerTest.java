@@ -96,4 +96,38 @@ public class ContributorControllerTest {
         ResponseEntity<?> response = controller.getAttestationPdf(1L, 2026, readOnlyAuth);
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
+
+    @Test
+    public void testCreateForbidden() {
+        Contributor c = new Contributor();
+        ResponseEntity<?> response = controller.create(c, readOnlyAuth);
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
+    @Test
+    public void testCreateValidationError() {
+        when(service.create(any())).thenThrow(new IllegalArgumentException("Nome completo é obrigatório."));
+        ResponseEntity<?> response = controller.create(new Contributor(), treasurerAuth);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody() instanceof java.util.Map);
+        assertEquals("Nome completo é obrigatório.", ((java.util.Map<?, ?>) response.getBody()).get("message"));
+    }
+
+    @Test
+    public void testCreateDataIntegrityError() {
+        when(service.create(any())).thenThrow(new org.springframework.dao.DataIntegrityViolationException("unique constraint"));
+        ResponseEntity<?> response = controller.create(new Contributor(), treasurerAuth);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody() instanceof java.util.Map);
+        assertEquals("Número de contribuinte já existente ou dados inválidos.", ((java.util.Map<?, ?>) response.getBody()).get("message"));
+    }
+
+    @Test
+    public void testCreateInternalError() {
+        when(service.create(any())).thenThrow(new RuntimeException("database timeout"));
+        ResponseEntity<?> response = controller.create(new Contributor(), treasurerAuth);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertTrue(response.getBody() instanceof java.util.Map);
+        assertEquals("Erro ao processar o cadastro do contribuinte.", ((java.util.Map<?, ?>) response.getBody()).get("message"));
+    }
 }
