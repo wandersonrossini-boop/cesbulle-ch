@@ -55,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final errorMsg = await _authService.login(
-        _usernameController.text,
+        _usernameController.text.trim(),
         _passwordController.text,
       );
 
@@ -178,8 +178,16 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: isRegistering
                     ? null
                     : () async {
-                        if (nameCtrl.text.isEmpty || userCtrl.text.isEmpty || passCtrl.text.isEmpty) {
+                        final trimmedName = nameCtrl.text.trim();
+                        final trimmedUser = userCtrl.text.trim().toLowerCase();
+                        final trimmedPass = passCtrl.text;
+
+                        if (trimmedName.isEmpty || trimmedUser.isEmpty || trimmedPass.isEmpty) {
                           setModalState(() => modalError = 'Preencha todos os campos.');
+                          return;
+                        }
+                        if (trimmedPass.length < 6) {
+                          setModalState(() => modalError = 'A senha deve ter no mínimo 6 caracteres.');
                           return;
                         }
                         setModalState(() {
@@ -188,7 +196,7 @@ class _LoginPageState extends State<LoginPage> {
                         });
 
                         final err = await _authService.register(
-                            nameCtrl.text.trim(), userCtrl.text.trim(), passCtrl.text.trim(), base64Avatar);
+                            trimmedName, trimmedUser, trimmedPass, base64Avatar);
 
                         if (err != null) {
                           setModalState(() {

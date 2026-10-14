@@ -87,4 +87,110 @@ public class UserControllerTest {
         ResponseEntity<?> response = userController.getAllUsers(adminAuth);
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
+
+    @Test
+    public void testRevokeUserBlockedForPastorAccount() {
+        AppUser pastor = new AppUser();
+        pastor.setId(1L);
+        pastor.setUsername("pastor");
+        pastor.setRole("ADMIN");
+        pastor.setAuthorized(true);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(pastor));
+
+        ResponseEntity<?> response = userController.revokeUser(1L, adminAuth);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("não pode ser revogada"));
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    public void testRevokeUserBlockedForAdminRole() {
+        AppUser adminUser = new AppUser();
+        adminUser.setId(2L);
+        adminUser.setUsername("outro_admin");
+        adminUser.setRole("ADMIN");
+        adminUser.setAuthorized(true);
+
+        when(userRepository.findById(2L)).thenReturn(Optional.of(adminUser));
+
+        ResponseEntity<?> response = userController.revokeUser(2L, adminAuth);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("não pode ser revogada"));
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    public void testDeleteUserBlockedForPastorAccount() {
+        AppUser pastor = new AppUser();
+        pastor.setId(1L);
+        pastor.setUsername("pastor");
+        pastor.setRole("ADMIN");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(pastor));
+
+        ResponseEntity<?> response = userController.deleteUser(1L, adminAuth);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("não pode ser excluída"));
+        verify(userRepository, never()).delete(any());
+    }
+
+    @Test
+    public void testDeleteUserBlockedForAdminRole() {
+        AppUser adminUser = new AppUser();
+        adminUser.setId(2L);
+        adminUser.setUsername("outro_admin");
+        adminUser.setRole("ADMIN");
+
+        when(userRepository.findById(2L)).thenReturn(Optional.of(adminUser));
+
+        ResponseEntity<?> response = userController.deleteUser(2L, adminAuth);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("não pode ser excluída"));
+        verify(userRepository, never()).delete(any());
+    }
+
+    @Test
+    public void testRevokeUserSuccessForTreasurer() {
+        AppUser treasurer = new AppUser();
+        treasurer.setId(3L);
+        treasurer.setUsername("tesoureiro_joao");
+        treasurer.setRole("TREASURER");
+        treasurer.setAuthorized(true);
+
+        when(userRepository.findById(3L)).thenReturn(Optional.of(treasurer));
+
+        ResponseEntity<?> response = userController.revokeUser(3L, adminAuth);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertFalse(treasurer.isAuthorized());
+        verify(userRepository).save(treasurer);
+    }
+
+    @Test
+    public void testDeleteUserSuccessForTreasurer() {
+        AppUser treasurer = new AppUser();
+        treasurer.setId(3L);
+        treasurer.setUsername("tesoureiro_joao");
+        treasurer.setRole("TREASURER");
+
+        when(userRepository.findById(3L)).thenReturn(Optional.of(treasurer));
+
+        ResponseEntity<?> response = userController.deleteUser(3L, adminAuth);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(userRepository).delete(treasurer);
+    }
+
+    @Test
+    public void testRevokeUserForbiddenForTreasurerAuth() {
+        ResponseEntity<?> response = userController.revokeUser(3L, treasurerAuth);
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        verify(userRepository, never()).findById(any());
+    }
+
+    @Test
+    public void testDeleteUserForbiddenForTreasurerAuth() {
+        ResponseEntity<?> response = userController.deleteUser(3L, treasurerAuth);
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        verify(userRepository, never()).findById(any());
+    }
 }

@@ -75,21 +75,55 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/auth/**")).permitAll()
                 .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/error")).permitAll()
                 .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/users/me")).authenticated()
-                .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/users/**")).hasRole("ADMIN")
-                .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/audit-logs/**")).hasRole("ADMIN")
-                .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/admin/**")).hasRole("ADMIN")
+                .requestMatchers(
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/users"),
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/users/**")
+                ).hasRole("ADMIN")
+                .requestMatchers(
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/audit-logs"),
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/audit-logs/**")
+                ).hasRole("ADMIN")
+                .requestMatchers(
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/admin"),
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/admin/**")
+                ).hasRole("ADMIN")
                 .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/reports/financial/monthly/lock")).hasRole("ADMIN")
                 .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/reports/financial/monthly/unlock")).hasRole("ADMIN")
+                .requestMatchers(
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.POST, "/api/fechamento-culto"),
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.POST, "/api/fechamento-culto/**")
+                ).hasRole("TREASURER")
+                .requestMatchers(
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.POST, "/api/despesas")
+                ).hasRole("TREASURER")
                 .requestMatchers(
                     org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/contributors"),
                     org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/contributors/**")
                 ).hasAnyRole("ADMIN", "TREASURER")
-                .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/membros/**")).hasAnyRole("ADMIN", "TREASURER")
-                .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/despesas/**")).hasAnyRole("ADMIN", "TREASURER")
-                .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/fechamento-culto/**")).hasAnyRole("ADMIN", "TREASURER")
-                .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/reports/**")).hasAnyRole("ADMIN", "TREASURER")
-                .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/dashboard/**")).hasAnyRole("ADMIN", "TREASURER")
-                .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/movements/**")).hasAnyRole("ADMIN", "TREASURER")
+                .requestMatchers(
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/membros"),
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/membros/**")
+                ).hasAnyRole("ADMIN", "TREASURER")
+                .requestMatchers(
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/despesas"),
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/despesas/**")
+                ).hasAnyRole("ADMIN", "TREASURER")
+                .requestMatchers(
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/fechamento-culto"),
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/fechamento-culto/**")
+                ).hasAnyRole("ADMIN", "TREASURER")
+                .requestMatchers(
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/reports"),
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/reports/**")
+                ).hasAnyRole("ADMIN", "TREASURER")
+                .requestMatchers(
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/dashboard"),
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/dashboard/**")
+                ).hasAnyRole("ADMIN", "TREASURER")
+                .requestMatchers(
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/movements"),
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/movements/**")
+                ).hasAnyRole("ADMIN", "TREASURER")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

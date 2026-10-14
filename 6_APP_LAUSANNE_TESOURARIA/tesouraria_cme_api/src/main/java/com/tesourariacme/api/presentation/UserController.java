@@ -110,6 +110,9 @@ public class UserController {
         if (!isAdmin(authentication)) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 
         return userRepository.findById(id).map(user -> {
+            if ("pastor".equalsIgnoreCase(user.getUsername()) || "ADMIN".equalsIgnoreCase(user.getRole())) {
+                return ResponseEntity.badRequest().body("A conta administrativa principal não pode ser revogada.");
+            }
             user.setAuthorized(false);
             userRepository.save(user);
             return ResponseEntity.ok("Acesso revogado.");
@@ -120,11 +123,13 @@ public class UserController {
     public ResponseEntity<?> deleteUser(@PathVariable Long id, Authentication authentication) {
         if (!isAdmin(authentication)) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 
-        if (userRepository.existsById(id)) {
-            userRepository.deleteById(id);
+        return userRepository.findById(id).map(user -> {
+            if ("pastor".equalsIgnoreCase(user.getUsername()) || "ADMIN".equalsIgnoreCase(user.getRole())) {
+                return ResponseEntity.badRequest().body("A conta administrativa principal não pode ser excluída.");
+            }
+            userRepository.delete(user);
             return ResponseEntity.ok("Usuário removido.");
-        }
-        return ResponseEntity.notFound().build();
+        }).orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}/reset-password")
@@ -144,14 +149,14 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<AppUser> getMyProfile(Authentication authentication) {
-        return userRepository.findByUsername(authentication.getName())
+        return userRepository.findByUsernameIgnoreCase(authentication.getName())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/me")
     public ResponseEntity<?> updateMyProfile(@RequestBody ProfileUpdateRequest request, Authentication authentication) {
-        return userRepository.findByUsername(authentication.getName()).map(user -> {
+        return userRepository.findByUsernameIgnoreCase(authentication.getName()).map(user -> {
             if (request.getName() != null) user.setName(request.getName());
             if (request.getAvatarBase64() != null) user.setAvatarBase64(request.getAvatarBase64());
             if (request.getNewPassword() != null && !request.getNewPassword().isEmpty()) {

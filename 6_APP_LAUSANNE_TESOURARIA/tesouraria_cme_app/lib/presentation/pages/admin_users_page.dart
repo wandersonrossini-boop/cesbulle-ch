@@ -37,6 +37,10 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
 
   
   Future<void> _deleteUser(AppUser user) async {
+    if (user.username.toLowerCase() == 'pastor' || user.role.toUpperCase() == 'ADMIN') {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('A conta administrativa principal não pode ser excluída.')));
+      return;
+    }
     try {
       await _apiService.deleteUser(user.id);
       _loadUsers();
@@ -45,7 +49,8 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro: $e')));
     }
   }
-Future<void> _approveUser(AppUser user) async {
+
+  Future<void> _approveUser(AppUser user) async {
     try {
       await _apiService.approveUser(user.id);
       _loadUsers();
@@ -56,6 +61,10 @@ Future<void> _approveUser(AppUser user) async {
   }
 
   Future<void> _revokeUser(AppUser user) async {
+    if (user.username.toLowerCase() == 'pastor' || user.role.toUpperCase() == 'ADMIN') {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('A conta administrativa principal não pode ser revogada.')));
+      return;
+    }
     try {
       await _apiService.revokeUser(user.id);
       _loadUsers();
@@ -144,6 +153,7 @@ Future<void> _approveUser(AppUser user) async {
       itemCount: list.length,
       itemBuilder: (context, index) {
         final u = list[index];
+        final isMasterAdmin = u.username.toLowerCase() == 'pastor' || u.role.toUpperCase() == 'ADMIN';
         return Card(
           margin: const EdgeInsets.only(bottom: 8),
           child: ListTile(
@@ -157,26 +167,60 @@ Future<void> _approveUser(AppUser user) async {
             title: Text(u.name, style: const TextStyle(fontWeight: FontWeight.bold)),
             subtitle: Text('@${u.username} • ${u.role == 'ADMIN' ? 'Administrador' : 'Tesoureiro'}'),
             trailing: isPending
-                ? Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextButton(
-                        onPressed: () => _deleteUser(u),
-                        child: const Text('Rejeitar', style: TextStyle(color: AppTheme.excludeRed)),
-                      ),
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: () => _approveUser(u),
-                        style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryGreen),
-                        child: const Text('Aprovar', style: TextStyle(color: Colors.white)),
-                      ),
-                    ],
-                  )
-                : TextButton.icon(
-                      icon: const Icon(Icons.block, color: AppTheme.excludeRed, size: 18),
-                      label: const Text('Desativar acesso', style: TextStyle(color: AppTheme.excludeRed)),
-                      onPressed: () => _revokeUser(u),
-                    ),
+                ? (isMasterAdmin
+                    ? Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFCBD5E1)),
+                        ),
+                        child: const Text(
+                          'Conta Protegida',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.institutionalBlue,
+                          ),
+                        ),
+                      )
+                    : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextButton(
+                            onPressed: () => _deleteUser(u),
+                            child: const Text('Rejeitar', style: TextStyle(color: AppTheme.excludeRed)),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: () => _approveUser(u),
+                            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryGreen),
+                            child: const Text('Aprovar', style: TextStyle(color: Colors.white)),
+                          ),
+                        ],
+                      ))
+                : (isMasterAdmin
+                    ? Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFCBD5E1)),
+                        ),
+                        child: const Text(
+                          'Conta Protegida',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.institutionalBlue,
+                          ),
+                        ),
+                      )
+                    : TextButton.icon(
+                        icon: const Icon(Icons.block, color: AppTheme.excludeRed, size: 18),
+                        label: const Text('Desativar acesso', style: TextStyle(color: AppTheme.excludeRed)),
+                        onPressed: () => _revokeUser(u),
+                      )),
           ),
         );
       },

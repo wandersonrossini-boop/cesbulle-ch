@@ -110,18 +110,19 @@ class _AppSidebarDrawerState extends State<AppSidebarDrawer> {
                     );
                   },
                 ),
-                _buildMenuItem(
-                  context: context,
-                  icon: Icons.add_circle_outline_rounded,
-                  title: 'Novo fechamento',
-                  isActive: widget.activeRoute == 'fechamento',
-                  onTap: () {
-                    if (!widget.permanent) Navigator.pop(context);
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (_) => const WizardPage()),
-                    );
-                  },
-                ),
+                if (_user?.role != 'ADMIN')
+                  _buildMenuItem(
+                    context: context,
+                    icon: Icons.add_circle_outline_rounded,
+                    title: 'Novo fechamento',
+                    isActive: widget.activeRoute == 'fechamento',
+                    onTap: () {
+                      if (!widget.permanent) Navigator.pop(context);
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (_) => const WizardPage()),
+                      );
+                    },
+                  ),
                 _buildMenuItem(
                   context: context,
                   icon: Icons.receipt_long_rounded,

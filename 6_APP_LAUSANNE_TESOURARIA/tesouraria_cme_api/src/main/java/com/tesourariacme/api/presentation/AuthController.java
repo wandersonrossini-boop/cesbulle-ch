@@ -33,35 +33,51 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        logger.info(">>> API RECEBEU TENTATIVA DE LOGIN. Username exato recebido: '{}'", request.getUsername());
+        if (request.getUsername() == null || request.getUsername().trim().isEmpty() ||
+            request.getPassword() == null || request.getPassword().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas.");
+        }
+        String normalizedUsername = request.getUsername().trim().toLowerCase();
+        logger.info(">>> API RECEBEU TENTATIVA DE LOGIN. Username normalizado: '{}'", normalizedUsername);
         try {
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+                    new UsernamePasswordAuthenticationToken(normalizedUsername, request.getPassword())
             );
 
             // Se chegou aqui, as credenciais estão corretas e isAuthorized = true (ver CustomUserDetailsService)
-            String token = jwtUtil.generateToken(request.getUsername());
-            logger.info(">>> LOGIN BEM-SUCEDIDO para '{}'", request.getUsername());
+            String token = jwtUtil.generateToken(normalizedUsername);
+            logger.info(">>> LOGIN BEM-SUCEDIDO para '{}'", normalizedUsername);
             return ResponseEntity.ok(new LoginResponse(token));
         } catch (org.springframework.security.authentication.DisabledException e) {
-            logger.error(">>> LOGIN FALHOU (DisabledException) para '{}': {}", request.getUsername(), e.getMessage());
+            logger.error(">>> LOGIN FALHOU (DisabledException) para '{}': {}", normalizedUsername, e.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Usuário aguardando aprovação do Admin.");
         } catch (Exception e) {
-            logger.error(">>> LOGIN FALHOU (Exception) para '{}': {}", request.getUsername(), e.getMessage());
+            logger.error(">>> LOGIN FALHOU (Exception) para '{}': {}", normalizedUsername, e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Credenciais inválidas para o usuário: [" + request.getUsername() + "]");
+                    .body("Credenciais inválidas para o usuário: [" + normalizedUsername + "]");
         }
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+        if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Nome de usuário é obrigatório.");
+        }
+        if (request.getName() == null || request.getName().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Nome completo é obrigatório.");
+        }
+        if (request.getPassword() == null || request.getPassword().trim().length() < 6) {
+            return ResponseEntity.badRequest().body("A senha deve conter no mínimo 6 caracteres.");
+        }
+
+        String normalizedUsername = request.getUsername().trim().toLowerCase();
+        if (userRepository.findByUsernameIgnoreCase(normalizedUsername).isPresent()) {
             return ResponseEntity.badRequest().body("Usuário já existe.");
         }
 
         AppUser newUser = new AppUser();
-        newUser.setUsername(request.getUsername());
-        newUser.setName(request.getName());
+        newUser.setUsername(normalizedUsername);
+        newUser.setName(request.getName().trim());
         newUser.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         newUser.setRole("TREASURER");
         newUser.setAuthorized(false); // Aguardando aprovação
