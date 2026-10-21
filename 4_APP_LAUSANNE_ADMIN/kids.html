@@ -129,19 +129,29 @@
         let currentAgeFilter = '0-3';
         let windowDocs = [];
 
+        let isKidsInitialized = false;
+
+        function initKidsMonitor() {
+            if (isKidsInitialized) return;
+            isKidsInitialized = true;
+            db.collection('attendance')
+                .where('type', '==', 'kids')
+                .onSnapshot(snap => {
+                    windowDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    renderLists();
+                }, err => {
+                    console.error("Kids Monitor sync error:", err);
+                });
+        }
+
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 initKidsMonitor();
             }
         });
 
-        function initKidsMonitor() {
-            db.collection('attendance')
-                .where('type', '==', 'kids')
-                .onSnapshot(snap => {
-                    windowDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                    renderLists();
-                });
+        if (firebase.auth().currentUser) {
+            initKidsMonitor();
         }
 
         function setAgeFilter(filter) {

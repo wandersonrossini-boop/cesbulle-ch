@@ -1,0 +1,1886 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gabinete Pastoral</title>
+    <link rel="icon" type="image/png" href="assets/logo_3.png?v=70.3.53">
+
+    <!-- Firebase e Lógica Base -->
+    <script src="js/firebase-config.js?v=70.3.79"></script>
+    <script src="js/auth-manager.js?v=70.3.79"></script>
+    <script src="js/ui.js?v=70.4.0"></script>
+    <script src="js/reception_kids_logic.js?v=70.3.79"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* === DIAMOND DARK CORE v70.3.36 === */
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800;900&display=swap');
+        
+        :root {
+            --bg: #060608;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --gold: #C9A050;
+            --gold-dim: rgba(201, 160, 80, 0.1);
+            --text: #e8dcc8;
+            --text-dim: #94a3b8;
+            --border: rgba(201, 160, 80, 0.15);
+            --font: 'Outfit', sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; background-color: var(--bg); color: var(--text); font-family: var(--font); overflow-x: hidden; }
+        
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; opacity: 0.3; }
+        ::-webkit-scrollbar-thumb:hover { background: #fff; }
+
+        /* HEADER */
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 25px; background: rgba(0,0,0,0.8); border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(10px);
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); display: flex; align-items: center; justify-content: center;
+            z-index: 99999;
+        }
+        
+        .login-box {
+            background: #111; padding: 40px; border-radius: 20px;
+            border: 1px solid var(--gold); width: 90%; max-width: 400px;
+            text-align: center; box-shadow: 0 20px 50px rgba(201, 160, 80, 0.2);
+        }
+
+        input, select, textarea {
+            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #333;
+            background: #000; color: #fff; outline: none; font-family: 'Outfit';
+            margin-bottom: 15px; font-size: 1rem;
+        }
+        
+        input:focus, textarea:focus, select:focus { border-color: var(--gold); }
+
+        .btn-gold {
+            background: var(--gold); color: #000; font-weight: 800; border: none;
+            padding: 12px 20px; border-radius: 10px; cursor: pointer;
+            width: 100%; font-size: 1rem; text-transform: uppercase;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-gold:hover { background: #d4af37; }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+            padding: 0 20px 50px 20px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .kpi-row {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px; padding: 20px; max-width: 1400px; margin: 0 auto;
+        }
+
+        .kpi-card {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 20px; border-radius: 15px; text-align: center;
+            border: 1px solid #334155;
+        }
+
+        .kpi-number {
+            font-size: 2.5rem; font-weight: 900; color: var(--gold);
+        }
+
+        /* Modal Nova Diretriz */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: #1e293b; width: 90%; max-width: 500px; padding: 30px;
+            border-radius: 20px; border: 1px solid #334155;
+        }
+
+        /* SIDEBAR STYLING */
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 260px;
+            background: #0b0b0d;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+        .sidebar-brand {
+            padding: 10px 25px 25px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 0 15px;
+            flex: 1;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-decoration: none;
+            border: 1px solid transparent;
+        }
+        .nav-item:hover, .nav-item.active {
+            color: #fff;
+            background: var(--gold-dim);
+            border-color: var(--border);
+        }
+        .nav-item i {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: #060608;
+        }
+        .page-content {
+            display: none;
+            padding: 25px;
+        }
+        .page-content.active {
+            display: block;
+        }
+
+        /* TABLE STYLES */
+        .premium-table {
+            width: 100%; border-collapse: collapse; margin-top: 15px;
+        }
+        .premium-table th, .premium-table td {
+            padding: 15px; text-align: left; border-bottom: 1px solid var(--border);
+        }
+        .premium-table th {
+            color: var(--gold); font-weight: 700; text-transform: uppercase; font-size: 0.85rem;
+        }
+        .premium-table tr:hover {
+            background: rgba(255,255,255,0.01);
+        }
+
+        /* WIZARD STYLES */
+        .wizard-steps {
+            display: flex; justify-content: space-between; margin-bottom: 30px;
+            border-bottom: 1px solid var(--border); padding-bottom: 15px;
+        }
+        .wizard-step {
+            flex: 1; text-align: center; color: var(--text-dim); font-weight: 700;
+            font-size: 0.9rem; padding: 10px; border-bottom: 2px solid transparent;
+        }
+        .wizard-step.active {
+            color: var(--gold); border-bottom-color: var(--gold);
+        }
+        .wizard-form-step {
+            display: none;
+        }
+        .wizard-form-step.active {
+            display: block;
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1100px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 900px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .mobile-menu-btn {
+                display: flex !important;
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TELA DE LOGIN PRIVADA -->
+    <div id="login-screen" class="login-overlay" style="display:none;">
+        <div class="login-box">
+            <h2 style="margin-top:0; color:var(--gold);"><i class="fas fa-chess-king"></i> Gabinete Pastoral</h2>
+            <p style="color:var(--text-dim); font-size:0.9rem; margin-bottom:25px;">Acesso restrito à Liderança Master.</p>
+            
+            <input type="password" id="gabinete-pin" placeholder="PIN de Acesso" style="text-align:center; letter-spacing:3px; font-size:1.2rem;">
+            <button class="btn-gold" onclick="fazerLogin()"><i class="fas fa-lock"></i> Entrar no Gabinete</button>
+            <div id="login-error" style="color:#ef4444; font-size:0.8rem; margin-top:15px;"></div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="app-container" style="display:none;" class="dashboard-layout">
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <img src="assets/logo_3.png" height="35" style="filter: drop-shadow(0 0 5px rgba(201, 160, 80, 0.3));">
+                <h1 style="font-size: 1.1rem; margin: 0; font-weight: 800; letter-spacing: 1px; color:#fff;">CES LAUSANNE</h1>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-item active" onclick="switchPage('dashboard')" id="nav-dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="switchPage('lideres')" id="nav-lideres">
+                    <i class="fas fa-users"></i>
+                    <span>Líderes</span>
+                </div>
+                <div class="nav-item" onclick="switchPage('ministerios')" id="nav-ministerios">
+                    <i class="fas fa-sitemap"></i>
+                    <span>Ministérios</span>
+                </div>
+                <div class="nav-item" onclick="switchPage('ordens')" id="nav-ordens">
+                    <i class="fas fa-tasks"></i>
+                    <span>Ordens</span>
+                </div>
+                <div class="nav-item" onclick="switchPage('ata')" id="nav-ata">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Ata Digital</span>
+                </div>
+                <div class="nav-item" onclick="switchPage('diretrizes')" id="nav-diretrizes">
+                    <i class="fas fa-scroll"></i>
+                    <span>Diretrizes</span>
+                </div>
+                <div class="nav-item" onclick="switchPage('escalas')" id="nav-escalas">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Escala de Cultos</span>
+                </div>
+                <div class="nav-item" onclick="switchPage('relatorios')" id="nav-relatorios">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Relatórios</span>
+                </div>
+                <div class="nav-item" onclick="switchPage('settings')" id="nav-settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Configurações</span>
+                </div>
+            </nav>
+
+            <div style="padding:0 15px 20px;">
+                <div class="nav-item" onclick="AuthManager.logout()" style="color:#ef4444;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Sair</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            <div class="top-bar">
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <div class="mobile-menu-btn" onclick="toggleSidebar()" style="display:none; align-items:center; justify-content:center; background:var(--gold); color:#000; width:40px; height:40px; border-radius:8px; cursor:pointer;">
+                        <i class="fas fa-bars"></i>
+                    </div>
+                    <h2 style="margin:0; font-size:1.3rem; color:var(--gold); font-weight:800;" id="current-page-title">Dashboard</h2>
+                </div>
+                <div style="display:flex; align-items:center; gap:20px;">
+                    <div style="position:relative; cursor:pointer;" onclick="alert('Nenhuma notificação nova no momento.')">
+                        <i class="fas fa-bell" style="font-size:1.2rem; color:var(--gold);"></i>
+                        <span style="position:absolute; top:-8px; right:-8px; background:#ef4444; color:#fff; font-size:0.7rem; font-weight:800; border-radius:50%; width:16px; height:16px; display:flex; align-items:center; justify-content:center;">8</span>
+                    </div>
+                    <button onclick="AuthManager.logout()" style="background:transparent; color:#ef4444; border:1px solid #ef4444; padding:8px 15px; border-radius:8px; cursor:pointer; font-weight:800;"><i class="fas fa-sign-out-alt"></i> Sair</button>
+                </div>
+            </div>
+
+            <!-- PAGE: DASHBOARD -->
+            <div id="page-dashboard" class="page-content active">
+                <!-- KPIs -->
+                <div class="kpi-row" style="padding:0; margin-bottom:25px;">
+                    <div class="kpi-card">
+                        <div class="kpi-number" id="kpi-lideres">0</div>
+                        <div style="font-size:0.8rem; color:var(--text-dim); text-transform:uppercase; font-weight:800; letter-spacing:1px; margin-top:5px;">Líderes Ativos</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-number" id="kpi-ministerios">0</div>
+                        <div style="font-size:0.8rem; color:var(--text-dim); text-transform:uppercase; font-weight:800; letter-spacing:1px; margin-top:5px;">Ministérios</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-number" id="kpi-igreja">0</div>
+                        <div style="font-size:0.8rem; color:var(--text-dim); text-transform:uppercase; font-weight:800; letter-spacing:1px; margin-top:5px;">Igreja</div>
+                    </div>
+                </div>
+
+                <!-- TOP QUICK ESCALA AD -->
+                <div class="glass-card" style="margin-bottom:25px; background: linear-gradient(135deg, rgba(201, 160, 80, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
+                        <div>
+                            <h3 style="margin:0; color:var(--gold); font-size:1.2rem; font-weight:800; text-transform:uppercase;"><i class="fas fa-calendar-day"></i> Escala de Cultos</h3>
+                            <p style="margin:5px 0 0 0; color:var(--text-dim); font-size:0.85rem;">Gerencie as escalas dos próximos cultos da igreja e compartilhe com as equipes.</p>
+                        </div>
+                        <button class="btn-gold" style="width:auto; padding:10px 20px;" onclick="openNovaEscala()"><i class="fas fa-plus"></i> Nova Escala</button>
+                    </div>
+                </div>
+
+                <!-- 3 COLUMNS -->
+                <div class="dashboard-grid" style="padding:0;">
+                    <!-- COLUMN 1: ATA DIGITAL -->
+                    <div class="glass-card">
+                        <h3 style="margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px; color:var(--gold);"><i class="fas fa-history"></i> Ata Digital (Real-Time)</h3>
+                        <div id="ata-digital-feed" style="overflow-y:auto; max-height:450px; padding-right:5px;">
+                            <div style="text-align:center; padding:20px; color:var(--text-dim);">Carregando feed...</div>
+                        </div>
+                    </div>
+
+                    <!-- COLUMN 2: DIRETRIZES -->
+                    <div class="glass-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:15px;">
+                            <h3 style="margin:0; color:var(--gold);"><i class="fas fa-paper-plane"></i> Diretrizes Pastorais</h3>
+                            <button onclick="document.getElementById('modal-nova-diretriz').style.display='flex'" style="background:var(--gold-dim); border:1px solid var(--border); color:#fff; border-radius:8px; padding:5px 10px; cursor:pointer; font-size:0.8rem; font-weight:800;"><i class="fas fa-plus"></i> Despachar</button>
+                        </div>
+                        <div style="flex:1; display:flex; flex-direction:column; gap:15px; overflow-y:auto; max-height:450px;">
+                            <h4 style="margin:0; font-size:0.85rem; text-transform:uppercase; color:var(--gold);">Enviadas / Ativas</h4>
+                            <div id="gabinete-active-list" style="overflow-y:auto;">
+                                <div style="text-align:center; padding:20px; color:var(--text-dim);">Carregando diretrizes...</div>
+                            </div>
+                            <h4 style="margin:20px 0 0 0; font-size:0.85rem; text-transform:uppercase; color:var(--text-dim); border-top:1px solid var(--border); padding-top:15px;">Histórico (Concluídas)</h4>
+                            <div id="gabinete-history-list" style="overflow-y:auto;"></div>
+                        </div>
+                    </div>
+
+                    <!-- COLUMN 3: ESCALAS SUMMARY -->
+                    <div class="glass-card">
+                        <h3 style="margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px; color:var(--gold);"><i class="fas fa-calendar-alt"></i> Escala de Cultos</h3>
+                        <div style="flex:1; display:flex; flex-direction:column; gap:15px; overflow-y:auto; max-height:450px;">
+                            <h4 style="margin:0; font-size:0.85rem; text-transform:uppercase; color:var(--gold);">Próximos Cultos</h4>
+                            <div id="dashboard-proximos-cultos">
+                                <div style="text-align:center; padding:15px; color:var(--text-dim); font-size:0.85rem;">Carregando...</div>
+                            </div>
+                            <h4 style="margin:20px 0 0 0; font-size:0.85rem; text-transform:uppercase; color:var(--text-dim); border-top:1px solid var(--border); padding-top:15px;">Escalas Recentes</h4>
+                            <div id="dashboard-recentes-cultos">
+                                <div style="text-align:center; padding:15px; color:var(--text-dim); font-size:0.85rem;">Carregando...</div>
+                            </div>
+                            <div style="margin-top:15px; text-align:center;">
+                                <a href="javascript:void(0)" onclick="switchPage('escalas')" style="color:var(--gold); font-size:0.9rem; font-weight:800; text-decoration:none;">Ver todas as escalas <i class="fas fa-chevron-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE: ESCALAS (List View) -->
+            <div id="page-escalas" class="page-content">
+                <div class="glass-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:15px;">
+                        <div>
+                            <h3 style="margin:0; color:var(--gold); font-size:1.5rem;"><i class="fas fa-calendar-alt"></i> Gerenciamento de Escalas</h3>
+                            <p style="margin:5px 0 0 0; color:var(--text-dim); font-size:0.9rem;">Histórico completo e agendamentos de escalas de culto.</p>
+                        </div>
+                        <button class="btn-gold" style="width:auto; padding:10px 20px;" onclick="openNovaEscala()"><i class="fas fa-plus"></i> Criar Nova Escala</button>
+                    </div>
+
+                    <div style="overflow-x:auto;">
+                        <table class="premium-table">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Culto</th>
+                                    <th>Dirigente</th>
+                                    <th>Tipo</th>
+                                    <th>Status</th>
+                                    <th style="text-align:right;">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="escalas-table-body">
+                                <tr>
+                                    <td colspan="6" style="text-align:center; color:var(--text-dim); padding:40px;">Carregando escalas salvas...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE: NOVA ESCALA (Wizard View) -->
+            <div id="page-nova-escala" class="page-content">
+                <div class="glass-card" style="max-width:900px; margin:0 auto;">
+                    <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
+                        <button onclick="switchPage('escalas')" style="background:transparent; border:1px solid var(--border); color:#fff; width:35px; height:35px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="fas fa-arrow-left"></i></button>
+                        <div>
+                            <h3 style="margin:0; color:var(--gold); font-size:1.4rem;" id="wizard-title">Nova Escala de Culto</h3>
+                            <p style="margin:2px 0 0 0; color:var(--text-dim); font-size:0.85rem;">Preencha os detalhes e a programação oficial do culto.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step Tracker -->
+                    <div class="wizard-steps">
+                        <div class="wizard-step active" id="wstep-1">1. Informações</div>
+                        <div class="wizard-step" id="wstep-2">2. Programação</div>
+                        <div class="wizard-step" id="wstep-3">3. Participantes</div>
+                        <div class="wizard-step" id="wstep-4">4. Revisão</div>
+                    </div>
+
+                    <!-- Hidden Edit ID -->
+                    <input type="hidden" id="escala-id">
+
+                    <!-- STEP 1: INFORMAÇÕES -->
+                    <div class="wizard-form-step active" id="wform-1">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Nome do Culto</label>
+                                <input type="text" id="escala-nome" placeholder="Ex: Culto das Primícias">
+                            </div>
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Tipo de Culto</label>
+                                <select id="escala-tipo-culto" onchange="prefillProgramacao()">
+                                    <option value="Outro">Outro (Manual)</option>
+                                    <option value="Domingo Manhã">Domingo Manhã (Culto das Primícias)</option>
+                                    <option value="Domingo Noite">Domingo Noite (Celebração)</option>
+                                    <option value="Terça-feira">Terça-feira (Ensino/Alicerce)</option>
+                                    <option value="Sexta-feira">Sexta-feira (Clamor)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:15px; margin-top:10px;">
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Data</label>
+                                <input type="date" id="escala-data">
+                            </div>
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Horário de Início</label>
+                                <input type="time" id="escala-horario">
+                            </div>
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Local</label>
+                                <input type="text" id="escala-local" value="Templo Sede">
+                            </div>
+                        </div>
+
+                        <div style="margin-top:10px;">
+                            <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Tema / Descrição</label>
+                            <input type="text" id="escala-tema" placeholder="Ex: Provai e vede que o Senhor é bom.">
+                        </div>
+
+                        <div style="margin-top:10px;">
+                            <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Dirigente do Culto</label>
+                            <input type="text" id="escala-dirigente" placeholder="Ex: Pb. Binho Ribeiro">
+                        </div>
+
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:10px;">
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Repetir escala?</label>
+                                <select id="escala-repetir">
+                                    <option value="Não">Não repetir</option>
+                                    <option value="Semanal">Semanalmente</option>
+                                    <option value="Mensal">Mensalmente</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Publicar escala?</label>
+                                <select id="escala-status">
+                                    <option value="Publicada">Sim - Disponível no Altar e Geral</option>
+                                    <option value="Rascunho">Não - Salvar como Rascunho</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:10px;">
+                            <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Observações</label>
+                            <textarea id="escala-obs" rows="3" placeholder="Avisos gerais ou observações da escala..."></textarea>
+                        </div>
+
+                        <div style="display:flex; justify-content:flex-end; margin-top:20px;">
+                            <button class="btn-gold" style="width:auto; padding:12px 30px;" onclick="goToStep(2)">Próximo <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: PROGRAMAÇÃO -->
+                    <div class="wizard-form-step" id="wform-2">
+                        <p style="color:var(--text-dim); font-size:0.9rem; margin-bottom:20px;">Adicione as atividades e momentos do culto na ordem sequencial.</p>
+                        
+                        <div id="escala-itens-container">
+                            <!-- Injected rows of program items -->
+                        </div>
+
+                        <button onclick="addProgramacaoRow()" style="background:transparent; border:1px dashed var(--gold); color:var(--gold); border-radius:10px; padding:12px; cursor:pointer; width:100%; font-weight:700; margin-top:10px;"><i class="fas fa-plus"></i> Adicionar Atividade</button>
+
+                        <div style="display:flex; justify-content:space-between; margin-top:30px;">
+                            <button onclick="goToStep(1)" style="background:transparent; border:1px solid var(--border); color:#fff; padding:12px 25px; border-radius:10px; cursor:pointer;"><i class="fas fa-arrow-left"></i> Voltar</button>
+                            <button class="btn-gold" style="width:auto; padding:12px 30px;" onclick="goToStep(3)">Próximo <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: PARTICIPANTES -->
+                    <div class="wizard-form-step" id="wform-3">
+                        <p style="color:var(--text-dim); font-size:0.9rem; margin-bottom:20px;">Defina os responsáveis pelas demais equipes de apoio no culto.</p>
+                        
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Ministério de Louvor</label>
+                                <input type="text" id="escala-part-louvor" placeholder="Ex: Banda Lausanne e Backs">
+                            </div>
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Sonoplastia / Mídia / Projeção</label>
+                                <input type="text" id="escala-part-midia" placeholder="Ex: Equipe de Mídia">
+                            </div>
+                        </div>
+
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:10px;">
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Recepção / Diaconato</label>
+                                <input type="text" id="escala-part-recepcao" placeholder="Ex: Pb. Binho e Diáconos">
+                            </div>
+                            <div>
+                                <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Kids (Espaço Crianças)</label>
+                                <input type="text" id="escala-part-kids" placeholder="Ex: Ministério Infantil">
+                            </div>
+                        </div>
+
+                        <div style="margin-top:10px;">
+                            <label style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">Intercessão / Oração Apoio</label>
+                            <input type="text" id="escala-part-intercessao" placeholder="Ex: Equipe de Clamor">
+                        </div>
+
+                        <div style="display:flex; justify-content:space-between; margin-top:30px;">
+                            <button onclick="goToStep(2)" style="background:transparent; border:1px solid var(--border); color:#fff; padding:12px 25px; border-radius:10px; cursor:pointer;"><i class="fas fa-arrow-left"></i> Voltar</button>
+                            <button class="btn-gold" style="width:auto; padding:12px 30px;" onclick="goToStep(4)">Próximo <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: REVISÃO -->
+                    <div class="wizard-form-step" id="wform-4">
+                        <p style="color:var(--text-dim); font-size:0.9rem; margin-bottom:20px;">Confira a visualização final da folha de escala de culto antes de salvar.</p>
+                        
+                        <!-- Page Preview Box (reproducing the sage sheet look in miniature) -->
+                        <div id="escala-preview-sheet" style="background:#b3d2be; color:#000; border-radius:15px; padding:35px; margin-bottom:25px; box-shadow:0 15px 40px rgba(0,0,0,0.4); font-family:'Outfit';">
+                            <!-- Rendered preview content matching design -->
+                        </div>
+
+                        <div style="display:flex; justify-content:space-between; margin-top:30px;">
+                            <button onclick="goToStep(3)" style="background:transparent; border:1px solid var(--border); color:#fff; padding:12px 25px; border-radius:10px; cursor:pointer;"><i class="fas fa-arrow-left"></i> Voltar</button>
+                            <button class="btn-gold" style="width:auto; padding:12px 35px; background:#10b981; color:#fff;" id="btn-salvar-escala" onclick="salvarEscalaCompleta()"><i class="fas fa-save"></i> Salvar e Publicar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OTHER PAGES PLACEHOLDERS -->
+            <div id="page-lideres" class="page-content">
+                <div class="glass-card">
+                    <h3 style="color:var(--gold); border-bottom:1px solid var(--border); padding-bottom:10px;"><i class="fas fa-users"></i> Gestão de Líderes</h3>
+                    <p style="color:var(--text-dim); margin-top:10px;">Aqui estão listados os líderes ativos em nossa base de dados.</p>
+                    <div style="overflow-x:auto; margin-top:20px;">
+                        <table class="premium-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Função</th>
+                                    <th>E-mail</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lideres-table-body">
+                                <tr><td colspan="4" style="text-align:center; color:var(--text-dim);">Carregando líderes...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-ministerios" class="page-content">
+                <div class="glass-card">
+                    <h3 style="color:var(--gold); border-bottom:1px solid var(--border); padding-bottom:10px;"><i class="fas fa-sitemap"></i> Ministérios Lausanne</h3>
+                    <p style="color:var(--text-dim); margin-top:10px;">Estrutura organizacional dos departamentos e ministérios cadastrados.</p>
+                    <div style="overflow-x:auto; margin-top:20px;">
+                        <table class="premium-table">
+                            <thead>
+                                <tr>
+                                    <th>Ministério</th>
+                                    <th>Pilar / Área</th>
+                                    <th>Líder Responsável</th>
+                                    <th>Membros Ativos</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ministerios-table-body">
+                                <tr><td colspan="4" style="text-align:center; color:var(--text-dim);">Carregando ministérios...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-ordens" class="page-content">
+                <div class="glass-card">
+                    <h3 style="color:var(--gold); border-bottom:1px solid var(--border); padding-bottom:10px;"><i class="fas fa-tasks"></i> Ordens Pastorais</h3>
+                    <p style="color:var(--text-dim); margin-top:10px;">Acompanhamento das tarefas e diretrizes encaminhadas à Secretaria.</p>
+                    <div id="ordens-gabinete-list" style="margin-top:20px;"></div>
+                </div>
+            </div>
+
+            <div id="page-ata" class="page-content">
+                <div class="glass-card">
+                    <h3 style="color:var(--gold); border-bottom:1px solid var(--border); padding-bottom:10px;"><i class="fas fa-clipboard-list"></i> Ata Digital Completa</h3>
+                    <p style="color:var(--text-dim); margin-top:10px;">Histórico detalhado em tempo real de logs de recepção, decisões e eventos.</p>
+                    <div id="ata-digital-feed-completa" style="margin-top:20px; overflow-y:auto; max-height:600px;"></div>
+                </div>
+            </div>
+
+            <div id="page-diretrizes" class="page-content">
+                <div class="glass-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:20px;">
+                        <h3 style="margin:0; color:var(--gold);"><i class="fas fa-scroll"></i> Despacho de Diretrizes</h3>
+                        <button class="btn-gold" style="width:auto; padding:8px 20px;" onclick="document.getElementById('modal-nova-diretriz').style.display='flex'"><i class="fas fa-plus"></i> Despachar Diretriz</button>
+                    </div>
+                    <p style="color:var(--text-dim);">Envie ordens e instruções diretamente ao painel da secretaria e acompanhe a resolução.</p>
+                    
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:20px;">
+                        <div>
+                            <h4 style="color:var(--gold); margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:10px;">Ativas</h4>
+                            <div id="diretrizes-page-ativas"></div>
+                        </div>
+                        <div>
+                            <h4 style="color:var(--text-dim); margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:10px;">Concluídas</h4>
+                            <div id="diretrizes-page-concluidas"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-relatorios" class="page-content">
+                <div class="glass-card">
+                    <h3 style="color:var(--gold); border-bottom:1px solid var(--border); padding-bottom:10px;"><i class="fas fa-chart-bar"></i> Relatórios Gerais</h3>
+                    <p style="color:var(--text-dim); margin-top:10px;">Acesso a relatórios demográficos, frequência nos cultos e novos visitantes.</p>
+                    <div style="display:flex; align-items:center; justify-content:center; padding:100px 0; border:1px dashed var(--border); border-radius:15px; margin-top:20px;">
+                        <div style="text-align:center; color:var(--text-dim);">
+                            <i class="fas fa-tools" style="font-size:3rem; color:var(--gold); margin-bottom:15px;"></i>
+                            <h4>Módulo de Inteligência de Relatórios</h4>
+                            <p style="font-size:0.85rem; margin-top:5px;">Esta seção estará disponível na próxima atualização do sistema.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-settings" class="page-content">
+                <div class="glass-card">
+                    <h3 style="color:var(--gold); border-bottom:1px solid var(--border); padding-bottom:10px;"><i class="fas fa-cog"></i> Configurações do Gabinete</h3>
+                    <p style="color:var(--text-dim); margin-top:10px;">Gerencie as chaves de acesso, PINs de autenticação e opções da conta pastoral.</p>
+                    <div style="display:flex; align-items:center; justify-content:center; padding:100px 0; border:1px dashed var(--border); border-radius:15px; margin-top:20px;">
+                        <div style="text-align:center; color:var(--text-dim);">
+                            <i class="fas fa-user-shield" style="font-size:3rem; color:var(--gold); margin-bottom:15px;"></i>
+                            <h4>Configurações de Segurança e Acesso</h4>
+                            <p style="font-size:0.85rem; margin-top:5px;">Para alterar chaves master ou dados cadastrais, acesse o painel master do servidor.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL NOVA DIRETRIZ -->
+    <div id="modal-nova-diretriz" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-top:0; color:var(--gold);"><i class="fas fa-paper-plane"></i> Despachar Diretriz</h3>
+            <label style="color:#94a3b8; font-size:0.8rem;">Tipo de Ordem</label>
+            <select id="gabinete-tipo">
+                <option value="Escala de Culto">Escala de Culto</option>
+                <option value="Pedido Administrativo">Pedido Administrativo</option>
+                <option value="Reunião Agendada">Agendar Reunião</option>
+                <option value="Aviso Crítico">Aviso Crítico</option>
+            </select>
+
+            <label style="color:#94a3b8; font-size:0.8rem;">Título / Resumo</label>
+            <input type="text" id="gabinete-titulo" placeholder="Ex: Escala de Louvor (Domingo)">
+
+            <label style="color:#94a3b8; font-size:0.8rem;">Instruções Detalhadas</label>
+            <textarea id="gabinete-desc" rows="4" placeholder="O que a secretaria deve fazer?"></textarea>
+
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button class="btn-gold" onclick="salvarDiretrizPastoral(this)"><i class="fas fa-paper-plane"></i> ENVIAR</button>
+                <button onclick="document.getElementById('modal-nova-diretriz').style.display='none'" style="background:transparent; border:1px solid #94a3b8; color:#94a3b8; padding:12px; border-radius:10px; cursor:pointer;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const db = firebase.firestore();
+        let currentPage = 'dashboard';
+        
+        // Clean, reactive auth synchronization for Gabinete
+        window.onAuthSuccess = async (user, role) => {
+            console.log("💎 Gabinete Auth Success:", role);
+            const isMaster = await AuthManager.verifyAccess('gabinete');
+            if(isMaster) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-container').style.display = 'flex';
+                iniciarGabinete();
+            } else {
+                handleLoggedOut();
+            }
+        };
+
+        window.onAuthLogout = () => {
+            console.log("💎 Gabinete Auth Logout");
+            handleLoggedOut();
+        };
+
+        function handleLoggedOut() {
+            document.getElementById('app-container').style.display = 'none';
+            const isInsideIframe = window.self !== window.top;
+            if (!isInsideIframe) {
+                document.getElementById('login-screen').style.display = 'flex';
+            }
+        }
+
+        async function fazerLogin() {
+            const pin = document.getElementById('gabinete-pin').value;
+            const err = document.getElementById('login-error');
+            err.innerText = "Verificando...";
+            const result = await AuthManager.login('admin', pin);
+            if(!result.success) {
+                err.innerText = "PIN Incorreto ou sem permissão.";
+            }
+        }
+
+        // NAVIGATION
+        function switchPage(pageId) {
+            currentPage = pageId;
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            const targetPage = document.getElementById('page-' + pageId);
+            if(targetPage) targetPage.classList.add('active');
+            
+            // Activate corresponding sidebar item
+            const navBtn = document.getElementById('nav-' + pageId);
+            if(navBtn) navBtn.classList.add('active');
+            
+            const titles = {
+                'dashboard': 'Dashboard',
+                'lideres': 'Líderes',
+                'ministerios': 'Ministérios',
+                'ordens': 'Ordens Pastorais',
+                'ata': 'Ata Digital',
+                'diretrizes': 'Diretrizes Pastorais',
+                'escalas': 'Escala de Cultos',
+                'relatorios': 'Relatórios',
+                'settings': 'Configurações'
+            };
+            document.getElementById('current-page-title').innerText = titles[pageId] || 'Gabinete';
+            
+            // Toggle sidebar on mobile
+            document.getElementById('sidebar').classList.remove('open');
+            
+            // Run specific load tasks
+            if(pageId === 'lideres') loadPeopleList();
+            if(pageId === 'ministerios') loadMinistriesList();
+            if(pageId === 'ata') loadAtaDigitalCompleta();
+            if(pageId === 'diretrizes') loadDiretrizesPage();
+            if(pageId === 'escalas') loadEscalas();
+            if(pageId === 'ordens') loadOrdensPage();
+        }
+
+
+
+        // LOGIC START
+        async function iniciarGabinete() {
+            loadKPIs();
+            loadAtaDigitalFeed();
+            loadGabineteCards();
+            loadEscalas();
+        }
+
+        async function loadKPIs() {
+            try {
+                // Lideres from config/notification_leaders
+                const doc = await db.collection('config').doc('notification_leaders').get();
+                let leaders = 0;
+                if (doc.exists && doc.data().leaders) {
+                    leaders = doc.data().leaders.length;
+                }
+                document.getElementById('kpi-lideres').innerText = leaders;
+
+                // Ministerios from ministerios_list
+                const mSnap = await db.collection('ministerios_list').get();
+                document.getElementById('kpi-ministerios').innerText = mSnap.size;
+
+                // Igreja (Membros + Kids - Visitantes)
+                const [peopleSnap, kidsSnap] = await Promise.all([
+                    db.collection('people').get(),
+                    db.collection('kids').get()
+                ]);
+                let totalIgreja = kidsSnap.size;
+                peopleSnap.forEach(d => {
+                    const data = d.data();
+                    const type = (data.type || data.field_20 || data.role || data.categoria || '').toLowerCase();
+                    if (!type.includes('visitant')) {
+                        totalIgreja++;
+                    }
+                });
+                document.getElementById('kpi-igreja').innerText = totalIgreja;
+
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        async function loadAtaDigitalFeed() {
+            const feedContainer = document.getElementById('ata-digital-feed');
+            try {
+                // Real-time listener para Ata Digital (somente as 20 últimas)
+                db.collection('ata_digital').orderBy('data', 'desc').limit(20).onSnapshot(snap => {
+                    if(snap.empty) {
+                        feedContainer.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">Nenhum registro.</div>';
+                        return;
+                    }
+                    let html = '';
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        const dateObj = d.data ? d.data.toDate() : new Date();
+                        
+                        let color = '#94a3b8';
+                        if(d.tipo === 'Entrada' || d.tipo === 'Criação') color = '#10b981';
+                        else if(d.tipo === 'Atualização') color = '#3b82f6';
+                        else if(d.tipo === 'Saída' || d.tipo === 'Exclusão') color = '#ef4444';
+
+                        html += `
+                            <div style="display:flex; gap:15px; margin-bottom:15px; background:#1e293b; padding:15px; border-radius:12px; border-left:3px solid ${color};">
+                                <div style="min-width:60px; text-align:right;">
+                                    <div style="font-size:0.7rem; color:#94a3b8; font-weight:800;">${dateObj.toLocaleDateString('pt-BR').substring(0,5)}</div>
+                                    <div style="font-size:0.7rem; color:#64748b;">${dateObj.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size:0.75rem; color:${color}; font-weight:800; text-transform:uppercase; margin-bottom:3px;">${d.tipo}</div>
+                                    <div style="font-size:0.9rem; color:#f8fafc;">${d.descricao}</div>
+                                    <div style="font-size:0.7rem; color:#64748b; margin-top:4px;"><i class="fas fa-user-circle"></i> Resp: ${d.responsavel}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    feedContainer.innerHTML = html;
+                });
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        async function loadGabineteCards() {
+            const activeList = document.getElementById('gabinete-active-list');
+            const historyList = document.getElementById('gabinete-history-list');
+
+            try {
+                // Pendentes
+                db.collection('pastoral_tasks').where('status', '==', 'pendente').onSnapshot(snapP => {
+                    if(snapP.empty) {
+                        activeList.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8; font-size:0.9rem;">Nenhuma diretriz pendente no momento.</div>';
+                    } else {
+                        let htmlP = '';
+                        snapP.forEach(doc => {
+                            const d = doc.data();
+                            const dateObj = d.criado_em ? d.criado_em.toDate() : new Date();
+                            htmlP += `
+                                <div style="background:#1e293b; border:1px solid #3b82f6; border-left:4px solid #3b82f6; border-radius:12px; padding:15px; margin-bottom:10px;">
+                                    <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#94a3b8; margin-bottom:5px;">
+                                        <span style="color:#60a5fa; font-weight:800;">${d.tipo}</span>
+                                        <span>${dateObj.toLocaleDateString('pt-BR')}</span>
+                                    </div>
+                                    <div style="font-size:1rem; font-weight:800; color:#f8fafc; margin-bottom:5px;">${d.titulo}</div>
+                                    <div style="font-size:0.85rem; color:#cbd5e1;">${d.descricao}</div>
+                                </div>
+                            `;
+                        });
+                        activeList.innerHTML = htmlP;
+                    }
+                });
+
+                // Concluidas
+                db.collection('pastoral_tasks').where('status', '==', 'concluido').orderBy('concluido_em', 'desc').limit(15).onSnapshot(snapC => {
+                    if(snapC.empty) {
+                        historyList.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8; font-size:0.9rem;">O histórico está vazio.</div>';
+                    } else {
+                        let htmlC = '';
+                        snapC.forEach(doc => {
+                            const d = doc.data();
+                            const dateObj = d.concluido_em ? d.concluido_em.toDate() : new Date();
+                            htmlC += `
+                                <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #334155;">
+                                    <div>
+                                        <div style="color:#94a3b8; font-size:0.85rem; text-decoration:line-through;">${d.titulo}</div>
+                                        <div style="font-size:0.7rem; color:#64748b;">${d.tipo} • ${dateObj.toLocaleDateString('pt-BR')}</div>
+                                    </div>
+                                    <i class="fas fa-check-circle" style="color:#10b981;"></i>
+                                </div>
+                            `;
+                        });
+                        historyList.innerHTML = htmlC;
+                    }
+                });
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        async function salvarDiretrizPastoral(btn) {
+            const tipo = document.getElementById('gabinete-tipo').value;
+            const titulo = document.getElementById('gabinete-titulo').value;
+            const desc = document.getElementById('gabinete-desc').value;
+
+            if(!titulo || !desc) {
+                alert("Preencha título e detalhes da diretriz!");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = 'Enviando...';
+
+            try {
+                await db.collection('pastoral_tasks').add({
+                    tipo: tipo,
+                    titulo: titulo,
+                    descricao: desc,
+                    status: 'pendente',
+                    criado_em: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                if(window.registrarAtaDigital) {
+                    window.registrarAtaDigital('Diretriz', `O Pastor enviou uma nova diretriz: ${titulo}`, 'Gabinete', 'Gabinete');
+                }
+
+                document.getElementById('modal-nova-diretriz').style.display = 'none';
+                document.getElementById('gabinete-titulo').value = '';
+                document.getElementById('gabinete-desc').value = '';
+            } catch(e) {
+                alert("Erro ao salvar: " + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> ENVIAR';
+            }
+        }
+
+        // LOADERS FOR PLACEHOLDERS
+        async function loadPeopleList() {
+            const tbody = document.getElementById('lideres-table-body');
+            try {
+                const doc = await db.collection('config').doc('notification_leaders').get();
+                if(!doc.exists || !doc.data().leaders || doc.data().leaders.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-dim);">Nenhum líder cadastrado na secretaria.</td></tr>';
+                    return;
+                }
+                const leaders = doc.data().leaders;
+                let html = '';
+                leaders.forEach(l => {
+                    html += `
+                        <tr>
+                            <td style="font-weight:700; color:#fff;">${l.name || 'Sem nome'}</td>
+                            <td><span style="background:var(--gold-dim); color:var(--gold); border:1px solid var(--border); padding:4px 10px; border-radius:12px; font-size:0.8rem; font-weight:800;">${l.title || 'Líder'}</span></td>
+                            <td style="color:var(--text-dim);">${l.source || 'Secretaria'}</td>
+                            <td><span style="color:#10b981;"><i class="fas fa-check-circle"></i> Ativo</span></td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html;
+            } catch(e) {
+                console.error(e);
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#ef4444;">Erro ao carregar líderes da secretaria.</td></tr>';
+            }
+        }
+
+        async function loadMinistriesList() {
+            const tbody = document.getElementById('ministerios-table-body');
+            try {
+                const snap = await db.collection('ministerios_list').get();
+                if(snap.empty) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-dim);">Nenhum ministério cadastrado na secretaria.</td></tr>';
+                    return;
+                }
+                
+                const docs = [];
+                snap.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
+                docs.sort((a, b) => (a.pillar || '').localeCompare(b.pillar || '') || (a.ordem || 99) - (b.ordem || 99));
+
+                let html = '';
+                docs.forEach(d => {
+                    html += `
+                        <tr>
+                            <td style="font-weight:700; color:#fff;">${d.nome || 'Sem nome'}</td>
+                            <td><span style="background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:6px; font-size:0.8rem; color:#cbd5e1;">${d.pillar || 'Geral'}</span></td>
+                            <td><span style="text-decoration:underline; color:var(--text);">${d.lideres || 'Não definido'}</span></td>
+                            <td style="font-weight:800; color:var(--gold);">${d.integrantes || 0} integrantes</td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html;
+            } catch(e) {
+                console.error(e);
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#ef4444;">Erro ao carregar ministérios da secretaria.</td></tr>';
+            }
+        }
+
+        // ESCALAS WIZARD MANAGEMENT
+        let currentStep = 1;
+        function goToStep(stepNum) {
+            if(stepNum === 2 && currentStep === 1) {
+                const nome = document.getElementById('escala-nome').value.trim();
+                const data = document.getElementById('escala-data').value;
+                const horario = document.getElementById('escala-horario').value;
+                if(!nome || !data || !horario) {
+                    alert("Por favor, preencha o Nome, a Data e o Horário do Culto!");
+                    return;
+                }
+            }
+
+            currentStep = stepNum;
+            
+            document.querySelectorAll('.wizard-step').forEach((s, idx) => {
+                if(idx + 1 === stepNum) s.classList.add('active');
+                else s.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.wizard-form-step').forEach((f, idx) => {
+                if(idx + 1 === stepNum) f.classList.add('active');
+                else f.classList.remove('active');
+            });
+            
+            if(stepNum === 4) {
+                renderEscalaPreview();
+            }
+        }
+
+        const templates = {
+            'Domingo Manhã': [
+                { horario: '09h45', atividade: 'PRÉLUDIO: Música Suave para Receber os irmãos', responsavel: '' },
+                { horario: '10h00', atividade: 'INÍCIO COM MUITA GRATIDÃO', responsavel: '' },
+                { horario: '10h05', atividade: 'ADORAÇÃO (3 HINOS)', responsavel: '' },
+                { horario: '10h25', atividade: 'MOMENTO DO MILAGRE', responsavel: '' },
+                { horario: '10h35', atividade: 'APRESENTAR CONVIDADOS E PREGADOR', responsavel: '' },
+                { horario: '10h40', atividade: 'MENSAGEM OFICIAL E APELOS', responsavel: '' },
+                { horario: '11h40', atividade: 'OFERTA E DÍZIMOS', responsavel: '' },
+                { horario: '11h50', atividade: 'LOUVOR', responsavel: '' },
+                { horario: '11h55', atividade: 'AGENDA SEMANAL', responsavel: '' },
+                { horario: '12h00', atividade: 'ORAÇÃO GRATIDÃO, ENVIO E BÊNÇÃO FINAL', responsavel: '' },
+                { horario: '12h00', atividade: 'TÉRMINO', responsavel: '' }
+            ],
+            'Terça-feira': [
+                { horario: '19h30', atividade: 'ORAÇÃO DE JOELHOS', responsavel: '' },
+                { horario: '19h45', atividade: 'ORAÇÃO EM CÍRCULO', responsavel: '' },
+                { horario: '20h00', atividade: 'PALAVRA DE ENSINO', responsavel: '' },
+                { horario: '20h40', atividade: 'MOMENTO DE DEVOLVER AO SENHOR, OFERTAS E DÍZIMOS', responsavel: '' },
+                { horario: '20h45', atividade: 'CONVITE PARA ORAÇÃO E ENVIO E BÊNÇÃO FINAL', responsavel: '' },
+                { horario: '20h50', atividade: 'TÉRMINO', responsavel: '' }
+            ],
+            'Sexta-feira': [
+                { horario: '19h30', atividade: 'CLAMOR E ADORAÇÃO', responsavel: '' },
+                { horario: '20h00', atividade: 'PALAVRA DE EDIFICAÇÃO', responsavel: '' },
+                { horario: '20h45', atividade: 'MINISTRAÇÃO E ORAÇÃO DE PODER', responsavel: '' },
+                { horario: '21h00', atividade: 'TÉRMINO', responsavel: '' }
+            ],
+            'Domingo Noite': [
+                { horario: '18h00', atividade: 'PRÉLUDIO: Música Instrumental', responsavel: '' },
+                { horario: '18h15', atividade: 'ABERTURA E ORAÇÃO INICIAL', responsavel: '' },
+                { horario: '18h20', atividade: 'LOUVOR CONGREGACIONAL (3 CÂNTICOS)', responsavel: '' },
+                { horario: '18h45', atividade: 'DÍZIMOS E OFERTAS / AVISOS', responsavel: '' },
+                { horario: '18h55', atividade: 'PALAVRA MINISTRADA', responsavel: '' },
+                { horario: '19h40', atividade: 'MINISTRAÇÃO E APELO', responsavel: '' },
+                { horario: '19h55', atividade: 'ORAÇÃO FINAL E BÊNÇÃO APOSTÓLICA', responsavel: '' }
+            ]
+        };
+
+        function prefillProgramacao() {
+            const type = document.getElementById('escala-tipo-culto').value;
+            const container = document.getElementById('escala-itens-container');
+            container.innerHTML = '';
+            
+            if(templates[type]) {
+                templates[type].forEach(item => {
+                    addProgramacaoRow(item.horario, item.atividade, item.responsavel);
+                });
+            } else {
+                addProgramacaoRow('10h00', 'Início', '');
+            }
+        }
+
+        function addProgramacaoRow(horario = '', atividade = '', responsavel = '') {
+            const container = document.getElementById('escala-itens-container');
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'programacao-row';
+            rowDiv.style = 'display:grid; grid-template-columns: 100px 1fr 200px 50px; gap:10px; margin-bottom:10px; align-items:center;';
+            rowDiv.innerHTML = `
+                <input type="text" placeholder="Ex: 10h00" value="${horario}" class="p-row-time" style="margin-bottom:0;">
+                <input type="text" placeholder="Ex: Prelúdio / Oração" value="${atividade}" class="p-row-act" style="margin-bottom:0;">
+                <input type="text" placeholder="Responsável" value="${responsavel}" class="p-row-resp" style="margin-bottom:0;">
+                <button onclick="removeProgramacaoRow(this)" style="background:transparent; border:1px solid #ef4444; color:#ef4444; border-radius:8px; width:40px; height:40px; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="fas fa-trash"></i></button>
+            `;
+            container.appendChild(rowDiv);
+        }
+
+        function removeProgramacaoRow(btn) {
+            btn.parentElement.remove();
+        }
+
+        function openNovaEscala(id = '') {
+            document.getElementById('escala-id').value = id;
+            if(!id) {
+                document.getElementById('wizard-title').innerText = "Nova Escala de Culto";
+                document.getElementById('escala-nome').value = '';
+                document.getElementById('escala-tipo-culto').value = 'Outro';
+                document.getElementById('escala-data').value = new Date().toISOString().split('T')[0];
+                document.getElementById('escala-horario').value = '10:00';
+                document.getElementById('escala-local').value = 'Templo Sede';
+                document.getElementById('escala-tema').value = '';
+                document.getElementById('escala-dirigente').value = '';
+                document.getElementById('escala-repetir').value = 'Não';
+                document.getElementById('escala-status').value = 'Publicada';
+                document.getElementById('escala-obs').value = '';
+                
+                document.getElementById('escala-part-louvor').value = '';
+                document.getElementById('escala-part-midia').value = '';
+                document.getElementById('escala-part-recepcao').value = '';
+                document.getElementById('escala-part-kids').value = '';
+                document.getElementById('escala-part-intercessao').value = '';
+                
+                document.getElementById('escala-itens-container').innerHTML = '';
+                addProgramacaoRow('10h00', 'Início', '');
+                
+                goToStep(1);
+                switchPage('nova-escala');
+            } else {
+                document.getElementById('wizard-title').innerText = "Editar Escala de Culto";
+                db.collection('service_schedules').doc(id).get().then(doc => {
+                    if(doc.exists) {
+                        const d = doc.data();
+                        document.getElementById('escala-nome').value = d.nome_culto || '';
+                        document.getElementById('escala-tipo-culto').value = d.tipo_culto || 'Outro';
+                        document.getElementById('escala-data').value = d.data || '';
+                        document.getElementById('escala-horario').value = d.horario_inicio || '';
+                        document.getElementById('escala-local').value = d.local || 'Templo Sede';
+                        document.getElementById('escala-tema').value = d.descricao || '';
+                        document.getElementById('escala-dirigente').value = d.dirigente || '';
+                        document.getElementById('escala-repetir').value = d.repetir || 'Não';
+                        document.getElementById('escala-status').value = d.status || 'Publicada';
+                        document.getElementById('escala-obs').value = d.observacoes || '';
+                        
+                        const part = d.participantes || {};
+                        document.getElementById('escala-part-louvor').value = part.louvor || '';
+                        document.getElementById('escala-part-midia').value = part.midia || '';
+                        document.getElementById('escala-part-recepcao').value = part.recepcao || '';
+                        document.getElementById('escala-part-kids').value = part.kids || '';
+                        document.getElementById('escala-part-intercessao').value = part.intercessao || '';
+                        
+                        const container = document.getElementById('escala-itens-container');
+                        container.innerHTML = '';
+                        if(d.programacao && d.programacao.length > 0) {
+                            d.programacao.forEach(item => {
+                                addProgramacaoRow(item.horario, item.atividade, item.responsavel);
+                            });
+                        } else {
+                            addProgramacaoRow('10h00', 'Início', '');
+                        }
+                        
+                        goToStep(1);
+                        switchPage('nova-escala');
+                    }
+                });
+            }
+        }
+
+        function renderEscalaPreview() {
+            const nome = document.getElementById('escala-nome').value.toUpperCase();
+            const dataVal = document.getElementById('escala-data').value;
+            const horario = document.getElementById('escala-horario').value;
+            const tema = document.getElementById('escala-tema').value;
+            const dirigente = document.getElementById('escala-dirigente').value.toUpperCase();
+            const tipo = document.getElementById('escala-tipo-culto').value;
+            const status = document.getElementById('escala-status').value;
+            
+            const dateObj = new Date(dataVal + 'T00:00:00');
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            const dateStrFormatted = dateObj.toLocaleDateString('pt-BR', options).toUpperCase();
+            
+            let displayDate = dateStrFormatted.replace(' DE ', ' ').replace(' DE ', ' ');
+            if (tipo === 'Domingo Manhã') displayDate = displayDate.replace('DOMINGO', 'DOMINGO MANHÃ');
+            else if (tipo === 'Terça-feira') displayDate = displayDate.replace('TERÇA-FEIRA', 'TERÇA');
+
+            const rows = [];
+            document.querySelectorAll('#escala-itens-container .programacao-row').forEach(row => {
+                const time = row.querySelector('.p-row-time').value.trim();
+                const act = row.querySelector('.p-row-act').value.trim();
+                const resp = row.querySelector('.p-row-resp').value.trim();
+                if(time && act) {
+                    rows.push({ horario: time, atividade: act, responsavel: resp });
+                }
+            });
+
+            let programacaoHtml = '';
+            rows.forEach(item => {
+                programacaoHtml += `
+                    <div style="font-size:1.05rem; font-weight:700; margin-bottom:12px; display:flex; align-items:flex-start; position:relative; padding-left:20px;">
+                        <span style="position:absolute; left:0; top:8px; width:6px; height:6px; background:#64748b; border-radius:50%;"></span>
+                        <span style="margin-right:6px;">${item.horario} - ${item.atividade.toUpperCase()}:</span>
+                        <span style="text-decoration:underline;">${item.responsavel ? item.responsavel.toUpperCase() : ''}</span>
+                    </div>
+                `;
+            });
+
+            const partLouvor = document.getElementById('escala-part-louvor').value;
+            const partMidia = document.getElementById('escala-part-midia').value;
+            const partRecepcao = document.getElementById('escala-part-recepcao').value;
+            const partKids = document.getElementById('escala-part-kids').value;
+            const partIntercessao = document.getElementById('escala-part-intercessao').value;
+
+            let participantsHtml = '';
+            if(partLouvor || partMidia || partRecepcao || partKids || partIntercessao) {
+                participantsHtml = `
+                    <div style="margin-top:25px; border-top:1.5px dashed #475569; padding-top:15px;">
+                        <h4 style="margin:0 0 10px 0; font-size:1rem; text-transform:uppercase; color:#e11d48; font-weight:900;">Equipes de Apoio</h4>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.9rem;">
+                            ${partLouvor ? `<div><strong>Louvor:</strong> ${partLouvor}</div>` : ''}
+                            ${partMidia ? `<div><strong>Mídia:</strong> ${partMidia}</div>` : ''}
+                            ${partRecepcao ? `<div><strong>Diaconato/Recepção:</strong> ${partRecepcao}</div>` : ''}
+                            ${partKids ? `<div><strong>Kids:</strong> ${partKids}</div>` : ''}
+                            ${partIntercessao ? `<div><strong>Intercessão:</strong> ${partIntercessao}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            const previewSheet = document.getElementById('escala-preview-sheet');
+            previewSheet.innerHTML = `
+                <div style="position:relative;">
+                    <img src="assets/logo_3.png" style="position:absolute; top:0; right:0; height:65px;">
+                    <h2 style="font-size:2rem; font-weight:900; color:#e11d48; margin:0; line-height:1; letter-spacing:1px; text-transform:uppercase;">ESCALA DO CULTO</h2>
+                    <div style="font-size:1.45rem; font-weight:700; color:#e11d48; margin:3px 0 12px 0;">${displayDate}</div>
+                    <div style="font-size:1.2rem; font-weight:700; color:#e11d48; margin:5px 0 15px 0; text-transform:uppercase;">${horario}H - ${nome}</div>
+                    ${tema ? `<div style="font-style:italic; font-size:0.95rem; margin-bottom:10px; color:#334155;">Tema: "${tema}"</div>` : ''}
+                    
+                    <div style="font-size:1.05rem; font-weight:700; margin-bottom:20px; text-transform:uppercase;">
+                        DIRIGENTE DO CULTO: <span style="text-decoration:underline;">${dirigente || 'NÃO DEFINIDO'}</span>
+                    </div>
+                    
+                    <div style="font-size:0.8rem; color:#1e293b; margin:5px 0; line-height:1.3; font-weight:500;">
+                        - É função do dirigente, contactar três dias antes, a todos que irão participar no culto, para comprovada participação e organização.
+                    </div>
+                    <div style="font-size:0.8rem; color:#1e293b; margin:5px 0; line-height:1.3; font-weight:500;">
+                        - Deve o dirigente estar atento para que todos subam à sua hora, sem serem chamados e estar pronto para os substituir se caso necessário.
+                    </div>
+                    
+                    <div style="margin-top:20px; border-top:1.5px dashed #475569; padding-top:20px;">
+                        ${programacaoHtml}
+                    </div>
+
+                    ${participantsHtml}
+                </div>
+            `;
+            
+            const submitBtn = document.getElementById('btn-salvar-escala');
+            if(status === 'Rascunho') {
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Salvar como Rascunho';
+                submitBtn.style.background = '#f59e0b';
+            } else {
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Salvar e Publicar';
+                submitBtn.style.background = '#10b981';
+            }
+        }
+
+        async function salvarEscalaCompleta() {
+            const btn = document.getElementById('btn-salvar-escala');
+            btn.disabled = true;
+            btn.innerHTML = 'Salvando...';
+
+            const id = document.getElementById('escala-id').value;
+            const nome = document.getElementById('escala-nome').value.trim();
+            const dataVal = document.getElementById('escala-data').value;
+            const horario = document.getElementById('escala-horario').value;
+            const local = document.getElementById('escala-local').value;
+            const tema = document.getElementById('escala-tema').value.trim();
+            const dirigente = document.getElementById('escala-dirigente').value.trim();
+            const tipo = document.getElementById('escala-tipo-culto').value;
+            const repetir = document.getElementById('escala-repetir').value;
+            const status = document.getElementById('escala-status').value;
+            const obs = document.getElementById('escala-obs').value.trim();
+            
+            const rows = [];
+            document.querySelectorAll('#escala-itens-container .programacao-row').forEach(row => {
+                const time = row.querySelector('.p-row-time').value.trim();
+                const act = row.querySelector('.p-row-act').value.trim();
+                const resp = row.querySelector('.p-row-resp').value.trim();
+                if(time && act) {
+                    rows.push({ horario: time, atividade: act, responsavel: resp });
+                }
+            });
+
+            const participantes = {
+                louvor: document.getElementById('escala-part-louvor').value.trim(),
+                midia: document.getElementById('escala-part-midia').value.trim(),
+                recepcao: document.getElementById('escala-part-recepcao').value.trim(),
+                kids: document.getElementById('escala-part-kids').value.trim(),
+                intercessao: document.getElementById('escala-part-intercessao').value.trim()
+            };
+
+            const dataObj = {
+                nome_culto: nome,
+                data: dataVal,
+                horario_inicio: horario,
+                local: local,
+                descricao: tema,
+                dirigente: dirigente,
+                tipo_culto: tipo,
+                repetir: repetir,
+                status: status,
+                observacoes: obs,
+                programacao: rows,
+                participantes: participantes,
+                criado_em: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                if(id) {
+                    await db.collection('service_schedules').doc(id).update(dataObj);
+                    
+                    // Ata digital log
+                    await db.collection('ata_digital').add({
+                        tipo: 'Atualização',
+                        descricao: `O Pastor atualizou a escala do culto: ${nome} (${dataVal.split('-').reverse().join('/')})`,
+                        responsavel: 'Gabinete Pastoral',
+                        data: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } else {
+                    await db.collection('service_schedules').add(dataObj);
+                    
+                    // Ata digital log
+                    await db.collection('ata_digital').add({
+                        tipo: 'Criação',
+                        descricao: `O Pastor publicou uma nova escala de culto: ${nome} para ${dataVal.split('-').reverse().join('/')}`,
+                        responsavel: 'Gabinete Pastoral',
+                        data: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+                
+                alert("Escala salva com sucesso!");
+                switchPage('escalas');
+            } catch(e) {
+                alert("Erro ao salvar escala: " + e.message);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        let scalesListener = null;
+        function loadEscalas() {
+            if(scalesListener) scalesListener();
+            
+            const tbody = document.getElementById('escalas-table-body');
+            const todayStr = new Date().toISOString().split('T')[0];
+            
+            scalesListener = db.collection('service_schedules').orderBy('data', 'asc').onSnapshot(snap => {
+                let tableHtml = '';
+                let dashboardUpcomingHtml = '';
+                let dashboardRecentHtml = '';
+
+                const allScales = [];
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    allScales.push({ id: doc.id, ...d });
+                });
+
+                if(allScales.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-dim); padding:40px;">Nenhuma escala criada.</td></tr>';
+                    document.getElementById('dashboard-proximos-cultos').innerHTML = '<div style="text-align:center; padding:15px; color:var(--text-dim); font-size:0.85rem;">Nenhum culto agendado.</div>';
+                    document.getElementById('dashboard-recentes-cultos').innerHTML = '<div style="text-align:center; padding:15px; color:var(--text-dim); font-size:0.85rem;">Nenhum histórico recente.</div>';
+                    return;
+                }
+
+                // Table build
+                allScales.forEach(escala => {
+                    const dateFormatted = escala.data ? escala.data.split('-').reverse().join('/') : '--/--/----';
+                    const statusColor = escala.status === 'Publicada' ? '#10b981' : '#f59e0b';
+                    
+                    tableHtml += `
+                        <tr>
+                            <td style="font-weight:700; color:#fff;">${dateFormatted}</td>
+                            <td style="color:#fff; font-weight:500;">${escala.nome_culto || 'Sem nome'}</td>
+                            <td>${escala.dirigente || '--'}</td>
+                            <td><span style="background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:6px; font-size:0.8rem;">${escala.tipo_culto || 'Outro'}</span></td>
+                            <td><span style="color:${statusColor}; font-weight:800; font-size:0.85rem;"><i class="fas fa-circle" style="font-size:0.6rem; margin-right:4px;"></i> ${escala.status}</span></td>
+                            <td style="text-align:right;">
+                                <div style="display:flex; gap:8px; justify-content:flex-end;">
+                                    <button class="btn-gold" style="width:auto; padding:6px 12px; font-size:0.8rem; background:#64748b; color:#fff;" onclick="exportToPDFById('${escala.id}')"><i class="fas fa-file-pdf"></i> PDF</button>
+                                    <button class="btn-gold" style="width:auto; padding:6px 12px; font-size:0.8rem; background:#3b82f6; color:#fff;" onclick="openNovaEscala('${escala.id}')"><i class="fas fa-edit"></i></button>
+                                    <button class="btn-gold" style="width:auto; padding:6px 12px; font-size:0.8rem; background:#ef4444; color:#fff;" onclick="excluirEscala('${escala.id}')"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = tableHtml;
+
+                // Dashboard upcoming and recent filter
+                const upcoming = allScales.filter(e => e.data >= todayStr);
+                const recent = allScales.filter(e => e.data < todayStr).reverse();
+
+                upcoming.slice(0, 3).forEach(escala => {
+                    const dateFormatted = escala.data ? escala.data.split('-').reverse().join('/') : '--/--';
+                    const statusText = escala.status === 'Publicada' ? 'Publicada' : 'Em aberto';
+                    const statusColor = escala.status === 'Publicada' ? '#10b981' : '#f59e0b';
+                    
+                    dashboardUpcomingHtml += `
+                        <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div style="font-weight:700; color:#fff; font-size:0.9rem;">${escala.nome_culto}</div>
+                                <div style="font-size:0.75rem; color:var(--text-dim); margin-top:3px;"><i class="fas fa-calendar"></i> ${dateFormatted} • ${escala.horario_inicio || '10:00'}</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <span style="display:block; font-size:0.7rem; color:${statusColor}; font-weight:800; text-transform:uppercase; margin-bottom:5px;">${statusText}</span>
+                                <button onclick="exportToPDFById('${escala.id}')" style="background:transparent; border:1px solid var(--gold); color:var(--gold); font-size:0.75rem; padding:4px 10px; border-radius:6px; cursor:pointer;"><i class="fas fa-file-pdf"></i> PDF</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                document.getElementById('dashboard-proximos-cultos').innerHTML = dashboardUpcomingHtml || '<div style="text-align:center; padding:15px; color:var(--text-dim); font-size:0.85rem;">Nenhum próximo culto.</div>';
+
+                recent.slice(0, 2).forEach(escala => {
+                    const dateFormatted = escala.data ? escala.data.split('-').reverse().join('/') : '--/--';
+                    
+                    dashboardRecentHtml += `
+                        <div style="background:rgba(255,255,255,0.01); border:1px solid rgba(255,255,255,0.05); border-radius:12px; padding:10px 12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div style="font-weight:600; color:#cbd5e1; font-size:0.85rem;">${escala.nome_culto}</div>
+                                <div style="font-size:0.72rem; color:var(--text-dim); margin-top:2px;">${dateFormatted} • ${escala.dirigente || 'Sem dir.'}</div>
+                            </div>
+                            <button onclick="exportToPDFById('${escala.id}')" style="background:transparent; border:1px solid rgba(201,160,80,0.3); color:var(--text-dim); font-size:0.72rem; padding:4px 8px; border-radius:6px; cursor:pointer;"><i class="fas fa-file-pdf"></i></button>
+                        </div>
+                    `;
+                });
+                document.getElementById('dashboard-recentes-cultos').innerHTML = dashboardRecentHtml || '<div style="text-align:center; padding:15px; color:var(--text-dim); font-size:0.85rem;">Nenhuma escala anterior.</div>';
+            });
+        }
+
+        async function excluirEscala(id) {
+            if(confirm("Tem certeza que deseja excluir esta escala? Esta ação é irreversível.")) {
+                try {
+                    await db.collection('service_schedules').doc(id).delete();
+                    
+                    await db.collection('ata_digital').add({
+                        tipo: 'Exclusão',
+                        descricao: `O Pastor excluiu uma escala de culto.`,
+                        responsavel: 'Gabinete Pastoral',
+                        data: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    alert("Escala excluída!");
+                } catch(e) {
+                    alert("Erro ao excluir: " + e.message);
+                }
+            }
+        }
+
+        function exportToPDFById(id) {
+            db.collection('service_schedules').doc(id).get().then(doc => {
+                if(doc.exists) {
+                    exportToPDF(doc.id, doc.data());
+                }
+            });
+        }
+
+        // FULL SCREEN LOADERS
+        async function loadAtaDigitalCompleta() {
+            const feedContainer = document.getElementById('ata-digital-feed-completa');
+            try {
+                db.collection('ata_digital').orderBy('data', 'desc').limit(100).onSnapshot(snap => {
+                    if(snap.empty) {
+                        feedContainer.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">Nenhum registro.</div>';
+                        return;
+                    }
+                    let html = '';
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        const dateObj = d.data ? d.data.toDate() : new Date();
+                        
+                        let color = '#94a3b8';
+                        if(d.tipo === 'Entrada' || d.tipo === 'Criação') color = '#10b981';
+                        else if(d.tipo === 'Atualização') color = '#3b82f6';
+                        else if(d.tipo === 'Saída' || d.tipo === 'Exclusão') color = '#ef4444';
+
+                        html += `
+                            <div style="display:flex; gap:15px; margin-bottom:15px; background:#1e293b; padding:15px; border-radius:12px; border-left:3px solid ${color};">
+                                <div style="min-width:70px; text-align:right;">
+                                    <div style="font-size:0.75rem; color:#94a3b8; font-weight:800;">${dateObj.toLocaleDateString('pt-BR')}</div>
+                                    <div style="font-size:0.7rem; color:#64748b;">${dateObj.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size:0.8rem; color:${color}; font-weight:800; text-transform:uppercase; margin-bottom:3px;">${d.tipo}</div>
+                                    <div style="font-size:0.95rem; color:#f8fafc;">${d.descricao}</div>
+                                    <div style="font-size:0.75rem; color:#64748b; margin-top:4px;"><i class="fas fa-user-circle"></i> Responsável: ${d.responsavel}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    feedContainer.innerHTML = html;
+                });
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        async function loadDiretrizesPage() {
+            const ativasList = document.getElementById('diretrizes-page-ativas');
+            const concluidasList = document.getElementById('diretrizes-page-concluidas');
+
+            try {
+                db.collection('pastoral_tasks').where('status', '==', 'pendente').onSnapshot(snap => {
+                    if(snap.empty) {
+                        ativasList.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">Nenhuma diretriz ativa.</div>';
+                    } else {
+                        let html = '';
+                        snap.forEach(doc => {
+                            const d = doc.data();
+                            const dateObj = d.criado_em ? d.criado_em.toDate() : new Date();
+                            html += `
+                                <div style="background:#1e293b; border:1px solid #3b82f6; border-left:4px solid #3b82f6; border-radius:12px; padding:15px; margin-bottom:12px;">
+                                    <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#94a3b8; margin-bottom:5px;">
+                                        <span style="color:#60a5fa; font-weight:800;">${d.tipo}</span>
+                                        <span>${dateObj.toLocaleDateString('pt-BR')}</span>
+                                    </div>
+                                    <div style="font-size:1rem; font-weight:800; color:#f8fafc; margin-bottom:5px;">${d.titulo}</div>
+                                    <div style="font-size:0.85rem; color:#cbd5e1; margin-bottom:10px;">${d.descricao}</div>
+                                    <div style="display:flex; justify-content:flex-end;">
+                                        <button onclick="concluirDiretriz('${doc.id}')" style="background:#10b981; border:none; color:#000; padding:6px 12px; border-radius:6px; font-weight:800; font-size:0.8rem; cursor:pointer;"><i class="fas fa-check"></i> Marcar Concluída</button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        ativasList.innerHTML = html;
+                    }
+                });
+
+                db.collection('pastoral_tasks').where('status', '==', 'concluido').orderBy('concluido_em', 'desc').limit(20).onSnapshot(snap => {
+                    if(snap.empty) {
+                        concluidasList.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">Histórico vazio.</div>';
+                    } else {
+                        let html = '';
+                        snap.forEach(doc => {
+                            const d = doc.data();
+                            const dateObj = d.concluido_em ? d.concluido_em.toDate() : new Date();
+                            html += `
+                                <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                                    <div>
+                                        <div style="font-weight:600; color:#cbd5e1; font-size:0.85rem; text-decoration:line-through;">${d.titulo}</div>
+                                        <div style="font-size:0.7rem; color:var(--text-dim); margin-top:3px;">${d.tipo} • Concluída em ${dateObj.toLocaleDateString('pt-BR')}</div>
+                                    </div>
+                                    <i class="fas fa-check-circle" style="color:#10b981; font-size:1.1rem;"></i>
+                                </div>
+                            `;
+                        });
+                        concluidasList.innerHTML = html;
+                    }
+                });
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        async function concluirDiretriz(id) {
+            try {
+                await db.collection('pastoral_tasks').doc(id).update({
+                    status: 'concluido',
+                    concluido_em: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                alert("Diretriz marcada como concluída!");
+            } catch(e) {
+                alert("Erro: " + e.message);
+            }
+        }
+
+        function loadOrdensPage() {
+            const container = document.getElementById('ordens-gabinete-list');
+            db.collection('pastoral_tasks').orderBy('criado_em', 'desc').onSnapshot(snap => {
+                if(snap.empty) {
+                    container.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">Nenhuma ordem pastoral registrada.</div>';
+                    return;
+                }
+                let html = '';
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    const dateObj = d.criado_em ? d.criado_em.toDate() : new Date();
+                    const badgeColor = d.status === 'pendente' ? '#3b82f6' : '#10b981';
+                    
+                    html += `
+                        <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border); border-left:4px solid ${badgeColor}; border-radius:12px; padding:15px; margin-bottom:12px;">
+                            <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#94a3b8; margin-bottom:5px;">
+                                <span style="font-weight:800; color:${badgeColor};">${d.tipo}</span>
+                                <span>${dateObj.toLocaleDateString('pt-BR')}</span>
+                            </div>
+                            <div style="font-size:1rem; font-weight:800; color:#f8fafc; margin-bottom:5px;">${d.titulo}</div>
+                            <div style="font-size:0.85rem; color:#cbd5e1;">${d.descricao}</div>
+                            <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:var(--text-dim);">
+                                <span>Status: <strong style="color:${badgeColor};">${d.status.toUpperCase()}</strong></span>
+                                ${d.status === 'pendente' ? `<button onclick="concluirDiretriz('${doc.id}')" style="background:#10b981; border:none; color:#000; padding:4px 10px; border-radius:4px; font-weight:800; font-size:0.7rem; cursor:pointer;"><i class="fas fa-check"></i> Concluir</button>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            });
+        }
+
+        // PDF EXPORT TOOL
+        function exportToPDF(id, escala) {
+            const printWindow = window.open('', '_blank', 'width=800,height=1000');
+            
+            const dateObj = new Date(escala.data + 'T00:00:00');
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            const dateStrFormatted = dateObj.toLocaleDateString('pt-BR', options).toUpperCase();
+            
+            let displayDate = dateStrFormatted.replace(' DE ', ' ').replace(' DE ', ' ');
+            if (escala.tipo_culto === 'Domingo Manhã') displayDate = displayDate.replace('DOMINGO', 'DOMINGO MANHÃ');
+            else if (escala.tipo_culto === 'Terça-feira') displayDate = displayDate.replace('TERÇA-FEIRA', 'TERÇA');
+
+            let programacaoHtml = '';
+            (escala.programacao || []).forEach(item => {
+                programacaoHtml += `
+                    <li class="escala-item">
+                        <span class="escala-time">${item.horario} - ${item.atividade.toUpperCase()}:</span>
+                        <span class="escala-resp">${item.responsavel ? item.responsavel.toUpperCase() : ''}</span>
+                    </li>
+                `;
+            });
+
+            const part = escala.participantes || {};
+            let participantsHtml = '';
+            if(part.louvor || part.midia || part.recepcao || part.kids || part.intercessao) {
+                participantsHtml = `
+                    <div class="pdf-participants">
+                        <h4 class="pdf-part-title">Equipes de Apoio</h4>
+                        <div class="pdf-part-grid">
+                            ${part.louvor ? `<div><strong>LOUVOR:</strong> ${part.louvor.toUpperCase()}</div>` : ''}
+                            ${part.midia ? `<div><strong>MÍDIA:</strong> ${part.midia.toUpperCase()}</div>` : ''}
+                            ${part.recepcao ? `<div><strong>RECEPÇÃO/DIACONATO:</strong> ${part.recepcao.toUpperCase()}</div>` : ''}
+                            ${part.kids ? `<div><strong>KIDS:</strong> ${part.kids.toUpperCase()}</div>` : ''}
+                            ${part.intercessao ? `<div><strong>INTERCESSÃO:</strong> ${part.intercessao.toUpperCase()}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Escala do Culto - ${escala.nome_culto}</title>
+                    <style>
+                        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap');
+                        body {
+                            background-color: #b3d2be;
+                            color: #000000;
+                            font-family: 'Outfit', sans-serif;
+                            margin: 0;
+                            padding: 40px;
+                            box-sizing: border-box;
+                            min-height: 100vh;
+                            -webkit-print-color-adjust: exact;
+                            print-color-adjust: exact;
+                        }
+                        .escala-container {
+                            max-width: 800px;
+                            margin: 0 auto;
+                            position: relative;
+                        }
+                        .logo-img {
+                            position: absolute;
+                            top: 0;
+                            right: 0;
+                            width: 80px;
+                            height: auto;
+                        }
+                        .header-title {
+                            font-size: 3.5rem;
+                            font-weight: 900;
+                            color: #e11d48;
+                            margin: 0;
+                            line-height: 1;
+                            letter-spacing: 1px;
+                        }
+                        .header-date {
+                            font-size: 2.2rem;
+                            font-weight: 700;
+                            color: #e11d48;
+                            margin: 5px 0 15px 0;
+                            letter-spacing: 0.5px;
+                        }
+                        .header-subtitle {
+                            font-size: 1.8rem;
+                            font-weight: 700;
+                            color: #e11d48;
+                            margin: 10px 0 25px 0;
+                            text-transform: uppercase;
+                        }
+                        .dirigente-box {
+                            font-size: 1.35rem;
+                            font-weight: 700;
+                            margin-bottom: 25px;
+                            text-transform: uppercase;
+                        }
+                        .dirigente-name {
+                            text-decoration: underline;
+                        }
+                        .info-notice {
+                            font-size: 0.92rem;
+                            color: #000000;
+                            margin: 8px 0;
+                            line-height: 1.4;
+                            padding-left: 15px;
+                            position: relative;
+                            font-weight: 500;
+                        }
+                        .info-notice::before {
+                            content: "-";
+                            position: absolute;
+                            left: 0;
+                            top: 0;
+                        }
+                        .escala-list {
+                            list-style: none;
+                            padding: 0;
+                            margin: 30px 0 0 0;
+                        }
+                        .escala-item {
+                            font-size: 1.25rem;
+                            font-weight: 700;
+                            margin-bottom: 20px;
+                            display: flex;
+                            align-items: flex-start;
+                            position: relative;
+                            padding-left: 25px;
+                        }
+                        .escala-item::before {
+                            content: "";
+                            position: absolute;
+                            left: 5px;
+                            top: 10px;
+                            width: 7px;
+                            height: 7px;
+                            background-color: #64748b;
+                            border-radius: 50%;
+                        }
+                        .escala-time {
+                            margin-right: 8px;
+                        }
+                        .escala-resp {
+                            text-decoration: underline;
+                        }
+                        .pdf-participants {
+                            margin-top: 35px;
+                            border-top: 2px dashed #475569;
+                            padding-top: 20px;
+                        }
+                        .pdf-part-title {
+                            margin: 0 0 12px 0;
+                            font-size: 1.2rem;
+                            text-transform: uppercase;
+                            color: #e11d48;
+                            font-weight: 900;
+                        }
+                        .pdf-part-grid {
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 12px;
+                            font-size: 1.05rem;
+                        }
+                        @media print {
+                            body {
+                                background-color: #b3d2be !important;
+                                -webkit-print-color-adjust: exact;
+                                print-color-adjust: exact;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="escala-container">
+                        <img src="assets/logo_3.png" class="logo-img">
+                        <h1 class="header-title">ESCALA DO CULTO</h1>
+                        <div class="header-date">${displayDate}</div>
+                        <div class="header-subtitle">${escala.horario_inicio}H - ${escala.nome_culto.toUpperCase()}</div>
+                        
+                        <div class="dirigente-box">
+                            DIRIGENTE DO CULTO: <span class="dirigente-name">${escala.dirigente ? escala.dirigente.toUpperCase() : 'NÃO DEFINIDO'}</span>
+                        </div>
+                        
+                        <div class="info-notice">
+                            É função do dirigente, contactar três dias antes, a todos que irão participar no culto, para comprovada participação e organização.
+                        </div>
+                        <div class="info-notice">
+                            Deve o dirigente estar atento para que todos subam à sua hora, sem serem chamados e estar pronto para os substituir se caso necessário.
+                        </div>
+                        
+                        <ul class="escala-list">
+                            ${programacaoHtml}
+                        </ul>
+
+                        ${participantsHtml}
+                    </div>
+                    <script>
+                        window.onload = function() {
+                            setTimeout(function() {
+                                window.print();
+                            }, 500);
+                        }
+                    <\/script>
+                </body>
+                </html>
+            `;
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
+        }
+    </script>
+</body>
+</html>

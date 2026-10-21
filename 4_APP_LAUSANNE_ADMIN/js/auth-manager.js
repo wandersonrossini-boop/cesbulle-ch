@@ -16,10 +16,30 @@ const AuthManager = {
             if (snap.exists) {
                 const data = snap.data();
                 if (data.ativo === false) throw new Error("Usuário inativo.\nEntre em contato com o administrador.");
-                userRole = data.role || userRole;
+                if (data.role && data.role !== 'monitor') {
+                    userRole = data.role;
+                }
             }
         } catch (fsErr) {
             console.warn("⚠️ Firestore user lookup fallback to email role:", fsErr.message);
+        }
+
+        if (!userRole || userRole === 'guest') {
+            try {
+                if (user.email) {
+                    const monSnap = await db.collection("monitores")
+                        .where("email", "==", user.email.toLowerCase())
+                        .get();
+                    if (!monSnap.empty) {
+                        const mData = monSnap.docs[0].data();
+                        if (mData.active !== false) {
+                            userRole = mData.role || 'integracao';
+                        }
+                    }
+                }
+            } catch (monErr) {
+                console.warn("⚠️ Lookup in monitores fallback:", monErr.message);
+            }
         }
 
         if (!userRole || userRole === 'guest') {
@@ -146,10 +166,30 @@ const AuthManager = {
                         await firebase.auth().signOut();
                         return { success: false, error: "Usuário inativo.\nEntre em contato com o administrador." };
                     }
-                    userRole = userData.role || userRole;
+                    if (userData.role && userData.role !== 'monitor') {
+                        userRole = userData.role;
+                    }
                 }
             } catch (fsErr) {
                 console.warn("Firestore user check fallback during login:", fsErr);
+            }
+
+            if (!userRole || userRole === 'guest') {
+                try {
+                    if (result.user.email) {
+                        const monSnap = await db.collection("monitores")
+                            .where("email", "==", result.user.email.toLowerCase())
+                            .get();
+                        if (!monSnap.empty) {
+                            const mData = monSnap.docs[0].data();
+                            if (mData.active !== false) {
+                                userRole = mData.role || 'integracao';
+                            }
+                        }
+                    }
+                } catch (monErr) {
+                    console.warn("Lookup in monitores failed during login:", monErr);
+                }
             }
 
             if (!userRole || userRole === 'guest') {
@@ -172,6 +212,7 @@ const AuthManager = {
      */
     async logout() {
         await firebase.auth().signOut();
+        localStorage.removeItem('current_module');
         localStorage.removeItem('session_role');
         localStorage.removeItem('session_role_persistent');
         localStorage.removeItem('session_pin_persistent');

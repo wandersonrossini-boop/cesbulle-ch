@@ -511,9 +511,12 @@
                 </div>
 
                 <div id="email-password-wrapper" style="display: none; flex-direction: column; gap: 14px; margin-bottom: 20px;">
-                    <input type="email" id="email-input" style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border-gold); border-radius: 10px; padding: 14px; font-size: 0.95rem; color: #fff; outline: none;" placeholder="E-mail (@catedral.ch)">
+                    <input type="email" id="email-input" style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border-gold); border-radius: 10px; padding: 14px; font-size: 0.95rem; color: #fff; outline: none;" placeholder="E-mail cadastrado">
                     <input type="password" id="password-input" style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border-gold); border-radius: 10px; padding: 14px; font-size: 0.95rem; color: #fff; outline: none;" placeholder="Senha">
-                    <p id="toggle-login-method" style="color: var(--gold); font-size: 0.8rem; cursor: pointer; text-decoration: underline;" onclick="toggleLoginMethod()">Entrar com PIN de Equipe</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                        <p id="toggle-login-method" style="color: var(--gold); font-size: 0.8rem; cursor: pointer; text-decoration: underline; margin:0;" onclick="toggleLoginMethod()">Entrar com PIN de Equipe</p>
+                        <p style="color: #94A3B8; font-size: 0.8rem; cursor: pointer; text-decoration: underline; margin:0; transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94A3B8'" onclick="esqueciMinhaSenha()">Redefinir senha</p>
+                    </div>
                 </div>
 
                 <div style="display:flex; align-items:center; gap:10px; margin-bottom:24px; justify-content:center; cursor:pointer;" onclick="toggleRemember()">
@@ -552,12 +555,34 @@
         window.onAuthSuccess = (user, role) => {
             console.log("💎 Shell Auth Success:", role);
             
-            const savedModule = localStorage.getItem('current_module');
-            let targetModule = savedModule || currentRole || role;
+            const userEmail = (user && user.email) ? user.email.toLowerCase() : '';
+            const emailRole = typeof AuthManager !== 'undefined' && AuthManager.getRoleFromEmail ? AuthManager.getRoleFromEmail(userEmail) : null;
             
-            if (!targetModule || targetModule === 'guest') {
-                targetModule = role;
+            // Priority:
+            // 1. Explicit user selection on screen (currentRole) or explicit role in URL (roleParam)
+            let targetModule = currentRole || roleParam;
+            
+            // 2. Departmental account matching:
+            // If logged in with infantil account, it MUST ALWAYS go to kids
+            if (userEmail.includes('infantil') || userEmail.includes('kids')) {
+                targetModule = 'kids';
+            } else if (userEmail.includes('recepcao')) {
+                if (targetModule === 'kids') targetModule = 'reception';
+            } else if (!targetModule && emailRole && emailRole !== 'guest' && emailRole !== 'admin') {
+                targetModule = emailRole;
             }
+            
+            // 3. Fallback to saved module from localStorage or auth role
+            if (!targetModule) {
+                targetModule = localStorage.getItem('current_module') || role;
+            }
+            
+            if (!targetModule || targetModule === 'guest' || targetModule === 'monitor') {
+                targetModule = (role && role !== 'monitor' && role !== 'guest') ? role : (currentRole || 'reception');
+            }
+            
+            if (targetModule === 'infantil') targetModule = 'kids';
+            if (targetModule === 'recepcao') targetModule = 'reception';
             
             currentRole = targetModule;
             enterApp(targetModule);
@@ -569,6 +594,8 @@
         };
 
         function showLoginView() {
+            currentRole = null;
+            localStorage.removeItem('current_module');
             document.getElementById('view-login').style.display = 'block';
             document.getElementById('app-header').style.display = 'none';
             document.getElementById('app-container').style.display = 'none';
@@ -599,6 +626,11 @@
         }, 2500);
 
         function selectRole(role) {
+            if (role === 'infantil') role = 'kids';
+            if (role === 'recepcao') role = 'reception';
+            currentRole = role;
+            localStorage.setItem('current_module', role);
+
             if(role === 'altar') {
                 AuthManager.login('altar', 'midia25').then(res => {
                     if(res.success){
@@ -610,7 +642,6 @@
                 });
                 return;
             }
-            currentRole = role;
             document.getElementById('role-selection').style.display='none';
             document.getElementById('pin-screen').style.display='flex';
             
@@ -656,6 +687,8 @@
         }
 
         function showRoles() {
+            currentRole = null;
+            localStorage.removeItem('current_module');
             document.getElementById('pin-screen').style.display='none';
             document.getElementById('role-selection').style.display='block';
         }
@@ -711,7 +744,34 @@
         }
         function toggleRemember() { document.getElementById('remember-me').checked = !document.getElementById('remember-me').checked; }
 
+        async function esqueciMinhaSenha() {
+            let email = document.getElementById('email-input').value.trim();
+            if (!email) {
+                email = prompt("Digite o e-mail cadastrado na secretaria para receber o link de redefinição de senha:");
+            }
+            if (!email || !email.includes('@')) {
+                if (email) alert("Por favor, digite um endereço de e-mail válido.");
+                return;
+            }
+            try {
+                await firebase.auth().sendPasswordResetEmail(email.trim());
+                alert("✅ Link de redefinição enviado com sucesso!\n\nVerifique a caixa de entrada e a pasta de spam do e-mail: " + email.trim() + "\npara cadastrar sua nova senha.");
+            } catch (err) {
+                console.error("Erro ao solicitar redefinição:", err);
+                let msg = "Não foi possível enviar o e-mail: " + err.message;
+                if (err.code === 'auth/user-not-found') {
+                    msg = "Nenhum usuário cadastrado com o e-mail informado.";
+                } else if (err.code === 'auth/invalid-email') {
+                    msg = "Formato de e-mail inválido.";
+                }
+                alert("❌ " + msg);
+            }
+        }
+
         function enterApp(moduleName) {
+            if (moduleName === 'infantil') moduleName = 'kids';
+            if (moduleName === 'recepcao') moduleName = 'reception';
+
             // Strict routing verification
             if (moduleName === 'integracao' && currentRole !== 'integracao') {
                 alert("Usuário sem permissão para este módulo.");
@@ -759,8 +819,8 @@
                 
                 const iframe = document.createElement('iframe');
                 iframe.id = 'iframe-' + moduleName;
-                const authRole = moduleName === 'admin' ? 'admin' : 'integracao';
-                iframe.src = srcFile + "?v=70.3.103&role=" + authRole;
+                const authRole = moduleName === 'admin' ? 'admin' : (moduleName === 'kids' ? 'kids' : 'integracao');
+                iframe.src = srcFile + "?v=70.3.111&role=" + authRole;
                 
                 wrapper.appendChild(iframe);
                 container.appendChild(wrapper);

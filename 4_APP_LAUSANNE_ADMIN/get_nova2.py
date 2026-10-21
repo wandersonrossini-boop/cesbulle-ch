@@ -1,0 +1,8 @@
+﻿with open('old_gabinete.html', 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+for i, line in enumerate(lines):
+    if "function openNovaEscala(" in line:
+        for j in range(max(0, i+10), min(i+50, len(lines))):
+            if "style.display" in lines[j] or "modal" in lines[j]:
+                print(f"{j+1}: {lines[j].strip()}")
+        break

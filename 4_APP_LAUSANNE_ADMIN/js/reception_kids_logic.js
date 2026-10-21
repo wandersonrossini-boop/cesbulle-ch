@@ -2,6 +2,22 @@
 // CORE LOGIC v70.3.31 Diamond (Cache Force)
 window.db = window.db || (typeof firebase !== 'undefined' ? firebase.firestore() : null);
 
+// Fallback Toast definition
+if (!window.showToast) {
+    window.showToast = function(msgOrTitle, msg) {
+        var toast = document.getElementById('toast-notification');
+        var toastMsg = document.getElementById('toast-message');
+        var text = msg ? (msgOrTitle + ': ' + msg) : (msgOrTitle || 'Mensagem enviada com sucesso');
+        if (toast && toastMsg) {
+            toastMsg.innerText = text;
+            toast.classList.add('show');
+            setTimeout(function() { toast.classList.remove('show'); }, 3500);
+        } else {
+            console.log("Toast:", text);
+        }
+    };
+}
+
 // [DIAMOND v51.1] IDENTITY RECEIVER
 window.addEventListener('message', function(event) {
     if (event.data && event.data.type === 'MASTER_BYPASS_SIGNAL') {

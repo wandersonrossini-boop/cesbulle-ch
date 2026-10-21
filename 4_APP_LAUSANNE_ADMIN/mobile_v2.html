@@ -451,8 +451,24 @@
         // Clean, reactive auth synchronization
         window.onAuthSuccess = (user, role) => {
             console.log("💎 Shell Auth Success:", role);
-            const targetRole = roleParam || currentRole || role;
-            if (targetRole && targetRole !== 'guest') {
+            const userEmail = (user && user.email) ? user.email.toLowerCase() : '';
+            const emailRole = typeof AuthManager !== 'undefined' && AuthManager.getRoleFromEmail ? AuthManager.getRoleFromEmail(userEmail) : null;
+
+            let targetRole = currentRole || roleParam;
+            if (userEmail.includes('infantil') || userEmail.includes('kids')) {
+                targetRole = 'kids';
+            } else if (userEmail.includes('recepcao')) {
+                if (targetRole === 'kids') targetRole = 'reception';
+            } else if (!targetRole && emailRole && emailRole !== 'guest' && emailRole !== 'admin') {
+                targetRole = emailRole;
+            } else if (!targetRole) {
+                targetRole = role;
+            }
+
+            if (targetRole === 'infantil') targetRole = 'kids';
+            if (targetRole === 'recepcao') targetRole = 'reception';
+
+            if (targetRole && targetRole !== 'guest' && targetRole !== 'monitor') {
                 enterApp(targetRole);
             } else {
                 showLoginView();
@@ -465,6 +481,7 @@
         };
 
         function showLoginView() {
+            currentRole = null;
             document.getElementById('view-login').style.display = 'block';
             document.getElementById('app-header').style.display = 'none';
             document.getElementById('app-container').style.display = 'none';
@@ -495,6 +512,8 @@
         }, 2500);
 
         function selectRole(role) {
+            if (role === 'infantil') role = 'kids';
+            if (role === 'recepcao') role = 'reception';
             if(role === 'altar') {
                 AuthManager.login('altar', 'midia25').then(res => {
                     if(res.success){
@@ -514,6 +533,7 @@
         }
 
         function showRoles() {
+            currentRole = null;
             document.getElementById('pin-screen').style.display='none';
             document.getElementById('role-selection').style.display='block';
         }
@@ -538,6 +558,8 @@
         function toggleRemember() { document.getElementById('remember-me').checked = !document.getElementById('remember-me').checked; }
 
         function enterApp(role) {
+            if (role === 'infantil') role = 'kids';
+            if (role === 'recepcao') role = 'reception';
             if (role === 'lideres' || role === 'lider' || role === 'ministerio' || role === 'ministério') {
                 role = 'admin';
             }
@@ -555,7 +577,7 @@
                 document.getElementById(viewId).classList.add('active');
                 const f = document.getElementById(frameId);
                 if (f) {
-                    if (!f.src) f.src = f.dataset.src + "?v=70.3.79&role=" + role;
+                    if (!f.src) f.src = f.dataset.src + "?v=70.3.111&role=" + role;
                     
                     if(pin === 'Lausanne25') {
                         setTimeout(() => {

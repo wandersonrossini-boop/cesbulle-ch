@@ -4,15 +4,35 @@
 <head>
     <meta charset="UTF-8">
     <script>
-        // EMERGENCY CACHE BUSTER v70.3.78 - FULL LOGICAL PARITY
-        (function() {
-            const CURRENT_VER = "70.3.78";
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('v') !== CURRENT_VER && window.location.protocol !== 'file:') {
-                urlParams.set('v', CURRENT_VER);
-                window.location.search = urlParams.toString();
+        // Global Toast Notification Utility (Available before any other script runs)
+        var _toastTimeout = null;
+        function showToast(msgOrTitle, msg) {
+            var toast = document.getElementById('toast-notification');
+            var toastMsg = document.getElementById('toast-message');
+            var text = msg ? (msgOrTitle + ': ' + msg) : (msgOrTitle || 'Mensagem enviada com sucesso');
+
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast-notification';
+                toast.className = 'toast-notification';
+                toast.innerHTML = '<i class="fas fa-check-circle" style="color: var(--gold, #C9A050);"></i> <span id="toast-message">' + text + '</span>';
+                if (document.body) {
+                    document.body.appendChild(toast);
+                } else {
+                    document.addEventListener('DOMContentLoaded', function() { document.body.appendChild(toast); });
+                }
+                toastMsg = document.getElementById('toast-message');
+            } else if (toastMsg) {
+                toastMsg.innerText = text;
             }
-        })();
+
+            if (toast) toast.classList.add('show');
+            if (_toastTimeout) clearTimeout(_toastTimeout);
+            _toastTimeout = setTimeout(function() {
+                if (toast) toast.classList.remove('show');
+            }, 3500);
+        }
+        window.showToast = showToast;
     </script>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -22,7 +42,7 @@
     <script src="js/auth-manager.js?v=70.3.79"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <!-- Core Reception Logic v70.3.79 (Cache Force) -->
-    <script src="js/reception_kids_logic.js?v=70.3.88"></script>
+    <script src="js/reception_kids_logic.js?v=70.3.111"></script>
     <script>
         // SECURITY GUARD REMOVED to allow direct PC access
     </script>
@@ -50,7 +70,6 @@
     <link rel="stylesheet" href="css/style-v2.css?v=61.0.0">
     <link rel="stylesheet" href="css/mobile-v2.css?v=61.0.0">
     
-    
     <script>
         // Singleton pattern to prevent "already declared" errors
         window.db = window.db || (typeof firebase !== 'undefined' ? firebase.firestore() : null);
@@ -76,9 +95,13 @@
         }
 
         html, body {
-            background-color: var(--bg-light-page) !important;
-            background: var(--bg-light-page) !important;
-            color: var(--text-primary) !important;
+            background-color: #03141a !important;
+            background-image: url('assets/bg_recepcao.png') !important;
+            background-repeat: no-repeat !important;
+            background-position: center center !important;
+            background-size: cover !important;
+            background-attachment: fixed !important;
+            color: #F8FAFC !important;
             padding-bottom: 80px;
             margin: 0;
             font-family: var(--font-body);
@@ -531,7 +554,7 @@
                 display: flex;
                 min-height: 100vh;
                 width: 100%;
-                background: var(--bg-light-page);
+                background: transparent !important;
             }
             .pc-sidebar {
                 display: flex !important;
@@ -1728,19 +1751,30 @@
         
 
         :root {
-            --navy-main: #0A131F !important;
-            --navy-card: #0F172A !important;
-            --navy-hover: #14263D !important;
+            --navy-main: #001f24 !important;
+            --navy-card: rgba(3, 24, 30, 0.82) !important;
+            --navy-hover: rgba(8, 127, 131, 0.25) !important;
+            --teal-accent: #087F83 !important;
             --gold-main: #C9A96A !important;
             --text-light: #F8FAFC !important;
             --text-muted: #94A3B8 !important;
-            --border-dark: #1E293B !important;
+            --border-dark: rgba(8, 127, 131, 0.28) !important;
             --font-serif: 'Playfair Display', serif !important;
         }
         
-        body, .app-layout, .app-main {
-            background-color: var(--navy-main) !important;
+        body, .app-layout, .app-main, .container {
+            background-color: transparent !important;
+            background: transparent !important;
             color: var(--text-light) !important;
+        }
+
+        html, body {
+            background-color: #03141a !important;
+            background-image: url('assets/bg_recepcao.png') !important;
+            background-repeat: no-repeat !important;
+            background-position: center center !important;
+            background-size: cover !important;
+            background-attachment: fixed !important;
         }
 
         .pc-sidebar {
@@ -1750,43 +1784,43 @@
         /* Convert to top nav header */
         .mobile-header {
             display: flex !important;
-            background: var(--navy-card) !important;
+            background: rgba(2, 20, 26, 0.85) !important;
+            backdrop-filter: blur(14px) !important;
+            -webkit-backdrop-filter: blur(14px) !important;
             padding: 15px 30px !important;
-            border-bottom: 1px solid var(--border-dark) !important;
+            border-bottom: 1px solid rgba(8, 127, 131, 0.25) !important;
         }
         .mobile-header .brand-title { color: #FFF !important; font-size: 1.4rem !important; }
         .mobile-header .brand-sub { color: var(--gold-main) !important; }
 
-        /* Hide the hamburger icon as we will use bottom nav */
-        /* .mobile-header > div:nth-child(2) { display: none !important; } removed so INICIO button is visible */
-
         /* The main container */
         .app-main { 
-    padding: 30px 20px !important; 
-    min-height: calc(100vh - 180px); /* Account for header and footer */
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start; /* Default for mobile */
-}
-@media(min-width: 900px) {
-    .app-main {
-        justify-content: center; /* Center vertically on large screens */
-        padding-top: 2vh !important; /* Push it down a bit */
-    }
-}
+            padding: 30px 20px !important; 
+            min-height: calc(100vh - 180px); /* Account for header and footer */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Default for mobile */
+            background: transparent !important;
+        }
+        @media(min-width: 900px) {
+            .app-main {
+                justify-content: center; /* Center vertically on large screens */
+                padding-top: 2vh !important; /* Push it down a bit */
+            }
+        }
 
-        
         .card-floating {
-            background: var(--navy-card) !important;
-            border: 1px solid var(--border-dark) !important;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+            background: rgba(3, 24, 30, 0.82) !important;
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px) !important;
+            border: 1px solid rgba(8, 127, 131, 0.28) !important;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
             box-sizing: border-box !important;
+            border-radius: 12px !important;
             max-width: 100% !important;
-            /* margin and max-width removed to prevent breaking global modules like Ao Vivo */
         }
 
         /* Top Check-in Tabs (VISITANTE, CRIANCA...) */
-        
         #tab-checkin > .segmented-control .segment-btn {
             color: var(--text-muted) !important;
             background: transparent !important;
@@ -1801,30 +1835,32 @@
 
         /* Input fields */
         input[type="text"], input[type="tel"], input[type="email"], select, textarea {
-            background: var(--navy-main) !important;
-            border: 1px solid var(--border-dark) !important;
+            background: rgba(1, 15, 20, 0.85) !important;
+            border: 1px solid rgba(8, 127, 131, 0.3) !important;
             color: var(--text-light) !important;
             box-sizing: border-box !important;
             max-width: 100% !important;
+            border-radius: 8px !important;
         }
-        input:focus, select:focus {
-            border-color: var(--gold-main) !important;
+        input:focus, select:focus, textarea:focus {
+            border-color: #087F83 !important;
+            box-shadow: 0 0 0 2px rgba(8, 127, 131, 0.2) !important;
         }
 
         /* Sub tabs (NOVO / JA VISITOU) */
         .visitor-subtabs {
-            background: var(--navy-main) !important;
-            border: 1px solid var(--border-dark) !important;
+            background: rgba(1, 15, 20, 0.8) !important;
+            border: 1px solid rgba(8, 127, 131, 0.3) !important;
             gap: 0 !important;
             padding: 4px !important;
-            border-radius: 6px !important;
+            border-radius: 8px !important;
             margin-bottom: 20px !important;
         }
         .visitor-subtabs .subtab-btn {
             color: var(--text-muted) !important;
             padding: 10px !important;
             font-size: 0.85rem !important;
-            border-radius: 4px !important;
+            border-radius: 6px !important;
         }
         .visitor-subtabs .subtab-btn.active {
             background: var(--gold-main) !important;
@@ -1848,8 +1884,7 @@
 
         /* Hide Ultimas entradas / Fix grid */
         .pc-visitor-grid { display: block !important; }
-        /* .pc-column-right restored */ /* Hide Ultimas entradas permanently from main view */
-        
+
         /* Bottom Nav */
         .bottom-nav {
             display: flex !important;
@@ -1858,8 +1893,10 @@
             left: 0 !important;
             width: 100% !important;
             max-width: 100% !important;
-            background: var(--navy-card) !important;
-            border-top: 1px solid var(--border-dark) !important;
+            background: rgba(2, 20, 26, 0.9) !important;
+            backdrop-filter: blur(14px) !important;
+            -webkit-backdrop-filter: blur(14px) !important;
+            border-top: 1px solid rgba(8, 127, 131, 0.25) !important;
             z-index: 1000 !important;
             margin: 0 !important;
             transform: none !important;
@@ -2528,12 +2565,13 @@
                 });
 
                 batch.commit().then(() => {
-                    showToast("Mensagem enviada com sucesso");
-                    const SW_VERSION = 'v48.12.17';
-                    // Security v48.12.17 Enforce
-                    navigator.serviceWorker.register('sw-v3.js?v=' + SW_VERSION).then(reg => {
-                        console.log('SW ' + SW_VERSION + ' Registered (Mobile-v48.12.17)');
-                    });
+                    if (typeof showToast === 'function') {
+                        showToast("Mensagem enviada com sucesso");
+                    } else if (typeof window.showToast === 'function') {
+                        window.showToast("Mensagem enviada com sucesso");
+                    } else {
+                        console.log("Mensagem enviada com sucesso");
+                    }
                 }).catch(err => {
                     console.error("Erro:", err);
                     alert("Erro ao enviar: " + err.message);

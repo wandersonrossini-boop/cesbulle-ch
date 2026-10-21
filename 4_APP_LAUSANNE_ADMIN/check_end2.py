@@ -1,0 +1,12 @@
+﻿import re
+
+with open('recepcao_v2.html', 'r', encoding='utf-8') as f:
+    content = f.read()
+
+start = content.find('<!-- === TAB 3')
+end = content.find('// NAVIGATION LOGIC')
+substring = content[start:end]
+
+lines = substring.split('\n')
+for i, line in enumerate(lines[-20:]):
+    print(line)
