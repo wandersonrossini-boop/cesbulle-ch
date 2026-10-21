@@ -19,3 +19,12 @@ horizon/
 **/.env
 **/.env.local
 **/.env.production
+
+# Artefatos temporários de diagnóstico e inspeção restritos a Lausanne Admin
+4_APP_LAUSANNE_ADMIN/check_*.py
+4_APP_LAUSANNE_ADMIN/diag_*.py
+4_APP_LAUSANNE_ADMIN/diag_*.ps1
+4_APP_LAUSANNE_ADMIN/chk_*.ps1
+4_APP_LAUSANNE_ADMIN/step*.py
+4_APP_LAUSANNE_ADMIN/bump*.py
+4_APP_LAUSANNE_ADMIN/out.txt
