@@ -1040,6 +1040,316 @@
             background: #087F83 !important;
         }
 
+        /* ── SEÇÃO INÍCIO (LAYOUT INSTITUCIONAL REFINADO) ── */
+        .home-spiritual-card {
+            background: #EFF6F7;
+            border: 1px solid #D6E8EA;
+            border-radius: 14px;
+            padding: 20px 18px;
+            margin-bottom: 12px;
+        }
+        .home-spiritual-card h3 {
+            margin: 0 0 6px;
+            font-size: 1.35rem;
+            color: #0E364A;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+        .home-spiritual-card p.subtitle {
+            margin: 0 0 16px;
+            font-size: 0.92rem;
+            color: #4D6B79;
+            line-height: 1.4;
+        }
+        .spiritual-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .spiritual-btn {
+            background: #F8FCFC;
+            border: 1px solid #C9E2E5;
+            border-radius: 10px;
+            padding: 12px 10px 14px;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 96px;
+            transition: all 0.2s ease;
+        }
+        .spiritual-btn:hover, .spiritual-btn:active {
+            background: #FFFFFF;
+            border-color: #A5D2D7;
+            transform: translateY(-1px);
+        }
+        .spiritual-btn h4 {
+            margin: 0 0 4px;
+            font-size: 0.95rem;
+            color: #0E364A;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .spiritual-btn p {
+            margin: 0;
+            font-size: 0.78rem;
+            color: #5A7B8A;
+            line-height: 1.3;
+            padding-right: 12px;
+        }
+        .spiritual-btn .arrow-icon {
+            position: absolute;
+            right: 8px;
+            bottom: 12px;
+            font-size: 0.75rem;
+            color: #0E364A;
+            opacity: 0.65;
+        }
+
+        .home-agenda-card {
+            background: #F8FAFB;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+        .home-agenda-card:hover, .home-agenda-card:active {
+            background: #FFFFFF;
+            border-color: #CBD5E1;
+        }
+        .home-agenda-card h4 {
+            margin: 0 0 3px;
+            font-size: 1.05rem;
+            color: #0E364A;
+            font-weight: 700;
+        }
+        .home-agenda-card p {
+            margin: 0;
+            font-size: 0.88rem;
+            color: #64748B;
+        }
+        .home-agenda-card .arrow-icon {
+            font-size: 0.9rem;
+            color: #0E364A;
+            opacity: 0.65;
+            margin-left: 12px;
+        }
+
+        .home-social-card {
+            background: #F9F6F0;
+            border: 1px solid #EADCCB;
+            border-radius: 14px;
+            padding: 18px 18px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+        .home-social-card:hover, .home-social-card:active {
+            background: #FCFAF6;
+            border-color: #DFCDBC;
+        }
+        .home-social-card h4 {
+            margin: 0 0 4px;
+            font-size: 1.25rem;
+            color: #0E364A;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+        }
+        .home-social-card p {
+            margin: 0;
+            font-size: 0.88rem;
+            color: #5F6E75;
+            line-height: 1.4;
+        }
+        .home-social-card .arrow-icon {
+            font-size: 0.95rem;
+            color: #0E364A;
+            opacity: 0.65;
+            margin-left: 14px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 360px) {
+            .spiritual-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            .spiritual-btn {
+                min-height: auto;
+                padding: 12px 14px;
+            }
+        }
+
+    
+        /* ── REFINED SCREENS FROM MOCKUP ── */
+        .subpage-header {
+            display: flex;
+            align-items: center;
+            padding: 20px 0 15px;
+            margin-bottom: 10px;
+        }
+        .subpage-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #0E364A;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            background: none;
+            border: none;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+        .subpage-title-center {
+            text-align: center;
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: #0E364A;
+            margin: 0 0 6px;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -0.4px;
+        }
+        .subpage-subtitle-center {
+            text-align: center;
+            font-size: 0.95rem;
+            color: #64748B;
+            margin: 0 0 25px;
+            line-height: 1.45;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-green-submit {
+            background: #1B5E4B !important;
+            color: #FFFFFF !important;
+            border: none !important;
+            border-radius: 12px !important;
+            padding: 16px 22px !important;
+            font-weight: 700 !important;
+            font-size: 1rem !important;
+            letter-spacing: 0.5px !important;
+            cursor: pointer !important;
+            width: 100% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin-top: 15px !important;
+            margin-bottom: 18px !important;
+            box-shadow: 0 2px 8px rgba(27, 94, 75, 0.2) !important;
+            transition: all 0.2s ease !important;
+            font-family: 'Inter', sans-serif !important;
+        }
+        .btn-green-submit:hover, .btn-green-submit:active {
+            background: #14493A !important;
+            transform: translateY(-1px) !important;
+        }
+        .privacy-notice {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #F8FAFB;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 14px 18px;
+            color: #475569;
+            font-size: 0.85rem;
+            line-height: 1.35;
+            margin-top: 12px;
+        }
+        .privacy-notice i {
+            color: #0E364A;
+            font-size: 1rem;
+            opacity: 0.85;
+            flex-shrink: 0;
+        }
+
+        .action-card-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        .action-card-item {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 14px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+        }
+        .action-card-item:hover, .action-card-item:active {
+            border-color: #CBD5E1;
+            background: #F8FAFB;
+            transform: translateY(-1px);
+        }
+        .action-card-item h3 {
+            margin: 0 0 4px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #0E364A;
+            font-family: 'Inter', sans-serif;
+        }
+        .action-card-item p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #64748B;
+            font-family: 'Inter', sans-serif;
+        }
+        .action-card-item .arrow-icon {
+            font-size: 1rem;
+            color: #0E364A;
+            opacity: 0.6;
+            margin-left: 12px;
+            flex-shrink: 0;
+        }
+
+        /* Success screen modal / container */
+        .unified-success-box {
+            text-align: center;
+            padding: 40px 15px 30px;
+        }
+        .unified-success-circle {
+            width: 84px;
+            height: 84px;
+            background: #E8F5EE;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+        .unified-success-circle i {
+            color: #1B5E4B;
+            font-size: 2.2rem;
+        }
+        .unified-success-box h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #0E364A;
+            margin: 0 0 16px;
+            letter-spacing: -0.4px;
+        }
+        .unified-success-box p {
+            font-size: 1rem;
+            color: #475569;
+            line-height: 1.5;
+            margin: 0 0 35px;
+        }
+
     </style>
 </head>
 <body>
@@ -1047,31 +1357,77 @@
 <!-- ═══ SCREEN 1: INÍCIO (ACOLHIMENTO) ═══ -->
 <div class="app-screen active" id="screen-inicio">
 <!-- HEADER HOME -->
-<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 45px;">
-<img alt="CME Lausanne" src="assets/logo_cme_transparent.png" style="height: 50px; object-fit: contain;"/>
-<div style="display:flex; align-items:center; background: #F8FAFC; padding: 6px 14px; border-radius: 20px; border: 1px solid #E2E8F0; color: #173F63; font-weight: 600; font-size: 0.9rem;">
-<i class="fas fa-user" style="margin-right: 8px; color: #3B7C84;"></i>
-<span id="welcome-name-top">Visitante</span>
+<div style="margin-bottom: 28px;">
+<img alt="CME Lausanne" src="assets/logo_cme_transparent.png" style="height: 52px; object-fit: contain; display: block;"/>
 </div>
+
+<div style="margin-bottom: 24px;">
+<h2 style="font-family: 'Inter', sans-serif; font-size: 2.2rem; font-weight: 400; color: #64748B; margin: 0 0 2px; line-height: 1.15; letter-spacing: -0.5px;">
+    Olá,
+</h2>
+<h2 id="welcome-name-display" style="font-family: 'Inter', sans-serif; font-size: 2.6rem; font-weight: 800; color: #0E364A; margin: 0 0 6px; line-height: 1.15; letter-spacing: -0.8px;">
+    <span id="welcome-name"></span>
+</h2>
+<p style="font-family: 'Inter', sans-serif; font-size: 1.75rem; font-weight: 400; color: #64748B; margin: 0; line-height: 1.2; letter-spacing: -0.3px;">
+    Como você está?
+</p>
 </div>
-<h2 style="font-family: 'Inter', sans-serif; font-size: 2.4rem; font-weight: 700; color: #173F63; margin-bottom: 2px; line-height: 1.1; letter-spacing: -0.5px;">
-                Olá<span id="welcome-name"></span>.
-            </h2>
-<h2 style="font-family: 'Inter', sans-serif; font-size: 2.2rem; font-weight: 400; color: #173F63; margin-top: 0; margin-bottom: 12px; line-height: 1.1; letter-spacing: -0.5px;">
-                Como você está?
-            </h2>
-<div style="margin-bottom: 45px;">
+
+<!-- Separador dourado discreto -->
+<div style="width: 34px; height: 3.5px; background: #C5A059; margin-bottom: 24px; border-radius: 2px;"></div>
+
+<!-- Título da seção -->
+<h3 style="font-size: 1.35rem; color: #0E364A; margin: 0 0 18px; font-weight: 700; font-family: 'Inter', sans-serif; letter-spacing: -0.4px;">
+    Por onde deseja começar?
+</h3>
+
+<!-- 1. Área Espiritual -->
+<div class="home-spiritual-card">
+    <h3>Área espiritual</h3>
+    <p class="subtitle" style="margin-bottom: 14px;">Pedido de oração, uma palavra ou visita.<br>Faça seu pedido e nós entraremos em contacto.</p>
+    <div class="spiritual-grid">
+        <div class="spiritual-btn" onclick="switchTab('oracao')">
+            <div>
+                <h4>Oração</h4>
+                <p>Envie seu pedido.</p>
+            </div>
+            <i class="fas fa-chevron-right arrow-icon"></i>
+        </div>
+        <div class="spiritual-btn" onclick="switchTab('palavra')">
+            <div>
+                <h4>Uma palavra</h4>
+                <p>Converse conosco.</p>
+            </div>
+            <i class="fas fa-chevron-right arrow-icon"></i>
+        </div>
+        <div class="spiritual-btn" onclick="switchTab('visita')">
+            <div>
+                <h4>Visita</h4>
+                <p>Solicite uma visita.</p>
+            </div>
+            <i class="fas fa-chevron-right arrow-icon"></i>
+        </div>
+    </div>
 </div>
-<div style="width: 35px; height: 3px; background: var(--cme-gold); margin-bottom: 15px; border-radius: 2px;"></div>
-<h3 style="font-size: 1.15rem; color: #173F63; margin-bottom: 20px; font-weight: 700; font-family: 'Inter', sans-serif;">Como podemos ajudar?</h3>
-<div onclick="switchTab('espiritual')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
-<h3 style="margin:0; font-size: 1.15rem; color: #173F63; font-weight: 700; margin-bottom:5px;">Área espiritual</h3>
-<p style="margin:0; font-size: 0.95rem; color: #475569;">Pedido de oração, uma palavra ou visita da nossa equipe.</p>
+
+<!-- 2. Agenda e horários — acesso discreto -->
+<div class="home-agenda-card" onclick="switchTab('agenda')">
+    <div>
+        <h4>Agenda e horários</h4>
+        <p>Nossos cultos e encontros.</p>
+    </div>
+    <i class="fas fa-chevron-right arrow-icon"></i>
 </div>
-<div onclick="switchTab('social')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
-<h3 style="margin:0; font-size: 1.15rem; color: #173F63; font-weight: 700; margin-bottom:5px;">Área social</h3>
-<p style="margin:0; font-size: 0.95rem; color: #475569;">Apoio no país, ajuda em necessidades e agendamento de horário.</p>
+
+<!-- 3. Área social — último acesso -->
+<div class="home-social-card" onclick="switchTab('social')">
+    <div>
+        <h4>Área social</h4>
+        <p>Apoio no país e necessidades práticas.<br>Envie sua solicitação.</p>
+    </div>
+    <i class="fas fa-chevron-right arrow-icon"></i>
 </div>
+
 </div>
 <!-- SCREEN: QUEM SOMOS -->
 <div class="app-screen" id="screen-quemsomos" style="padding: 0; background: #FFFFFF; min-height: 100vh;">
@@ -1153,111 +1509,151 @@
 </div>
 </div>
 </div>
-<!-- SCREEN: AGENDA -->
-<div class="app-screen" id="screen-agenda" style="padding: 0; background: #FFFFFF; min-height: 100vh;">
-<div style="background: #FFFFFF; padding: 25px 20px 15px;">
-<div style="display:flex; align-items:center;">
-<i class="fas fa-arrow-left" onclick="switchTab('quemsomos')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
-<h2 style="margin:0; font-size: 1.2rem; font-weight:700; color: #173F63;">Agenda e horários</h2>
+<!-- SCREEN: AGENDA (Tela 6 da referência) -->
+<div class="app-screen" id="screen-agenda" style="padding: 15px 20px 120px; background: #FFFFFF; min-height: 100vh;">
+    <div class="subpage-header">
+        <button class="subpage-back" onclick="switchTab('inicio')">
+            <i class="fas fa-chevron-left"></i> Voltar
+        </button>
+    </div>
+
+    <h2 class="subpage-title-center">Agenda e horários</h2>
+    <p class="subpage-subtitle-center">Nossos cultos e encontros.</p>
+
+    <!-- Cards de Agenda -->
+    <div style="display:flex; flex-direction:column; gap:10px; margin-bottom: 22px;">
+        <div style="display:flex; align-items:center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; padding: 14px 18px;">
+            <div style="min-width: 85px; text-align: left; padding-right: 15px; border-right: 1px solid #E2E8F0;">
+                <span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;">DOMINGO</span>
+                <span style="display:block; font-size: 1.25rem; color: #0E364A; font-weight: 800;">10:00</span>
+            </div>
+            <div style="padding-left: 15px; flex:1;">
+                <h3 style="margin:0; font-size: 1.05rem; color: #0E364A; font-weight: 700;">Culto Principal</h3>
+            </div>
+        </div>
+
+        <div style="display:flex; align-items:center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; padding: 14px 18px;">
+            <div style="min-width: 85px; text-align: left; padding-right: 15px; border-right: 1px solid #E2E8F0;">
+                <span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;">TERÇA</span>
+                <span style="display:block; font-size: 1.25rem; color: #0E364A; font-weight: 800;">19:30</span>
+            </div>
+            <div style="padding-left: 15px; flex:1;">
+                <h3 style="margin:0; font-size: 1.05rem; color: #0E364A; font-weight: 700;">Culto de Oração</h3>
+            </div>
+        </div>
+
+        <div style="display:flex; align-items:center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; padding: 14px 18px;">
+            <div style="min-width: 85px; text-align: left; padding-right: 15px; border-right: 1px solid #E2E8F0;">
+                <span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;">QUARTA</span>
+                <span style="display:block; font-size: 1.25rem; color: #0E364A; font-weight: 800;">09:00</span>
+            </div>
+            <div style="padding-left: 15px; flex:1;">
+                <h3 style="margin:0; font-size: 1.05rem; color: #0E364A; font-weight: 700;">Momento de Intercessão</h3>
+            </div>
+        </div>
+
+        <div style="display:flex; align-items:center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; padding: 14px 18px;">
+            <div style="min-width: 85px; text-align: left; padding-right: 15px; border-right: 1px solid #E2E8F0;">
+                <span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;">SEXTA</span>
+                <span style="display:block; font-size: 1.25rem; color: #0E364A; font-weight: 800;">19:30</span>
+            </div>
+            <div style="padding-left: 15px; flex:1;">
+                <h3 style="margin:0; font-size: 1.05rem; color: #0E364A; font-weight: 700;">Encontro de Mulheres</h3>
+            </div>
+        </div>
+
+        <div style="display:flex; align-items:center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; padding: 14px 18px;">
+            <div style="min-width: 85px; text-align: left; padding-right: 15px; border-right: 1px solid #E2E8F0;">
+                <span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;">SÁBADO</span>
+                <span style="display:block; font-size: 1.25rem; color: #0E364A; font-weight: 800;">19:00</span>
+            </div>
+            <div style="padding-left: 15px; flex:1;">
+                <h3 style="margin:0; font-size: 1.05rem; color: #0E364A; font-weight: 700;">Célula Jovem</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="privacy-notice" style="text-align: left; justify-content: flex-start;">
+        <i class="far fa-calendar-alt" style="font-size: 1.2rem; color: #0E364A;"></i>
+        <span>Acompanhe aqui os nossos cultos e encontros. Para outras informações, entre em contacto.</span>
+    </div>
 </div>
+<!-- SCREEN: ESPIRITUAL (Tela 2 da referência) -->
+<div class="app-screen" id="screen-espiritual" style="padding: 15px 20px 120px; background: #FFFFFF; min-height: 100vh;">
+    <div class="subpage-header">
+        <button class="subpage-back" onclick="switchTab('inicio')">
+            <i class="fas fa-chevron-left"></i> Área espiritual
+        </button>
+    </div>
+
+    <div class="action-card-list">
+        <div class="action-card-item" onclick="switchTab('oracao')">
+            <div>
+                <h3>Oração</h3>
+                <p>Envie seu pedido de oração.</p>
+            </div>
+            <i class="fas fa-chevron-right arrow-icon"></i>
+        </div>
+        <div class="action-card-item" onclick="switchTab('palavra')">
+            <div>
+                <h3>Uma palavra</h3>
+                <p>Converse conosco.</p>
+            </div>
+            <i class="fas fa-chevron-right arrow-icon"></i>
+        </div>
+        <div class="action-card-item" onclick="switchTab('visita')">
+            <div>
+                <h3>Visita</h3>
+                <p>Solicite uma visita.</p>
+            </div>
+            <i class="fas fa-chevron-right arrow-icon"></i>
+        </div>
+    </div>
+
+    <div class="privacy-notice">
+        <i class="fas fa-lock"></i>
+        <span>Todos os pedidos são tratados com atenção e discrição.</span>
+    </div>
 </div>
-<img src="assets/agenda_cultos.png" style="width: 100%; height: 210px; object-fit: cover; display: block;" alt="Agenda e horários - Culto">
-<div style="padding: 25px 20px 120px;">
-<h2 style="font-size: 1.6rem; color: #173F63; font-weight: 700; margin-bottom: 5px; font-family:'Inter', sans-serif;">Agenda e horários</h2>
-<div style="width: 35px; height: 3px; background: var(--cme-gold); margin-bottom: 20px; border-radius: 2px;"></div>
-<p style="font-size: 1.05rem; color: #173F63; font-weight: 500; line-height: 1.6; margin-bottom: 25px; font-family:'Inter', sans-serif;">
-                    Nossos cultos e encontros.
-                </p>
-<!-- Cards de Agenda -->
-<div style="display:flex; align-items:center; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; margin-bottom: 12px; overflow: hidden; padding: 16px 18px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
-<div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1.5px solid #CBD5E1;">
-<span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Domingo</span>
-<span style="display:block; font-size: 1.2rem; color: #173F63; font-weight: 700;">10:00</span>
-</div>
-<div style="padding-left: 15px; flex:1;">
-<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700;">Celebração Principal</h3>
-</div>
-</div>
-<div style="display:flex; align-items:center; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; margin-bottom: 12px; overflow: hidden; padding: 16px 18px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
-<div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1.5px solid #CBD5E1;">
-<span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Terça</span>
-<span style="display:block; font-size: 1.2rem; color: #173F63; font-weight: 700;">19:30</span>
-</div>
-<div style="padding-left: 15px; flex:1;">
-<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700;">Culto "Alicerce"</h3>
-</div>
-</div>
-<div style="display:flex; align-items:center; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; margin-bottom: 12px; overflow: hidden; padding: 16px 18px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
-<div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1.5px solid #CBD5E1;">
-<span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Quarta</span>
-<span style="display:block; font-size: 1.2rem; color: #173F63; font-weight: 700;">09:00</span>
-</div>
-<div style="padding-left: 15px; flex:1;">
-<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700;">Momento de Intercessão</h3>
-</div>
-</div>
-<div style="display:flex; align-items:center; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; margin-bottom: 12px; overflow: hidden; padding: 16px 18px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
-<div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1.5px solid #CBD5E1;">
-<span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Sexta</span>
-<span style="display:block; font-size: 1.2rem; color: #173F63; font-weight: 700;">19:30</span>
-</div>
-<div style="padding-left: 15px; flex:1;">
-<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700;">Encontro de Mulheres "Conectadas"</h3>
-</div>
-</div>
-<div style="display:flex; align-items:center; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; margin-bottom: 12px; overflow: hidden; padding: 16px 18px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
-<div style="min-width: 80px; text-align: left; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 15px; border-right: 1.5px solid #CBD5E1;">
-<span style="display:block; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Sábado</span>
-<span style="display:block; font-size: 1.2rem; color: #173F63; font-weight: 700;">15:00</span>
-</div>
-<div style="padding-left: 15px; flex:1;">
-<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700;">Célula Jovem "Frame"</h3>
-</div>
-</div>
-</div>
-</div>
-<!-- SCREEN: ESPIRITUAL -->
-<div class="app-screen" id="screen-espiritual" style="padding: 25px 20px 120px; background: #FFFFFF; min-height: 100vh;">
-<div style="display:flex; align-items:center; margin-bottom: 25px;">
-<i class="fas fa-chevron-left" onclick="switchTab('inicio')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
-<h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Área espiritual</h2>
-</div>
-<div onclick="switchTab('oracao')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
-<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Oração</h3>
-<p style="margin:0; font-size: 0.85rem; color: #64748B;">Envie seu pedido de oração.</p>
-</div>
-<div onclick="switchTab('visita')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
-<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Uma palavra</h3>
-<p style="margin:0; font-size: 0.85rem; color: #64748B;">Converse com um ministro.</p>
-</div>
-<div onclick="switchTab('visita')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
-<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Visita</h3>
-<p style="margin:0; font-size: 0.85rem; color: #64748B;">Solicite uma visita da nossa equipe.</p>
-</div>
-<div style="padding: 15px 0; display:flex; align-items:center; margin-top: 10px;">
-<p style="margin:0; font-size: 0.8rem; color: #64748B; line-height:1.4;">
-                As solicitações são tratadas com a maior discrição possível.
-            </p>
-</div>
-</div>
-<!-- SCREEN: SOCIAL -->
-<div class="app-screen" id="screen-social" style="padding: 25px 20px 120px; background: #FFFFFF; min-height: 100vh;">
-<div style="display:flex; align-items:center; margin-bottom: 25px;">
-<i class="fas fa-chevron-left" onclick="switchTab('inicio')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
-<h2 style="margin:0; font-size: 1.4rem; font-weight:700; color: #173F63;">Área social</h2>
-</div>
-<div onclick="switchTab('visita')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
-<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Integração no país</h3>
-<p style="margin:0; font-size: 0.85rem; color: #64748B;">Apoio e orientação local.</p>
-</div>
-<div onclick="switchTab('visita')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
-<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Preciso de ajuda</h3>
-<p style="margin:0; font-size: 0.85rem; color: #64748B;">Auxílio em necessidades básicas.</p>
-</div>
-<div onclick="switchTab('visita')" style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
-<h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Agendar horário</h3>
-<p style="margin:0; font-size: 0.85rem; color: #64748B;">Fale com a área social.</p>
-</div>
+<!-- SCREEN: SOCIAL (Tela 7 da referência) -->
+<div class="app-screen" id="screen-social" style="padding: 15px 20px 120px; background: #FFFFFF; min-height: 100vh;">
+    <div class="subpage-header">
+        <button class="subpage-back" onclick="switchTab('inicio')">
+            <i class="fas fa-chevron-left"></i> Voltar
+        </button>
+    </div>
+
+    <h2 class="subpage-title-center">Área social</h2>
+    <p class="subpage-subtitle-center">Precisa de apoio ou orientação?<br>Envie sua solicitação.</p>
+
+    <div class="action-card-list">
+        <div class="action-card-item" onclick="switchTab('visita')">
+            <div>
+                <h3>Apoio e orientações</h3>
+                <p>Informações sobre vida no país, documentos e direcionamento.</p>
+            </div>
+            <i class="fas fa-chevron-right arrow-icon"></i>
+        </div>
+        <div class="action-card-item" onclick="switchTab('visita')">
+            <div>
+                <h3>Necessidades práticas</h3>
+                <p>Ajuda em situações de necessidade.</p>
+            </div>
+            <i class="fas fa-chevron-right arrow-icon"></i>
+        </div>
+        <div class="action-card-item" onclick="switchTab('visita')">
+            <div>
+                <h3>Agendar atendimento</h3>
+                <p>Solicite um horário para conversar conosco.</p>
+            </div>
+            <i class="fas fa-chevron-right arrow-icon"></i>
+        </div>
+    </div>
+
+    <div class="privacy-notice">
+        <i class="fas fa-lock"></i>
+        <span>Sua solicitação será recebida e tratada com atenção.</span>
+    </div>
 </div>
 <!-- SCREEN: AGENDAMENTOS -->
 <div class="app-screen" id="screen-agendamentos" style="padding: 25px 20px 120px; background: #FFFFFF; min-height: 100vh;">
@@ -1406,67 +1802,136 @@
 <i class="fas fa-chevron-right app-card-arrow"></i>
 </div>
 </div>
-<!-- ═══ SCREEN: PEDIDO DE ORAÇÃO ═══ -->
-<div class="app-screen" id="screen-oracao">
-<div class="screen-back-header">
-<button class="btn-back" onclick="switchTab('inicio')"><i class="fas fa-chevron-left"></i> Voltar</button>
-</div>
-<h2 class="screen-title-serif">Pedido de Oração</h2>
-<p class="screen-subtitle">Compartilhe seu pedido. Nossa equipe vai orar por você.</p>
-<div id="oracao-form">
-<div class="field-group">
-<label>Seu Nome (opcional)</label>
-<input id="oracao-nome" placeholder="Nome em segredo se preferir..." type="text"/>
-</div>
-<div class="field-group">
-<label>Seu Pedido *</label>
-<textarea id="oracao-pedido" placeholder="Escreva aqui pelo que devemos orar..." rows="4"></textarea>
-</div>
-<button class="btn-submit" onclick="submitForm('oracao', this)">
-                ENVIAR AO ALTAR
-            </button>
-</div>
-<div class="success-state" id="oracao-success">
-<i class="fas fa-check-circle" style="color:#10b981;"></i>
-<h3>Pedido Entregue!</h3>
-<p>Estaremos orando por você. Deus te abençoe poderosamente!</p>
-</div>
-<div class="system-online-badge">
-<span class="system-dot"></span>Sistema online · Lausanne v70.3.78
+<!-- ═══ SCREEN: PEDIDO DE ORAÇÃO (Tela 3 da referência) ═══ -->
+<div class="app-screen" id="screen-oracao" style="padding: 15px 20px 120px; background: #FFFFFF; min-height: 100vh;">
+    <div class="subpage-header">
+        <button class="subpage-back" onclick="switchTab('inicio')">
+            <i class="fas fa-chevron-left"></i> Voltar
+        </button>
+    </div>
+
+    <div id="oracao-form">
+        <h2 class="subpage-title-center">Pedido de Oração</h2>
+        <p class="subpage-subtitle-center">Compartilhe seu pedido. Vamos orar juntos por você.</p>
+
+        <div class="field-group">
+            <label>Seu nome (opcional)</label>
+            <input id="oracao-nome" placeholder="Nome em segredo se preferir..." type="text"/>
         </div>
-</div>
-<!-- ═══ SCREEN: FALAR COM A EQUIPE ═══ -->
-<div class="app-screen" id="screen-visita">
-<div class="screen-back-header">
-<button class="btn-back" onclick="switchTab('inicio')"><i class="fas fa-chevron-left"></i> Voltar</button>
-</div>
-<h2 class="screen-title-serif">Falar com a Equipe</h2>
-<p class="screen-subtitle">Estamos aqui para te ouvir, ajudar e servir.</p>
-<div id="visita-form">
-<div class="field-group">
-<label>Nome Completo *</label>
-<input id="visita-nome" placeholder="Seu nome..." type="text"/>
-</div>
-<div class="field-group">
-<label>WhatsApp / Telefone *</label>
-<input id="visita-fone" placeholder="+41 79 000 00 00" type="tel"/>
-</div>
-<div class="field-group">
-<label>Como podemos te ajudar?</label>
-<input id="visita-assunto" placeholder="Descreva brevemente..." type="text"/>
-</div>
-<button class="btn-submit btn-blue" onclick="submitForm('visita', this)">
-                SOLICITAR SUPORTE
-            </button>
-</div>
-<div class="success-state" id="visita-success">
-<i class="fas fa-check-circle" style="color:#3b82f6;"></i>
-<h3>Solicitação Enviada!</h3>
-<p>Nossa equipe de acolhimento entrará em contato em breve. Estamos aqui!</p>
-</div>
-<div class="system-online-badge">
-<span class="system-dot"></span>Sistema online · Lausanne v70.3.78
+        <div class="field-group">
+            <label>Seu pedido *</label>
+            <textarea id="oracao-pedido" placeholder="Escreva aqui o seu pedido de oração..." rows="4"></textarea>
         </div>
+        <button class="btn-green-submit" onclick="submitForm('oracao', this)">
+            ENVIAR
+        </button>
+        <div class="privacy-notice">
+            <i class="fas fa-lock"></i>
+            <span>Seu pedido será recebido e tratado com atenção e discrição.</span>
+        </div>
+    </div>
+
+    <!-- Tela 8: Sucesso Unificado -->
+    <div class="unified-success-box" id="oracao-success" style="display:none;">
+        <div class="unified-success-circle">
+            <i class="fas fa-check"></i>
+        </div>
+        <h2>Solicitação enviada</h2>
+        <p>Seu pedido foi recebido.<br>Vamos analisar e dar o encaminhamento adequado.<br>Agradecemos por compartilhar conosco.</p>
+        <button class="btn-green-submit" onclick="switchTab('inicio')">
+            VOLTAR PARA O INÍCIO
+        </button>
+    </div>
+</div>
+
+<!-- ═══ SCREEN: SOLICITAR UMA PALAVRA (Tela 4 da referência) ═══ -->
+<div class="app-screen" id="screen-palavra" style="padding: 15px 20px 120px; background: #FFFFFF; min-height: 100vh;">
+    <div class="subpage-header">
+        <button class="subpage-back" onclick="switchTab('inicio')">
+            <i class="fas fa-chevron-left"></i> Voltar
+        </button>
+    </div>
+
+    <div id="palavra-form">
+        <h2 class="subpage-title-center">Solicitar uma palavra</h2>
+        <p class="subpage-subtitle-center">Deseja conversar com alguém da nossa equipe? Envie sua solicitação.</p>
+
+        <div class="field-group">
+            <label>Seu nome completo *</label>
+            <input id="palavra-nome" placeholder="Seu nome..." type="text"/>
+        </div>
+        <div class="field-group">
+            <label>WhatsApp / Telefone *</label>
+            <input id="palavra-fone" placeholder="+41 79 000 00 00" type="tel"/>
+        </div>
+        <div class="field-group">
+            <label>Como podemos te ajudar? *</label>
+            <input id="palavra-assunto" placeholder="Descreva brevemente..." type="text"/>
+        </div>
+        <button class="btn-green-submit" onclick="submitForm('palavra', this)">
+            ENVIAR
+        </button>
+        <div class="privacy-notice">
+            <i class="fas fa-lock"></i>
+            <span>Sua solicitação será recebida e tratada com atenção.</span>
+        </div>
+    </div>
+
+    <div class="unified-success-box" id="palavra-success" style="display:none;">
+        <div class="unified-success-circle">
+            <i class="fas fa-check"></i>
+        </div>
+        <h2>Solicitação enviada</h2>
+        <p>Seu pedido foi recebido.<br>Vamos analisar e dar o encaminhamento adequado.<br>Agradecemos por compartilhar conosco.</p>
+        <button class="btn-green-submit" onclick="switchTab('inicio')">
+            VOLTAR PARA O INÍCIO
+        </button>
+    </div>
+</div>
+
+<!-- ═══ SCREEN: SOLICITAR UMA VISITA (Tela 5 da referência) ═══ -->
+<div class="app-screen" id="screen-visita" style="padding: 15px 20px 120px; background: #FFFFFF; min-height: 100vh;">
+    <div class="subpage-header">
+        <button class="subpage-back" onclick="switchTab('inicio')">
+            <i class="fas fa-chevron-left"></i> Voltar
+        </button>
+    </div>
+
+    <div id="visita-form">
+        <h2 class="subpage-title-center">Solicitar uma Visita</h2>
+        <p class="subpage-subtitle-center">Gostaria de receber uma visita?<br>Envie sua solicitação.</p>
+
+        <div class="field-group">
+            <label>Seu nome completo *</label>
+            <input id="visita-nome" placeholder="Seu nome..." type="text"/>
+        </div>
+        <div class="field-group">
+            <label>WhatsApp / Telefone *</label>
+            <input id="visita-fone" placeholder="+41 79 000 00 00" type="tel"/>
+        </div>
+        <div class="field-group">
+            <label>Qual o motivo da visita? *</label>
+            <input id="visita-assunto" placeholder="Descreva brevemente..." type="text"/>
+        </div>
+        <button class="btn-green-submit" onclick="submitForm('visita', this)">
+            ENVIAR
+        </button>
+        <div class="privacy-notice">
+            <i class="fas fa-lock"></i>
+            <span>Sua solicitação será recebida e tratada com atenção.</span>
+        </div>
+    </div>
+
+    <div class="unified-success-box" id="visita-success" style="display:none;">
+        <div class="unified-success-circle">
+            <i class="fas fa-check"></i>
+        </div>
+        <h2>Solicitação enviada</h2>
+        <p>Seu pedido foi recebido.<br>Vamos analisar e dar o encaminhamento adequado.<br>Agradecemos por compartilhar conosco.</p>
+        <button class="btn-green-submit" onclick="switchTab('inicio')">
+            VOLTAR PARA O INÍCIO
+        </button>
+    </div>
 </div>
 <!-- ── BOTTOM NAVIGATION BAR ── -->
 <!-- BOTTOM NAVIGATION BAR -->
@@ -1846,13 +2311,13 @@ Nossa equipe entrará em contato em breve para os próximos passos no serviço v
         (function() {
             const name = localStorage.getItem('visitor_first_name');
             const el = document.getElementById('welcome-name');
-            const elTop = document.getElementById('welcome-name-top');
+            const elDisplay = document.getElementById('welcome-name-display');
             if (name) {
-                if (el) el.textContent = ', ' + name;
-                if (elTop) elTop.textContent = name;
+                if (el) el.textContent = name;
+                if (elDisplay) elDisplay.style.display = 'block';
             } else {
                 if (el) el.textContent = '';
-                if (elTop) elTop.parentElement.style.display = 'none';
+                if (elDisplay) elDisplay.style.display = 'none';
             }
             const ref = new URLSearchParams(window.location.search).get('ref');
             if (ref) localStorage.setItem('acolhedor_origem', ref);
@@ -1868,33 +2333,27 @@ Nossa equipe entrará em contato em breve para os próximos passos no serviço v
             if (navBtn) navBtn.classList.add('active');
             if (screen) screen.classList.add('active');
 
-            if (id === 'oracao' || id === 'visita') {
+            if (id === 'oracao' || id === 'visita' || id === 'palavra') {
                 const f = document.getElementById(id + '-form');
                 const s = document.getElementById(id + '-success');
                 if (f) f.style.display = 'block';
                 if (s) s.style.display = 'none';
+                const btn = document.querySelector('#' + id + '-form button');
+                if (btn) {
+                    btn.innerHTML = 'ENVIAR';
+                    btn.style.opacity = '1';
+                    btn.style.pointerEvents = 'auto';
+                }
                 if (id === 'oracao') {
                     const ped = document.getElementById('oracao-pedido');
                     if (ped) ped.value = '';
-                    const btn = document.querySelector('#oracao-form button');
-                    if (btn) {
-                        btn.innerHTML = 'ENVIAR AO ALTAR';
-                        btn.style.opacity = '1';
-                        btn.style.pointerEvents = 'auto';
-                    }
                 } else {
-                    const n = document.getElementById('visita-nome');
-                    const p = document.getElementById('visita-fone');
-                    const a = document.getElementById('visita-assunto');
+                    const n = document.getElementById(id + '-nome');
+                    const p = document.getElementById(id + '-fone');
+                    const a = document.getElementById(id + '-assunto');
                     if (n) n.value = '';
                     if (p) p.value = '';
                     if (a) a.value = '';
-                    const btn = document.querySelector('#visita-form button');
-                    if (btn) {
-                        btn.innerHTML = 'SOLICITAR SUPORTE';
-                        btn.style.opacity = '1';
-                        btn.style.pointerEvents = 'auto';
-                    }
                 }
             }
 
@@ -2049,20 +2508,20 @@ Nossa equipe entrará em contato em breve para os próximos passos no serviço v
                     data.message = pedido;
                     await db.collection('schedule_requests').add(data);
 
-                } else if (tipo === 'visita') {
-                    const nome = document.getElementById('visita-nome').value.trim();
-                    const fone = document.getElementById('visita-fone').value.trim();
+                } else if (tipo === 'visita' || tipo === 'palavra') {
+                    const nome = document.getElementById(tipo + '-nome').value.trim();
+                    const fone = document.getElementById(tipo + '-fone').value.trim();
                     if (!nome || !fone) {
                         alert('Nome e WhatsApp são obrigatórios.');
                         throw new Error('empty');
                     }
-                    data.type = 'visita';
-                    data.action = 'Solicitação de Acolhimento';
+                    data.type = tipo;
+                    data.action = tipo === 'palavra' ? 'Solicitar uma palavra' : 'Solicitar uma Visita';
                     data.person_name = nome;
                     data.name = nome;
                     data.contact = fone;
                     data.phone = fone;
-                    data.message = document.getElementById('visita-assunto').value.trim();
+                    data.message = document.getElementById(tipo + '-assunto').value.trim();
                     await db.collection('integracao').add(data);
 
                 } else if (tipo === 'batismo') {
