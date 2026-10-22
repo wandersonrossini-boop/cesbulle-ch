@@ -1357,29 +1357,21 @@
 <!-- ═══ SCREEN 1: INÍCIO (ACOLHIMENTO) ═══ -->
 <div class="app-screen active" id="screen-inicio">
 <!-- HEADER HOME -->
-<div style="margin-bottom: 28px;">
-<img alt="CME Lausanne" src="assets/logo_cme_transparent.png" style="height: 52px; object-fit: contain; display: block;"/>
+<div style="margin-bottom: 18px;">
+<img alt="CME Lausanne" src="assets/logo_cme_transparent.png" style="height: 48px; object-fit: contain; display: block;"/>
 </div>
 
-<div style="margin-bottom: 24px;">
-<h2 style="font-family: 'Inter', sans-serif; font-size: 2.2rem; font-weight: 400; color: #64748B; margin: 0 0 2px; line-height: 1.15; letter-spacing: -0.5px;">
-    Olá,
+<div style="margin-bottom: 16px;">
+<h2 style="font-family: 'Inter', sans-serif; font-size: 2.1rem; line-height: 1.2; letter-spacing: -0.6px; margin: 0 0 4px; word-break: break-word; overflow-wrap: break-word;">
+    <span style="font-weight: 400; color: #64748B;">Olá, </span><span id="welcome-name" style="font-weight: 800; color: #0E364A;"></span>
 </h2>
-<h2 id="welcome-name-display" style="font-family: 'Inter', sans-serif; font-size: 2.6rem; font-weight: 800; color: #0E364A; margin: 0 0 6px; line-height: 1.15; letter-spacing: -0.8px;">
-    <span id="welcome-name"></span>
-</h2>
-<p style="font-family: 'Inter', sans-serif; font-size: 1.75rem; font-weight: 400; color: #64748B; margin: 0; line-height: 1.2; letter-spacing: -0.3px;">
+<p style="font-family: 'Inter', sans-serif; font-size: 1.35rem; font-weight: 400; color: #64748B; margin: 0; line-height: 1.25; letter-spacing: -0.3px;">
     Como você está?
 </p>
 </div>
 
 <!-- Separador dourado discreto -->
-<div style="width: 34px; height: 3.5px; background: #C5A059; margin-bottom: 24px; border-radius: 2px;"></div>
-
-<!-- Título da seção -->
-<h3 style="font-size: 1.35rem; color: #0E364A; margin: 0 0 18px; font-weight: 700; font-family: 'Inter', sans-serif; letter-spacing: -0.4px;">
-    Por onde deseja começar?
-</h3>
+<div style="width: 34px; height: 3.5px; background: #C5A059; margin-bottom: 18px; border-radius: 2px;"></div>
 
 <!-- 1. Área Espiritual -->
 <div class="home-spiritual-card">
@@ -1480,18 +1472,18 @@
 </div>
 </div>
 <!-- SCREEN: PRINCIPIOS -->
-<div class="app-screen" id="screen-principios" style="padding: 0; background: #FFFFFF; min-height: 100vh;">
-<div style="background: #FFFFFF; padding: 25px 20px 15px;">
+<div class="app-screen" id="screen-principios" style="padding: 0; background: #FFFFFF; min-height: 100%; min-height: 100dvh; box-sizing: border-box;">
+<div style="background: #FFFFFF; padding: 18px 20px 14px;">
 <div style="display:flex; align-items:center;">
 <i class="fas fa-arrow-left" onclick="switchTab('quemsomos')" style="font-size: 1.2rem; cursor: pointer; color: #173F63; margin-right: 15px;"></i>
 <h2 style="margin:0; font-size: 1.2rem; font-weight:700; color: #173F63;">Nossa maneira de viver</h2>
 </div>
 </div>
-<img src="assets/principios_comunidade.png" style="width: 100%; height: 210px; object-fit: cover; display: block;" alt="Nossa maneira de viver - Comunidade">
-<div style="padding: 25px 20px 120px;">
-<h2 style="font-size: 1.6rem; color: #173F63; font-weight: 700; margin-bottom: 5px; font-family:'Inter', sans-serif;">Nossa maneira de viver</h2>
-<div style="width: 35px; height: 3px; background: var(--cme-gold); margin-bottom: 20px; border-radius: 2px;"></div>
-<p style="font-size: 0.95rem; color: #475569; line-height: 1.6; margin-bottom: 25px; font-family:'Inter', sans-serif;">
+<img src="assets/principios_comunidade.png" style="width: 100%; height: 145px; object-fit: cover; object-position: center; display: block;" alt="Nossa maneira de viver - Comunidade">
+<div style="padding: 20px 20px calc(105px + env(safe-area-inset-bottom, 20px));">
+<h2 style="font-size: 1.5rem; color: #173F63; font-weight: 700; margin-bottom: 5px; font-family:'Inter', sans-serif;">Nossa maneira de viver</h2>
+<div style="width: 35px; height: 3px; background: var(--cme-gold); margin-bottom: 14px; border-radius: 2px;"></div>
+<p style="font-size: 0.95rem; color: #475569; line-height: 1.55; margin-bottom: 18px; font-family:'Inter', sans-serif;">
                     Na CME Lausanne buscamos viver uma fé autêntica, que se expressa em comunidade e serviço.
                 </p>
 <!-- Princípios -->
@@ -1503,7 +1495,7 @@
 <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Comunidade</h3>
 <p style="margin:0; font-size: 0.9rem; color: #64748B; line-height:1.4;">Relacionamento, comunhão e cuidado mútuo.</p>
 </div>
-<div style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
+<div style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 16px 18px; margin-bottom: 0; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
 <h3 style="margin:0; font-size: 1.05rem; color: #173F63; font-weight: 700; margin-bottom:3px;">Serviço</h3>
 <p style="margin:0; font-size: 0.9rem; color: #64748B; line-height:1.4;">Colocando nossa fé em prática através do amor ao próximo.</p>
 </div>
@@ -2311,13 +2303,10 @@ Nossa equipe entrará em contato em breve para os próximos passos no serviço v
         (function() {
             const name = localStorage.getItem('visitor_first_name');
             const el = document.getElementById('welcome-name');
-            const elDisplay = document.getElementById('welcome-name-display');
             if (name) {
                 if (el) el.textContent = name;
-                if (elDisplay) elDisplay.style.display = 'block';
             } else {
                 if (el) el.textContent = '';
-                if (elDisplay) elDisplay.style.display = 'none';
             }
             const ref = new URLSearchParams(window.location.search).get('ref');
             if (ref) localStorage.setItem('acolhedor_origem', ref);
@@ -2621,13 +2610,13 @@ Nossa equipe entrará em contato em breve para os próximos passos no serviço v
 
                     localStorage.setItem('visitor_first_name', nome.split(' ')[0]);
                     const wn = document.getElementById('welcome-name');
-                    if (wn) wn.textContent = ', ' + nome.split(' ')[0];
+                    if (wn) wn.textContent = nome.split(' ')[0];
                 }
 
                 if (data.person_name && data.person_name !== 'Anônimo') {
                     localStorage.setItem('visitor_first_name', data.person_name.split(' ')[0]);
                     const wn = document.getElementById('welcome-name');
-                    if (wn) wn.textContent = ', ' + data.person_name.split(' ')[0];
+                    if (wn) wn.textContent = data.person_name.split(' ')[0];
                 }
 
                 const formEl = document.getElementById(tipo + '-form');
