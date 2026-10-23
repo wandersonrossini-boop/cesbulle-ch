@@ -288,28 +288,93 @@
             box-sizing: border-box;
         }
 
-        /* EXCEL-LIKE TABLE STYLES */
+        /* EXCEL-LIKE TABLE STYLES (Sober & Professional) */
+        #page-people .people-filter-tabs {
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 6px;
+        }
+
+        #page-people .category-tab {
+            background: #ffffff;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 7px 14px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: none;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #page-people .category-tab i {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        #page-people .category-tab:hover:not(.active) {
+            background: #f8fafc;
+            color: #0f172a;
+            border-color: #94a3b8;
+        }
+
+        #page-people .category-tab.active {
+            background: #0f172a !important;
+            color: #ffffff !important;
+            border-color: #0f172a !important;
+        }
+
+        #page-people .category-tab.active i {
+            color: #cbd5e1 !important;
+        }
+
+        #page-people .category-tab .tab-count {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+
+        #page-people .category-tab.active .tab-count {
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
         .excel-table-container {
             width: 100%;
             overflow-x: auto;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #ffffff;
         }
 
         .excel-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
+            font-family: inherit;
         }
 
         .excel-table th {
             background: #f8fafc;
-            color: #475569;
-            font-weight: 800;
+            color: #334155;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
             text-align: left;
-            padding: 12px 15px;
-            border-bottom: 2px solid #e2e8f0;
+            padding: 10px 14px;
+            border-bottom: 1px solid #cbd5e1;
             white-space: nowrap;
             position: sticky;
             top: 0;
@@ -317,26 +382,63 @@
         }
 
         .excel-table td {
-            padding: 10px 15px;
-            border-bottom: 1px solid #e2e8f0;
+            padding: 10px 14px;
+            border-bottom: 1px solid #f1f5f9;
             color: #1e293b;
             vertical-align: middle;
+            font-size: 0.82rem;
         }
 
         .excel-table tr:hover {
-            background: #f1f5f9;
+            background: #f8fafc;
         }
 
         .excel-table tr.zebra {
-            background: #fcfcfc;
+            background: #fafbfc;
         }
 
         .excel-badge {
-            padding: 2px 8px;
-            border-radius: 6px;
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 4px;
             font-size: 0.7rem;
-            font-weight: 800;
-            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+            border: 1px solid transparent;
+        }
+
+        .tbl-btn-action {
+            background: #ffffff;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 5px 9px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s ease;
+        }
+
+        .tbl-btn-action:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+            border-color: #94a3b8;
+        }
+
+        .tbl-btn-action.tbl-btn-danger {
+            color: #b91c1c;
+            border-color: #fca5a5;
+            background: #ffffff;
+        }
+
+        .tbl-btn-action.tbl-btn-danger:hover {
+            background: #fef2f2;
+            border-color: #ef4444;
+            color: #991b1b;
         }
 
         .view-toggle-btn {
@@ -1051,130 +1153,121 @@
             <div id="page-people" class="page-content" style="display:none;">
 
                 <div class="panel-card"
-                    style="background:#ffffff !important; padding:30px !important;">
-                    <!-- Header compacto -->
-                    <div
-                        style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
-                        <div style="font-weight:800; font-size:1rem; color:#1a1a1a;">
-                            <i class="fas fa-address-book" style="color:var(--gold-accent); margin-right:8px;"></i>
-                            Base de Dados <span id="people-count"
-                                style="background:#f1f5f9; color:#6b7280; font-size:0.75rem; padding:2px 10px; border-radius:12px; font-weight:700; margin-left:6px;">...</span>
+                    style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:24px; box-shadow:none;">
+                    <!-- Cabeçalho Institucional -->
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; flex-wrap:wrap; gap:12px; border-bottom:1px solid #f1f5f9; padding-bottom:16px;">
+                        <div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <h2 style="font-weight:700; font-size:1.15rem; color:#0f172a; margin:0; letter-spacing:-0.2px;">Base de Dados</h2>
+                                <span id="people-count" style="background:#f1f5f9; color:#475569; font-size:0.75rem; padding:3px 8px; border-radius:4px; font-weight:600; border:1px solid #e2e8f0;">...</span>
+                            </div>
+                            <p style="margin:4px 0 0 0; font-size:0.8rem; color:#64748b;">Gestão oficial de membros, congregação e cadastros da igreja.</p>
                         </div>
                         <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-
-
                             <button onclick="openMembershipWizard()"
-                                 style="background:var(--gold-accent); color:#000; border:none; border-radius:10px; padding:7px 14px; font-weight:800; font-size:0.8rem; cursor:pointer; font-family:'Outfit'; display:flex; align-items:center; gap:6px;">
-                                 <i class="fas fa-user-plus"></i> Cadastro Completo
+                                style="background:#0f172a; color:#ffffff; border:1px solid #0f172a; border-radius:6px; padding:8px 14px; font-weight:600; font-size:0.82rem; cursor:pointer; font-family:inherit; display:inline-flex; align-items:center; gap:6px;">
+                                <i class="fas fa-user-plus"></i> Novo Cadastro
                             </button>
-
                             <button onclick="exportarTudo()"
-                                style="background:#10b981; color:white; border:none; border-radius:10px; padding:7px 14px; font-weight:800; font-size:0.8rem; cursor:pointer; font-family:'Outfit'; display:flex; align-items:center; gap:6px;">
-                                <i class="fas fa-file-excel"></i> CSV
+                                style="background:#ffffff; color:#334155; border:1px solid #cbd5e1; border-radius:6px; padding:8px 14px; font-weight:600; font-size:0.82rem; cursor:pointer; font-family:inherit; display:inline-flex; align-items:center; gap:6px;"
+                                title="Exportar tabela em formato CSV">
+                                <i class="fas fa-download"></i> Exportar CSV
                             </button>
                             <button onclick="loadPeople(true)"
-                                style="background:var(--gold-accent); color:black; border:none; border-radius:10px; width:34px; height:34px; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 10px rgba(201,160,80,0.3);"
+                                style="background:#ffffff; color:#475569; border:1px solid #cbd5e1; border-radius:6px; width:34px; height:34px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;"
                                 title="Sincronizar dados">
                                 <i class="fas fa-sync-alt" id="sync-people-icon" style="font-size:0.8rem;"></i>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Info/Legend Explaining Categories -->
-                    <div id="people-legend-box" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:15px; margin-bottom:15px; font-family:'Outfit'; display:none; box-shadow:0 4px 6px rgba(0,0,0,0.02);">
-                        <h4 style="margin:0 0 10px 0; color:#1e293b; font-size:0.92rem; font-weight:800; display:flex; align-items:center; gap:8px;">
-                            <i class="fas fa-info-circle" style="color:var(--gold-accent);"></i> Entenda a Organização dos Cadastros
-                        </h4>
-                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; font-size:0.78rem; line-height:1.4; color:#475569;">
-                            <div style="border-left:3px solid #10b981; padding-left:8px; grid-column: span 2;">
-                                <strong style="color:#059669;">Membros / Acompanhamento:</strong> Membros oficiais com ficha de cadastro qualificada (30+ campos respondidos, incluindo dados de identificação obrigatórios e batismo).
-                                <div style="margin-top:5px; display:flex; gap:10px; flex-wrap:wrap;">
-                                    <span style="font-size:0.7rem; background:#ecfdf5; color:#047857; padding:1px 5px; border-radius:4px; font-weight:700;">Membro (Ficha 30+ Campos)</span>
-                                    <span style="font-size:0.7rem; background:#fee2e2; color:#ef4444; padding:1px 5px; border-radius:4px; font-weight:700;">Triagem (Recepção/Pendentes)</span>
-                                    <span style="font-size:0.7rem; background:#fef3c7; color:#d97706; padding:1px 5px; border-radius:4px; font-weight:700;">Jornada (Acompanhamento CRM)</span>
-                                </div>
+                    <!-- Legenda explicativa sob demanda -->
+                    <div id="people-legend-box" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:14px; margin-bottom:16px; display:none;">
+                        <div style="font-weight:600; color:#1e293b; font-size:0.82rem; margin-bottom:8px;">Classificação dos Cadastros</div>
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; font-size:0.75rem; line-height:1.45; color:#475569;">
+                            <div style="border-left:2px solid #0f172a; padding-left:8px;">
+                                <strong style="color:#0f172a;">Membros:</strong> Cadastro qualificado e batismo regularizado.
                             </div>
-                            <div style="border-left:3px solid #6d28d9; padding-left:8px;">
-                                <strong style="color:#6d28d9;">Congregados:</strong> Pessoas com cadastro incompleto (entre 5 e 29 campos respondidos), frequentando ativamente.
+                            <div style="border-left:2px solid #475569; padding-left:8px;">
+                                <strong style="color:#334155;">Congregados:</strong> Frequência regular com dados em processo de atualização.
                             </div>
-                            <div style="border-left:3px solid #3b82f6; padding-left:8px;">
-                                <strong style="color:#2563eb;">Cadastro (Visitantes):</strong> Cadastro inicial básico (menos de 5 campos respondidos, ex: apenas Nome e WhatsApp).
+                            <div style="border-left:2px solid #64748b; padding-left:8px;">
+                                <strong style="color:#334155;">Visitantes:</strong> Cadastro inicial de recepção e primeiro contato.
                             </div>
-                            <div style="border-left:3px solid #f59e0b; padding-left:8px;">
-                                <strong style="color:#d97706;">Crianças:</strong> Crianças cadastradas no espaço Kids.
+                            <div style="border-left:2px solid #94a3b8; padding-left:8px;">
+                                <strong style="color:#334155;">Crianças:</strong> Registros vinculados ao departamento infantil.
                             </div>
-                            <div style="border-left:3px solid #4b5563; padding-left:8px;">
-                                <strong style="color:#374151;">Outra Igreja:</strong> Visitantes de outra igreja ou registros com dados incompletos.
+                            <div style="border-left:2px solid #cbd5e1; padding-left:8px;">
+                                <strong style="color:#334155;">Outra Igreja:</strong> Visitantes com vínculo eclesiástico externo.
                             </div>
                         </div>
                     </div>
 
-                    <!-- Busca compacta -->
-                    <div style="display:flex; gap:10px; align-items:center; margin-bottom:14px;">
+                    <!-- Barra de Ferramentas (Busca e Detalhes) -->
+                    <div style="display:flex; gap:8px; align-items:center; margin-bottom:14px;">
                         <div style="position:relative; flex:1;">
-                            <i class="fas fa-search"
-                                style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:0.85rem;"></i>
+                            <i class="fas fa-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:0.8rem;"></i>
                             <input type="text" id="search-people" onkeyup="filterPeople()"
-                                placeholder="Buscar nome, contato..."
-                                style="width:100%; padding:10px 12px 10px 34px; border-radius:10px; border:1px solid #e5e7eb; font-family:'Outfit'; font-size:0.88rem; outline:none; box-sizing:border-box;">
+                                placeholder="Buscar por nome, contato ou localidade..."
+                                style="width:100%; padding:9px 12px 9px 34px; border-radius:6px; border:1px solid #cbd5e1; font-family:inherit; font-size:0.82rem; outline:none; background:#ffffff; color:#0f172a; box-sizing:border-box;">
                         </div>
-                        <button onclick="togglePeopleLegend()" style="background:#f8fafc; color:#475569; border:1px solid #cbd5e1; border-radius:10px; height:38px; padding:0 12px; cursor:pointer; font-family:'Outfit'; font-size:0.82rem; font-weight:700; display:flex; align-items:center; gap:6px; transition:0.2s;" onmouseover="this.style.background='#e2e8f0'">
-                            <i class="fas fa-question-circle" style="color:var(--gold-accent);"></i> Classificações
+                        <button onclick="togglePeopleLegend()"
+                            style="background:#ffffff; color:#475569; border:1px solid #cbd5e1; border-radius:6px; height:34px; padding:0 12px; cursor:pointer; font-family:inherit; font-size:0.78rem; font-weight:600; display:inline-flex; align-items:center; gap:6px;">
+                            <i class="fas fa-info-circle"></i> Critérios
                         </button>
                     </div>
 
-                    <!-- Abas de Filtro de Base de Dados -->
-                    <div class="people-filter-tabs" style="display:flex; gap:8px; overflow-x:auto; padding-bottom:10px; margin-bottom:10px; scrollbar-width:none;">
-                        <button class="category-tab active" id="tab-membro" onclick="setPeopleTab('membro', this)" style="color:#15803d;">
-                            <i class="fas fa-id-badge"></i> Membros
+                    <!-- Abas de Filtro -->
+                    <div class="people-filter-tabs">
+                        <button class="category-tab active" id="tab-membro" onclick="setPeopleTab('membro', this)">
+                            <i class="fas fa-user-check"></i> Membros
                         </button>
-                        <button class="category-tab" id="tab-congregado" onclick="setPeopleTab('congregado', this)" style="color:#6d28d9;">
-                            <i class="fas fa-pray"></i> Congregados
+                        <button class="category-tab" id="tab-congregado" onclick="setPeopleTab('congregado', this)">
+                            <i class="fas fa-users"></i> Congregados
                         </button>
-                        <button class="category-tab" id="tab-visitante" onclick="setPeopleTab('visitante', this)" style="color:#3b82f6;">
-                            <i class="fas fa-user-plus"></i> Cadastro (Visitantes)
+                        <button class="category-tab" id="tab-visitante" onclick="setPeopleTab('visitante', this)">
+                            <i class="fas fa-user"></i> Visitantes
                         </button>
-                        <button class="category-tab" id="tab-crianca" onclick="setPeopleTab('crianca', this)" style="color:#f59e0b;">
+                        <button class="category-tab" id="tab-crianca" onclick="setPeopleTab('crianca', this)">
                             <i class="fas fa-child"></i> Crianças
                         </button>
-                        <button class="category-tab" id="tab-outros" onclick="setPeopleTab('outros', this)" style="color:#4b5563;">
+                        <button class="category-tab" id="tab-outros" onclick="setPeopleTab('outros', this)">
                             <i class="fas fa-church"></i> Outra Igreja
                         </button>
                     </div>
 
-                    <!-- Lista Container (Dynamic Grid or Table) -->
+                    <!-- Lista Container (Tabela Principal) -->
                     <div id="people-list-container"
-                        style="max-height:calc(100vh - 280px); overflow-y:auto; padding-right:10px; padding-bottom:20px; margin-top:15px;">
-                        <div style="text-align:center; padding:30px; color:#9ca3af; font-family:'Outfit';">
+                        style="max-height:calc(100vh - 280px); overflow-y:auto; padding-bottom:10px;">
+                        <div style="text-align:center; padding:30px; color:#64748b; font-family:inherit; font-size:0.85rem;">
                             Carregando membros...</div>
                     </div>
                 </div>
 
 
-                <!-- ANIVERSARIANTES DO MÊS PANEL -->
+                <!-- ANIVERSARIANTES DO MÊS (Sóbrio & Institucional) -->
                 <div class="panel-card"
-                    style="background:#fff !important; margin-top:30px;">
-                    <div class="panel-title"
-                        style="color:#1a1a1a; font-weight:800; font-size:1.1rem; margin-bottom:20px;">
-                        <span><i class="fas fa-birthday-cake"
-                                style="color:#ec4899; margin-right:10px;"></i>Aniversariantes do Mês</span>
+                    style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:20px; margin-top:24px; box-shadow:none;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; border-bottom:1px solid #f1f5f9; padding-bottom:10px;">
+                        <h3 style="color:#0f172a; font-weight:700; font-size:0.95rem; margin:0; display:inline-flex; align-items:center; gap:8px;">
+                            <i class="fas fa-calendar-alt" style="color:#64748b;"></i> Aniversariantes do Mês
+                        </h3>
                     </div>
 
                     <div id="birthdays-month-container"
-                        style="display:flex; flex-direction:column; gap:8px; max-height:250px; overflow-y:auto; margin-bottom:15px;">
-                        <div style="text-align:center; padding:20px; color:#9ca3af;">Carregando aniversariantes...</div>
+                        style="display:flex; flex-direction:column; gap:6px; max-height:240px; overflow-y:auto; margin-bottom:14px;">
+                        <div style="text-align:center; padding:16px; color:#94a3b8; font-size:0.8rem;">Carregando aniversariantes...</div>
                     </div>
 
-                    <div style="border-top: 1px solid #f3f4f6; padding-top: 15px;">
-                        <div style="font-size:0.8rem; font-weight:700; color:#6b7280; margin-bottom:8px;">Adicionar
-                            Aniversariante Manualmente</div>
-                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <div style="border-top:1px solid #f1f5f9; padding-top:14px;">
+                        <div style="font-size:0.75rem; font-weight:600; color:#475569; margin-bottom:8px;">Adicionar Aniversariante Manualmente</div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
                             <input type="text" id="add-bday-name" placeholder="Nome Completo"
-                                style="flex:2; padding:10px 12px; border-radius:10px; border:1px solid #e5e7eb; font-family:'Outfit'; font-size:0.9rem;">
+                                style="flex:2; padding:8px 10px; border-radius:6px; border:1px solid #cbd5e1; font-family:inherit; font-size:0.82rem; color:#0f172a;">
                             <input type="text" id="add-bday-date" placeholder="DD/MM" maxlength="5"
-                                style="flex:1; padding:10px 12px; border-radius:10px; border:1px solid #e5e7eb; font-family:'Outfit'; font-size:0.9rem; text-align:center;">
+                                style="flex:1; padding:8px 10px; border-radius:6px; border:1px solid #cbd5e1; font-family:inherit; font-size:0.82rem; text-align:center; color:#0f172a;">
                             <button onclick="addManualBirthday()"
-                                style="background:var(--gold-accent); color:black; border:none; border-radius:10px; padding:10px 16px; font-weight:800; cursor:pointer; font-family:'Outfit';">Adicionar</button>
+                                style="background:#0f172a; color:#ffffff; border:1px solid #0f172a; border-radius:6px; padding:8px 14px; font-weight:600; font-size:0.8rem; cursor:pointer; font-family:inherit;">Adicionar</button>
                         </div>
                     </div>
                 </div>
@@ -5435,14 +5528,14 @@
         // --- PEOPLE (Categorized) ---
         // Cat badge colors
         const CAT_COLORS = {
-            'Membro': { bg: '#111827', color: '#ffffff' },
-            'Obreiro': { bg: '#854d0e', color: '#ffffff' },
-            'Congregado': { bg: '#475569', color: '#ffffff' },
-            'Visitante': { bg: '#3b82f6', color: '#ffffff' },
-            'Triagem': { bg: '#be123c', color: '#ffffff' },
-            'Jornada': { bg: '#d4af37', color: '#000000' }, // Gold theme for Bulle
-            'Criança': { bg: '#9a3412', color: '#ffffff' },
-            'Outros': { bg: '#111827', color: '#ffffff' }
+            'Membro': { bg: '#f1f5f9', color: '#0f172a', border: '#cbd5e1' },
+            'Obreiro': { bg: '#f1f5f9', color: '#0f172a', border: '#cbd5e1' },
+            'Congregado': { bg: '#f8fafc', color: '#334155', border: '#e2e8f0' },
+            'Visitante': { bg: '#f8fafc', color: '#475569', border: '#e2e8f0' },
+            'Triagem': { bg: '#f8fafc', color: '#475569', border: '#e2e8f0' },
+            'Jornada': { bg: '#f8fafc', color: '#334155', border: '#e2e8f0' },
+            'Criança': { bg: '#f8fafc', color: '#475569', border: '#e2e8f0' },
+            'Outros': { bg: '#f8fafc', color: '#475569', border: '#e2e8f0' }
         };
 
         window.currentPeopleTab = 'membro';
@@ -5456,22 +5549,15 @@
         window.setPeopleTab = function (tabName, btnElement) {
             window.currentPeopleTab = tabName;
 
-            // Update UI buttons
-            const tabs = document.querySelectorAll('.category-tab');
+            // Update UI buttons exclusively inside #page-people
+            const tabs = document.querySelectorAll('#page-people .category-tab');
             tabs.forEach(t => {
                 t.classList.remove('active');
-                t.style.background = '#f9fafb';
-
-                if (t.innerText.includes('Membros')) t.style.color = '#15803d';
-                else if (t.innerText.includes('Congregados')) t.style.color = '#6d28d9';
-                else if (t.innerText.includes('Visitantes')) t.style.color = '#3b82f6';
-                else if (t.innerText.includes('Crianças')) t.style.color = '#f59e0b';
-                else if (t.innerText.includes('Outra Igreja')) t.style.color = '#4b5563';
             });
 
-            btnElement.classList.add('active');
-            btnElement.style.background = '#111827';
-            btnElement.style.color = '#ffffff';
+            if (btnElement) {
+                btnElement.classList.add('active');
+            }
 
             filterPeople(); // Re-run the visual filter
         }
@@ -5603,12 +5689,12 @@
                     <table class="excel-table">
                         <thead>
                             <tr>
-                                <th><i class="fas fa-id-badge" style="margin-right:6px;"></i>Perfil</th>
-                                <th><i class="fas fa-user-circle" style="margin-right:6px;"></i>Identificação</th>
-                                <th><i class="fas fa-phone-alt" style="margin-right:6px;"></i>WhatsApp / Canal</th>
-                                <th><i class="fas fa-map-pin" style="margin-right:6px;"></i>Localidade</th>
-                                <th><i class="fas fa-history" style="margin-right:6px;"></i>Histórico / Notas</th>
-                                <th style="text-align:right;"><i class="fas fa-cogs" style="margin-right:6px;"></i>Gestão</th>
+                                <th style="width:110px;">Classificação</th>
+                                <th>Nome e Registro</th>
+                                <th style="width:170px;">Contacto</th>
+                                <th style="width:140px;">Localidade</th>
+                                <th>Observações</th>
+                                <th style="text-align:right; width:130px;">Ações</th>
                             </tr>
                         </thead>
                         <tbody id="people-table-body"></tbody>
@@ -5672,7 +5758,7 @@
                                 else if (waNum.length === 11 && !waNum.startsWith('55')) waNum = '55' + waNum;
                                 
                                 const waText = encodeURIComponent(`Olá ${name.split(' ')[0]}! Tudo bem? Equipe Catedral Bulle aqui.`);
-                                linkHtml = `<a href="https://wa.me/${waNum}?text=${waText}" target="_blank" style="color:#16a34a; text-decoration:none; font-weight:700; display:flex; align-items:center; gap:5px;"><i class="fab fa-whatsapp" style="font-size:1.1rem;"></i> ${phone}</a>`;
+                                linkHtml = `<a href="https://wa.me/${waNum}?text=${waText}" target="_blank" style="color:#0f172a; text-decoration:none; font-size:0.82rem; font-weight:500; display:inline-flex; align-items:center; gap:5px;"><i class="fab fa-whatsapp" style="color:#15803d; font-size:0.9rem;"></i> ${phone}</a>`;
                             }
                         }
 
@@ -5684,34 +5770,31 @@
                         let originText = '';
                         if (cat === 'Triagem') {
                             if (d.original_collection === 'integracao') {
-                                originText = `<span style="font-size:0.6rem; background:#fee2e2; color:#ef4444; padding:2px 6px; border-radius:4px; font-weight:800; margin-top:4px; display:inline-block;"><i class="fas fa-handshake"></i> Recepção/Culto</span>`;
+                                originText = `<span style="font-size:0.68rem; background:#f8fafc; color:#475569; border:1px solid #e2e8f0; padding:1px 5px; border-radius:3px; margin-top:3px; display:inline-block;">Recepção</span>`;
                             } else if (d.original_collection === 'schedule_requests') {
-                                originText = `<span style="font-size:0.6rem; background:#fff1f2; color:#f43f5e; padding:2px 6px; border-radius:4px; font-weight:800; margin-top:4px; display:inline-block;"><i class="fas fa-clock"></i> Ficha Online Pendente</span>`;
+                                originText = `<span style="font-size:0.68rem; background:#f8fafc; color:#475569; border:1px solid #e2e8f0; padding:1px 5px; border-radius:3px; margin-top:3px; display:inline-block;">Ficha Online</span>`;
                             }
                         } else if (cat === 'Jornada') {
-                            originText = `<span style="font-size:0.6rem; background:#fef3c7; color:#d97706; padding:2px 6px; border-radius:4px; font-weight:800; margin-top:4px; display:inline-block;"><i class="fas fa-route"></i> CRM / Acompanhamento</span>`;
+                            originText = `<span style="font-size:0.68rem; background:#f8fafc; color:#334155; border:1px solid #e2e8f0; padding:1px 5px; border-radius:3px; margin-top:3px; display:inline-block;">Acompanhamento</span>`;
                         }
 
                         tr.innerHTML = `
-                            <td><span class="excel-badge" style="background:${c.bg}; color:${c.color};">${displayCat}</span></td>
+                            <td><span class="excel-badge" style="background:${c.bg}; color:${c.color}; border:1px solid ${c.border || '#e2e8f0'};">${displayCat}</span></td>
                             <td>
-                                <div style="display:flex; align-items:center; gap:10px;">
-                                    <div style="width:30px; height:30px; border-radius:8px; background:#111827; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.75rem; flex-shrink:0;">${initial}</div>
-                                    <div>
-                                        <div style="font-weight:700; color:#1e293b; display:flex; align-items:center;">${name}${warningIcons}</div>
-                                        <div style="font-size:0.65rem; color:#94a3b8; font-weight:800;">REG: ${dateStr}</div>
-                                        ${originText}
-                                    </div>
+                                <div>
+                                    <div style="font-weight:600; color:#0f172a; font-size:0.84rem; display:flex; align-items:center;">${name}${warningIcons}</div>
+                                    <div style="font-size:0.7rem; color:#64748b; margin-top:2px;">Registo: ${dateStr}</div>
+                                    ${originText}
                                 </div>
                             </td>
                             <td>${linkHtml}</td>
-                            <td style="font-weight:600; color:#475569;"><i class="fas fa-location-arrow" style="font-size:0.7rem; color:#cbd5e1; margin-right:4px;"></i>${city}</td>
-                            <td style="max-width:250px; line-height:1.3;">${latestNote}</td>
+                            <td style="color:#334155; font-size:0.8rem;">${city}</td>
+                            <td style="max-width:280px; line-height:1.35; font-size:0.78rem;">${latestNote}</td>
                             <td style="text-align:right;">
-                                <div style="display:flex; gap:8px; justify-content:flex-end;">
-                                    ${cat === 'Visitante' ? `<button onclick="iniciarJornada('${d.id}')" style="background:#d4af37; color:black; border:none; border-radius:8px; width:30px; height:30px; cursor:pointer;" title="Iniciar Jornada"><i class="fas fa-route" style="font-size:0.8rem;"></i></button>` : ''}
-                                    <button onclick="viewProfile('${d.id}', '${d.original_collection || (cat === 'Criança' ? 'kids' : 'people')}')" style="background:#111827; color:white; border:none; border-radius:8px; width:30px; height:30px; cursor:pointer;" title="Ver Perfil"><i class="fas fa-user-pen" style="font-size:0.8rem;"></i></button>
-                                    <button onclick="deletePerson('${d.id}','${name.replace(/'/g, "\\'")}', '${d.original_collection || (cat === 'Criança' ? 'kids' : 'people')}')" style="background:#fee2e2; color:#ef4444; border:none; border-radius:8px; width:30px; height:30px; cursor:pointer;" title="Remover"><i class="fas fa-trash" style="font-size:0.8rem;"></i></button>
+                                <div style="display:flex; gap:6px; justify-content:flex-end;">
+                                    ${cat === 'Visitante' ? `<button class="tbl-btn-action" onclick="iniciarJornada('${d.id}')" title="Iniciar Acompanhamento"><i class="fas fa-arrow-right"></i> Jornada</button>` : ''}
+                                    <button class="tbl-btn-action" onclick="viewProfile('${d.id}', '${d.original_collection || (cat === 'Criança' ? 'kids' : 'people')}')" title="Visualizar ficha de cadastro">Ver</button>
+                                    <button class="tbl-btn-action tbl-btn-danger" onclick="deletePerson('${d.id}','${name.replace(/'/g, "\\'")}', '${d.original_collection || (cat === 'Criança' ? 'kids' : 'people')}')" title="Excluir registo"><i class="fas fa-trash-alt"></i></button>
                                 </div>
                             </td>
                         `;
@@ -6509,19 +6592,16 @@
                         }
 
                         html += `
-                            <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:${isToday ? '#fff1f2' : '#fffcfd'}; border:2px solid #111827 !important; border-radius:10px; margin-bottom:8px;">
+                            <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; margin-bottom:6px;">
                                 <div style="display:flex; align-items:center; gap:10px;">
-                                    <div style="width:32px; height:32px; border-radius:50%; background:#fce7f3; color:#db2777; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.8rem;">
-                                        ${isToday ? '<i class="fas fa-birthday-cake" style="animation: bounce 2s infinite;"></i>' : '<i class="fas fa-gift"></i>'}
+                                    <div style="font-size:0.75rem; font-weight:600; color:${isToday ? '#0f172a' : '#64748b'}; width:48px;">
+                                        ${isToday ? '<span style="background:#0f172a; color:#fff; padding:1px 5px; border-radius:3px;">Hoje</span>' : dayMonth}
                                     </div>
-                                    <div>
-                                        <div style="font-weight:700; color:#1f2937; font-size:0.9rem;">${name}</div>
-                                        <div style="font-size:0.75rem; color:#db2777; font-weight:800;">${isToday ? 'HOJE!' : dayMonth}</div>
-                                    </div>
+                                    <div style="font-weight:500; color:#0f172a; font-size:0.82rem;">${name}</div>
                                 </div>
-                                <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+                                <div style="display:flex; align-items:center; gap:8px;">
                                     ${btnHtml}
-                                    <button onclick="deletePerson('${doc.id}','${name.replace(/'/g, "\\'")}', '${doc.original_collection || (d.type && d.type.toLowerCase().includes('kids') ? 'kids' : 'people')}')" style="background:none; border:none; color:#fca5a5; cursor:pointer; font-size:0.7rem; text-decoration:underline; padding:0; line-height:1;" title="Remover Cadastro">Remover</button>
+                                    <button onclick="deletePerson('${doc.id}','${name.replace(/'/g, "\\'")}', '${doc.original_collection || (d.type && d.type.toLowerCase().includes('kids') ? 'kids' : 'people')}')" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:0.72rem; padding:0;" title="Remover"><i class="fas fa-trash-alt"></i></button>
                                 </div>
                             </div>
                         `;
