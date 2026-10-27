@@ -1990,24 +1990,24 @@
             <!-- PAGE: RELATORIOS -->
             <div id="page-relatorios" class="page-content" style="display:none;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <h2 style="margin:0; font-size:1.2rem; color:#2c3e50;"><i class="fas fa-file-invoice"
-                            style="color:var(--gold-accent); margin-right:8px;"></i> Centro de Relatórios</h2>
+                    <h2 style="margin:0; font-size:1.15rem; color:#0f172a; font-weight:700;"><i class="fas fa-file-invoice"
+                            style="color:#475569; margin-right:8px; font-size:1rem;"></i> Centro de Relatórios</h2>
                 </div>
-                <div class="dashboard-row">
-                    <div class="glass-card-v2" onclick="generatePrayerReport()" style="cursor:pointer;">
-                        <i class="fas fa-pray stats-icon-v2"></i>
-                        <div class="stats-label-v2">Relatório de Oração</div>
-                        <div class="stats-value-v2" style="font-size:1.2rem;">Gerar p/ Google Docs</div>
+                <div class="dashboard-row" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px;">
+                    <div class="glass-card-v2" onclick="generatePrayerReport()" style="cursor:pointer; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:20px; box-shadow:none; display:flex; flex-direction:column; justify-content:space-between; min-height:130px; transition:all 0.15s ease;">
+                        <i class="fas fa-pray" style="color:#0f172a; font-size:1.2rem; margin-bottom:10px;"></i>
+                        <div style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.5px;">Relatório de Oração</div>
+                        <div style="font-size:1.05rem; font-weight:600; color:#0f172a;">Gerar p/ Google Docs</div>
                     </div>
-                    <div class="glass-card-v2" onclick="generateLiderancasMinisteriosReport()" style="cursor:pointer; background: linear-gradient(135deg, rgba(201, 160, 80, 0.05) 0%, rgba(255, 255, 255, 0.9) 100%); border: 1px solid rgba(201, 160, 80, 0.2);">
-                        <i class="fas fa-sitemap stats-icon-v2" style="color:var(--gold-accent);"></i>
-                        <div class="stats-label-v2">Lideranças e Ministérios</div>
-                        <div class="stats-value-v2" style="font-size:1.2rem;">Enviar Relatório ao Pastor</div>
+                    <div class="glass-card-v2" onclick="generateLiderancasMinisteriosReport()" style="cursor:pointer; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:20px; box-shadow:none; display:flex; flex-direction:column; justify-content:space-between; min-height:130px; transition:all 0.15s ease;">
+                        <i class="fas fa-sitemap" style="color:#0f172a; font-size:1.2rem; margin-bottom:10px;"></i>
+                        <div style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.5px;">Lideranças e Ministérios</div>
+                        <div style="font-size:1.05rem; font-weight:600; color:#0f172a;">Enviar Relatório ao Pastor</div>
                     </div>
-                    <div class="glass-card-v2" onclick="exportarTudo()" style="cursor:pointer;">
-                        <i class="fas fa-file-csv stats-icon-v2"></i>
-                        <div class="stats-label-v2">Base Completa</div>
-                        <div class="stats-value-v2" style="font-size:1.2rem;">Exportar CSV (42 campos)</div>
+                    <div class="glass-card-v2" onclick="exportarTudo()" style="cursor:pointer; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:20px; box-shadow:none; display:flex; flex-direction:column; justify-content:space-between; min-height:130px; transition:all 0.15s ease;">
+                        <i class="fas fa-file-csv" style="color:#0f172a; font-size:1.2rem; margin-bottom:10px;"></i>
+                        <div style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.5px;">Base Completa</div>
+                        <div style="font-size:1.05rem; font-weight:600; color:#0f172a;">Exportar CSV (42 campos)</div>
                     </div>
                 </div>
             </div>
@@ -2015,13 +2015,13 @@
             <!-- PAGE: ATA DIGITAL -->
             <div id="page-ata" class="page-content" style="display:none;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <h2 style="margin:0; font-size:1.2rem; color:#2c3e50;"><i class="fas fa-clipboard-check"
-                            style="color:var(--gold-accent); margin-right:8px;"></i> Ata Digital (Auditoria)</h2>
+                    <h2 style="margin:0; font-size:1.15rem; color:#0f172a; font-weight:700;"><i class="fas fa-clipboard-check"
+                            style="color:#475569; margin-right:8px; font-size:1rem;"></i> Ata Digital (Auditoria)</h2>
                     <input type="text" id="ata-search-input" onkeyup="filterAtaLogs()" placeholder="Filtrar ações..."
-                        style="width:250px; padding:8px 15px; border-radius:10px; border:2px solid #111827; font-family:'Outfit'; font-size:0.85rem;">
+                        style="width:240px; padding:7px 12px; border-radius:6px; border:1px solid #cbd5e1; font-family:inherit; font-size:0.82rem; background:#ffffff; color:#0f172a; outline:none;">
                 </div>
-                <div class="panel-card" style="background:#fff; border:2px solid #111827; border-radius:16px; padding:20px; box-shadow:0 8px 16px rgba(0,0,0,0.03);">
-                    <div id="ata-digital-container-new" style="max-height:600px; overflow-y:auto; padding:10px 5px;">
+                <div class="panel-card" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; padding:16px; box-shadow:none;">
+                    <div id="ata-digital-container-new" style="max-height:600px; overflow-y:auto; padding:4px 2px;">
                         <p style="text-align:center; color:#94a3b8; padding:40px;"><i class="fas fa-spinner fa-spin"></i> Sincronizando histórico de ações...</p>
                     </div>
                 </div>
@@ -2030,10 +2030,10 @@
             <!-- PAGE: EVENTS (Eventos) -->
             <div id="page-events" class="page-content" style="display:none;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <h2 style="margin:0; font-size:1.2rem; color:#2c3e50;"><i class="fas fa-calendar-day"
-                            style="color:var(--gold-accent); margin-right:8px;"></i> Gestão de Eventos</h2>
+                    <h2 style="margin:0; font-size:1.15rem; color:#0f172a; font-weight:700;"><i class="fas fa-calendar-day"
+                            style="color:#475569; margin-right:8px; font-size:1rem;"></i> Gestão de Eventos</h2>
                     <button onclick="openNewEventModal()" class="btn-sm"
-                        style="background:var(--gold-accent); color:black; font-weight:800; border-radius:10px; padding:10px 20px; border:none; cursor:pointer;">
+                        style="background:#0f172a; color:#ffffff; font-weight:600; border-radius:6px; padding:7px 14px; border:1px solid #0f172a; cursor:pointer; font-size:0.82rem; display:inline-flex; align-items:center; gap:6px; font-family:inherit;">
                         <i class="fas fa-plus"></i> Novo Evento
                     </button>
                 </div>
@@ -4864,22 +4864,22 @@
             if (!container) return;
 
             if (list.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:40px;">Nenhum registro de auditoria encontrado.</p>';
+                container.innerHTML = '<p style="text-align:center; color:#64748b; padding:30px; font-size:0.85rem;">Nenhum registro de auditoria encontrado.</p>';
                 return;
             }
 
             const icons = {
                 "Exclusão de Registro": "fa-user-minus",
                 "Novo Membro": "fa-user-plus",
-                "Nomeação de Líder": "fa-medal",
+                "Nomeação de Líder": "fa-user-tag",
                 "Criação de Ministério": "fa-folder-plus",
                 "Edição de Ministério": "fa-folder-open",
                 "Exclusão de Ministério": "fa-folder-minus",
                 "Aprovação de Ficha": "fa-check-double",
-                "Promover Etapa": "fa-chevron-circle-right"
+                "Promover Etapa": "fa-chevron-right"
             };
 
-            let html = '<div style="margin-left: 15px; border-left: 2px solid #f1f5f9; padding-left: 15px;">';
+            let html = '<div style="display:flex; flex-direction:column; gap:8px;">';
             list.forEach(item => {
                 const date = item.timestamp;
                 let dateStr = '—';
@@ -4889,19 +4889,19 @@
                         : new Date(date).toLocaleString('pt-BR');
                 }
                 html += `
-                <div class="timeline-item" style="margin-bottom: 25px; position: relative;">
-                    <div style="position: absolute; left: -26px; top: 0; width: 20px; height: 20px; border-radius: 50%; background: #111; color: var(--gold-accent); display: flex; align-items: center; justify-content: center; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); font-size: 0.65rem;">
-                        <i class="fas ${icons[item.action] || 'fa-bell'}"></i>
+                <div class="audit-card" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:12px 14px; text-align:left;">
+                    <div style="width:24px; height:24px; border-radius:4px; background:#f1f5f9; color:#0f172a; display:inline-flex; align-items:center; justify-content:center; font-size:0.75rem;">
+                        <i class="fas ${icons[item.action] || 'fa-clipboard-check'}"></i>
                     </div>
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; text-align: left; box-shadow: 0 2px 4px rgba(0,0,0,0.01);">
+                    <div style="display:contents;">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-                            <span style="font-weight: 800; font-size: 0.9rem; color: #1e293b; text-transform: uppercase; letter-spacing: 0.5px;">${item.action}</span>
-                            <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 600;">${dateStr}</span>
+                            <span style="font-weight:600; font-size:0.85rem; color:#0f172a;">${item.action}</span>
+                            <span style="font-size: 0.75rem; color: #64748b; font-weight: 500;">${dateStr}</span>
                         </div>
-                        <div style="font-size: 0.8rem; color: #64748b; margin-top: 6px;">
-                            <strong>Operador:</strong> ${item.user} | <strong>Alvo:</strong> <span style="color: #c59b27; font-weight: 800;">${item.target}</span>
+                        <div style="font-size: 0.8rem; color: #64748b; margin-top: 4px; margin-left: 32px;">
+                            <strong>Operador:</strong> ${item.user} | <strong>Alvo:</strong> <span style="color: #0f172a; font-weight: 600;">${item.target}</span>
                         </div>
-                        <div style="font-size: 0.8rem; color: #475569; margin-top: 4px; border-top: 1px dashed #e2e8f0; padding-top: 6px;">
+                        <div style="font-size: 0.8rem; color: #475569; margin-top: 6px; margin-left: 32px; border-top: 1px solid #f1f5f9; padding-top: 6px; line-height: 1.4;">
                             ${item.details}
                         </div>
                     </div>
@@ -7773,7 +7773,7 @@
                 container.innerHTML = '';
                 
                 if (snap.empty) {
-                    container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:40px; color:#94a3b8; border:1px dashed #e2e8f0; border-radius:20px;"><i class="fas fa-calendar-times" style="font-size:2rem; display:block; margin-bottom:10px;"></i>Nenhum evento criado ainda.</div>';
+                    container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:30px 15px; color:#64748b; font-size:0.85rem; font-weight:500;">Nenhum evento cadastrado</div>';
                     return;
                 }
 
@@ -7789,24 +7789,24 @@
             const card = document.createElement('div');
             card.className = 'glass-card-v2';
             card.style.cursor = 'pointer';
-            card.style.minHeight = '160px';
+            card.style.minHeight = '130px';
             card.onclick = () => viewEventDetails(event.id);
 
             const dateStr = event.date ? new Date(event.date + "T12:00:00").toLocaleDateString('pt-BR') : 'Sem data';
-            const typeLabel = event.type === 'closed' ? '<span style="color:#6d28d9; background:#f5f3ff; padding:4px 12px; border-radius:10px; font-size:0.7rem; font-weight:800;">FECHADO</span>' : '<span style="color:#15803d; background:#ecfdf5; padding:4px 12px; border-radius:10px; font-size:0.7rem; font-weight:800;">ABERTO</span>';
+            const typeLabel = event.type === 'closed' ? '<span style="color:#334155; background:#f1f5f9; border:1px solid #cbd5e1; padding:2px 8px; border-radius:4px; font-size:0.7rem; font-weight:600;">FECHADO</span>' : '<span style="color:#0f172a; background:#f8fafc; border:1px solid #cbd5e1; padding:2px 8px; border-radius:4px; font-size:0.7rem; font-weight:600;">ABERTO</span>';
 
             card.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px;">
-                    <div style="width:40px; height:40px; background:rgba(212,175,55,0.1); color:var(--gold-accent); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
-                        <i class="fas fa-calendar-check"></i>
+                    <div style="width:32px; height:32px; background:#f1f5f9; color:#0f172a; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.85rem;">
+                        <i class="fas fa-calendar"></i>
                     </div>
                     ${typeLabel}
                 </div>
-                <div style="font-weight:900; font-size:1.1rem; color:#1e293b; margin-bottom:5px; font-family:'Outfit';">${event.name}</div>
-                <div style="font-size:0.85rem; color:#64748b; margin-bottom:20px; font-weight:600;"><i class="far fa-calendar-alt" style="margin-right:5px;"></i> ${dateStr}</div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:15px; border-top:1px solid #f1f5f9;">
-                    <span style="font-size:0.75rem; color:#94a3b8; font-weight:700; text-transform:uppercase;">Gerenciar Evento</span>
-                    <i class="fas fa-arrow-right" style="color:var(--gold-accent); font-size:0.8rem;"></i>
+                <div style="font-weight:700; font-size:1rem; color:#0f172a; margin-bottom:4px; font-family:inherit;">${event.name}</div>
+                <div style="font-size:0.8rem; color:#64748b; font-weight:500;"><i class="far fa-calendar" style="margin-right:5px;"></i> ${dateStr}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:10px; border-top:1px solid #f1f5f9;">
+                    <span style="font-size:0.75rem; color:#64748b; font-weight:600;">Gerenciar Evento</span>
+                    <i class="fas fa-chevron-right" style="color:#94a3b8; font-size:0.75rem;"></i>
                 </div>
             `;
             container.appendChild(card);
