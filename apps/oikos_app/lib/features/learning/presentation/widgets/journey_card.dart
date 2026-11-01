@@ -6,12 +6,18 @@ import 'progress_ring.dart';
 class JourneyCard extends StatelessWidget {
   final Journey journey;
   final double progressPercentage;
+  final int completedLessonsCount;
+  final int totalLessonsCount;
+  final String? activeChapterTitle;
   final VoidCallback onTap;
 
   const JourneyCard({
     super.key,
     required this.journey,
     required this.progressPercentage,
+    this.completedLessonsCount = 0,
+    this.totalLessonsCount = 0,
+    this.activeChapterTitle,
     required this.onTap,
   });
 
@@ -90,16 +96,18 @@ class JourneyCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Progresso',
-                        style: TextStyle(
+                      Text(
+                        totalLessonsCount > 0
+                            ? '$completedLessonsCount de $totalLessonsCount lições concluídas'
+                            : 'Progresso da Trilha',
+                        style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textSecondary,
@@ -107,7 +115,11 @@ class JourneyCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Capítulo Atual: 1', // Placeholder logic
+                        progressPercentage >= 1.0
+                            ? 'Trilha Completa ⭐'
+                            : (activeChapterTitle != null && activeChapterTitle!.isNotEmpty
+                                ? activeChapterTitle!
+                                : (progressPercentage > 0 ? 'Em andamento' : 'Pronto para começar')),
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,

@@ -14,7 +14,9 @@ import '../providers/xp_provider.dart';
 import '../../domain/xp_repository.dart';
 import '../../../../features/learning/domain/adaptive_study_tool.dart';
 import '../../../../features/brain/presentation/providers/brain_provider.dart';
+import '../../../../features/brain/presentation/providers/trajectory_provider.dart';
 import '../../../../features/brain/domain/entities/learning_decision.dart';
+import '../../../../features/brain/domain/entities/learning_event.dart';
 import '../../../../features/avatar/presentation/avatar_renderer.dart';
 import '../../../../features/avatar/domain/avatar.dart';
 import '../../../../features/avatar/domain/avatar_expression.dart';
@@ -81,8 +83,13 @@ class _LivingScenePageState extends ConsumerState<LivingScenePage> {
     if (decision != null && xp > 0) {
       return decision.motivationLine;
     }
-    // Mensagem por nível
-    if (xp == 0) return 'Olá ${widget.userName}! Toque num objeto para começar 👇';
+    // Mensagem inicial e contextual
+    if (xp == 0) {
+      if (decision != null && decision.topic.isNotEmpty) {
+        return 'Olá ${widget.userName}! Vamos explorar ${decision.topic}?';
+      }
+      return 'Olá ${widget.userName}! Que tal começar sua primeira missão suíça?';
+    }
     if (level == 1) return 'Bom começo! Mais ${XpRepository.xpForNextLevel(xp)} XP para o nível 2!';
     if (level >= 5) return 'Uau! Nível $level! Você é incrível, ${widget.userName}! 🌟';
     return 'Nível $level desbloqueado! O que quer aprender hoje?';
@@ -121,14 +128,43 @@ class _LivingScenePageState extends ConsumerState<LivingScenePage> {
           child: AdaptiveStudyTool.fromDecision(
             decision: decision,
             toolIdOverride: spec.toolId,
-            onEvent: (event) {
-              // TODO: Gravar evento no TrajectoryRepository (ex: HintRequested, ExerciseAnswered)
-              debugPrint('Horizon Trajectory Event: ${event.runtimeType}');
+            userId: widget.userId,
+            experienceMode: mode,
+            onEvent: (event) async {
+              try {
+                await ref.read(trajectoryRepositoryProvider).saveEvent(event);
+              } catch (e) {
+                debugPrint('Horizon Trajectory saveEvent error: $e');
+              }
             },
             onSessionFinished: (result) async {
-              // 1. Gravar SessionFinished no TrajectoryRepository
-              // Gravar sessão no TrajectoryRepository
-              debugPrint('Horizon Trajectory Session Finished.');
+              try {
+                final sessionEvent = result.userId == widget.userId
+                    ? result
+                    : SessionFinished(
+                        eventId: result.eventId,
+                        sessionId: result.sessionId,
+                        userId: widget.userId,
+                        timestamp: result.timestamp,
+                        toolId: result.toolId,
+                        topic: result.topic,
+                        difficulty: result.difficulty,
+                        totalDurationSeconds: result.totalDurationSeconds,
+                        accuracy: result.accuracy,
+                        errorCount: result.errorCount,
+                      );
+                await ref.read(trajectoryRepositoryProvider).saveEvent(sessionEvent);
+                ref.invalidate(learningDecisionProvider(widget.userId));
+
+                final progressBox = await Hive.openBox<Map>('missionProgressBox');
+                await progressBox.put('ch_numbers_nonante_001', {
+                  'completedAt': DateTime.now().toIso8601String(),
+                  'accuracy': result.accuracy,
+                  'toolId': result.toolId,
+                });
+              } catch (e) {
+                debugPrint('Horizon Trajectory saveSession error: $e');
+              }
               
               Navigator.pop(context);
               await ref.read(xpProvider(widget.userId).notifier).addXp(20);
@@ -204,18 +240,69 @@ class _LivingScenePageState extends ConsumerState<LivingScenePage> {
                               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.primary),
                             ),
                             const SizedBox(height: 16),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                icon: const Icon(Icons.school, color: Colors.white),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  Navigator.pushNamed(context, '/learning');
+                                },
+                                label: const Text(
+                                  'Ver Todas as 4 Jornadas e Capítulos',
+                                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
                             _buildScenarioProgressItem(
                               '🛒', 
-                              'Mercado', 
+                              'Mercado (Français)', 
                               isLausanneCompleted ? 1.0 : 0.0, 
                               const Color(0xFF10B981),
+                              onTap: () {
+                                Navigator.pop(context);
+                                Navigator.pushNamed(context, '/learning');
+                              },
                             ),
                             const SizedBox(height: 16),
-                            _buildScenarioProgressItem('🏫', 'Escola', 0.0, Colors.blue),
+                            _buildScenarioProgressItem(
+                              '🏫', 
+                              'Escola (Português)', 
+                              0.0, 
+                              Colors.blue,
+                              onTap: () {
+                                Navigator.pop(context);
+                                Navigator.pushNamed(context, '/learning');
+                              },
+                            ),
                             const SizedBox(height: 16),
-                            _buildScenarioProgressItem('🏥', 'Médico', 0.0, Colors.orange),
+                            _buildScenarioProgressItem(
+                              '🏥', 
+                              'Médico (Matemática)', 
+                              0.0, 
+                              Colors.orange,
+                              onTap: () {
+                                Navigator.pop(context);
+                                Navigator.pushNamed(context, '/learning');
+                              },
+                            ),
                             const SizedBox(height: 16),
-                            _buildScenarioProgressItem('✈️', 'Aeroporto', 0.00, Colors.grey),
+                            _buildScenarioProgressItem(
+                              '✈️', 
+                              'Aeroporto (Inglês)', 
+                              0.00, 
+                              Colors.grey,
+                              onTap: () {
+                                Navigator.pop(context);
+                                Navigator.pushNamed(context, '/learning');
+                              },
+                            ),
                             const Divider(height: 48),
                             const Text(
                               'Missões Concluídas',
@@ -254,36 +341,45 @@ class _LivingScenePageState extends ConsumerState<LivingScenePage> {
     );
   }
 
-  Widget _buildScenarioProgressItem(String emoji, String title, double progress, Color color) {
-    return Row(
-      children: [
-        Text(emoji, style: const TextStyle(fontSize: 28)),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildScenarioProgressItem(String emoji, String title, double progress, Color color, {VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 28)),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                  Text('${(progress * 100).toInt()}%', style: TextStyle(fontSize: 13, color: color, fontWeight: FontWeight.bold)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                      Text('${(progress * 100).toInt()}%', style: TextStyle(fontSize: 13, color: color, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      minHeight: 6,
+                      backgroundColor: color.withValues(alpha: 0.12),
+                      valueColor: AlwaysStoppedAnimation(color),
+                    ),
+                  ),
                 ],
               ),
-              const SizedBox(height: 6),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  minHeight: 6,
-                  backgroundColor: color.withOpacity(0.12),
-                  valueColor: AlwaysStoppedAnimation(color),
-                ),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 8),
+            const Icon(Icons.chevron_right, color: Colors.grey, size: 20),
+          ],
         ),
-      ],
+      ),
     );
   }
 
@@ -612,11 +708,11 @@ class _LivingScenePageState extends ConsumerState<LivingScenePage> {
                     ),
                   ),
 
-                  // 3. Personagens ancorados ao chão (Unity ou Fallback Reativo)
+                  // 3. Personagens ancorados ao chão com Card de Missão Pedagógica
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: Container(
-                      constraints: const BoxConstraints(maxWidth: 600, maxHeight: 380), // Container centralizado proporcional
+                      constraints: const BoxConstraints(maxWidth: 600, maxHeight: 520),
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: _buildUnityOrFallbackScene(currentUser, members, decision, xpState, isToddler),
                     ),
@@ -686,7 +782,7 @@ class _LivingScenePageState extends ConsumerState<LivingScenePage> {
   }
 
   // ──────────────────────────────────────────────────────────────────────────
-  // Cenário Principal: Lumo + Avatares da Família
+  // Cenário Principal: Lumo + Avatares da Família + Ação Pedagógica Hero
   // ──────────────────────────────────────────────────────────────────────────
   Widget _buildUnityOrFallbackScene(
     FamilyMember currentUser,
@@ -695,160 +791,253 @@ class _LivingScenePageState extends ConsumerState<LivingScenePage> {
     XpState xpState,
     bool isToddler,
   ) {
+    final spec = decision.sceneObjects.isNotEmpty ? decision.sceneObjects.first : null;
 
-    // Layout da cena com Lumo no centro
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      crossAxisAlignment: CrossAxisAlignment.end,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        // Avatar do usuário atual à esquerda
-        Flexible(
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 20),
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => _showAvatarMenu(context, currentUser),
+        // Linha dos Personagens e Livro (Parte superior do chão)
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            // Avatar do usuário atual à esquerda
+            Flexible(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: _buildUserAvatar(
-                  currentUser.avatarAsset, 
-                  currentUser.emoji,
-                  expression: _currentState == HomeSceneState.celebrating 
-                      ? AvatarExpressionType.happy 
-                      : AvatarExpressionType.neutral,
-                ),
-              ),
-            ),
-          ),
-        ),
-        // Livro no meio com affordance de pulsação
-        Flexible(
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 20),
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => _showBookProgressMenu(context, members),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: _isLausanneCompleted 
-                            ? Colors.black.withOpacity(0.08)
-                            : AppColors.primary.withOpacity(0.35),
-                        blurRadius: _isLausanneCompleted ? 12 : 18,
-                        spreadRadius: _isLausanneCompleted ? 0 : 2,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                    border: _isLausanneCompleted 
-                        ? null 
-                        : Border.all(color: AppColors.primary, width: 2),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      '📖',
-                      style: TextStyle(fontSize: 42),
+                padding: const EdgeInsets.only(bottom: 12),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => _showAvatarMenu(context, currentUser),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    child: _buildUserAvatar(
+                      currentUser.avatarAsset, 
+                      currentUser.emoji,
+                      expression: _currentState == HomeSceneState.celebrating 
+                          ? AvatarExpressionType.happy 
+                          : AvatarExpressionType.neutral,
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        ),
-        // Lumo no centro — mascote principal
-        Flexible(
-          flex: 2,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Balão de fala (ou botão Play para toddlers)
-              if (isToddler) ...[
-                GestureDetector(
+            // Livro com indicador claro de progresso
+            Flexible(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTap: () {
-                    if (decision.sceneObjects.isNotEmpty) {
-                      final spec = decision.sceneObjects.first;
-                      _handleObjectTap(spec.id, currentUser.experienceMode, decision, spec);
-                    }
-                  },
-                  child: Container(
-                    width: 76,
-                    height: 76,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFFF9800), Color(0xFFFF5722)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 3),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFFF5722).withOpacity(0.4),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
+                  onTap: () => _showBookProgressMenu(context, members),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 74,
+                          height: 74,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.95),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: _isLausanneCompleted 
+                                    ? Colors.black.withOpacity(0.08)
+                                    : AppColors.primary.withOpacity(0.35),
+                                blurRadius: _isLausanneCompleted ? 12 : 18,
+                                spreadRadius: _isLausanneCompleted ? 0 : 2,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                            border: Border.all(
+                              color: _isLausanneCompleted ? Colors.green.shade400 : AppColors.primary,
+                              width: 2.5,
+                            ),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              '📖',
+                              style: TextStyle(fontSize: 38),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            _isLausanneCompleted ? 'Revisar' : 'Jornadas',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: _isLausanneCompleted ? Colors.green.shade700 : AppColors.primary,
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.play_arrow_rounded,
-                        color: Colors.white,
-                        size: 48,
+                  ),
+                ),
+              ),
+            ),
+            // Lumo no centro — mascote pedagógico
+            Flexible(
+              flex: 2,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Balão de fala do Lumo
+                  if (!isToddler) ...[
+                    _buildSpeechBubble(_lumoMessage(xpState.xp, xpState.level, _lastXpGained, decision)),
+                    const SizedBox(height: 8),
+                  ],
+                  // Lumo animado
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        if (spec != null) {
+                          _handleObjectTap(spec.id, currentUser.experienceMode, decision, spec);
+                        } else {
+                          final greeting = ref.read(lumoServiceProvider).getGreeting();
+                          setState(() => _currentState = HomeSceneState.suggestingActivity);
+                          showDialog(
+                            context: context,
+                            builder: (_) => AlertDialog(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                              title: const Row(children: [
+                                Text('Lumo ', style: TextStyle(fontSize: 24)),
+                              ]),
+                              content: Text(greeting),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('Ok'),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      },
+                      child: LumoRenderer(
+                        variant: _lumoVariant(),
+                        size: 148,
                       ),
                     ),
                   ),
-                ).animate(
-                  onPlay: (controller) => controller.repeat(reverse: true),
-                ).scale(begin: const Offset(0.95, 0.95), end: const Offset(1.05, 1.05), duration: 800.ms),
-                const SizedBox(height: 12),
-              ] else ...[
-                _buildSpeechBubble(_lumoMessage(xpState.xp, xpState.level, _lastXpGained, decision)),
-                const SizedBox(height: 8),
-              ],
-              // Lumo animado com SVG
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () {
-                    if (decision.sceneObjects.isNotEmpty) {
-                      final spec = decision.sceneObjects.first;
-                      _handleObjectTap(spec.id, currentUser.experienceMode, decision, spec);
-                    } else {
-                      final greeting = ref.read(lumoServiceProvider).getGreeting();
-                      setState(() => _currentState = HomeSceneState.suggestingActivity);
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                          title: const Row(children: [
-                            Text('Lumo ', style: TextStyle(fontSize: 24)),
-                          ]),
-                          content: Text(greeting),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Ok'),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-                  },
-                  // Lumo — animações internas geridas pelo próprio widget
-                  child: LumoRenderer(
-                    variant: _lumoVariant(),
-                    size: 160,
+                ],
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 12),
+
+        // Hero Card de Ação Principal (Pedagógica)
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.96),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AppColors.primary.withOpacity(0.12), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.06),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      decision.topic.isNotEmpty ? decision.topic.toUpperCase() : 'MISSÃO RECOMENDADA',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primary,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
                   ),
+                  const Spacer(),
+                  const Text(
+                    '✦ +20 XP',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFFF59E0B),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                decision.actionLabel.isNotEmpty ? decision.actionLabel : 'Explorar Desafio do Dia',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
                 ),
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
+                      label: const Text(
+                        'COMEÇAR MISSÃO ▶',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        elevation: 0,
+                      ),
+                      onPressed: () {
+                        if (spec != null) {
+                          _handleObjectTap(spec.id, currentUser.experienceMode, decision, spec);
+                        } else {
+                          Navigator.pushNamed(context, '/learning');
+                        }
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  IconButton(
+                    tooltip: 'Explorar Jornadas',
+                    icon: const Icon(Icons.map_outlined, color: AppColors.primary, size: 26),
+                    style: IconButton.styleFrom(
+                      backgroundColor: AppColors.primary.withOpacity(0.08),
+                      padding: const EdgeInsets.all(12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    ),
+                    onPressed: () => Navigator.pushNamed(context, '/learning'),
+                  ),
+                ],
               ),
             ],
           ),
