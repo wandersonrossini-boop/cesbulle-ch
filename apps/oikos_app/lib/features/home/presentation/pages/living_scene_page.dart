@@ -989,7 +989,7 @@ class _LivingScenePageState extends ConsumerState<LivingScenePage> {
               ),
               const SizedBox(height: 8),
               Text(
-                decision.actionLabel.isNotEmpty ? decision.actionLabel : 'Explorar Desafio do Dia',
+                decision.motivationLine.isNotEmpty ? decision.motivationLine : 'Explorar Desafio do Dia',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
