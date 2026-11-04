@@ -26,6 +26,15 @@ public class ServiceClosingDetailResponse {
     private BigDecimal unidentifiedOfertaTotal;
     private BigDecimal unidentifiedVotoTotal;
     
+    private BigDecimal unidentifiedDinheiroTotal;
+    private BigDecimal unidentifiedTwintTotal;
+    private BigDecimal unidentifiedTransferenciaTotal;
+
+    private BigDecimal totalDinheiro;
+    private BigDecimal totalEletronico;
+    private BigDecimal totalTwint;
+    private BigDecimal totalTransferencias;
+
     private BigDecimal identifiedTotal;
     private BigDecimal unidentifiedTotal;
     private BigDecimal registeredTotal;
@@ -54,6 +63,14 @@ public class ServiceClosingDetailResponse {
         dto.setUnidentifiedOfertaTotal(entity.getUnidentifiedOfertaTotal());
         dto.setUnidentifiedVotoTotal(entity.getUnidentifiedVotoTotal());
         
+        dto.setUnidentifiedDinheiroTotal(entity.getUnidentifiedDinheiroTotal());
+        dto.setUnidentifiedTwintTotal(entity.getUnidentifiedTwintTotal());
+        dto.setUnidentifiedTransferenciaTotal(entity.getUnidentifiedTransferenciaTotal());
+        dto.setTotalDinheiro(entity.getTotalDinheiro());
+        dto.setTotalEletronico(entity.getTotalEletronico());
+        dto.setTotalTwint(entity.getTotalTwint());
+        dto.setTotalTransferencias(entity.getTotalTransferencias());
+
         if (entity.getIdentifiedEntries() != null) {
             dto.setIdentifiedEntries(entity.getIdentifiedEntries().stream().map(e -> {
                 EnvelopeRequest req = new EnvelopeRequest();
@@ -61,6 +78,7 @@ public class ServiceClosingDetailResponse {
                 req.setType(e.getType());
                 req.setAmount(e.getAmount());
                 req.setContributorId(e.getContributorId());
+                req.setPaymentMethod(e.getPaymentMethod());
                 return req;
             }).collect(Collectors.toList()));
         }

@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tesouraria_cme_app/presentation/blocs/history_bloc.dart';
 import 'package:tesouraria_cme_app/services/fechamento_api_service.dart';
 import 'package:tesouraria_cme_app/domain/service_closing_history_models.dart';
+import 'package:tesouraria_cme_app/domain/envelope.dart';
 import 'package:tesouraria_cme_app/presentation/blocs/service_closing_events_states.dart';
 
 class FakeFechamentoApiService implements FechamentoApiService {
@@ -30,6 +31,7 @@ class FakeFechamentoApiService implements FechamentoApiService {
     return ServiceClosingDetail(
       id: id,
       serviceDate: '2026-08-09',
+      rawServiceDate: '2026-08-09',
       mainTreasurer: 'A',
       coTreasurer: 'B',
       identifiedEntries: [],
@@ -47,7 +49,46 @@ class FakeFechamentoApiService implements FechamentoApiService {
   Future<void> deleteClosing(int id) async {
     return;
   }
-  
+
+  @override
+  Future<ServiceClosingCorrectionItem> submitCorrection(int closingId, {
+    required String reason,
+    required double physicalTotal,
+    required double unidentifiedDizimoTotal,
+    required double unidentifiedOfertaTotal,
+    required double unidentifiedVotoTotal,
+    required List<Envelope> identifiedEntries,
+    String? verifierName,
+    String? verifierType,
+  }) async {
+    return ServiceClosingCorrectionItem(
+      id: 1,
+      serviceClosingId: closingId,
+      originalPhysicalTotal: 100.0,
+      correctedPhysicalTotal: physicalTotal,
+      difference: physicalTotal - 100.0,
+      reason: reason,
+      correctedBy: 'pastor',
+      createdAt: '2026-11-04 21:00:00',
+    );
+  }
+
+  @override
+  Future<List<ServiceClosingCorrectionItem>> fetchCorrections(int closingId) async {
+    return [
+      ServiceClosingCorrectionItem(
+        id: 1,
+        serviceClosingId: closingId,
+        originalPhysicalTotal: 100.0,
+        correctedPhysicalTotal: 90.0,
+        difference: -10.0,
+        reason: 'Ajuste inicial',
+        correctedBy: 'pastor',
+        createdAt: '2026-11-04 21:00:00',
+      )
+    ];
+  }
+
   @override
   Future<void> submitClosing(dynamic state) async {}
 
@@ -140,6 +181,29 @@ void main() {
       
       expectLater(bloc.stream, emitsInOrder(expectedStates));
       bloc.add(LoadClosingDetailEvent(1));
+    });
+
+    test('emits HistoryCorrectionSuccess and reloads when RequestCorrectionEvent is added', () async {
+      final fakeService = FakeFechamentoApiService();
+      final bloc = HistoryBloc(fakeService);
+
+      final expectedStates = [
+        isA<HistoryCorrectionSubmitting>(),
+        isA<HistoryCorrectionSuccess>(),
+        isA<HistoryDetailLoading>(),
+        isA<HistoryDetailLoaded>(),
+      ];
+
+      expectLater(bloc.stream, emitsInOrder(expectedStates));
+      bloc.add(RequestCorrectionEvent(
+        closingId: 1,
+        reason: 'Erro de contagem avulsa',
+        physicalTotal: 90.0,
+        unidentifiedDizimoTotal: 0,
+        unidentifiedOfertaTotal: 90.0,
+        unidentifiedVotoTotal: 0,
+        identifiedEntries: [],
+      ));
     });
   });
 }

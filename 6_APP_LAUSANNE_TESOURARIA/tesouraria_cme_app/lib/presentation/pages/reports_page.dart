@@ -395,6 +395,8 @@ class _ReportsPageState extends State<ReportsPage> {
               const SizedBox(height: 24),
               _buildKpis(report, isDesktop),
               const SizedBox(height: 24),
+              _buildPaymentMethodsCard(report, isDesktop),
+              const SizedBox(height: 24),
               _buildTables(report, isDesktop),
               const SizedBox(height: 24),
               _buildExportSection(),
@@ -712,6 +714,99 @@ class _ReportsPageState extends State<ReportsPage> {
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: color, fontFamily: 'monospace'),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPaymentMethodsCard(MonthlyReportModel report, bool isDesktop) {
+    final pm = report.paymentMethods;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.payments_outlined, size: 18, color: Color(0xFF1E3A8A)),
+              const SizedBox(width: 8),
+              const Text(
+                "Entradas por Meio de Recebimento",
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          if (isDesktop)
+            Row(
+              children: [
+                Expanded(child: _buildPaymentMethodMetric("Dinheiro em Espécie", pm.totalDinheiro, const Color(0xFF0F766E), Icons.attach_money_rounded)),
+                const SizedBox(width: 16),
+                Expanded(child: _buildPaymentMethodMetric("TWINT", pm.totalTwint, const Color(0xFFD97706), Icons.phone_android_rounded)),
+                const SizedBox(width: 16),
+                Expanded(child: _buildPaymentMethodMetric("Transferências", pm.totalTransferencias, const Color(0xFF2563EB), Icons.account_balance_rounded)),
+                const SizedBox(width: 16),
+                Expanded(child: _buildPaymentMethodMetric("Total Eletrônico", pm.totalEletronico, const Color(0xFF4338CA), Icons.credit_card_rounded, isHighlighted: true)),
+              ],
+            )
+          else
+            Column(
+              children: [
+                _buildMobilePaymentMethodRow("Dinheiro em Espécie", pm.totalDinheiro, const Color(0xFF0F766E)),
+                const Divider(color: Color(0xFFF1F5F9)),
+                _buildMobilePaymentMethodRow("TWINT", pm.totalTwint, const Color(0xFFD97706)),
+                const Divider(color: Color(0xFFF1F5F9)),
+                _buildMobilePaymentMethodRow("Transferências", pm.totalTransferencias, const Color(0xFF2563EB)),
+                const Divider(color: Color(0xFFF1F5F9)),
+                _buildMobilePaymentMethodRow("Total Eletrônico", pm.totalEletronico, const Color(0xFF4338CA), isBold: true),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPaymentMethodMetric(String label, double amount, Color color, IconData icon, {bool isHighlighted = false}) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isHighlighted ? color.withValues(alpha: 0.06) : const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: isHighlighted ? color.withValues(alpha: 0.3) : const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 14, color: color),
+              const SizedBox(width: 6),
+              Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF64748B))),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'CHF ' + _formatCHF(amount),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color, fontFamily: 'monospace'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMobilePaymentMethodRow(String label, double amount, Color color, {bool isBold = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: TextStyle(fontSize: 13, color: const Color(0xFF475569), fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
+          Text('CHF ' + _formatCHF(amount), style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: color, fontFamily: 'monospace')),
         ],
       ),
     );

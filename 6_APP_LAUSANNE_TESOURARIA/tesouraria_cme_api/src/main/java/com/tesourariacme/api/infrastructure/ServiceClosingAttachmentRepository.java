@@ -8,4 +8,5 @@ import java.util.Optional;
 @Repository
 public interface ServiceClosingAttachmentRepository extends JpaRepository<ServiceClosingAttachment, Long> {
     Optional<ServiceClosingAttachment> findByIdAndServiceClosingId(Long id, Long serviceClosingId);
+    java.util.List<ServiceClosingAttachment> findByServiceClosingIdAndActiveTrue(Long serviceClosingId);
 }

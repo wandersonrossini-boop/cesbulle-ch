@@ -99,6 +99,15 @@ public class ServiceClosingController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/{closingId}/attachments")
+    public ResponseEntity<?> listAttachments(@PathVariable Long closingId) {
+        return repository.findById(closingId).map(closing -> {
+            java.util.List<com.tesourariacme.api.domain.ServiceClosingAttachment> list =
+                    attachmentRepository.findByServiceClosingIdAndActiveTrue(closingId);
+            return ResponseEntity.ok(list);
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/{closingId}/attachments/{attachmentId}")
     public ResponseEntity<?> downloadAttachment(
             @PathVariable Long closingId,
@@ -131,6 +140,8 @@ public class ServiceClosingController {
     private final ServiceClosingSessionService sessionService;
     private final ObjectMapper objectMapper;
     private final com.tesourariacme.api.application.MonthlyPeriodService monthlyPeriodService;
+    @Autowired(required = false)
+    private com.tesourariacme.api.application.CorrectServiceClosingUseCase correctServiceClosingUseCase;
     private static Object activeDraft = null; // static to persist across controller requests
 
     @Autowired
@@ -145,6 +156,20 @@ public class ServiceClosingController {
         this.sessionService = sessionService;
         this.objectMapper = objectMapper;
         this.monthlyPeriodService = monthlyPeriodService;
+    }
+
+    @Autowired
+    public ServiceClosingController(
+            SubmitServiceClosingUseCase useCase,
+            ServiceClosingSessionService sessionService,
+            ObjectMapper objectMapper,
+            com.tesourariacme.api.application.MonthlyPeriodService monthlyPeriodService,
+            @Autowired(required = false) com.tesourariacme.api.application.CorrectServiceClosingUseCase correctServiceClosingUseCase) {
+        this.useCase = useCase;
+        this.sessionService = sessionService;
+        this.objectMapper = objectMapper;
+        this.monthlyPeriodService = monthlyPeriodService;
+        this.correctServiceClosingUseCase = correctServiceClosingUseCase;
     }
 
     @PostMapping("/draft")
@@ -182,6 +207,9 @@ public class ServiceClosingController {
             closing.setUnidentifiedDizimoTotal(request.getUnidentifiedDizimoTotal());
             closing.setUnidentifiedOfertaTotal(request.getUnidentifiedOfertaTotal());
             closing.setUnidentifiedVotoTotal(request.getUnidentifiedVotoTotal());
+            closing.setUnidentifiedDinheiroTotal(request.getUnidentifiedDinheiroTotal());
+            closing.setUnidentifiedTwintTotal(request.getUnidentifiedTwintTotal());
+            closing.setUnidentifiedTransferenciaTotal(request.getUnidentifiedTransferenciaTotal());
             
             if (request.getIdentifiedEntries() != null) {
                 closing.setIdentifiedEntries(request.getIdentifiedEntries().stream().map(req -> {
@@ -190,6 +218,7 @@ public class ServiceClosingController {
                     env.setType(req.getType());
                     env.setAmount(req.getAmount());
                     env.setContributorId(req.getContributorId());
+                    env.setPaymentMethod(req.getPaymentMethod() != null ? req.getPaymentMethod() : com.tesourariacme.api.domain.PaymentMethod.DINHEIRO);
                     return env;
                 }).collect(Collectors.toList()));
             }
@@ -238,6 +267,33 @@ public class ServiceClosingController {
     public ResponseEntity<?> deleteClosing(@PathVariable Long id, Authentication authentication) {
         return ResponseEntity.status(org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED)
                 .body("A exclusão de fechamentos de culto finalizados não é permitida para garantir a rastreabilidade e integridade fiscal.");
+    }
+
+    @PostMapping("/{id}/corrections")
+    public ResponseEntity<?> requestCorrection(
+            @PathVariable Long id,
+            @RequestBody ServiceClosingCorrectionRequest request,
+            Authentication authentication) {
+        try {
+            String username = authentication != null ? authentication.getName() : "SYSTEM";
+            com.tesourariacme.api.domain.ServiceClosingCorrection correction = correctServiceClosingUseCase.execute(id, request, username);
+            return ResponseEntity.ok(ServiceClosingCorrectionResponse.fromEntity(correction));
+        } catch (org.springframework.security.access.AccessDeniedException e) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erro ao processar correção: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/corrections")
+    public ResponseEntity<?> getCorrections(@PathVariable Long id) {
+        java.util.List<ServiceClosingCorrectionResponse> list = correctServiceClosingUseCase.getCorrections(id)
+                .stream()
+                .map(ServiceClosingCorrectionResponse::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(list);
     }
 
     @PostMapping("/session")

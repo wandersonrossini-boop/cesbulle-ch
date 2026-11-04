@@ -3,7 +3,6 @@ package com.tesourariacme.api.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import java.math.BigDecimal;
 
 @Entity
@@ -12,7 +11,6 @@ import java.math.BigDecimal;
 })
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class Envelope {
     
     @Id
@@ -28,10 +26,23 @@ public class Envelope {
     
     private Long contributorId;
 
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod = PaymentMethod.DINHEIRO;
+
     public Envelope(Long id, String memberName, EnvelopeType type, BigDecimal amount) {
         this.id = id;
         this.memberName = memberName;
         this.type = type;
         this.amount = amount;
+        this.paymentMethod = PaymentMethod.DINHEIRO;
+    }
+
+    public Envelope(Long id, String memberName, EnvelopeType type, BigDecimal amount, Long contributorId, PaymentMethod paymentMethod) {
+        this.id = id;
+        this.memberName = memberName;
+        this.type = type;
+        this.amount = amount;
+        this.contributorId = contributorId;
+        this.paymentMethod = (paymentMethod != null) ? paymentMethod : PaymentMethod.DINHEIRO;
     }
 }

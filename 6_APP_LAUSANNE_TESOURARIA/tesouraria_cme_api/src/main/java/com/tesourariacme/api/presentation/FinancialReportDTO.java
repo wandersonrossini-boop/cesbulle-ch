@@ -13,6 +13,7 @@ import java.util.List;
 public class FinancialReportDTO {
     private Period period;
     private Summary summary;
+    private PaymentMethodSummary paymentMethods;
     private List<CategorySummary> incomesByCategory;
     private List<CategorySummary> expensesByCategory;
     private Metadata metadata;
@@ -46,6 +47,25 @@ public class FinancialReportDTO {
             this.totalCommitted = totalCommitted;
             this.netBalance = netBalance;
         }
+    }
+
+    public FinancialReportDTO(Period period, Summary summary, List<CategorySummary> incomesByCategory, List<CategorySummary> expensesByCategory, Metadata metadata) {
+        this.period = period;
+        this.summary = summary;
+        this.paymentMethods = new PaymentMethodSummary(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+        this.incomesByCategory = incomesByCategory;
+        this.expensesByCategory = expensesByCategory;
+        this.metadata = metadata;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PaymentMethodSummary {
+        private BigDecimal totalDinheiro;
+        private BigDecimal totalTwint;
+        private BigDecimal totalTransferencias;
+        private BigDecimal totalEletronico;
     }
 
     @Data

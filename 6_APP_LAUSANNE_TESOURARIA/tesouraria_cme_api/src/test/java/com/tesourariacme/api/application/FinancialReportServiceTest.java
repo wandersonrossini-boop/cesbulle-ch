@@ -133,4 +133,49 @@ public class FinancialReportServiceTest {
         assertEquals(0, BigDecimal.ZERO.compareTo(report.getSummary().getTotalCommitted()));
         assertEquals(0, BigDecimal.valueOf(300.00).compareTo(report.getSummary().getNetBalance())); // Reduced
     }
+
+    @Test
+    public void testSegregationByPaymentMethod() {
+        ServiceClosing closing = new ServiceClosing();
+        closing.setServiceDate(LocalDate.of(2026, 8, 15));
+        closing.setTotalDinheiro(new BigDecimal("350.00"));
+        closing.setTotalTwint(new BigDecimal("100.00"));
+        closing.setTotalTransferencias(new BigDecimal("50.00"));
+        closing.setTotalEletronico(new BigDecimal("150.00"));
+
+        List<Envelope> envelopes = new ArrayList<>();
+        Envelope e1 = new Envelope();
+        e1.setType(EnvelopeType.DIZIMO);
+        e1.setAmount(new BigDecimal("350.00"));
+        e1.setPaymentMethod(PaymentMethod.DINHEIRO);
+        envelopes.add(e1);
+
+        Envelope e2 = new Envelope();
+        e2.setType(EnvelopeType.OFERTA);
+        e2.setAmount(new BigDecimal("100.00"));
+        e2.setPaymentMethod(PaymentMethod.TWINT);
+        envelopes.add(e2);
+
+        Envelope e3 = new Envelope();
+        e3.setType(EnvelopeType.VOTO);
+        e3.setAmount(new BigDecimal("50.00"));
+        e3.setPaymentMethod(PaymentMethod.TRANSFERENCIA);
+        envelopes.add(e3);
+
+        closing.setIdentifiedEntries(envelopes);
+
+        when(serviceClosingRepository.findByServiceDateBetween(any(LocalDate.class), any(LocalDate.class)))
+                .thenReturn(List.of(closing));
+        when(expenseRepository.findByExpenseDateBetweenAndStatusIn(any(LocalDate.class), any(LocalDate.class), anyList()))
+                .thenReturn(List.of());
+
+        FinancialReportDTO report = service.generateMonthlyReport(8, 2026);
+
+        assertNotNull(report.getPaymentMethods());
+        assertEquals(0, new BigDecimal("350.00").compareTo(report.getPaymentMethods().getTotalDinheiro()));
+        assertEquals(0, new BigDecimal("100.00").compareTo(report.getPaymentMethods().getTotalTwint()));
+        assertEquals(0, new BigDecimal("50.00").compareTo(report.getPaymentMethods().getTotalTransferencias()));
+        assertEquals(0, new BigDecimal("150.00").compareTo(report.getPaymentMethods().getTotalEletronico()));
+        assertEquals(0, new BigDecimal("500.00").compareTo(report.getSummary().getTotalIncomes()));
+    }
 }

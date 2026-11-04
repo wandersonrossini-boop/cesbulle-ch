@@ -43,16 +43,18 @@ class AnonymousEntry extends Equatable {
   final EnvelopeType type;
   final int amount;
   final String? enteredBy;
+  final PaymentMethod paymentMethod;
 
   const AnonymousEntry({
     required this.id,
     required this.type,
     required this.amount,
     this.enteredBy,
+    this.paymentMethod = PaymentMethod.dinheiro,
   });
 
   @override
-  List<Object?> get props => [id, type, amount, enteredBy];
+  List<Object?> get props => [id, type, amount, enteredBy, paymentMethod];
 
   Map<String, dynamic> toJson() {
     return {
@@ -60,15 +62,25 @@ class AnonymousEntry extends Equatable {
       'type': type.name,
       'amount': amount,
       if (enteredBy != null) 'enteredBy': enteredBy,
+      'paymentMethod': paymentMethod.name.toUpperCase(),
     };
   }
 
   factory AnonymousEntry.fromJson(Map<String, dynamic> json) {
+    PaymentMethod method = PaymentMethod.dinheiro;
+    final methodStr = json['paymentMethod']?.toString().toUpperCase();
+    if (methodStr == 'TWINT') {
+      method = PaymentMethod.twint;
+    } else if (methodStr == 'TRANSFERENCIA' || methodStr == 'TRANSFERÊNCIA' || methodStr == 'BANK_TRANSFER') {
+      method = PaymentMethod.transferencia;
+    }
+
     return AnonymousEntry(
       id: json['id'],
-      type: EnvelopeType.values.firstWhere((e) => e.name == json['type']),
+      type: EnvelopeType.values.firstWhere((e) => e.name == json['type'], orElse: () => EnvelopeType.oferta),
       amount: json['amount'],
       enteredBy: json['enteredBy'] as String?,
+      paymentMethod: method,
     );
   }
 }
@@ -159,7 +171,41 @@ class ServiceClosingState extends Equatable {
   int get identifiedTotal => identifiedEntries.fold(0, (sum, item) => sum + item.amount);
   int get anonymousTotal => anonymousEntries.fold(0, (sum, item) => sum + item.amount);
   int get registeredTotal => identifiedTotal + anonymousTotal;
-  int get difference => physicalTotal - registeredTotal;
+
+  int get totalDinheiroIdentificado => identifiedEntries
+      .where((e) => e.paymentMethod == PaymentMethod.dinheiro)
+      .fold(0, (sum, item) => sum + item.amount);
+
+  int get totalDinheiroAnonimo => anonymousEntries
+      .where((e) => e.paymentMethod == PaymentMethod.dinheiro)
+      .fold(0, (sum, item) => sum + item.amount);
+
+  int get totalDinheiro => totalDinheiroIdentificado + totalDinheiroAnonimo;
+
+  int get totalTwintIdentificado => identifiedEntries
+      .where((e) => e.paymentMethod == PaymentMethod.twint)
+      .fold(0, (sum, item) => sum + item.amount);
+
+  int get totalTwintAnonimo => anonymousEntries
+      .where((e) => e.paymentMethod == PaymentMethod.twint)
+      .fold(0, (sum, item) => sum + item.amount);
+
+  int get totalTwint => totalTwintIdentificado + totalTwintAnonimo;
+
+  int get totalTransferenciaIdentificado => identifiedEntries
+      .where((e) => e.paymentMethod == PaymentMethod.transferencia)
+      .fold(0, (sum, item) => sum + item.amount);
+
+  int get totalTransferenciaAnonimo => anonymousEntries
+      .where((e) => e.paymentMethod == PaymentMethod.transferencia)
+      .fold(0, (sum, item) => sum + item.amount);
+
+  int get totalTransferencias => totalTransferenciaIdentificado + totalTransferenciaAnonimo;
+
+  int get totalEletronico => totalTwint + totalTransferencias;
+
+  // A diferença de caixa compara SOMENTE o dinheiro registrado em espécie com o dinheiro físico contado na mesa
+  int get difference => physicalTotal - totalDinheiro;
 
   int identifiedTotalBy(EnvelopeType type) => identifiedEntries.where((e) => e.type == type).fold(0, (sum, item) => sum + item.amount);
   int anonymousTotalBy(EnvelopeType type) => anonymousEntries.where((e) => e.type == type).fold(0, (sum, item) => sum + item.amount);

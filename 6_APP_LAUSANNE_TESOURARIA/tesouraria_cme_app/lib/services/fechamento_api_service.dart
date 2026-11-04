@@ -23,10 +23,14 @@ class FechamentoApiService {
         "type": e.type.name.toUpperCase(),
         "amount": BigDecimalConverter.fromRappen(e.amount),
         if (e.contributorId != null) "contributorId": e.contributorId,
+        "paymentMethod": e.paymentMethod.name.toUpperCase(),
       }).toList(),
       "unidentifiedDizimoTotal": BigDecimalConverter.fromRappen(state.anonymousTotalBy(EnvelopeType.dizimo)),
       "unidentifiedOfertaTotal": BigDecimalConverter.fromRappen(state.anonymousTotalBy(EnvelopeType.oferta)),
       "unidentifiedVotoTotal": BigDecimalConverter.fromRappen(state.anonymousTotalBy(EnvelopeType.voto)),
+      "unidentifiedDinheiroTotal": BigDecimalConverter.fromRappen(state.totalDinheiroAnonimo),
+      "unidentifiedTwintTotal": BigDecimalConverter.fromRappen(state.totalTwintAnonimo),
+      "unidentifiedTransferenciaTotal": BigDecimalConverter.fromRappen(state.totalTransferenciaAnonimo),
     };
 
     final prefs = await SharedPreferences.getInstance();
@@ -446,5 +450,77 @@ class FechamentoApiService {
     } else {
       throw Exception('Falha ao criar sessão tardia (${response.statusCode}): ${response.body}');
     }
+  }
+
+
+  Future<ServiceClosingCorrectionItem> submitCorrection(int closingId, {
+    required String reason,
+    required double physicalTotal,
+    required double unidentifiedDizimoTotal,
+    required double unidentifiedOfertaTotal,
+    required double unidentifiedVotoTotal,
+    required List<Envelope> identifiedEntries,
+    String? verifierName,
+    String? verifierType,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    final payload = {
+      'reason': reason,
+      'physicalTotal': physicalTotal,
+      'unidentifiedDizimoTotal': unidentifiedDizimoTotal,
+      'unidentifiedOfertaTotal': unidentifiedOfertaTotal,
+      'unidentifiedVotoTotal': unidentifiedVotoTotal,
+      'identifiedEntries': identifiedEntries.map((e) => {
+        'memberName': e.memberName,
+        'type': e.type.name.toUpperCase(),
+        'amount': e.amount / 100.0,
+        if (e.contributorId != null) 'contributorId': e.contributorId,
+      }).toList(),
+      if (verifierName != null) 'verifierName': verifierName,
+      if (verifierType != null) 'verifierType': verifierType,
+    };
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/fechamento-culto/$closingId/corrections'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(payload),
+    );
+
+    if (response.statusCode == 200) {
+      return ServiceClosingCorrectionItem.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+    } else if (response.statusCode == 403) {
+      throw Exception('Apenas administradores ou tesoureiros autorizados podem corrigir fechamentos.');
+    } else {
+      String msg = utf8.decode(response.bodyBytes);
+      try {
+        final parsed = jsonDecode(msg);
+        if (parsed is Map && parsed.containsKey('message')) msg = parsed['message'];
+      } catch (_) {}
+      throw Exception(msg.isNotEmpty ? msg : 'Falha ao aplicar correção (${response.statusCode})');
+    }
+  }
+
+  Future<List<ServiceClosingCorrectionItem>> fetchCorrections(int closingId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/fechamento-culto/$closingId/corrections'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> list = jsonDecode(utf8.decode(response.bodyBytes));
+      return list.map((item) => ServiceClosingCorrectionItem.fromJson(item)).toList();
+    }
+    return [];
   }
 }

@@ -33,6 +33,16 @@ public class ServiceClosing {
     private BigDecimal unidentifiedOfertaTotal;
     private BigDecimal unidentifiedVotoTotal;
     
+    // Dimensões de Meios de Recebimento
+    private BigDecimal unidentifiedDinheiroTotal;
+    private BigDecimal unidentifiedTwintTotal;
+    private BigDecimal unidentifiedTransferenciaTotal;
+
+    private BigDecimal totalDinheiro;
+    private BigDecimal totalEletronico;
+    private BigDecimal totalTwint;
+    private BigDecimal totalTransferencias;
+
     private BigDecimal unidentifiedTotal;
     private BigDecimal identifiedTotal;
     private BigDecimal registeredTotal;
@@ -47,6 +57,10 @@ public class ServiceClosing {
         if (unidentifiedOfertaTotal == null) unidentifiedOfertaTotal = BigDecimal.ZERO;
         if (unidentifiedVotoTotal == null) unidentifiedVotoTotal = BigDecimal.ZERO;
         
+        if (unidentifiedDinheiroTotal == null) unidentifiedDinheiroTotal = BigDecimal.ZERO;
+        if (unidentifiedTwintTotal == null) unidentifiedTwintTotal = BigDecimal.ZERO;
+        if (unidentifiedTransferenciaTotal == null) unidentifiedTransferenciaTotal = BigDecimal.ZERO;
+
         identifiedTotal = identifiedEntries.stream()
                 .map(Envelope::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -72,9 +86,43 @@ public class ServiceClosing {
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .add(unidentifiedVotoTotal);
 
-        if (physicalTotal.compareTo(registeredTotal) != 0) {
-            throw new IllegalArgumentException("Fechamento inválido: total físico difere do total registrado.");
+        // Separação por meio de recebimento
+        BigDecimal identifiedDinheiro = identifiedEntries.stream()
+                .filter(e -> e.getPaymentMethod() == null || e.getPaymentMethod() == PaymentMethod.DINHEIRO)
+                .map(Envelope::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal identifiedTwint = identifiedEntries.stream()
+                .filter(e -> e.getPaymentMethod() == PaymentMethod.TWINT)
+                .map(Envelope::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal identifiedTransferencia = identifiedEntries.stream()
+                .filter(e -> e.getPaymentMethod() == PaymentMethod.TRANSFERENCIA)
+                .map(Envelope::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal unidentifiedElectronicSum = unidentifiedTwintTotal.add(unidentifiedTransferenciaTotal);
+        BigDecimal effectiveUnidentifiedDinheiro;
+
+        if (unidentifiedDinheiroTotal.compareTo(BigDecimal.ZERO) > 0 || unidentifiedElectronicSum.compareTo(BigDecimal.ZERO) > 0) {
+            effectiveUnidentifiedDinheiro = unidentifiedDinheiroTotal;
+        } else {
+            // Compatibilidade regressiva: se não discriminou meios anônimos, assume dinheiro
+            effectiveUnidentifiedDinheiro = unidentifiedTotal;
+        }
+
+        totalDinheiro = identifiedDinheiro.add(effectiveUnidentifiedDinheiro);
+        totalTwint = identifiedTwint.add(unidentifiedTwintTotal);
+        totalTransferencias = identifiedTransferencia.add(unidentifiedTransferenciaTotal);
+        totalEletronico = totalTwint.add(totalTransferencias);
+
+        // Regra contábil de reconciliação física:
+        // O dinheiro físico contado na mesa (physicalTotal) deve conferir com o total recebido em dinheiro (totalDinheiro).
+        if (physicalTotal.compareTo(totalDinheiro) != 0) {
+            throw new IllegalArgumentException(String.format(
+                    "Fechamento inválido: dinheiro físico contado (CHF %s) difere do total de dinheiro registrado (CHF %s).",
+                    physicalTotal, totalDinheiro));
         }
     }
 }
-

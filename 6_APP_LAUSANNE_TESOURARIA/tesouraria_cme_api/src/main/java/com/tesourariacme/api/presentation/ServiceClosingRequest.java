@@ -18,4 +18,9 @@ public class ServiceClosingRequest {
     private BigDecimal unidentifiedDizimoTotal;
     private BigDecimal unidentifiedOfertaTotal;
     private BigDecimal unidentifiedVotoTotal;
+    
+    // Meios de recebimento anônimos
+    private BigDecimal unidentifiedDinheiroTotal;
+    private BigDecimal unidentifiedTwintTotal;
+    private BigDecimal unidentifiedTransferenciaTotal;
 }

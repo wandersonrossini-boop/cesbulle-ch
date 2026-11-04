@@ -50,6 +50,7 @@ class _WizardPageState extends State<WizardPage> {
 
   ClosingPhase _phase = ClosingPhase.setup;
   EnvelopeType _selectedType = EnvelopeType.dizimo;
+  PaymentMethod _selectedPaymentMethod = PaymentMethod.dinheiro;
   DateTime _selectedDate = DateTime.now();
   String _keyboardBuffer = '0';
   late final ServiceClosingBloc _bloc;
@@ -1285,6 +1286,7 @@ class _WizardPageState extends State<WizardPage> {
           const SizedBox(height: 12),
           
           // Card VALOR
+          _buildPaymentMethodSelector(),
           _buildValorCard(),
           const SizedBox(height: 12),
           
@@ -1403,7 +1405,8 @@ class _WizardPageState extends State<WizardPage> {
                     const SizedBox(height: 16),
                     
                     // Card VALOR
-                    _buildValorCard(),
+                    _buildPaymentMethodSelector(),
+          _buildValorCard(),
                     const SizedBox(height: 16),
                     
                     // Custom numeric keyboard
@@ -1851,6 +1854,7 @@ class _WizardPageState extends State<WizardPage> {
         type: _selectedType,
         amount: rappen,
         contributorId: _selectedContributorId,
+        paymentMethod: _selectedPaymentMethod,
       );
       context.read<ServiceClosingBloc>().add(AddEnvelopeEvent(envelope));
     } else {
@@ -1859,6 +1863,7 @@ class _WizardPageState extends State<WizardPage> {
         id: DateTime.now().microsecondsSinceEpoch.toString(),
         type: _selectedType,
         amount: rappen,
+        paymentMethod: _selectedPaymentMethod,
       );
       context.read<ServiceClosingBloc>().add(AddAnonymousOfferingEvent(entry));
     }
@@ -2070,7 +2075,7 @@ class _WizardPageState extends State<WizardPage> {
           ),
         ),
         const SizedBox(height: 24),
-        const Text("Conferência do caixa", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF111827))),
+        const Text("Reconciliação e Conferência do Caixa", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF111827))),
         const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(16),
@@ -2078,12 +2083,20 @@ class _WizardPageState extends State<WizardPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _mathRow("Total registrado", state.registeredTotal),
+              _mathRow("Total em Dinheiro (Espécie)", state.totalDinheiro),
               const SizedBox(height: 6),
-              _mathRow("Total físico", state.physicalTotal),
-              const SizedBox(height: 16),
+              _mathRow("TWINT", state.totalTwint),
+              const SizedBox(height: 6),
+              _mathRow("Transferências Bancárias", state.totalTransferencias),
+              const SizedBox(height: 6),
+              _mathRow("Total Eletrônico (TWINT + Bancário)", state.totalEletronico, color: const Color(0xFF0369A1)),
+              const Divider(height: 16),
+              _mathRow("Total Geral Registrado", state.registeredTotal, isBold: true),
+              const Divider(height: 16),
+              _mathRow("Dinheiro Físico Contado na Mesa", state.physicalTotal, isBold: true),
+              const SizedBox(height: 12),
               _mathRow(
-                "Diferença", 
+                "Diferença de Caixa (Dinheiro)", 
                 state.difference, 
                 isBold: true, 
                 color: state.difference == 0 ? AppTheme.institutionalBlue : AppTheme.excludeRed
@@ -2091,14 +2104,14 @@ class _WizardPageState extends State<WizardPage> {
               if (state.difference != 0)
                 const Padding(
                   padding: EdgeInsets.only(top: 8.0, bottom: 16.0),
-                  child: Text("A diferença deve ser zero para finalizar o fechamento.", style: TextStyle(color: AppTheme.excludeRed, fontSize: 11)),
+                  child: Text("A diferença do dinheiro físico em caixa deve ser zero para finalizar o fechamento.", style: TextStyle(color: AppTheme.excludeRed, fontSize: 11)),
                 )
               else
                 const SizedBox(height: 16),
               OutlinedButton.icon(
                 onPressed: () => _showPhysicalTotalDialog(context, state, isDesktop),
                 icon: const Icon(Icons.calculate_outlined, size: 18),
-                label: const Text("INFORMAR TOTAL FÍSICO"),
+                label: const Text("INFORMAR DINHEIRO CONTADO (FÍSICO)"),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppTheme.institutionalBlue,
                   side: const BorderSide(color: AppTheme.institutionalBlue),
@@ -2598,6 +2611,23 @@ class _WizardPageState extends State<WizardPage> {
             padding: const EdgeInsets.only(top: 8.0),
             child: Text(state.error!, textAlign: TextAlign.center, style: const TextStyle(color: AppTheme.excludeRed, fontSize: 12)),
           ),
+        const SizedBox(height: 12),
+        OutlinedButton.icon(
+          onPressed: () {
+            setState(() {
+              _phase = ClosingPhase.counting;
+              _startSyncTimer();
+            });
+          },
+          icon: const Icon(Icons.arrow_back, size: 16),
+          label: const Text("Voltar à contagem e edição de valores"),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppTheme.institutionalBlue,
+            side: const BorderSide(color: Color(0xFFCBD5E1)),
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
       ],
     );
 
@@ -3037,6 +3067,75 @@ class _WizardPageState extends State<WizardPage> {
       },
     );
   }
+
+
+  Widget _buildPaymentMethodSelector() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      padding: const EdgeInsets.all(4),
+      child: Row(
+        children: PaymentMethod.values.map((method) {
+          final isSelected = _selectedPaymentMethod == method;
+          IconData icon;
+          switch (method) {
+            case PaymentMethod.dinheiro:
+              icon = Icons.payments_outlined;
+              break;
+            case PaymentMethod.twint:
+              icon = Icons.phone_android;
+              break;
+            case PaymentMethod.transferencia:
+              icon = Icons.account_balance_outlined;
+              break;
+          }
+          return Expanded(
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  _selectedPaymentMethod = method;
+                });
+              },
+              borderRadius: BorderRadius.circular(6),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected ? Colors.white : Colors.transparent,
+                  borderRadius: BorderRadius.circular(6),
+                  boxShadow: isSelected
+                      ? [const BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1))]
+                      : null,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      icon,
+                      size: 15,
+                      color: isSelected ? AppTheme.institutionalBlue : const Color(0xFF64748B),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      method.label,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                        color: isSelected ? AppTheme.institutionalBlue : const Color(0xFF64748B),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
 }
 
 class _SessionEntryItem {

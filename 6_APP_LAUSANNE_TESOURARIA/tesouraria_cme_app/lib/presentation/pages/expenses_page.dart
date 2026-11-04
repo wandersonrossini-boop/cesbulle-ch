@@ -1,3 +1,4 @@
+import '../widgets/attachment_viewer_modal.dart';
 import '../widgets/attachment_uploader.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -541,7 +542,21 @@ class _ExpensesPageState extends State<ExpensesPage> {
     );
   }
 
-  Future<void> _viewAttachment(String expenseId, Map<String, dynamic> attachment) async {
+  void _viewAttachment(String expenseId, Map<String, dynamic> attachment) {
+    final attachmentId = attachment['id']?.toString() ?? '';
+    final fileName = attachment['fileName'] ?? 'anexo';
+    final contentType = attachment['contentType'] as String?;
+    AttachmentViewerModal.viewAttachment(
+      context: context,
+      entityType: 'despesas',
+      entityId: expenseId,
+      attachmentId: attachmentId,
+      fileName: fileName,
+      contentType: contentType,
+    );
+  }
+
+  Future<void> _legacyViewAttachment(String expenseId, Map<String, dynamic> attachment) async {
     final attachmentId = attachment['id'];
     final fileName = attachment['fileName'] ?? 'anexo';
     

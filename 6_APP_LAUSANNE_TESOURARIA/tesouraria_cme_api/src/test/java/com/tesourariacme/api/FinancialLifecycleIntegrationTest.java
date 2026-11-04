@@ -80,6 +80,9 @@ public class FinancialLifecycleIntegrationTest {
     private ServiceClosingSessionRepository serviceClosingSessionRepository;
 
     @MockBean
+    private ServiceClosingCorrectionRepository serviceClosingCorrectionRepository;
+
+    @MockBean
     private ServiceScheduleRepository serviceScheduleRepository;
 
     @MockBean

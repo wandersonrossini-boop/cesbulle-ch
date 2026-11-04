@@ -57,7 +57,7 @@ public class ServiceClosingTest {
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
             closing.calculateTotalsAndValidate();
         });
-        assertEquals("Fechamento inválido: total físico difere do total registrado.", thrown.getMessage());
+        assertTrue(thrown.getMessage().contains("dinheiro físico contado"));
     }
 
     @Test

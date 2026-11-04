@@ -88,6 +88,25 @@ public class FinancialReportService {
             if (anonVot.compareTo(BigDecimal.ZERO) > 0)    { sumAnonVotos    = sumAnonVotos.add(anonVot);       countAnonVotos++;    }
         }
 
+        // 1.1 Totais consolidados por meio de recebimento (Dinheiro em espécie vs Eletrônico)
+        BigDecimal totalDinheiro = closings.stream()
+                .map(c -> c.getTotalDinheiro() != null ? c.getTotalDinheiro() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalTwint = closings.stream()
+                .map(c -> c.getTotalTwint() != null ? c.getTotalTwint() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalTransferencias = closings.stream()
+                .map(c -> c.getTotalTransferencias() != null ? c.getTotalTransferencias() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalEletronico = totalTwint.add(totalTransferencias);
+
+        FinancialReportDTO.PaymentMethodSummary paymentMethodSummary = new FinancialReportDTO.PaymentMethodSummary(
+                totalDinheiro, totalTwint, totalTransferencias, totalEletronico
+        );
+
         List<FinancialReportDTO.CategorySummary> incomesList = new ArrayList<>();
         incomesList.add(new FinancialReportDTO.CategorySummary("Dízimos Nominais (Identificados)", sumNominalDizimos, countNominalDizimos));
         incomesList.add(new FinancialReportDTO.CategorySummary("Dízimos Anônimos (Não Identificados)", sumAnonDizimos, countAnonDizimos));
@@ -131,7 +150,7 @@ public class FinancialReportService {
         FinancialReportDTO.Summary summary = new FinancialReportDTO.Summary(totalIncomes, totalExpenses, totalCommitted, netBalance);
         FinancialReportDTO.Metadata metadata = new FinancialReportDTO.Metadata(LocalDateTime.now(), "CHF", "OFFICIAL");
 
-        return new FinancialReportDTO(period, summary, incomesList, expensesList, metadata);
+        return new FinancialReportDTO(period, summary, paymentMethodSummary, incomesList, expensesList, metadata);
     }
 
     public String generateMonthlyReportCsv(int month, int year) {
@@ -149,6 +168,15 @@ public class FinancialReportService {
         sb.append(report.getSummary().getTotalIncomes()).append(";")
           .append(report.getSummary().getTotalExpenses()).append(";")
           .append(report.getSummary().getNetBalance()).append("\n\n");
+
+        if (report.getPaymentMethods() != null) {
+            sb.append("MEIOS DE RECEBIMENTO (ENTRADAS)\n");
+            sb.append("Dinheiro em Especie;TWINT;Transferencias Bancarias;Total Eletronico\n");
+            sb.append(report.getPaymentMethods().getTotalDinheiro()).append(";")
+              .append(report.getPaymentMethods().getTotalTwint()).append(";")
+              .append(report.getPaymentMethods().getTotalTransferencias()).append(";")
+              .append(report.getPaymentMethods().getTotalEletronico()).append("\n\n");
+        }
 
         sb.append("DETALHAMENTO DE ENTRADAS\n");
         sb.append("Categoria/Tipo;Valor;Quantidade\n");
@@ -222,6 +250,29 @@ public class FinancialReportService {
             kpiTable.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph(report.getSummary().getNetBalance().toString(), bodyFont)));
 
             document.add(kpiTable);
+
+            // 4.1 Meios de Recebimento
+            if (report.getPaymentMethods() != null) {
+                com.lowagie.text.Paragraph pmHeader = new com.lowagie.text.Paragraph("DISCRIMINAÇÃO POR MEIO DE RECEBIMENTO", sectionFont);
+                pmHeader.setSpacingAfter(10);
+                document.add(pmHeader);
+
+                com.lowagie.text.pdf.PdfPTable pmTable = new com.lowagie.text.pdf.PdfPTable(4);
+                pmTable.setWidthPercentage(100);
+                pmTable.setSpacingAfter(20);
+
+                pmTable.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph("DINHEIRO (ESPÉCIE)", boldFont)));
+                pmTable.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph("TWINT", boldFont)));
+                pmTable.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph("TRANSFERÊNCIAS", boldFont)));
+                pmTable.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph("TOTAL ELETRÔNICO", boldFont)));
+
+                pmTable.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph("CHF " + report.getPaymentMethods().getTotalDinheiro(), bodyFont)));
+                pmTable.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph("CHF " + report.getPaymentMethods().getTotalTwint(), bodyFont)));
+                pmTable.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph("CHF " + report.getPaymentMethods().getTotalTransferencias(), bodyFont)));
+                pmTable.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph("CHF " + report.getPaymentMethods().getTotalEletronico(), bodyFont)));
+
+                document.add(pmTable);
+            }
 
             // 5. Entradas Detalhadas
             com.lowagie.text.Paragraph incomeHeader = new com.lowagie.text.Paragraph("DETALHAMENTO DE ENTRADAS", sectionFont);

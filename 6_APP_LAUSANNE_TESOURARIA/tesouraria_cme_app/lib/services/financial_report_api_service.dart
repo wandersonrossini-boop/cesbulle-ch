@@ -10,6 +10,7 @@ class MonthlyReportModel {
   final double totalExpenses;
   final double totalCommitted;
   final double netBalance;
+  final PaymentMethodSummaryModel paymentMethods;
   final List<CategorySummaryModel> incomesByCategory;
   final List<CategorySummaryModel> expensesByCategory;
   final String status;
@@ -21,6 +22,7 @@ class MonthlyReportModel {
     required this.totalExpenses,
     required this.totalCommitted,
     required this.netBalance,
+    required this.paymentMethods,
     required this.incomesByCategory,
     required this.expensesByCategory,
     required this.status,
@@ -30,6 +32,7 @@ class MonthlyReportModel {
     final period = json['period'] ?? {};
     final summary = json['summary'] ?? {};
     final meta = json['metadata'] ?? {};
+    final pm = json['paymentMethods'] ?? {};
 
     final incomes = (json['incomesByCategory'] as List? ?? [])
         .map((item) => CategorySummaryModel.fromJson(item))
@@ -46,9 +49,33 @@ class MonthlyReportModel {
       totalExpenses: (summary['totalExpenses'] as num? ?? 0.0).toDouble(),
       totalCommitted: (summary['totalCommitted'] as num? ?? 0.0).toDouble(),
       netBalance: (summary['netBalance'] as num? ?? 0.0).toDouble(),
+      paymentMethods: PaymentMethodSummaryModel.fromJson(pm),
       incomesByCategory: incomes,
       expensesByCategory: expenses,
       status: meta['status'] ?? 'DRAFT',
+    );
+  }
+}
+
+class PaymentMethodSummaryModel {
+  final double totalDinheiro;
+  final double totalTwint;
+  final double totalTransferencias;
+  final double totalEletronico;
+
+  PaymentMethodSummaryModel({
+    required this.totalDinheiro,
+    required this.totalTwint,
+    required this.totalTransferencias,
+    required this.totalEletronico,
+  });
+
+  factory PaymentMethodSummaryModel.fromJson(Map<String, dynamic> json) {
+    return PaymentMethodSummaryModel(
+      totalDinheiro: (json['totalDinheiro'] as num? ?? 0.0).toDouble(),
+      totalTwint: (json['totalTwint'] as num? ?? 0.0).toDouble(),
+      totalTransferencias: (json['totalTransferencias'] as num? ?? 0.0).toDouble(),
+      totalEletronico: (json['totalEletronico'] as num? ?? 0.0).toDouble(),
     );
   }
 }
