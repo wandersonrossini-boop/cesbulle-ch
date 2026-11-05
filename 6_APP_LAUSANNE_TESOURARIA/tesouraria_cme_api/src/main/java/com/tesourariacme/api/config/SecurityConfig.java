@@ -100,7 +100,7 @@ public class SecurityConfig {
                 ).hasRole("TREASURER")
                 .requestMatchers(
                     org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.POST, "/api/despesas")
-                ).hasRole("TREASURER")
+                ).hasAnyRole("ADMIN", "TREASURER")
                 .requestMatchers(
                     org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/contributors"),
                     org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/contributors/**")

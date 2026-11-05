@@ -144,7 +144,15 @@ public class FinancialLifecycleIntegrationTest {
         ResponseEntity<?> closingResp = serviceClosingController.submitClosing(closingReq);
         assertEquals(HttpStatus.OK, closingResp.getStatusCode());
 
-        // 3. Lançar despesa e aprovar
+        // 3. Lançar despesa, aprovar e pagar respeitando a segregação de funções (four-eyes principle)
+        Authentication approverAuth = mock(Authentication.class);
+        when(approverAuth.getName()).thenReturn("dimi");
+        doReturn(List.of(new SimpleGrantedAuthority("ROLE_TREASURER"))).when(approverAuth).getAuthorities();
+
+        Authentication payerAuth = mock(Authentication.class);
+        when(payerAuth.getName()).thenReturn("lima");
+        doReturn(List.of(new SimpleGrantedAuthority("ROLE_TREASURER"))).when(payerAuth).getAuthorities();
+
         ExpenseRequest expenseReq = new ExpenseRequest();
         expenseReq.setExpenseDate(LocalDate.now());
         expenseReq.setAmount(BigDecimal.valueOf(50.0));
@@ -156,6 +164,7 @@ public class FinancialLifecycleIntegrationTest {
         expense.setAmount(BigDecimal.valueOf(50.0));
         expense.setStatus("PENDING");
         expense.setDescription("Aluguel");
+        expense.setCreatedBy("admin");
 
         when(expenseRepository.save(any(Expense.class))).thenReturn(expense);
         when(expenseRepository.findById(100L)).thenReturn(Optional.of(expense));
@@ -163,16 +172,20 @@ public class FinancialLifecycleIntegrationTest {
         ResponseEntity<?> expenseCreateResp = expenseController.createExpense(expenseReq, adminAuth);
         assertEquals(HttpStatus.OK, expenseCreateResp.getStatusCode(), () -> "Response Body: " + expenseCreateResp.getBody());
 
-        ResponseEntity<?> approveResp = expenseController.approveExpense(100L, adminAuth);
+        // Aprovação por segundo usuário independente (dimi)
+        ResponseEntity<?> approveResp = expenseController.approveExpense(100L, approverAuth);
         assertEquals(HttpStatus.OK, approveResp.getStatusCode());
+        expense.setStatus("APPROVED");
+        expense.setApprovedBy("dimi");
 
-        // Pay the expense (mock attachments so check passes)
+        // Pagamento por terceiro usuário independente (lima)
         ExpenseAttachment att = new ExpenseAttachment();
         att.setActive(true);
         expense.getAttachments().add(att);
-        ResponseEntity<?> payResp = expenseController.payExpense(100L, adminAuth);
+        ResponseEntity<?> payResp = expenseController.payExpense(100L, payerAuth);
         assertEquals(HttpStatus.OK, payResp.getStatusCode());
-        expense.setStatus("PAID"); // Update mock status to match business logic
+        expense.setStatus("PAID");
+        expense.setPaidBy("lima");
 
         // 4. Consultar relatório contábil mensal
         when(serviceClosingRepository.findByServiceDateBetween(any(LocalDate.class), any(LocalDate.class)))

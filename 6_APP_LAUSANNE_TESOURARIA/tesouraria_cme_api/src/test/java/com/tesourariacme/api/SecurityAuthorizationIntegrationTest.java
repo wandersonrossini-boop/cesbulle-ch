@@ -173,12 +173,13 @@ public class SecurityAuthorizationIntegrationTest {
     }
 
     @Test
-    public void testAdminForbiddenFromCreatingExpense() throws Exception {
+    public void testAdminAllowedToCreateExpense() throws Exception {
+        // ADMIN is now allowed to create expense (Opção B - Matriz de Permissões)
         mockMvc.perform(post("/api/despesas")
                 .header("Authorization", "Bearer " + adminToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isOk());
     }
 
     @Test

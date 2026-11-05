@@ -77,7 +77,7 @@ public class ExpenseController {
         expense.setPaymentMethod(request.getPaymentMethod());
         expense.setReceiptReference(request.getReceiptReference());
         expense.setObservations(request.getObservations());
-        expense.setCreatedBy(authentication.getName());
+        expense.setCreatedBy(authentication.getName().trim().toLowerCase());
         expense.setStatus("PENDING");
 
         Expense saved = expenseRepository.save(expense);
@@ -96,6 +96,10 @@ public class ExpenseController {
             }
             if (!"PENDING".equals(expense.getStatus())) {
                 return ResponseEntity.badRequest().body("Apenas despesas PENDENTES podem ser aprovadas.");
+            }
+            String currentUser = authentication.getName().trim().toLowerCase();
+            if (expense.getCreatedBy() != null && expense.getCreatedBy().trim().equalsIgnoreCase(currentUser)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Segregação de funções: o usuário que cadastrou a despesa não pode aprovar o próprio lançamento.");
             }
             expense.setStatus("APPROVED");
             expense.setApprovedBy(authentication.getName());
@@ -124,9 +128,16 @@ public class ExpenseController {
             if (!hasReceipt) {
                 return ResponseEntity.badRequest().body("É obrigatório anexar um comprovante antes de registrar o pagamento.");
             }
+            String currentUser = authentication.getName().trim().toLowerCase();
+            if (expense.getCreatedBy() != null && expense.getCreatedBy().trim().equalsIgnoreCase(currentUser)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Segregação de funções: o usuário que cadastrou a despesa não pode registrar o pagamento.");
+            }
+            if (expense.getApprovedBy() != null && expense.getApprovedBy().trim().equalsIgnoreCase(currentUser)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Segregação de funções: o usuário que aprovou a despesa não pode registrar o pagamento.");
+            }
             expense.setStatus("PAID");
-            expense.setApprovedBy(authentication.getName());
-            expense.setApprovalDate(LocalDate.now());
+            expense.setPaidBy(authentication.getName().trim().toLowerCase());
+            expense.setPaymentDate(LocalDate.now());
             Expense saved = expenseRepository.save(expense);
             auditLogService.logAction("EXPENSE_PAID", authentication.getName(), String.valueOf(saved.getId()), String.format("Paga: CHF %s - %s", saved.getAmount(), saved.getDescription()));
             return ResponseEntity.ok(saved);

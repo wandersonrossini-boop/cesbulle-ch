@@ -39,6 +39,8 @@ public class Expense {
     private String reversalJustification;
     private String approvedBy;
     private LocalDate approvalDate;
+    private String paidBy;
+    private LocalDate paymentDate;
     @Column(length = 500)
     private String observations;
 
