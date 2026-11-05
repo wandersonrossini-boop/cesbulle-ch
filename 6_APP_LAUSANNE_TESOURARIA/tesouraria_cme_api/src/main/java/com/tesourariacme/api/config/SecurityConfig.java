@@ -90,7 +90,12 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/reports/financial/monthly/lock")).hasRole("ADMIN")
                 .requestMatchers(org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/reports/financial/monthly/unlock")).hasRole("ADMIN")
                 .requestMatchers(
-                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.POST, "/api/fechamento-culto"),
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.POST, "/api/fechamento-culto")
+                ).hasAnyRole("ADMIN", "TREASURER")
+                .requestMatchers(
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.POST, "/api/fechamento-culto/*/corrections")
+                ).hasAnyRole("ADMIN", "TREASURER")
+                .requestMatchers(
                     org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.POST, "/api/fechamento-culto/**")
                 ).hasRole("TREASURER")
                 .requestMatchers(

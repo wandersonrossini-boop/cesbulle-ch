@@ -145,12 +145,39 @@ public class SecurityAuthorizationIntegrationTest {
     }
 
     @Test
-    public void testAdminForbiddenFromSubmittingServiceClosing() throws Exception {
+    public void testAdminAllowedPostToServiceClosingSecurityCheck() throws Exception {
+        // ADMIN can submit service closing (not 401, not 403)
         mockMvc.perform(post("/api/fechamento-culto")
                 .header("Authorization", "Bearer " + adminToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-                .andExpect(status().isForbidden());
+                .andExpect(result -> {
+                    int status = result.getResponse().getStatus();
+                    org.junit.jupiter.api.Assertions.assertNotEquals(401, status);
+                    org.junit.jupiter.api.Assertions.assertNotEquals(403, status);
+                });
+    }
+
+    @Test
+    public void testAdminAllowedPostToServiceClosingCorrectionsSecurityCheck() throws Exception {
+        // ADMIN can submit correction (not 401, not 403 at security filter)
+        mockMvc.perform(post("/api/fechamento-culto/1/corrections")
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+                .andExpect(result -> {
+                    int status = result.getResponse().getStatus();
+                    org.junit.jupiter.api.Assertions.assertNotEquals(401, status);
+                    org.junit.jupiter.api.Assertions.assertNotEquals(403, status);
+                });
+    }
+
+    @Test
+    public void testUnauthorizedUserForbiddenFromSubmittingServiceClosing() throws Exception {
+        mockMvc.perform(post("/api/fechamento-culto")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
