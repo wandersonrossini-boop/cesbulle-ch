@@ -146,30 +146,22 @@ public class SecurityAuthorizationIntegrationTest {
 
     @Test
     public void testAdminAllowedPostToServiceClosingSecurityCheck() throws Exception {
-        // ADMIN can submit service closing (not 401, not 403)
+        // ADMIN can submit service closing (passes security and reaches controller validation -> 400 Bad Request)
         mockMvc.perform(post("/api/fechamento-culto")
                 .header("Authorization", "Bearer " + adminToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-                .andExpect(result -> {
-                    int status = result.getResponse().getStatus();
-                    org.junit.jupiter.api.Assertions.assertNotEquals(401, status);
-                    org.junit.jupiter.api.Assertions.assertNotEquals(403, status);
-                });
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     public void testAdminAllowedPostToServiceClosingCorrectionsSecurityCheck() throws Exception {
-        // ADMIN can submit correction (not 401, not 403 at security filter)
+        // ADMIN can submit correction (passes security and reaches controller validation -> 400 Bad Request)
         mockMvc.perform(post("/api/fechamento-culto/1/corrections")
                 .header("Authorization", "Bearer " + adminToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-                .andExpect(result -> {
-                    int status = result.getResponse().getStatus();
-                    org.junit.jupiter.api.Assertions.assertNotEquals(401, status);
-                    org.junit.jupiter.api.Assertions.assertNotEquals(403, status);
-                });
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -191,16 +183,12 @@ public class SecurityAuthorizationIntegrationTest {
 
     @Test
     public void testTreasurerAllowedPostToServiceClosingSecurityCheck() throws Exception {
-        // Must pass security filter (not 401, not 403)
+        // TREASURER can submit service closing (passes security and reaches controller validation -> 400 Bad Request)
         mockMvc.perform(post("/api/fechamento-culto")
                 .header("Authorization", "Bearer " + treasurerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-                .andExpect(result -> {
-                    int status = result.getResponse().getStatus();
-                    org.junit.jupiter.api.Assertions.assertNotEquals(401, status);
-                    org.junit.jupiter.api.Assertions.assertNotEquals(403, status);
-                });
+                .andExpect(status().isBadRequest());
     }
 
     @Test
